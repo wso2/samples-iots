@@ -1,0 +1,30 @@
+{
+  "name": "org.wso2.iot.garbagebin",
+  "version": "1.0.0",
+  "nickName": "Water Tank stream",
+  "description": "This hold the device type stream of water tank",
+  "metaData": [
+    {
+      "name": "owner",
+      "type": "STRING"
+    },
+    {
+      "name": "deviceId",
+      "type": "STRING"
+    }
+  ],
+  "payloadData": [
+    {
+      "name": "garbagelevel",
+      "type": "FLOAT"
+    },
+    {
+      "name": "temperature",
+      "type": "FLOAT"
+    },
+    {
+      "name": "humidity",
+      "type": "FLOAT"
+    }
+  ]
+}
