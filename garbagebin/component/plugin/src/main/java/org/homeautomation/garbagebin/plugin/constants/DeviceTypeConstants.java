@@ -28,17 +28,17 @@ public class DeviceTypeConstants {
 
     public final static String DEVICE_TYPE = "garbagebin";
     public final static String DEVICE_PLUGIN_DEVICE_NAME = "DEVICE_NAME";
-    public final static String DEVICE_PLUGIN_DEVICE_ID = "watertank_DEVICE_ID";
+    public final static String DEVICE_PLUGIN_DEVICE_ID = "garbagebin_DEVICE_ID";
 
     //sensor events summarized table name
     public final static String STREAM_TEMPERATURE = "temperature";
     public final static String STREAM_HUMIDITY = "humidity";
+    public final static String STREAM_GARBAGELEVEL = "garbagelevel";
     public final static String TEMPERATURE_EVENT_TABLE = "DEVICE_TEMPERATURE_SUMMARY";
     public final static String HUMIDITY_EVENT_TABLE = "DEVICE_HUMIDITY_SUMMARY";
-    public final static String STREAM_GARBAGELEVEL = "garbagelevel";
-    public final static String GARBAGELEVEL_EVENT_TABLE = "DEVICE_garbagelevel_SUMMARY";
+    public final static String GARBAGELEVEL_EVENT_TABLE = "DEVICE_GARBAGELEVEL_SUMMARY";
 
-    public static final String DATA_SOURCE_NAME = "jdbc/watertankDM_DB";
+    public static final String DATA_SOURCE_NAME = "jdbc/garbagebinDM_DB";
     public final static String DEVICE_TYPE_PROVIDER_DOMAIN = "carbon.super";
 
     //mqtt transport related constants

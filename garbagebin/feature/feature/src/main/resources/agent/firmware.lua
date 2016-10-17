@@ -65,7 +65,7 @@ tmr.alarm(0, 5000, 1, function()
             DHT.read(dht)
             local t = DHT.getTemperature()
             local h = DHT.getHumidity()
-            local payload = "{event:{metaData:{owner:\"${DEVICE_OWNER}\",deviceId:\"${DEVICE_ID}\"},payloadData:{trashlevel:" .. trash_level .. ",temperature:" .. t .. ", humidity:" .. h .. "}}}"
+            local payload = "{event:{metaData:{owner:\"${DEVICE_OWNER}\",deviceId:\"${DEVICE_ID}\"},payloadData:{garbagelevel:" .. trash_level .. ",temperature:" .. t .. ", humidity:" .. h .. "}}}"
             m:publish("carbon.super/garbagebin/${DEVICE_ID}/data", payload, 0, 0, function(client)
                 print("Published> Trash Level: " .. trash_level .. "% Temperature: " .. t .. "C  Humidity: " .. h .. "%")
             end)

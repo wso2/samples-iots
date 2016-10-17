@@ -1,8 +1,8 @@
 {
   "name": "org.wso2.iot.garbagebin",
   "version": "1.0.0",
-  "nickName": "Water Tank stream",
-  "description": "This hold the device type stream of water tank",
+  "nickName": "Garbage bin stream",
+  "description": "This hold the device type stream of garbage bin",
   "metaData": [
     {
       "name": "owner",

@@ -23,7 +23,7 @@
        xsi:schemaLocation="
          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
          http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
-    <jaxrs:server id="watertank" address="/">
+    <jaxrs:server id="garbagebin" address="/">
         <jaxrs:serviceBeans>
             <bean id="DeviceTypeService"
                   class="org.homeautomation.garbagebin.api.DeviceTypeServiceImpl">

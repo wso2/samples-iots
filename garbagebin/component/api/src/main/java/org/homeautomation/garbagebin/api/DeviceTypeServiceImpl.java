@@ -319,7 +319,6 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                                    @QueryParam("sketchType") String sketchType) {
         try {
             ZipArchive zipFile = createDownloadFile(APIUtil.getAuthenticatedUser(), deviceName, sketchType);
-            zipFile.getZipFile().delete();
             Response.ResponseBuilder response = Response.ok(FileUtils.readFileToByteArray(zipFile.getZipFile()));
             response.status(Response.Status.OK);
             response.type("application/zip");

@@ -17,7 +17,7 @@
  */
 
 function onRequest(context) {
-    var log = new Log("cdmf.unit.device.type.watertank.device-view.js");
+    var log = new Log("cdmf.unit.device.type.garbagebin.device-view.js");
     var deviceType = context.uriParams.deviceType;
     var deviceId = request.getParameter("id");
     var autoCompleteParams = [

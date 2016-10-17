@@ -58,7 +58,7 @@ public class DeviceTypeDAOImpl {
         try {
             conn = DeviceTypeDAO.getConnection();
             String selectDBQuery =
-                    "SELECT watertank_DEVICE_ID, DEVICE_NAME FROM watertank_DEVICE WHERE watertank_DEVICE_ID = ?";
+                    "SELECT garbagebin_DEVICE_ID, DEVICE_NAME FROM garbagebin_DEVICE WHERE garbagebin_DEVICE_ID = ?";
             stmt = conn.prepareStatement(selectDBQuery);
             stmt.setString(1, deviceId);
             resultSet = stmt.executeQuery();
@@ -97,7 +97,7 @@ public class DeviceTypeDAOImpl {
         try {
             conn = DeviceTypeDAO.getConnection();
             String createDBQuery =
-                    "INSERT INTO watertank_DEVICE(watertank_DEVICE_ID, DEVICE_NAME) VALUES (?, ?)";
+                    "INSERT INTO garbagebin_DEVICE(garbagebin_DEVICE_ID, DEVICE_NAME) VALUES (?, ?)";
             stmt = conn.prepareStatement(createDBQuery);
             stmt.setString(1, device.getDeviceIdentifier());
             stmt.setString(2, device.getName());
@@ -134,7 +134,7 @@ public class DeviceTypeDAOImpl {
         try {
             conn = DeviceTypeDAO.getConnection();
             String updateDBQuery =
-                    "UPDATE watertank_DEVICE SET  DEVICE_NAME = ? WHERE watertank_DEVICE_ID = ?";
+                    "UPDATE garbagebin_DEVICE SET  DEVICE_NAME = ? WHERE garbagebin_DEVICE_ID = ?";
             stmt = conn.prepareStatement(updateDBQuery);
             if (device.getProperties() == null) {
                 device.setProperties(new ArrayList<Device.Property>());
@@ -173,7 +173,7 @@ public class DeviceTypeDAOImpl {
         PreparedStatement stmt = null;
         try {
             conn = DeviceTypeDAO.getConnection();
-            String deleteDBQuery = "DELETE FROM watertank_DEVICE WHERE watertank_DEVICE_ID = ?";
+            String deleteDBQuery = "DELETE FROM garbagebin_DEVICE WHERE garbagebin_DEVICE_ID = ?";
             stmt = conn.prepareStatement(deleteDBQuery);
             stmt.setString(1, deviceId);
             int rows = stmt.executeUpdate();
@@ -209,8 +209,8 @@ public class DeviceTypeDAOImpl {
         try {
             conn = DeviceTypeDAO.getConnection();
             String selectDBQuery =
-                    "SELECT watertank_DEVICE_ID, DEVICE_NAME " +
-                            "FROM watertank_DEVICE";
+                    "SELECT garbagebin_DEVICE_ID, DEVICE_NAME " +
+                            "FROM garbagebin_DEVICE";
             stmt = conn.prepareStatement(selectDBQuery);
             resultSet = stmt.executeQuery();
             while (resultSet.next()) {

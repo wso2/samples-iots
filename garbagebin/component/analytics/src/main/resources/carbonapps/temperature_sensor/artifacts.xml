@@ -22,7 +22,6 @@
 		<dependency artifact="temperature_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
 		<dependency artifact="temperature_store" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
 		<dependency artifact="temperature_receiver" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
-        <dependency artifact="temperature_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
 		<dependency artifact="temperature_script" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
     </artifact>
 </artifacts>

@@ -36,7 +36,7 @@ public class DeviceTypeStartupListener implements ServerStartupObserver {
         try {
             DeviceTypeUtils.setupMqttOutputAdapter();
         } catch (IOException e) {
-            log.error("Failed to initialize the  garbagebin output adapter", e);
+            log.error("Failed to initialize the arbagebin output adapter", e);
         }
     }
 }

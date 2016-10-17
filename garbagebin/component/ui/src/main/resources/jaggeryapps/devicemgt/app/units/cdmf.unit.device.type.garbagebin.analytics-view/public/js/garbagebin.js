@@ -24,7 +24,7 @@ function drawGraph_garbagebin(from, to) {
     var tzOffset = new Date().getTimezoneOffset() * 60;
 
     var streamIndex = 0;
-    var streams = ["waterlevel"];
+    var streams = ["temperature", "humidity", "garbagelevel"];
 
     populateGraph();
 
@@ -77,15 +77,15 @@ function drawGraph_garbagebin(from, to) {
                         });
             }
         } else {
-            graphConfig['series'].push(
-                    {
-                        'color': palette.color(),
-                        'data': [{
-                            x: parseInt(new Date().getTime() / 1000),
-                            y: 0
-                        }],
-                        'name': $("#garbagebin-details").data("devicename")
-                    });
+                graphConfig['series'].push(
+                        {
+                            'color': palette.color(),
+                            'data': [{
+                                x: parseInt(new Date().getTime() / 1000),
+                                y: 0
+                            }],
+                            'name': $("#garbagebin-details").data("devicename")
+                        });
         }
 
         var graph = new Rickshaw.Graph(graphConfig);
@@ -200,8 +200,8 @@ function drawGraph_garbagebin(from, to) {
             for (var i = 0; i < data.length; i++) {
                 chartData.push(
                         {
-                            x: parseInt(data[i]["values"]["time"]) - tzOffset,
-                            y: parseInt(data[i]["values"][type])
+                            x: parseInt(data[i].values.time) - tzOffset,
+                            y: parseInt(getFieldData(data[i], type))
                         }
                 );
             }
@@ -209,6 +209,23 @@ function drawGraph_garbagebin(from, to) {
             graphConfig.series[deviceIndex].data = chartData;
             graph.update();
         }
+    }
+    
+    function getFieldData(data, type) {
+        var columnData;
+        switch (type) {
+            case "temperature" :
+                columnData = data.values.temperature;
+                break;
+            case "humidity" :
+                columnData = data.values.humidity;
+                break;
+            case "garbagelevel" :
+                columnData = data.values.garbagelevel;
+                break;
+        }
+
+        return columnData;
     }
 
 }

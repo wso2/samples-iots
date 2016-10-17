@@ -9,8 +9,8 @@
 @Import('org.wso2.iot.garbagebin:1.0.0')
 define stream garbagebin (meta_owner string, meta_deviceId string, garbagelevel float, temperature float, humidity float);
 
-@Export('org.wso2.iot.devices.waterlevel:1.0.0')
-define stream waterlevel (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, waterlevel float);
+@Export('org.wso2.iot.devices.garbagelevel:1.0.0')
+define stream garbagelevel (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, garbagelevel float);
 
 @Export('org.wso2.iot.devices.temperature:1.0.0')
 define stream temperature (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, temperature float);
@@ -19,8 +19,8 @@ define stream temperature (meta_owner string, meta_deviceType string, meta_devic
 define stream humidity (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, humidity float);
 
 from garbagebin
-select meta_owner, 'garbagebin' as meta_deviceType, meta_deviceId, time:timestampInMilliseconds() as meta_time, waterlevel
-insert into waterlevel;
+select meta_owner, 'garbagebin' as meta_deviceType, meta_deviceId, time:timestampInMilliseconds() as meta_time, garbagelevel
+insert into garbagelevel;
 
 from garbagebin
 select meta_owner, 'garbagebin' as meta_deviceType, meta_deviceId, time:timestampInMilliseconds() as meta_time, temperature

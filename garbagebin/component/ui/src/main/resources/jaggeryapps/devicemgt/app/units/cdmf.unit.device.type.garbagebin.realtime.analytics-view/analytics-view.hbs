@@ -1,12 +1,11 @@
 {{unit "cdmf.unit.lib.handlebars"}}
+{{unit "cdmf.unit.lib.rickshaw-graph"}}
+
 {{#zone "topCss"}}
     {{css "css/water-level.css"}}
 {{/zone}}
 
 <div id="div-chart" data-websocketurl="{{websocketEndpoint}}">
-    <div class="water-pouring">
-        Water Supply : <span id="water-pouring-status">Inactive</span>
-    </div>
     <div class="water-level-wrapper">
         <div class="water-level">
             <div class="water-level_main">
@@ -16,6 +15,16 @@
                 <div class="highlight"></div>
             </div>
         </div>
+    </div>
+    <div id="chartWrapper-temperature" class="chartWrapper">
+        <div id="y_axis-temperature" class="custom_y_axis" style="margin-top: -20px;">Temperature</div>
+        <div id="chart-temperature" class="custom_rickshaw_graph"></div>
+        <div class="custom_x_axis">Time</div>
+    </div>
+    <div id="chartWrapper-humidity" class="chartWrapper">
+        <div id="y_axis-humidity" class="custom_y_axis" style="margin-top: -20px;">Humidity</div>
+        <div id="chart-humidity" class="custom_rickshaw_graph"></div>
+        <div class="custom_x_axis">Time</div>
     </div>
 </div>
 <a class="padding-left"

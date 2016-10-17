@@ -17,9 +17,18 @@
  */
 
 var ws;
-var coffee_amount = 0;
+var temperature;
+var temperatureData = [];
+
+var humidity;
+var humidityData = [];
+
+var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 
 $(window).load(function () {
+    temperature = lineGraph("temperature", temperatureData);
+    humidity = lineGraph("humidity", humidityData);
+    
     var websocketUrl = $("#div-chart").data("websocketurl");
     connect(websocketUrl);
 });
@@ -27,6 +36,57 @@ $(window).load(function () {
 $(window).unload(function () {
     disconnect();
 });
+
+function lineGraph(type, chartData) {
+    var tNow = new Date().getTime() / 1000;
+    for (var i = 0; i < 30; i++) {
+        chartData.push({
+                           x: tNow - (30 - i) * 15,
+                           y: parseFloat(0)
+                       });
+    }
+
+    var graph = new Rickshaw.Graph({
+        element: document.getElementById("chart-" + type),
+        width: $("#div-chart").width() - 50,
+        height: 300,
+        renderer: "line",
+        padding: {top: 0.2, left: 0.0, right: 0.0, bottom: 0.2},
+        xScale: d3.time.scale(),
+        series: [{
+            'color': palette.color(),
+            'data': chartData,
+            'name': type && type[0].toUpperCase() + type.slice(1)
+        }]
+    });
+
+    graph.render();
+
+    var xAxis = new Rickshaw.Graph.Axis.Time({
+        graph: graph
+    });
+
+    xAxis.render();
+
+    new Rickshaw.Graph.Axis.Y({
+        graph: graph,
+        orientation: 'left',
+        height: 300,
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        element: document.getElementById('y_axis-' + type)
+    });
+
+    new Rickshaw.Graph.HoverDetail({
+        graph: graph,
+        formatter: function (series, x, y) {
+            var date = '<span class="date">' + moment(x * 1000).format('Do MMM YYYY h:mm:ss a') + '</span>';
+            var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
+            return swatch + series.name + ": " + parseInt(y) + '<br>' + date;
+        }
+    });
+
+    return graph;
+}
 
 //websocket connection
 function connect(target) {
@@ -38,21 +98,26 @@ function connect(target) {
         console.log('WebSocket is not supported by this browser.');
     }
     if (ws) {
-        var waterPouringStatus = document.getElementById('water-pouring-status');
         ws.onmessage = function (event) {
             var dataPoint = JSON.parse(event.data);
+            //[1476707632443,"admin","1iyl0ne53t16b","82.0","27.0","38.0"]"
             if (dataPoint) {
-                updateWaterLevel(dataPoint[4]);
-                if (dataPoint[3] == 'true'){
-                    waterPouringStatus.innerHTML = 'Active';
-                    waterPouringStatus.style.color = 'green'
-                }else{
-                    waterPouringStatus.innerHTML = 'Inactive';
-                    waterPouringStatus.style.color = 'gray'
-                }
+                updateLevel(dataPoint[3]);
+                var time = parseInt(dataPoint[0]) / 1000;
+                graphUpdate(temperatureData, time, dataPoint[4], temperature);
+                graphUpdate(humidityData, time, dataPoint[5], humidity);
             }
         };
     }
+}
+
+function graphUpdate(chartData, xValue, yValue, graph) {
+    chartData.push({
+                       x: parseInt(xValue),
+                       y: parseFloat(yValue)
+                   });
+    chartData.shift();
+    graph.update();
 }
 
 function disconnect() {
@@ -62,7 +127,7 @@ function disconnect() {
     }
 }
 
-function updateWaterLevel(newValue) {
+function updateLevel(newValue) {
     var waterLevel = document.getElementById('water');
     waterLevel.innerHTML = (newValue | 0) + "%";
     if (newValue == 0) {

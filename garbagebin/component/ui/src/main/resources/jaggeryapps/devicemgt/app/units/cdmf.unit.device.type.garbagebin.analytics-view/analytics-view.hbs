@@ -15,23 +15,48 @@
   specific language governing permissions and limitations
   under the License.
 }}
-<span id="watertank-details" data-devices="{{devices}}" data-devicename="{{device.name}}"
+<span id="garbagebin-details" data-devices="{{devices}}" data-devicename="{{device.name}}"
       data-deviceid="{{device.deviceIdentifier}}"
       data-appcontext="{{@app.context}}"></span>
-<div id="watertank-div-chart" data-backend-api-url= {{backendApiUrl}}>
-    <div class="chartWrapper" id="chartWrapper-waterlevel">
-        <span id="span-title">Water Level</span>
-        <div id="y_axis-waterlevel" class="custom_y_axis"></div>
+<div id="garbagebin-div-chart" data-backend-api-url= {{backendApiUrl}}>
+    <div class="chartWrapper" id="chartWrapper-garbagelevel">
+        <span id="span-title">Garbage bin</span>
+        <div id="y_axis-garbagelevel" class="custom_y_axis"></div>
         <div class="legend_container">
-            <div id="smoother-waterlevel" title="Smoothing"></div>
-            <div id="legend-waterlevel"></div>
+            <div id="smoother-garbagelevel" title="Smoothing"></div>
+            <div id="legend-garbagelevel"></div>
         </div>
-        <div id="chart-waterlevel" class="custom_rickshaw_graph"></div>
-        <div id="x_axis-waterlevel" class="custom_x_axis"></div>
-        <div id="slider-waterlevel" class="custom_slider"></div>
+        <div id="chart-garbagelevel" class="custom_rickshaw_graph" ></div>
+        <div id="x_axis-garbagelevel" class="custom_x_axis"></div>
+        <div id="slider-garbagelevel" class="custom_slider"></div>
     </div>
+
+    <div class="chartWrapper" id="chartWrapper-temperature">
+        <span id="span-title">Temperature</span>
+        <div id="y_axis-temperature" class="custom_y_axis"></div>
+        <div class="legend_container">
+            <div id="smoother-temperature" title="Smoothing"></div>
+            <div id="legend-temperature"></div>
+        </div>
+        <div id="chart-temperature" class="custom_rickshaw_graph" ></div>
+        <div id="x_axis-temperature" class="custom_x_axis"></div>
+        <div id="slider-temperature" class="custom_slider"></div>
+    </div>
+
+    <div class="chartWrapper" id="chartWrapper-humidity">
+        <span id="span-title">Humidity</span>
+        <div id="y_axis-humidity" class="custom_y_axis"></div>
+        <div class="legend_container">
+            <div id="smoother-humidity" title="Smoothing"></div>
+            <div id="legend-humidity"></div>
+        </div>
+        <div id="chart-humidity" class="custom_rickshaw_graph" ></div>
+        <div id="x_axis-humidity" class="custom_x_axis"></div>
+        <div id="slider-humidity" class="custom_slider"></div>
+    </div>
+
 </div>
 
 {{#zone "bottomJs"}}
-    {{js "js/watertank.js"}}
+    {{js "js/garbagebin.js"}}
 {{/zone}}
