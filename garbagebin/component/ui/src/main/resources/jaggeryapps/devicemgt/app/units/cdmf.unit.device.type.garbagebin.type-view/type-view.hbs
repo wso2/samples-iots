@@ -1,5 +1,5 @@
 <div class="col-lg-12  margin-top-double">
-    <h1 class="grey ">Smart Water Tank</h1>
+    <h1 class="grey ">Smart Garbage Bin</h1>
     <hr>
 </div>
 
@@ -11,11 +11,11 @@
 
     <h3 class="uppercase">What it Does</h3>
     <hr>
-    <p class="grey margin-top">Connect your Smart Water Tank to WSO2 IoT Server.</p>
+    <p class="grey margin-top">Connect your Smart Garbage Bin to WSO2 IoT Server.</p>
     <br>
-    <p>An ESP8266 based Smart Water Tank device. Once run, the Smart Water Tank will connect to WSO2 IoTServer
-       and push Water Levels and Water pump/Supply valve status via MQTT. You can also configure on and off limits for
-       Water pump/Supply valve remotely with IoTServer.
+    <p>An ESP8266 based Smart Garbage Bin device. Once run, the Smart Garbage Bin  will connect to WSO2 IoTServer
+       and push Garbage Levels with temperature and humidity via MQTT. You can also configure sensor height and max level
+       remotely with IoTServer.
     </p>
     <br/>
     <h3 class="uppercase">What You Need</h3>
@@ -27,11 +27,11 @@
         </li>
         <li class="padding-top-double">
             <span class="circle">STEP 02</span>
-            &nbsp;&nbsp;&nbsp;Water level Sensor.
+            &nbsp;&nbsp;&nbsp;Ultrasonic sensor to measure the garbage level.
         </li>
         <li class="padding-top-double">
             <span class="circle">STEP 03</span>
-            &nbsp;&nbsp;&nbsp;Relay to on off Water pump or Supply valve.
+            &nbsp;&nbsp;&nbsp;DHT-11 sensor to read temperature and humidity.
         </li>
         <li class="padding-top-double">
             <span class="circle">STEP 04</span>
@@ -204,8 +204,7 @@
         <li class="padding-top-double">
             <span class="circle">01</span>
             &nbsp;&nbsp;&nbsp;Connect USB to TTL converter and other component with ESP8266 201
-            module
-            as schematic in Smart Water Tank SETUP.
+            module as schematic in Smart Garbage Bin SETUP.
         </li>
         <li class="padding-top-double">
             <span class="circle">02</span>
@@ -213,7 +212,7 @@
         </li>
         <li class="padding-top-double">
             <span class="circle">03</span>
-            &nbsp;&nbsp;&nbsp;Unzip the downloaded Smart Water Tank Agent
+            &nbsp;&nbsp;&nbsp;Unzip the downloaded Garbage Bin Agent
         </li>
         <li class="padding-top-double">
             <span class="circle">04</span>
@@ -246,7 +245,7 @@
                 <i class="fw fw-ring fw-stack-2x"></i>
                 <i class="fw fw-right-arrow fw-stack-1x"></i>
             </span>
-            &nbsp;&nbsp;&nbsp;water-tank.lua
+            &nbsp;&nbsp;&nbsp;firmware.lua
             <br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <span class="fw-stack fw-lg margin-right">
@@ -258,28 +257,28 @@
         </li>
         <li class="padding-top-double">
             <span class="circle">06</span>
-            &nbsp;&nbsp;&nbsp;Now you can remove USB to TTL module and fix Smart Water Tank device in your water tank.
+            &nbsp;&nbsp;&nbsp;Now you can remove USB to TTL module and fix Smart Garbage Bin device in your Garbage Bin.
             <br/><br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <span class="fw-stack fw-lg margin-right">
                 <i class="fw fw-ring fw-stack-2x"></i>
                 <i class="fw fw-right-arrow fw-stack-1x"></i>
             </span>
-            &nbsp;&nbsp;&nbsp;ESP8266 will publish water level and Water pump/Valve status to WSO2 IoT Server.
+            &nbsp;&nbsp;&nbsp;ESP8266 will publish Garbage level with Temperature and Humidity to WSO2 IoT Server.
             <br/><br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <span class="fw-stack fw-lg margin-right">
                 <i class="fw fw-ring fw-stack-2x"></i>
                 <i class="fw fw-right-arrow fw-stack-1x"></i>
             </span>
-            &nbsp;&nbsp;&nbsp;Water levels can be configured from Device Management page to on or off Water pump/Valve.
+            &nbsp;&nbsp;&nbsp;Height of the bin and max limit can be set remotely.
         </li>
     </ul>
     <br>
 </div>
 
 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 padding-double">
-    <h3 class="uppercase">Smart Water Tank Setup</h3>
+    <h3 class="uppercase">Smart Garbage Bin Setup</h3>
     <hr>
     <p class="grey margin-top">Click on the image to zoom</p>
     <center>

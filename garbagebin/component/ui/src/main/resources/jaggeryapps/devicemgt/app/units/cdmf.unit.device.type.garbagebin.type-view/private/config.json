@@ -1,6 +1,6 @@
 {
   "deviceType": {
-    "label": "Smart Water Tank",
+    "label": "Smart Garbage Bin",
     "category": "iot",
     "downloadAgentUri": "garbagebin/device/download"
   }
