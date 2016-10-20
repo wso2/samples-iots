@@ -18,6 +18,7 @@
 
 package org.homeautomation.garbagebin.api;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,6 +46,7 @@ import org.wso2.carbon.device.mgt.extensions.feature.mgt.annotations.Feature;
 import org.wso2.carbon.device.mgt.iot.util.ZipArchive;
 import org.wso2.carbon.identity.jwt.client.extension.JWTClient;
 import org.wso2.carbon.identity.jwt.client.extension.dto.AccessTokenInfo;
+import org.wso2.carbon.identity.jwt.client.extension.dto.JWTConfig;
 import org.wso2.carbon.identity.jwt.client.extension.exception.JWTClientException;
 import org.wso2.carbon.user.api.UserStoreException;
 
@@ -163,8 +165,13 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
 
             URL url = new URL(urlString);
             InetAddress address = InetAddress.getByName(url.getHost());
-
-            String otaPayload = "ota:" + address + "," + url.getPort() + "," + url.getPath();
+            int port = url.getPort();
+            if (port == -1) {
+                port = 80;
+            }
+            String path = url.getPath();
+            String[] pathParts = path.split("/");
+            String otaPayload = "ota:" + address.getHostAddress() + "," + port + "," + path + "," + pathParts[pathParts.length -1];
 
             Map<String, String> dynamicProperties = new HashMap<>();
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()

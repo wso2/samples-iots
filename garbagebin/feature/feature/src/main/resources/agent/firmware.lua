@@ -10,6 +10,7 @@ trash_level = -1
 height_to_full = 50
 height_to_sensor = 60
 client_connected = false
+client_connection_pending = false
 
 m = mqtt.Client("ESP8266-" .. node.chipid(), 120, "${DEVICE_TOKEN}", "")
 
@@ -79,7 +80,8 @@ function connectMQTTClient()
     local ip = wifi.sta.getip()
     if ip == nil then
         print("Waiting for network")
-    else
+    elseif client_connection_pending == false then
+        client_connection_pending = true
         print("Client IP: " .. ip)
         print("Trying to connect MQTT client")
         m:connect("${MQTT_EP}", ${MQTT_PORT}, 0, function(client)
@@ -94,18 +96,37 @@ function subscribeToMQTTQueue()
     m:subscribe("carbon.super/garbagebin/${DEVICE_ID}/command", 0, function(client, topic, message)
         print("Subscribed to MQTT Queue")
         gpio.write(trig, gpio.LOW)
+        client_connection_pending = false
     end)
     m:on("message", function(client, topic, message)
         print("MQTT message received")
         print(message)
-        local v1, v2= message:match("([^,]+),([^,]+)")
-        height_to_full = tonumber(v1)
-        height_to_sensor = tonumber(v2)
-        print("Loaded configs:" .. height_to_full .. "," .. height_to_sensor)
-        save_config();
+        if (string.match(message, "conf:")) then
+            message = message:gsub("conf:", "")
+            local v1, v2 = message:match("([^,]+),([^,]+)")
+            height_to_full = tonumber(v1)
+            height_to_sensor = tonumber(v2)
+            print("Loaded configs:" .. height_to_full .. "," .. height_to_sensor)
+            save_config();
+        elseif (string.match(message, "ota:")) then
+            message = message:gsub("ota:", "")
+            local v1, v2, v3, v4 = message:match("([^,]+),([^,]+),([^,]+),([^,]+)")
+            tmr.stop(0)
+            tmr.wdclr()
+            httpDL = require("httpDL")
+            collectgarbage()
+            httpDL.download(v1, v2, v3, v4, function (payload)
+                print("Firmware upgraded. Restarting...")
+                node.restart()
+            end)
+            httpDL = nil
+            package.loaded["httpDL"]=nil
+            collectgarbage()
+        end
     end)
     m:on("offline", function(client)
         print("Disconnected")
         client_connected = false
+        client_connection_pending = false
     end)
 end
