@@ -71,6 +71,19 @@ interface DeviceTypeService {
                            @Context HttpServletResponse response);
 
     /**
+     * @param deviceId     unique identifier for given device type.
+     * @param url          url of the OTA upgrade file.
+     */
+    @Path("device/{deviceId}/upgrade-firmware")
+    @POST
+    @Feature(code = "upgrade-firmware", name = "Upgrade device firmware",
+            description = "Upgrade firmware of the garbage bin with specified OTA url.")
+    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/upgrade-firmware"})
+    Response upgradeFirmware(@PathParam("deviceId") String deviceId,
+                           @QueryParam("url") String url,
+                           @Context HttpServletResponse response);
+
+    /**
      * Retrieve Sensor data for the given time period
      *
      * @param deviceId   unique identifier for given device type instance

@@ -62,6 +62,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -125,7 +129,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            String configs = maxLevel + "," + sensorHeight;
+            String configs = "conf:" + maxLevel + "," + sensorHeight;
             Map<String, String> dynamicProperties = new HashMap<>();
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
                                   + "/" + DeviceTypeConstants.DEVICE_TYPE + "/" + deviceId + "/command";
@@ -136,6 +140,50 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         } catch (DeviceAccessAuthorizationException e) {
             log.error("Unable to update configs", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+
+    /**
+     * @param deviceId     unique identifier for given device type.
+     * @param urlString    url of the OTA upgrade file.
+     */
+    @Path("device/{deviceId}/upgrade-firmware")
+    @POST
+    @Feature(code = "upgrade-firmware", name = "Upgrade device firmware",
+            description = "Upgrade firmware of the garbage bin with specified OTA url.")
+    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/upgrade-firmware"})
+    public Response upgradeFirmware(@PathParam("deviceId") String deviceId,
+                             @QueryParam("url") String urlString,
+                             @Context HttpServletResponse response) {
+        try {
+            if (!APIUtil.getDeviceAccessAuthorizationService()
+                    .isUserAuthorized(new DeviceIdentifier(deviceId, DeviceTypeConstants.DEVICE_TYPE))) {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            URL url = new URL(urlString);
+            InetAddress address = InetAddress.getByName(url.getHost());
+
+            String otaPayload = "ota:" + address + "," + url.getPort() + "," + url.getPath();
+
+            Map<String, String> dynamicProperties = new HashMap<>();
+            String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
+                                  + "/" + DeviceTypeConstants.DEVICE_TYPE + "/" + deviceId + "/command";
+            dynamicProperties.put(DeviceTypeConstants.ADAPTER_TOPIC_PROPERTY, publishTopic);
+            APIUtil.getOutputEventAdapterService().publish(DeviceTypeConstants.MQTT_ADAPTER_NAME,
+                                                           dynamicProperties, otaPayload);
+            return Response.ok().build();
+        } catch (DeviceAccessAuthorizationException e) {
+            log.error("Unable to upgrade firmware.", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        } catch (MalformedURLException e) {
+            String msg = "Malformed OTA url: " + urlString;
+            log.warn(msg);
+            return Response.status(Response.Status.BAD_REQUEST).entity(msg).build();
+        } catch (UnknownHostException e) {
+            String msg = "Unknown host name in url: " + urlString;
+            log.warn(msg);
+            return Response.status(Response.Status.BAD_REQUEST).entity(msg).build();
         }
     }
 
