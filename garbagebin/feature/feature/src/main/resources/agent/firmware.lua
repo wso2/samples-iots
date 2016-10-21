@@ -11,6 +11,7 @@ height_to_full = 50
 height_to_sensor = 60
 client_connected = false
 client_connection_pending = false
+waiting_count = 0
 
 m = mqtt.Client("ESP8266-" .. node.chipid(), 120, "${DEVICE_TOKEN}", "")
 
@@ -80,6 +81,10 @@ function connectMQTTClient()
     local ip = wifi.sta.getip()
     if ip == nil then
         print("Waiting for network")
+        waiting_count = waiting_count + 1
+        if waiting_count > 20 then
+            node.restart()
+        end
     elseif client_connection_pending == false then
         client_connection_pending = true
         print("Client IP: " .. ip)
