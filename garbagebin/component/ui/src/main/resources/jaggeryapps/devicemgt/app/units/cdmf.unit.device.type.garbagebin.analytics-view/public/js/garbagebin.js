@@ -29,6 +29,9 @@ function drawGraph_garbagebin(from, to) {
     populateGraph();
 
     function populateGraph() {
+        if (streamIndex >= streams.length) {
+            return;
+        }
         retrieveDataAndDrawLineGraph(streams[streamIndex], from, to);
         streamIndex++;
     }
@@ -77,15 +80,15 @@ function drawGraph_garbagebin(from, to) {
                         });
             }
         } else {
-                graphConfig['series'].push(
-                        {
-                            'color': palette.color(),
-                            'data': [{
-                                x: parseInt(new Date().getTime() / 1000),
-                                y: 0
-                            }],
-                            'name': $("#garbagebin-details").data("devicename")
-                        });
+            graphConfig['series'].push(
+                    {
+                        'color': palette.color(),
+                        'data': [{
+                            x: parseInt(new Date().getTime() / 1000),
+                            y: 0
+                        }],
+                        'name': $("#garbagebin-details").data("devicename")
+                    });
         }
 
         var graph = new Rickshaw.Graph(graphConfig);
@@ -210,7 +213,7 @@ function drawGraph_garbagebin(from, to) {
             graph.update();
         }
     }
-    
+
     function getFieldData(data, type) {
         var columnData;
         switch (type) {

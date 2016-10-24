@@ -123,7 +123,7 @@ input[type=range][orient=vertical] {
     height: 300px;
     position: relative;
     width: 298px;
-    background: none;
+    background: beige;
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-top: none;
     border-bottom: none;
@@ -279,7 +279,11 @@ input[type=range][orient=vertical] {
     -moz-border-radius: 10px;
     text-align: center;
     font-weight: bold;
-    font-size: 30px;
+    font-size: 40px;
+    -webkit-text-fill-color: black;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: white;
+    text-shadow: 0 0 5px #ffffff;
 }
 
 .water-pouring {
