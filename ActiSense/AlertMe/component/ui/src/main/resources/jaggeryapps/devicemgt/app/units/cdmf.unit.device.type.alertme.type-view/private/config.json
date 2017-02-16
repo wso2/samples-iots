@@ -1,0 +1,11 @@
+
+{
+  "deviceType": {
+    "label": "alertme",
+    "category": "virtual",
+    "downloadAgentUri": "alertme/device/download",
+    "scopes" : [
+      "perm:alertme:enroll"
+    ]
+  }
+}
