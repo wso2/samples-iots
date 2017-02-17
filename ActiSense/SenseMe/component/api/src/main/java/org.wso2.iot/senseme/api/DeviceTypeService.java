@@ -132,5 +132,18 @@ public interface DeviceTypeService {
     @Path("/device/download")
     @GET
     @Produces("application/zip")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Download agent",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
     Response downloadSketch(@QueryParam("deviceName") String deviceName, @QueryParam("sketchType") String sketchType);
 }
