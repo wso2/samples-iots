@@ -27,11 +27,10 @@
 #define PIR_OUT  14
 
 // Update these with values suitable for your network.
-const char* ssid = "<ADD YOUR WiFi SSID>";
-const char* password = "<ADD YOUR WiFi PASSWORD>";
+const char* ssid = "TP-LINK_EB7F32";
+const char* password = "80246008";
 
-const char* gateway_ip = "{GATEWAY_IP}";
-const int gateway_port = {GATEWAY_PORT};
+const char* gateway = "{GATEWAY}";
 const char* mqtt_server = "{MQTT_SERVER}";
 const int port = {MQTT_PORT};
 const char* tenant_domain = "{TENANT_DOMAIN}";
@@ -109,7 +108,7 @@ String getAccessToken() {
 
   HTTPClient http;    //Declare object of class HTTPClient
   char tokenEP[100];
-  snprintf (tokenEP, 100, "http://%s:%ld/oauth2wrapper/token", gateway_ip, gateway_port);
+  snprintf (tokenEP, 100, "%s/oauth2wrapper/token", gateway);
   Serial.println(tokenEP);
   http.begin(tokenEP);      //Specify request destination
   http.addHeader("content-type", "application/x-www-form-urlencoded");  //Specify content-type header

@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,11 +55,8 @@ import org.apache.commons.codec.binary.Base64;
 public class ZipUtil {
 
     private static final String LOCALHOST = "localhost";
-    private static final String HTTPS_PROTOCOL_URL = "https://${iot.gateway.host}:${iot.gateway.https.port}";
     private static final String HTTP_PROTOCOL_URL = "http://${iot.gateway.host}:${iot.gateway.http.port}";
-    private static final String CONFIG_TYPE = "general";
     private static final String DEFAULT_MQTT_ENDPOINT = "tcp://${mqtt.broker.host}:${mqtt.broker.port}";
-    public static final String HOST_NAME = "HostName";
 
     public ZipArchive createZipFile(String owner, String tenantDomain, String deviceType,
                                     String deviceId, String deviceName, String token,
@@ -71,25 +70,23 @@ public class ZipUtil {
 
         try {
             iotServerIP = getServerUrl();
-            String httpsServerEP = Utils.replaceSystemProperty(HTTPS_PROTOCOL_URL);
             String httpServerEP = Utils.replaceSystemProperty(HTTP_PROTOCOL_URL);
             String mqttEndpoint = Utils.replaceSystemProperty(DEFAULT_MQTT_ENDPOINT);
             if (mqttEndpoint.contains(LOCALHOST)) {
                 mqttEndpoint = mqttEndpoint.replace(LOCALHOST, iotServerIP);
-                httpsServerEP = httpsServerEP.replace(LOCALHOST, iotServerIP);
                 httpServerEP = httpServerEP.replace(LOCALHOST, iotServerIP);
             }
             String base64EncodedApplicationKey = getBase64EncodedAPIAppKey(apiApplicationKey).trim();
+            URI mqttUri = new URI(mqttEndpoint);
 
             Map<String, String> contextParams = new HashMap<>();
-            contextParams.put("SERVER_NAME", APIUtil.getTenantDomainOftheUser());
+            contextParams.put("TENANT_DOMAIN", tenantDomain);
             contextParams.put("DEVICE_OWNER", owner);
             contextParams.put("DEVICE_ID", deviceId);
             contextParams.put("DEVICE_NAME", deviceName);
-            contextParams.put("HTTPS_EP", httpsServerEP);
-            contextParams.put("HTTP_EP", httpServerEP);
-            contextParams.put("APIM_EP", httpsServerEP);
-            contextParams.put("MQTT_EP", mqttEndpoint);
+            contextParams.put("GATEWAY", httpServerEP);
+            contextParams.put("MQTT_SERVER", mqttUri.getHost());
+            contextParams.put("MQTT_PORT", String.valueOf(mqttUri.getPort()));
             contextParams.put("DEVICE_TOKEN", token);
             contextParams.put("DEVICE_REFRESH_TOKEN", refreshToken);
             contextParams.put("API_APPLICATION_KEY", base64EncodedApplicationKey);
@@ -97,7 +94,7 @@ public class ZipUtil {
             ZipArchive zipFile;
             zipFile = getSketchArchive(archivesPath, templateSketchPath, contextParams, deviceName);
             return zipFile;
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new DeviceManagementException("Zip File Creation Failed", e);
         }
     }
