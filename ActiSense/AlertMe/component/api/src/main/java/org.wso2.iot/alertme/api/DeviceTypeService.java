@@ -238,5 +238,18 @@ public interface DeviceTypeService {
     @Path("/device/download")
     @GET
     @Produces("application/zip")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Download agent",
+            notes = "",
+            response = Response.class,
+            tags = "alertme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:alertme:enroll")
+                    })
+            }
+    )
     Response downloadSketch(@QueryParam("deviceName") String deviceName, @QueryParam("sketchType") String sketchType);
 }
