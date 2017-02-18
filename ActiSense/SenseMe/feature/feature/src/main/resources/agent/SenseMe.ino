@@ -32,7 +32,7 @@ const char* password = "80246008";
 
 const char* gateway = "{GATEWAY}";
 const char* mqtt_server = "{MQTT_SERVER}";
-const int port = {MQTT_PORT};
+const int mqtt_port = {MQTT_PORT};
 const char* tenant_domain = "{TENANT_DOMAIN}";
 const char* owner = "{DEVICE_OWNER}";
 const char* device_id = "{DEVICE_ID}";
@@ -73,16 +73,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
+  char msg[length];
   for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
+    msg[i] = (char)payload[i];
   }
-  Serial.println();
+  Serial.println(msg);
 
   // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
+  if (strcmp(msg, "ON") == 0) {
     isTesting = true;
     count = 5;
     digitalWrite(INDICATOR_LED, HIGH);
+    Serial.print("Testing... ");
   }
 }
 
@@ -173,7 +175,7 @@ void setup() {
   Serial.print("\nConnecting MQTT client using access token: ");
   Serial.println(__accessToken);
 
-  snprintf (subscribedTopic, 100, "%s/senseme/%s/COMMAND", tenant_domain, device_id);
+  snprintf (subscribedTopic, 100, "%s/senseme/%s/command", tenant_domain, device_id);
   if (client.connect(device_id, __accessToken, "")) {
     client.subscribe(subscribedTopic);
     Serial.println("MQTT Client Connected");
@@ -245,15 +247,14 @@ void loop() {
   long now = millis();
   if (now - lastMsg > 2000) {
     lastMsg = now;
-
-    snprintf (msg, 120, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\"},\"payloadData\":{\"ULTRASONIC\":%ld}}}", owner, device_id, measureDistance());
+    snprintf (msg, 120, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"ULTRASONIC\":%ld}}}", owner, device_id, now, measureDistance());
     snprintf (publishTopic, 100, "%s/senseme/%s/ULTRASONIC", tenant_domain, device_id);
     client.publish(publishTopic, msg);
 //    Serial.print("Publish message: ");
 //    Serial.println(msg);
 //    Serial.println(publishTopic);
 
-    snprintf (msg, 120, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\"},\"payloadData\":{\"PIR\":%ld}}}", owner, device_id, isMoving);
+    snprintf (msg, 120, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"PIR\":%ld}}}", owner, device_id, now, isMoving);
     snprintf (publishTopic, 100, "%s/senseme/%s/PIR", tenant_domain, device_id);
     client.publish(publishTopic, msg);
 //    Serial.print("Publish message: ");
@@ -262,6 +263,7 @@ void loop() {
     if (isTesting) {
       if (count == 0) {
         isTesting = false;
+        Serial.println("Done!");
       } else {
         count--;
       }
