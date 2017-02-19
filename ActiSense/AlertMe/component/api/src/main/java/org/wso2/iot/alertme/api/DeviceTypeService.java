@@ -55,7 +55,7 @@ import javax.ws.rs.core.Response;
                 }
         ),
         tags = {
-                @Tag(name = "alertme", description = "")
+                @Tag(name = "alertme, device_management", description = "")
         }
 )
 @Scopes(

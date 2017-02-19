@@ -55,7 +55,7 @@ import javax.ws.rs.core.Response;
                 }
         ),
         tags = {
-                @Tag(name = "senseme", description = "")
+                @Tag(name = "senseme, device_management", description = "")
         }
 )
 @Scopes(
