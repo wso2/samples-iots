@@ -39,7 +39,7 @@ const char* device_id = "{DEVICE_ID}";
 const char* apiKey = "Basic {API_APPLICATION_KEY}";
 const char* accessToken = "{DEVICE_TOKEN}";
 const char* refreshToken = "{DEVICE_REFRESH_TOKEN}";
-long lastMsg = 0;
+long lastMsg = 2000;
 char msg[120];
 char publishTopic[100];
 char subscribedTopic[100];
@@ -221,7 +221,7 @@ void loop() {
   long now = millis();
   if (now - lastMsg > 2000) {
     lastMsg = now;
-    snprintf (msg, 120, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"alertme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"worndetector\":%ld}}}", owner, device_id, now, digitalRead(SWITCH));
+    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"alertme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"worndetector\":%ld}}}", owner, device_id, now, digitalRead(SWITCH));
     snprintf (publishTopic, 100, "%s/alertme/%s/worndetector", tenant_domain, device_id);
     client.publish(publishTopic, msg);
     Serial.print("Publish message: ");
