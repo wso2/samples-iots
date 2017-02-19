@@ -20,9 +20,6 @@ package org.wso2.iot.alertme.plugin.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.iot.alertme.plugin.impl.dao.DeviceTypeDAO;
-import org.wso2.iot.alertme.plugin.exception.DeviceMgtPluginException;
-import org.wso2.iot.alertme.plugin.impl.feature.DeviceTypeFeatureManager;
 import org.wso2.carbon.device.mgt.common.Device;
 import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
@@ -32,8 +29,10 @@ import org.wso2.carbon.device.mgt.common.FeatureManager;
 import org.wso2.carbon.device.mgt.common.configuration.mgt.PlatformConfiguration;
 import org.wso2.carbon.device.mgt.common.license.mgt.License;
 import org.wso2.carbon.device.mgt.common.license.mgt.LicenseManagementException;
+import org.wso2.iot.alertme.plugin.exception.DeviceMgtPluginException;
+import org.wso2.iot.alertme.plugin.impl.dao.DeviceTypeDAO;
+import org.wso2.iot.alertme.plugin.impl.feature.DeviceTypeFeatureManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -131,6 +130,17 @@ public class DeviceTypeManager implements DeviceManager {
             throw new DeviceManagementException(msg, e);
         }
         return status;
+    }
+
+    public boolean getAlerts(String senseMeDeviceId, String alertMeDeviceId, String policy)
+            throws DeviceManagementException {
+        try {
+            return deviceTypeDAO.getDeviceTypeDAO().addDeviceMapping(senseMeDeviceId, alertMeDeviceId, policy);
+        } catch (DeviceMgtPluginException e) {
+            String msg = "Error while subscribing for alerts";
+            log.error(msg, e);
+            throw new DeviceManagementException(msg, e);
+        }
     }
 
     @Override

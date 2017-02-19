@@ -18,26 +18,40 @@
 
 package org.wso2.iot.alertme.plugin.internal;
 
-import org.wso2.iot.alertme.plugin.exception.DeviceMgtPluginException;
-import org.wso2.iot.alertme.plugin.impl.util.DeviceTypeUtils;
-import org.wso2.iot.alertme.plugin.impl.DeviceTypeManagerService;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.core.ServerStartupObserver;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.device.mgt.common.spi.DeviceManagementService;
+import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.iot.alertme.plugin.exception.DeviceMgtPluginException;
+import org.wso2.iot.alertme.plugin.impl.DeviceTypeManagerService;
+import org.wso2.iot.alertme.plugin.impl.util.DeviceTypeUtils;
 
 /**
  * @scr.component name="org.wso2.iot.alertme.plugin.internal.ServiceComponent"
  * immediate="true"
+ * @scr.reference name="api.manager.config.service"
+ * interface="org.wso2.carbon.apimgt.impl.APIManagerConfigurationService"
+ * cardinality="1..1"
+ * policy="dynamic"
+ * bind="setAPIManagerConfigurationService"
+ * unbind="unsetAPIManagerConfigurationService"
+ * @scr.reference name="config.context.service"
+ * interface="org.wso2.carbon.utils.ConfigurationContextService"
+ * cardinality="0..1"
+ * policy="dynamic"
+ * bind="setConfigurationContextService"
+ * unbind="unsetConfigurationContextService"
  */
 
 public class ServiceComponent {
     private static final Log log = LogFactory.getLog(ServiceComponent.class);
     private ServiceRegistration serviceRegistration;
+
+    private static APIManagerConfigurationService amConfigService;
 
     protected void activate(ComponentContext ctx) {
         if (log.isDebugEnabled()) {
@@ -82,6 +96,29 @@ public class ServiceComponent {
             }
         } catch (Throwable e) {
             log.error("Error occurred while de-activating Iot Device Management bundle", e);
+        }
+    }
+
+    protected void unsetAPIManagerConfigurationService(APIManagerConfigurationService service) {
+        log.debug("API manager configuration service unbound from the API usage handler");
+        amConfigService = null;
+    }
+
+    protected void setAPIManagerConfigurationService(APIManagerConfigurationService service) {
+        log.debug("API manager configuration service bound to the API usage handler");
+        amConfigService = service;
+    }
+
+    protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Setting ConfigurationContextService");
+        }
+        DeviceTypeUtils.getSenseMeNotifications();
+    }
+
+    protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Un-setting ConfigurationContextService");
         }
     }
 }

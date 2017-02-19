@@ -108,6 +108,89 @@ public class DeviceTypeDAOImpl {
         return status;
     }
 
+    /**
+     * When a  mapping is added, if it exists it is updated.
+     * @param senseMeDeviceId
+     * @param alertMeDeviceId
+     * @param policy
+     * @return
+     * @throws DeviceMgtPluginException
+     */
+    public boolean addDeviceMapping(String senseMeDeviceId, String alertMeDeviceId, String policy) throws
+                                                                                   DeviceMgtPluginException {
+        boolean status = false;
+        Connection conn;
+        PreparedStatement stmt = null;
+        try {
+            conn = DeviceTypeDAO.getConnection();
+            String createDBQuery = "MERGE INTO SENSE_ALERT_MAPPINGS KEY(senseme_DEVICE_ID, alertme_DEVICE_ID) " +
+                                   "VALUES (?, ?, ?);";
+            stmt = conn.prepareStatement(createDBQuery);
+            stmt.setString(1, senseMeDeviceId);
+            stmt.setString(2, alertMeDeviceId);
+            stmt.setString(3, policy);
+            int rows = stmt.executeUpdate();
+            if (rows > 0) {
+                status = true;
+                if (log.isDebugEnabled()) {
+                    log.debug("senseme device " + senseMeDeviceId + " and " + alertMeDeviceId + " mapping added to DB.");
+                }
+            }
+
+        } catch (SQLException e) {
+            String msg = "Error occurred while adding the senseme " + senseMeDeviceId + " and  alertme "
+                         + alertMeDeviceId + " mapping added to DB.";
+            log.error(msg, e);
+            throw new DeviceMgtPluginException(msg, e);
+        } finally {
+            DeviceTypeUtils.cleanupResources(stmt, null);
+        }
+        return status;
+    }
+
+    /**
+     * Distance policy included as a property per retrieved device.
+     * @param alertMe
+     * @return
+     * @throws DeviceMgtPluginException
+     */
+    public List<Device> retrieveDeviceMappings(Device alertMe) throws
+                                                               DeviceMgtPluginException {
+        boolean status = false;
+        Connection conn;
+        PreparedStatement stmt = null;
+        ResultSet resultSet = null;
+        Device device;
+        List<Device> deviceMappings = new ArrayList<Device>();
+        try {
+            conn = DeviceTypeDAO.getConnection();
+            String checkMappingQuery = "SELECT * FROM SENSE_ALERT_MAPPINGS where " +
+                                       "alertme_DEVICE_ID = ?";
+            stmt = conn.prepareStatement(checkMappingQuery);
+            stmt.setString(1, alertMe.getDeviceIdentifier());
+            resultSet = stmt.executeQuery();
+            List<Device.Property> props = new ArrayList<>();
+            while (resultSet.next()) {
+                device = new Device();
+                device.setDeviceIdentifier(resultSet.getString(DeviceTypeConstants.DEVICE_PLUGIN_DEVICE_ID));
+                Device.Property prop = new Device.Property();
+                prop.setName("distance");
+                prop.setValue(resultSet.getString("policy"));
+                props.add(prop);
+                device.setProperties(props);
+                deviceMappings.add(device);
+            }
+        } catch (SQLException e) {
+            String msg = "Error occurred while retrieving device mappings for alertme ID "+
+                         alertMe.getDeviceIdentifier();
+            log.error(msg, e);
+            throw new DeviceMgtPluginException(msg, e);
+        } finally {
+            DeviceTypeUtils.cleanupResources(stmt, null);
+        }
+        return deviceMappings;
+    }
+
     public boolean updateDevice(Device device) throws DeviceMgtPluginException {
         boolean status = false;
         Connection conn = null;

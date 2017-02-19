@@ -18,13 +18,6 @@
 
 package org.wso2.iot.alertme.api;
 
-import org.wso2.iot.alertme.api.dto.DeviceJSON;
-import org.wso2.iot.alertme.api.dto.SensorRecord;
-import org.wso2.iot.alertme.api.util.APIUtil;
-import org.wso2.iot.alertme.api.util.ZipUtil;
-import org.wso2.iot.alertme.api.util.ZipArchive;
-import org.wso2.iot.alertme.plugin.constants.DeviceTypeConstants;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,43 +32,43 @@ import org.wso2.carbon.device.mgt.common.Device;
 import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
 import org.wso2.carbon.device.mgt.common.EnrolmentInfo;
+import org.wso2.carbon.device.mgt.common.InvalidDeviceException;
 import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationException;
+import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
+import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
+import org.wso2.carbon.device.mgt.core.operation.mgt.CommandOperation;
 import org.wso2.carbon.identity.jwt.client.extension.JWTClient;
 import org.wso2.carbon.identity.jwt.client.extension.dto.AccessTokenInfo;
 import org.wso2.carbon.identity.jwt.client.extension.exception.JWTClientException;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.device.mgt.common.*;
-import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationException;
-import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroupConstants;
-import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
-import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
-import org.wso2.carbon.device.mgt.core.operation.mgt.CommandOperation;
+import org.wso2.iot.alertme.api.dto.DeviceJSON;
+import org.wso2.iot.alertme.api.dto.SensorRecord;
+import org.wso2.iot.alertme.api.util.APIUtil;
+import org.wso2.iot.alertme.api.util.ZipArchive;
+import org.wso2.iot.alertme.api.util.ZipUtil;
+import org.wso2.iot.alertme.plugin.constants.DeviceTypeConstants;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Path;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.PUT;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-
-import java.util.UUID;
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * This is the API which is used to control and manage device type functionality
@@ -193,17 +186,18 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
      */
     @Path("device/{deviceId}/getalerts")
     @POST
-    public Response getAlerts(@PathParam("deviceId") String deviceId, @QueryParam("alertfrom") String alertfrom,@Context HttpServletResponse response){
+    public Response getAlerts(@PathParam("deviceId") String deviceId, @QueryParam("alertfrom") String alertfrom,
+                              @Context HttpServletResponse response) {
         try {
-            if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
-                    DeviceTypeConstants.DEVICE_TYPE))) {
+            if (!APIUtil.getDeviceAccessAuthorizationService()
+                    .isUserAuthorized(new DeviceIdentifier(deviceId, DeviceTypeConstants.DEVICE_TYPE))) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
-            //TODO: implement get alert function
+            APIUtil.getDeviceTypeManagementService().getAlerts(alertfrom, deviceId, "1m");
 
-        } catch (DeviceAccessAuthorizationException e) {
-            log.error(e.getErrorMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (DeviceAccessAuthorizationException | DeviceManagementException e) {
+            log.error("Error occurred while subscribing for alerts", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
         }
         return Response.status(Response.Status.ACCEPTED).build();
     }

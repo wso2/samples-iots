@@ -36,6 +36,8 @@ import org.wso2.carbon.device.mgt.core.service.DeviceManagementProviderService;
 import org.wso2.carbon.identity.jwt.client.extension.service.JWTClientManagerService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.iot.alertme.plugin.impl.DeviceTypeManager;
+import org.wso2.iot.alertme.plugin.impl.DeviceTypeManagerService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -178,5 +180,18 @@ public class APIUtil {
     public static String getAuthenticatedUserTenantDomain() {
         PrivilegedCarbonContext threadLocalCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         return threadLocalCarbonContext.getTenantDomain();
+    }
+
+    public static DeviceTypeManager getDeviceTypeManagementService() {
+        PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        DeviceTypeManagerService deviceManagementProviderService =
+                (DeviceTypeManagerService) ctx.getOSGiService(DeviceTypeManagerService.class, null);
+        if (deviceManagementProviderService == null) {
+            String msg = "Device Type Management service has not initialized.";
+            log.error(msg);
+            throw new IllegalStateException(msg);
+        }else{
+            return (DeviceTypeManager) deviceManagementProviderService.getDeviceManager();
+        }
     }
 }
