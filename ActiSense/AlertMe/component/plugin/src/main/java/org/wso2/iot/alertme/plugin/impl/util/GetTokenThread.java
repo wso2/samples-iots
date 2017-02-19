@@ -63,7 +63,6 @@ public class GetTokenThread implements Runnable {
         final MqttClient client;
         String accessToken = null;
         MqttConnectOptions options = new MqttConnectOptions();
-        //TODO:: Use constant strings
         options.setWill("senseme/disconnection", "Connection-Lost".getBytes(StandardCharsets.UTF_8), 2, true);
 
         String[] tags = {"sense_me"};
@@ -76,8 +75,9 @@ public class GetTokenThread implements Runnable {
         }
         try {
             client = new MqttClient("tcp://localhost:1886", "SenseMeSubscription", null);
-            //TODO:: Need to check for debug
-            log.info("MQTT subscriber was created with ClientID : " + "SenseMeSubscription");
+            if(log.isDebugEnabled()){
+                log.debug("MQTT subscriber was created with ClientID : " + "SenseMeSubscription");
+            }
             client.setCallback(new MqttCallback() {
 
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
@@ -116,13 +116,7 @@ public class GetTokenThread implements Runnable {
             client.connect(options);
             client.subscribe("carbon.super/senseme/+/ULTRASONIC");
         } catch (MqttException ex) {
-            //TODO:: Remove unnecessary formatting and print exception
-            String errorMsg = "MQTT Client Error\n" + "\tReason:  " + ex.getReasonCode() +
-                    "\n\tMessage: " + ex.getMessage() + "\n\tLocalMsg: " +
-                    ex.getLocalizedMessage() + "\n\tCause: " + ex.getCause() +
-                    "\n\tException: " + ex;
-            log.error(errorMsg);
-            //TODO:: Throw the error out
+            log.error(ex);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
@@ -139,7 +133,7 @@ public class GetTokenThread implements Runnable {
                     applicationUsername = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration()
                             .getAdminUserName();
                 } catch (UserStoreException e) {
-                    log.error("Error while getting username");
+                    log.error("Error while getting username", e);
                 }
                 APIManagementProviderService apiManagementProviderService = APIUtil.getAPIManagementProviderService();
                 try {
@@ -147,11 +141,11 @@ public class GetTokenThread implements Runnable {
                             applicationName, tags, KEY_TYPE, applicationUsername, true, "360000");
                     amUp = true;
                 } catch (Exception e) {
-                    log.error("Error while retrieving application keys.AM Is not up yet");
+                    log.error("Error while retrieving application keys.", e);
                     try {
                         Thread.sleep(15000);
                     } catch (InterruptedException e1) {
-                        log.error("Token Retrieval operation halting failed");
+                        log.error("Token Retrieval operation halting failed", e1);
                     }
                 }
             }
@@ -162,7 +156,7 @@ public class GetTokenThread implements Runnable {
             AccessTokenInfo accessTokenInfo = jwtClient.getAccessToken(apiApplicationKey.getConsumerKey(), apiApplicationKey.getConsumerSecret(), "admin", scopes);
             return accessTokenInfo.getAccessToken();
         } catch (JWTClientException e) {
-            e.printStackTrace();
+            log.error("Error while generating access tokens.", e);
         }
         return null;
     }
