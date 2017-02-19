@@ -24,10 +24,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.device.mgt.common.spi.DeviceManagementService;
-import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.iot.alertme.plugin.exception.DeviceMgtPluginException;
 import org.wso2.iot.alertme.plugin.impl.DeviceTypeManagerService;
+import org.wso2.iot.alertme.plugin.impl.ServerStartupHandler;
 import org.wso2.iot.alertme.plugin.impl.util.DeviceTypeUtils;
 
 /**
@@ -39,12 +40,6 @@ import org.wso2.iot.alertme.plugin.impl.util.DeviceTypeUtils;
  * policy="dynamic"
  * bind="setAPIManagerConfigurationService"
  * unbind="unsetAPIManagerConfigurationService"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService"
- * cardinality="0..1"
- * policy="dynamic"
- * bind="setConfigurationContextService"
- * unbind="unsetConfigurationContextService"
  */
 
 public class ServiceComponent {
@@ -63,6 +58,7 @@ public class ServiceComponent {
             serviceRegistration =
                     bundleContext.registerService(DeviceManagementService.class.getName(),
                             deviceTypeManagerService, null);
+            bundleContext.registerService(ServerStartupObserver.class.getName(), new ServerStartupHandler(), null);
             String setupOption = System.getProperty("setup");
             if (setupOption != null) {
                 if (log.isDebugEnabled()) {
@@ -109,16 +105,4 @@ public class ServiceComponent {
         amConfigService = service;
     }
 
-    protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
-        if (log.isDebugEnabled()) {
-            log.debug("Setting ConfigurationContextService");
-        }
-        DeviceTypeUtils.getSenseMeNotifications();
-    }
-
-    protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
-        if (log.isDebugEnabled()) {
-            log.debug("Un-setting ConfigurationContextService");
-        }
-    }
 }

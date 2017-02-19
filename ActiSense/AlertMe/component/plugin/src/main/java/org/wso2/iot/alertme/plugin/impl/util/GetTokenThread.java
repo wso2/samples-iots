@@ -135,7 +135,7 @@ public class GetTokenThread implements Runnable {
                     try {
                         Thread.sleep(15000);
                     } catch (InterruptedException e1) {
-                        log.error("Token Retrival operation halting failed");
+                        log.error("Token Retrieval operation halting failed");
                     }
                 }
             }
