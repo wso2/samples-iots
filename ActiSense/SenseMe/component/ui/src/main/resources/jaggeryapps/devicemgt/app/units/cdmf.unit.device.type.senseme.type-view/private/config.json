@@ -2,7 +2,7 @@
 {
   "deviceType": {
     "label": "senseme",
-    "category": "virtual",
+    "category": "iot",
     "downloadAgentUri": "senseme/device/download",
     "scopes" : [
       "perm:senseme:enroll"

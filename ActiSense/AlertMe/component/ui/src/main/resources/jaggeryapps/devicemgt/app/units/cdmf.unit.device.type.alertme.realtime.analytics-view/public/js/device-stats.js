@@ -24,7 +24,7 @@ var chartDataSensorType1 = [];
 var chartDataSensorType2 = [];
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
-    var tNow = new Date().getTime() / 1000;
+    var tNow = new Date().getTime() / 1000000;
     for (var i = 0; i < 30; i++) {
         chartData.push({
             x: tNow - (30 - i) * 15,

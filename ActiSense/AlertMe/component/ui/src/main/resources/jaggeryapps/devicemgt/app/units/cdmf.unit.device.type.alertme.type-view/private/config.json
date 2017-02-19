@@ -2,7 +2,7 @@
 {
   "deviceType": {
     "label": "alertme",
-    "category": "virtual",
+    "category": "iot",
     "downloadAgentUri": "alertme/device/download",
     "scopes" : [
       "perm:alertme:enroll"

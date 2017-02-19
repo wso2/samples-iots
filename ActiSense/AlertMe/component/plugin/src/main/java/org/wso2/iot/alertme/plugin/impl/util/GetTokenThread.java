@@ -67,9 +67,8 @@ public class GetTokenThread implements Runnable {
 
         final MqttClient client;
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setWill("senseme/disconnection", "Connection-Lost".getBytes(StandardCharsets.UTF_8), 2, true);
 
-        String[] tags = {"sense_me"};
+        String[] tags = {"senseme"};
         String accessToken = generateAccessToken("alertme-event-receiver", tags);
 
         if(accessToken != null) {
