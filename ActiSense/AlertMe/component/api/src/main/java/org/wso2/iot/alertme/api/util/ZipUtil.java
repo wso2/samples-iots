@@ -18,12 +18,15 @@
 
 package org.wso2.iot.alertme.api.util;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.wso2.carbon.apimgt.application.extension.constants.ApiApplicationConstants;
+import org.wso2.carbon.core.util.Utils;
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
 import org.wso2.carbon.utils.CarbonUtils;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -33,6 +36,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,9 +48,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import org.wso2.carbon.core.util.Utils;
-import org.json.JSONObject;
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * This is used to create a zip file that includes the necessary configuration required for the agent.
@@ -53,11 +55,8 @@ import org.apache.commons.codec.binary.Base64;
 public class ZipUtil {
 
     private static final String LOCALHOST = "localhost";
-    private static final String HTTPS_PROTOCOL_URL = "https://${iot.gateway.host}:${iot.gateway.https.port}";
     private static final String HTTP_PROTOCOL_URL = "http://${iot.gateway.host}:${iot.gateway.http.port}";
-    private static final String CONFIG_TYPE = "general";
     private static final String DEFAULT_MQTT_ENDPOINT = "tcp://${mqtt.broker.host}:${mqtt.broker.port}";
-    public static final String HOST_NAME = "HostName";
 
     public ZipArchive createZipFile(String owner, String tenantDomain, String deviceType,
                                     String deviceId, String deviceName, String token,
@@ -71,25 +70,23 @@ public class ZipUtil {
 
         try {
             iotServerIP = getServerUrl();
-            String httpsServerEP = Utils.replaceSystemProperty(HTTPS_PROTOCOL_URL);
             String httpServerEP = Utils.replaceSystemProperty(HTTP_PROTOCOL_URL);
             String mqttEndpoint = Utils.replaceSystemProperty(DEFAULT_MQTT_ENDPOINT);
             if (mqttEndpoint.contains(LOCALHOST)) {
                 mqttEndpoint = mqttEndpoint.replace(LOCALHOST, iotServerIP);
-                httpsServerEP = httpsServerEP.replace(LOCALHOST, iotServerIP);
                 httpServerEP = httpServerEP.replace(LOCALHOST, iotServerIP);
             }
             String base64EncodedApplicationKey = getBase64EncodedAPIAppKey(apiApplicationKey).trim();
+            URI mqttUri = new URI(mqttEndpoint);
 
             Map<String, String> contextParams = new HashMap<>();
-            contextParams.put("SERVER_NAME", APIUtil.getTenantDomainOftheUser());
+            contextParams.put("TENANT_DOMAIN", tenantDomain);
             contextParams.put("DEVICE_OWNER", owner);
             contextParams.put("DEVICE_ID", deviceId);
             contextParams.put("DEVICE_NAME", deviceName);
-            contextParams.put("HTTPS_EP", httpsServerEP);
-            contextParams.put("HTTP_EP", httpServerEP);
-            contextParams.put("APIM_EP", httpsServerEP);
-            contextParams.put("MQTT_EP", mqttEndpoint);
+            contextParams.put("GATEWAY", httpServerEP);
+            contextParams.put("MQTT_SERVER", mqttUri.getHost());
+            contextParams.put("MQTT_PORT", String.valueOf(mqttUri.getPort()));
             contextParams.put("DEVICE_TOKEN", token);
             contextParams.put("DEVICE_REFRESH_TOKEN", refreshToken);
             contextParams.put("API_APPLICATION_KEY", base64EncodedApplicationKey);
@@ -97,7 +94,7 @@ public class ZipUtil {
             ZipArchive zipFile;
             zipFile = getSketchArchive(archivesPath, templateSketchPath, contextParams, deviceName);
             return zipFile;
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new DeviceManagementException("Zip File Creation Failed", e);
         }
     }
@@ -111,7 +108,7 @@ public class ZipUtil {
         return Base64.encodeBase64String(stringToEncode.getBytes());
     }
 
-    public static String getServerUrl() {
+    private static String getServerUrl() {
         try {
             return org.apache.axis2.util.Utils.getIpAddress();
         } catch (SocketException e) {
@@ -119,9 +116,8 @@ public class ZipUtil {
         }
     }
 
-    public static ZipArchive getSketchArchive(String archivesPath, String templateSketchPath, Map contextParams
-            , String zipFileName)
-            throws DeviceManagementException, IOException {
+    private static ZipArchive getSketchArchive(String archivesPath, String templateSketchPath, Map contextParams,
+                                               String zipFileName) throws DeviceManagementException, IOException {
         String sketchPath = CarbonUtils.getCarbonHome() + File.separator + templateSketchPath;
         FileUtils.deleteDirectory(new File(archivesPath));//clear directory
         FileUtils.deleteDirectory(new File(archivesPath + ".zip"));//clear zip
@@ -164,13 +160,12 @@ public class ZipUtil {
             Map<String, List<String>> properties = new HashMap<String, List<String>>();
 
             String templates = prop.getProperty("templates");
-            List<String> list = new ArrayList<String>(Arrays.asList(templates.split(",")));
+            List<String> list = new ArrayList<>(Arrays.asList(templates.split(",")));
             properties.put("templates", list);
 
             final String filename = prop.getProperty("zipfilename");
-            list = new ArrayList<String>() {{
-                add(filename);
-            }};
+            list = new ArrayList<>();
+            list.add(filename);
             properties.put("zipfilename", list);
             return properties;
 
@@ -300,8 +295,7 @@ public class ZipUtil {
                         }
 
                     }
-                } else //it is just a file
-                {
+                } else {//it is just a file
                     FileInputStream fi = new FileInputStream(f);
                     origin = new BufferedInputStream(fi, BUFFER);
                     ZipEntry entry = new ZipEntry(sd);
