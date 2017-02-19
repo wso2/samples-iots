@@ -20,4 +20,5 @@
 Instructions
 -------------------------------------
 
-
+1. Move AlertMe.ino into AlertMe directory.
+2. Open AlertMe.ino with Arduino IDE and upload code to NodeMCU.

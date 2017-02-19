@@ -20,4 +20,5 @@
 Instructions
 -------------------------------------
 
-
+1. Move SenseMe.ino into SenseMe directory.
+2. Open SenseMe.ino with Arduino IDE and upload code to NodeMCU.
