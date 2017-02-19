@@ -53,6 +53,11 @@ public class GetTokenThread implements Runnable {
     private static final String KEY_TYPE = "PRODUCTION";
 
     public void run() {
+        try {
+            Thread.sleep(15000); //Wait for APIM start
+        } catch (InterruptedException e) {
+            log.error("Waiting failed", e);
+        }
         initSubscriber();
     }
 
@@ -61,12 +66,11 @@ public class GetTokenThread implements Runnable {
         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
 
         final MqttClient client;
-        String accessToken = null;
         MqttConnectOptions options = new MqttConnectOptions();
         options.setWill("senseme/disconnection", "Connection-Lost".getBytes(StandardCharsets.UTF_8), 2, true);
 
         String[] tags = {"sense_me"};
-        accessToken = generateAccessToken("alertme-event-receiver-" + UUID.randomUUID().toString(), tags);
+        String accessToken = generateAccessToken("alertme-event-receiver", tags);
 
         if(accessToken != null) {
             options.setUserName(accessToken);
@@ -105,7 +109,8 @@ public class GetTokenThread implements Runnable {
                 }
 
                 public void connectionLost(Throwable cause) {
-                    log.info("delivery lost");
+                    log.info("delivery lost. Re initializing subscriber...");
+                    initSubscriber();
                 }
 
                 public void deliveryComplete(IMqttDeliveryToken token) {
@@ -138,10 +143,10 @@ public class GetTokenThread implements Runnable {
                 APIManagementProviderService apiManagementProviderService = APIUtil.getAPIManagementProviderService();
                 try {
                     apiApplicationKey = apiManagementProviderService.generateAndRetrieveApplicationKeys(
-                            applicationName, tags, KEY_TYPE, applicationUsername, true, "360000");
+                            applicationName + "-" + UUID.randomUUID().toString(), tags, KEY_TYPE, applicationUsername, true, "360000");
                     amUp = true;
                 } catch (Exception e) {
-                    log.error("Error while retrieving application keys.", e);
+                    log.error("Error while retrieving application keys. ", e);
                     try {
                         Thread.sleep(15000);
                     } catch (InterruptedException e1) {
