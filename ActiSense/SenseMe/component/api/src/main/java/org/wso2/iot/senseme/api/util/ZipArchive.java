@@ -29,7 +29,7 @@ public class ZipArchive {
     private File zipFile = null;
     private String fileName = null;
 
-    public ZipArchive(String fileName, File zipFile) {
+    ZipArchive(String fileName, File zipFile) {
         this.fileName = fileName;
         this.zipFile = zipFile;
     }

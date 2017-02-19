@@ -22,7 +22,6 @@
     <property name="src-dir" value="src/main/resources/carbonapps"/>
     <property name="sensorType1_dir" value="PIR"/>
     <property name="sensorType2_dir" value="ULTRASONIC"/>
-    <property name="sensorType3_dir" value="bulb"/>
     <target name="clean">
         <delete dir="${target-dir}" />
     </target>
@@ -33,9 +32,6 @@
         </zip>
         <zip destfile="${target-dir}/${sensorType2_dir}.car">
             <zipfileset dir="${src-dir}/${sensorType2_dir}"/>
-        </zip>
-        <zip destfile="${target-dir}/${sensorType3_dir}.car">
-            <zipfileset dir="${src-dir}/${sensorType3_dir}"/>
         </zip>
     </target>
 </project>

@@ -28,15 +28,13 @@ import org.wso2.carbon.apimgt.annotations.api.Scope;
 import org.wso2.carbon.apimgt.annotations.api.Scopes;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Path;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.PUT;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -75,8 +73,8 @@ public interface DeviceTypeService {
     String SCOPE = "scope";
 
     /**
-     * @param deviceId  unique identifier for given device type instance
-     * @param state     change status of sensor: on/off
+     * @param deviceId unique identifier for given device type instance
+     * @param state    change status of sensor: on/off
      */
     @Path("device/{deviceId}/change-status")
     @POST
@@ -99,10 +97,11 @@ public interface DeviceTypeService {
 
     /**
      * Retrieve Sensor data for the given time period
+     *
      * @param deviceId unique identifier for given device type instance
-     * @param from  starting time
-     * @param to    ending time
-     * @return  response with List<SensorRecord> object which includes sensor data which is requested
+     * @param from     starting time
+     * @param to       ending time
+     * @return response with List<SensorRecord> object which includes sensor data which is requested
      */
     @Path("device/stats/{deviceId}")
     @GET
@@ -123,11 +122,13 @@ public interface DeviceTypeService {
     )
     Response getSensorStats(@PathParam("deviceId") String deviceId, @QueryParam("from") long from,
                             @QueryParam("to") long to, @QueryParam("sensorType") String sensorType);
+
     /**
      * To download device type agent source code as zip file
-     * @param deviceName   name for the device type instance
-     * @param sketchType   folder name where device type agent was installed into server
-     * @return  Agent source code as zip file
+     *
+     * @param deviceName name for the device type instance
+     * @param sketchType folder name where device type agent was installed into server
+     * @return Agent source code as zip file
      */
     @Path("/device/download")
     @GET

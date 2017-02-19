@@ -18,11 +18,10 @@
 
 package org.wso2.iot.senseme.api.util;
 
-import org.wso2.iot.senseme.api.dto.SensorRecord;
-
-import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
-import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SortByField;
@@ -34,8 +33,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationService;
 import org.wso2.carbon.device.mgt.core.service.DeviceManagementProviderService;
 import org.wso2.carbon.identity.jwt.client.extension.service.JWTClientManagerService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.wso2.iot.senseme.api.dto.SensorRecord;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,12 +47,15 @@ public class APIUtil {
 
     private static Log log = LogFactory.getLog(APIUtil.class);
 
+    private APIUtil(){
+    }
+
     public static String getAuthenticatedUser() {
         PrivilegedCarbonContext threadLocalCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String username = threadLocalCarbonContext.getUsername();
         String tenantDomain = threadLocalCarbonContext.getTenantDomain();
         if (username.endsWith(tenantDomain)) {
-            return username.substring(0, username.lastIndexOf("@"));
+            return username.substring(0, username.lastIndexOf('@'));
         }
         return username;
     }
@@ -118,20 +119,19 @@ public class APIUtil {
         AnalyticsDataAPI analyticsDataAPI = getAnalyticsDataAPI();
         int eventCount = analyticsDataAPI.searchCount(tenantId, tableName, query);
         if (eventCount == 0) {
-            return null;
+            return new ArrayList<>();
         }
         List<SearchResultEntry> resultEntries = analyticsDataAPI.search(tenantId, tableName, query, 0, eventCount,
                                                                         sortByFields);
         List<String> recordIds = getRecordIds(resultEntries);
         AnalyticsDataResponse response = analyticsDataAPI.get(tenantId, tableName, 1, null, recordIds);
-        Map<String, SensorRecord> sensorDatas = createSensorData(AnalyticsDataAPIUtil.listRecords(
+        Map<String, SensorRecord> sensorData = createSensorData(AnalyticsDataAPIUtil.listRecords(
                 analyticsDataAPI, response));
-        List<SensorRecord> sortedSensorData = getSortedSensorData(sensorDatas, resultEntries);
-        return sortedSensorData;
+        return getSortedSensorData(sensorData, resultEntries);
     }
 
-    public static List<SensorRecord> getSortedSensorData(Map<String, SensorRecord> sensorDatas,
-                                                         List<SearchResultEntry> searchResults) {
+    private static List<SensorRecord> getSortedSensorData(Map<String, SensorRecord> sensorDatas,
+                                                          List<SearchResultEntry> searchResults) {
         List<SensorRecord> sortedRecords = new ArrayList<>();
         for (SearchResultEntry searchResultEntry : searchResults) {
             sortedRecords.add(sensorDatas.get(searchResultEntry.getId()));
@@ -147,23 +147,23 @@ public class APIUtil {
         return ids;
     }
 
-    public static Map<String, SensorRecord> createSensorData(List<Record> records) {
-        Map<String, SensorRecord> sensorDatas = new HashMap<>();
+    private static Map<String, SensorRecord> createSensorData(List<Record> records) {
+        Map<String, SensorRecord> sensorData = new HashMap<>();
         for (Record record : records) {
-            SensorRecord sensorData = createSensorData(record);
-            sensorDatas.put(sensorData.getId(), sensorData);
+            SensorRecord sensorDataRecord = createSensorData(record);
+            sensorData.put(sensorDataRecord.getId(), sensorDataRecord);
         }
-        return sensorDatas;
+        return sensorData;
     }
 
-    public static SensorRecord createSensorData(Record record) {
+    private static SensorRecord createSensorData(Record record) {
         SensorRecord recordBean = new SensorRecord();
         recordBean.setId(record.getId());
         recordBean.setValues(record.getValues());
         return recordBean;
     }
 
-    public static AnalyticsDataAPI getAnalyticsDataAPI() {
+    private static AnalyticsDataAPI getAnalyticsDataAPI() {
         PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         AnalyticsDataAPI analyticsDataAPI =
                 (AnalyticsDataAPI) ctx.getOSGiService(AnalyticsDataAPI.class, null);

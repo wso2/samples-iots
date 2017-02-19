@@ -108,7 +108,7 @@ public class ZipUtil {
         return Base64.encodeBase64String(stringToEncode.getBytes());
     }
 
-    public static String getServerUrl() {
+    private static String getServerUrl() {
         try {
             return org.apache.axis2.util.Utils.getIpAddress();
         } catch (SocketException e) {
@@ -116,9 +116,8 @@ public class ZipUtil {
         }
     }
 
-    public static ZipArchive getSketchArchive(String archivesPath, String templateSketchPath, Map contextParams
-            , String zipFileName)
-            throws DeviceManagementException, IOException {
+    private static ZipArchive getSketchArchive(String archivesPath, String templateSketchPath, Map contextParams,
+                                               String zipFileName) throws DeviceManagementException, IOException {
         String sketchPath = CarbonUtils.getCarbonHome() + File.separator + templateSketchPath;
         FileUtils.deleteDirectory(new File(archivesPath));//clear directory
         FileUtils.deleteDirectory(new File(archivesPath + ".zip"));//clear zip
@@ -161,13 +160,12 @@ public class ZipUtil {
             Map<String, List<String>> properties = new HashMap<String, List<String>>();
 
             String templates = prop.getProperty("templates");
-            List<String> list = new ArrayList<String>(Arrays.asList(templates.split(",")));
+            List<String> list = new ArrayList<>(Arrays.asList(templates.split(",")));
             properties.put("templates", list);
 
             final String filename = prop.getProperty("zipfilename");
-            list = new ArrayList<String>() {{
-                add(filename);
-            }};
+            list = new ArrayList<>();
+            list.add(filename);
             properties.put("zipfilename", list);
             return properties;
 
@@ -297,8 +295,7 @@ public class ZipUtil {
                         }
 
                     }
-                } else //it is just a file
-                {
+                } else {//it is just a file
                     FileInputStream fi = new FileInputStream(f);
                     origin = new BufferedInputStream(fi, BUFFER);
                     ZipEntry entry = new ZipEntry(sd);

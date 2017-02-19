@@ -247,14 +247,14 @@ void loop() {
   long now = millis();
   if (now - lastMsg > 2000) {
     lastMsg = now;
-    snprintf (msg, 120, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"ULTRASONIC\":%ld}}}", owner, device_id, now, measureDistance());
+    snprintf (msg, 120, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"ULTRASONIC\":%ld.0}}}", owner, device_id, now, measureDistance());
     snprintf (publishTopic, 100, "%s/senseme/%s/ULTRASONIC", tenant_domain, device_id);
     client.publish(publishTopic, msg);
 //    Serial.print("Publish message: ");
 //    Serial.println(msg);
 //    Serial.println(publishTopic);
 
-    snprintf (msg, 120, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"PIR\":%ld}}}", owner, device_id, now, isMoving);
+    snprintf (msg, 120, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"PIR\":%ld.0}}}", owner, device_id, now, isMoving);
     snprintf (publishTopic, 100, "%s/senseme/%s/PIR", tenant_domain, device_id);
     client.publish(publishTopic, msg);
 //    Serial.print("Publish message: ");
