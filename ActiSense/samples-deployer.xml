@@ -27,6 +27,7 @@
     <modules>
         <module>AlertMe</module>
         <module>SenseMe</module>
+        <module>ActiSense-Dashboard</module>
     </modules>
 
     <modelVersion>4.0.0</modelVersion>
@@ -62,6 +63,9 @@
                                 <featureArtifactDef>
                                     org.wso2.iot:org.wso2.iot.senseme.feature:${org.wso2.iot.version}
                                 </featureArtifactDef>
+                                <featureArtifactDef>
+                                    org.wso2.iot:org.wso2.iot.actisense.feature:${org.wso2.iot.version}
+                                </featureArtifactDef>
                             </featureArtifacts>
                         </configuration>
                     </execution>
@@ -84,6 +88,10 @@
                                 </feature>
                                 <feature>
                                     <id>org.wso2.iot.senseme.feature.group</id>
+                                    <version>${org.wso2.iot.version}</version>
+                                </feature>
+                                <feature>
+                                    <id>org.wso2.iot.actisense.feature.group</id>
                                     <version>${org.wso2.iot.version}</version>
                                 </feature>
                             </features>

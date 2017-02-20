@@ -1,0 +1,134 @@
+{{!
+  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+  WSO2 Inc. licenses this file to you under the Apache License,
+  Version 2.0 (the "License"); you may not use this file except
+  in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+}}
+
+{{unit "cdmf.unit.ui.title" pageTitle="User Management"}}
+{{unit "cdmf.unit.data-tables-extended"}}
+{{unit "cdmf.unit.ui.modal"}}
+
+{{#zone "breadcrumbs"}}
+    <li>
+        <a href="{{@app.context}}/">
+            <i class="icon fw fw-home"></i>
+        </a>
+    </li>
+    <li>
+        <!--suppress HtmlUnknownTarget -->
+        <a href="{{@app.context}}/users">
+            USERS
+        </a>
+    </li>
+{{/zone}}
+
+{{#zone "navbarActions"}}
+    <li>
+        <!--suppress HtmlUnknownTarget -->
+        <a href="{{@app.context}}/user/add">
+            <span class="icon fw-stack">
+                <i class="fw fw-add fw-stack-1x"></i>
+                <i class="fw fw-circle-outline fw-stack-2x"></i>
+            </span>
+            Add User
+        </a>
+    </li>
+{{/zone}}
+
+{{#zone "content"}}
+    <input type="hidden" id="user" value="{{user.username}}">
+    <!-- content -->
+    <div id="loading-content" class="col-centered">
+        {{#if canManage}}
+            <input type="hidden" id="can-remove" value="true"/>
+            <input type="hidden" id="can-edit" value="true"/>
+            <input type="hidden" id="can-invite" value="true"/>
+            <input type="hidden" id="can-reset-password" value="true"/>
+        {{/if}}
+        {{#if canView}}
+            <input type="hidden" id="can-view" value="true"/>
+        {{/if}}
+
+        <i class="fw fw-settings fw-spin fw-2x"></i>
+        Loading users . . .
+        <br>
+    </div>
+
+    <div id="user-table" data-user={{adminUser}} data-logged-user={{currentUser}}>
+        <table class="table table-striped table-hover list-table display responsive nowrap data-table grid-view"
+               id="user-grid">
+            <thead>
+            <tr class="sort-row">
+                <th>By Username</th>
+            </tr>
+            <tr class="bulk-action-row">
+                <th colspan="3">
+                    <ul class="tiles">
+                        <li class="square">
+                            <a id="invite-user-link" href="#" data-click-event="remove-form" class="btn square-element"
+                               data-toggle="modal" data-target="#modalDemo">
+                                        <span class="icon fw-stack">
+                                            <i class="fw fw-invitation fw-stack-2x"></i>
+                                        </span>
+                                Invite Selected
+                            </a>
+                        </li>
+                    </ul>
+                </th>
+            </tr>
+            </thead>
+            <tbody id="ast-container"></tbody>
+        </table>
+    </div>
+
+    <div id="content-filter-types" style="display: none">
+        <div class="sort-title">Sort By</div>
+        <div class="sort-options">
+            <a href="#">By Username</a>
+        </div>
+    </div>
+
+    <div id="modal-content-reset-password" class="hide">
+        <div id="notification-error-msg" class="alert alert-danger hidden" role="alert">
+            <i class="icon fw fw-error"></i><span></span>
+        </div>
+        <h4>
+            Enter new password
+            <br><br>
+            <div>
+                <input type="password" autocomplete="off" class="form-control modal-input operationDataKeys new-password"
+                       data-key="message"/>
+            </div>
+            <br>
+            Retype new password
+            <br><br>
+            <div>
+                <input type="password" autocomplete="off" class="form-control modal-input operationDataKeys confirmed-password"
+                       data-key="message"/>
+            </div>
+            <br>
+        </h4>
+    </div>
+
+{{/zone}}
+{{#zone "common-navigation"}}
+    <!--Later add the navigation menu from here-->
+{{/zone}}
+{{#zone "bottomJs"}}
+    <!--suppress HtmlUnknownTarget -->
+    <script id="user-listing" data-current-user="{{@user.username}}"
+            src="{{@page.publicUri}}/templates/listing.hbs" type="text/x-handlebars-template"></script>
+    {{js "js/listing.js"}}
+{{/zone}}
