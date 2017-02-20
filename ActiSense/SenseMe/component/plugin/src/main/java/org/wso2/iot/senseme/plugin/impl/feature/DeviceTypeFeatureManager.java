@@ -15,17 +15,14 @@
  */
 package org.wso2.iot.senseme.plugin.impl.feature;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
 import org.wso2.carbon.device.mgt.common.Feature;
 import org.wso2.carbon.device.mgt.common.FeatureManager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Device type specific feature management server
@@ -41,21 +38,18 @@ public class DeviceTypeFeatureManager implements FeatureManager {
     private static final String FORM_PARAMS = "formParams";
 
     public DeviceTypeFeatureManager () {
-        feature.setCode("change-status");
-        feature.setName("Change status of sensor: on/off");
-        feature.setDescription("Change status of sensor: on/off");
+        feature.setCode("test");
+        feature.setName("Test SenseMe device");
+        feature.setDescription("Test SenseMe device by lighting white LED for 5 seconds");
 
         Map<String, Object> apiParams = new HashMap<>();
         apiParams.put(METHOD, "POST");
-        apiParams.put(URI, "/senseme/device/{deviceId}/change-status");
+        apiParams.put(URI, "/senseme/device/{deviceId}/test");
         List<String> pathParams = new ArrayList<>();
-        List<String> queryParams = new ArrayList<>();
-        List<String> formParams = new ArrayList<>();
         pathParams.add("deviceId");
         apiParams.put(PATH_PARAMS, pathParams);
-        queryParams.add("state");
-        apiParams.put(QUERY_PARAMS, queryParams);
-        apiParams.put(FORM_PARAMS, formParams);
+        apiParams.put(QUERY_PARAMS, new ArrayList<>());
+        apiParams.put(FORM_PARAMS, new ArrayList<>());
         List<Feature.MetadataEntry> metadataEntries = new ArrayList<>();
         Feature.MetadataEntry metadataEntry = new Feature.MetadataEntry();
         metadataEntry.setId(-1);

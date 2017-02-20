@@ -49,7 +49,7 @@ public class DeviceTypeFeatureManager implements FeatureManager {
 
         Map<String, Object> apiParams = new HashMap<>();
         apiParams.put(METHOD, "POST");
-        apiParams.put(URI, "device/{deviceId}/getalerts");
+        apiParams.put(URI, "/alertme/device/{deviceId}/getalerts");
         List<String> pathParams = new ArrayList<>();
         List<String> queryParams = new ArrayList<>();
         List<String> formParams = new ArrayList<>();
@@ -74,7 +74,7 @@ public class DeviceTypeFeatureManager implements FeatureManager {
 
         apiParams = new HashMap<>();
         apiParams.put(METHOD, "POST");
-        apiParams.put(URI, "device/{deviceId}/setproperties");
+        apiParams.put(URI, "/alertme/device/{deviceId}/setproperties");
         pathParams = new ArrayList<>();
         queryParams = new ArrayList<>();
         formParams = new ArrayList<>();
@@ -100,7 +100,7 @@ public class DeviceTypeFeatureManager implements FeatureManager {
 
         apiParams = new HashMap<>();
         apiParams.put(METHOD, "POST");
-        apiParams.put(URI, "device/{deviceId}/alert");
+        apiParams.put(URI, "/alertme/device/{deviceId}/alert");
         pathParams = new ArrayList<>();
         queryParams = new ArrayList<>();
         formParams = new ArrayList<>();

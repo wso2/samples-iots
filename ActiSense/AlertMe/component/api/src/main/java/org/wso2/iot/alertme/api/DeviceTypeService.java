@@ -81,7 +81,7 @@ public interface DeviceTypeService {
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
-            value = "getalertsfrom",
+            value = "Get alerts from senseme",
             notes = "",
             response = Response.class,
             tags = "alertme",
@@ -131,7 +131,7 @@ public interface DeviceTypeService {
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
-            value = "Alert alertme",
+            value = "Trigger alert on alertme",
             notes = "",
             response = Response.class,
             tags = "alertme",

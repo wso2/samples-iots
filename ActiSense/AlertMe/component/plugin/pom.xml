@@ -85,7 +85,8 @@
                             org.wso2.carbon.device.mgt.core.operation.mgt.*,
                             org.wso2.carbon.user.api,
                             org.wso2.carbon.apimgt.impl,
-                            com.google.gson
+                            com.google.gson,
+                            org.json.*
                         </Import-Package>
                         <Export-Package>
                             !${project-base-package}.plugin.internal,

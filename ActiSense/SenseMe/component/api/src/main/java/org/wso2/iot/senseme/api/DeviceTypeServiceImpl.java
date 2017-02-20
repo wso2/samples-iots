@@ -64,9 +64,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -101,41 +99,31 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
 
     /**
      * @param deviceId unique identifier for given device type instance
-     * @param state    change status of sensor: on/off
      */
-    @Path("device/{deviceId}/change-status")
+    @Path("device/{deviceId}/test")
     @POST
-    public Response changeStatus(@PathParam("deviceId") String deviceId,
-                                 @QueryParam("state") String state,
-                                 @Context HttpServletResponse response) {
+    public Response test(@PathParam("deviceId") String deviceId,
+                         @Context HttpServletResponse response) {
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
                                                                                                      DeviceTypeConstants.DEVICE_TYPE))) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
-            String sensorState = state.toUpperCase();
-            if (!sensorState.equals(DeviceTypeConstants.STATE_ON) && !sensorState.equals(
-                    DeviceTypeConstants.STATE_OFF)) {
-                log.error("The requested state change should be either - 'ON' or 'OFF'");
-                return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
-            }
-            Map<String, String> dynamicProperties = new HashMap<>();
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
                                   + "/" + DeviceTypeConstants.DEVICE_TYPE + "/" + deviceId + "/command";
-            dynamicProperties.put(DeviceTypeConstants.ADAPTER_TOPIC_PROPERTY, publishTopic);
             Operation commandOp = new CommandOperation();
-            commandOp.setCode("change-status");
+            commandOp.setCode("test");
             commandOp.setType(Operation.Type.COMMAND);
             commandOp.setEnabled(true);
-            commandOp.setPayLoad(state);
+            commandOp.setPayLoad("");
 
             Properties props = new Properties();
             props.setProperty("mqtt.adapter.topic", publishTopic);
             commandOp.setProperties(props);
 
             List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
-            deviceIdentifiers.add(new DeviceIdentifier(deviceId, "senseme"));
-            APIUtil.getDeviceManagementService().addOperation("senseme", commandOp,
+            deviceIdentifiers.add(new DeviceIdentifier(deviceId, DeviceTypeConstants.DEVICE_TYPE));
+            APIUtil.getDeviceManagementService().addOperation(DeviceTypeConstants.DEVICE_TYPE, commandOp,
                                                               deviceIdentifiers);
             return Response.ok().build();
         } catch (DeviceAccessAuthorizationException e) {

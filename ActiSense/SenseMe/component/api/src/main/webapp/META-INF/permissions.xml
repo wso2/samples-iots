@@ -70,9 +70,9 @@
         <scope>senseme_device</scope>
     </Permission>
     <Permission>
-        <name>Control Sensor</name>
+        <name>Test device</name>
         <path>/device-mgt/senseme/user</path>
-        <url>/device/*/change-status</url>
+        <url>/device/*/test</url>
         <method>POST</method>
         <scope>senseme_user</scope>
     </Permission>

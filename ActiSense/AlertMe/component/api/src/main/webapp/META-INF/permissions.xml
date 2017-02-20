@@ -70,9 +70,23 @@
         <scope>alertme_device</scope>
     </Permission>
     <Permission>
-        <name>Control Sensor</name>
+        <name>Get Alerts from SenseMe</name>
         <path>/device-mgt/alertme/user</path>
-        <url>/device/*/change-status</url>
+        <url>/device/*/getalerts</url>
+        <method>POST</method>
+        <scope>alertme_user</scope>
+    </Permission>
+    <Permission>
+        <name>Set device properties</name>
+        <path>/device-mgt/alertme/user</path>
+        <url>/device/*/setproperties</url>
+        <method>POST</method>
+        <scope>alertme_user</scope>
+    </Permission>
+    <Permission>
+        <name>Test Device</name>
+        <path>/device-mgt/alertme/user</path>
+        <url>/device/*/alert</url>
         <method>POST</method>
         <scope>alertme_user</scope>
     </Permission>

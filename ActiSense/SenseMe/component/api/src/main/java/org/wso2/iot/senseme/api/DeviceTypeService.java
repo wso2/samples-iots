@@ -74,14 +74,13 @@ public interface DeviceTypeService {
 
     /**
      * @param deviceId unique identifier for given device type instance
-     * @param state    change status of sensor: on/off
      */
-    @Path("device/{deviceId}/change-status")
+    @Path("device/{deviceId}/test")
     @POST
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
-            value = "Switch Status",
+            value = "Test device",
             notes = "",
             response = Response.class,
             tags = "senseme",
@@ -91,8 +90,7 @@ public interface DeviceTypeService {
                     })
             }
     )
-    Response changeStatus(@PathParam("deviceId") String deviceId,
-                          @QueryParam("state") String state,
+    Response test(@PathParam("deviceId") String deviceId,
                           @Context HttpServletResponse response);
 
     /**
