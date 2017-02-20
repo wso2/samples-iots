@@ -84,10 +84,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   String cmd(msg);
   int terminatorIndex = cmd.indexOf(';');
-  String payload = cmd.substring(0, terminatorIndex);
-  int separatorIndex = payload.indexOf(':');
-  String action = payload.substring(0, separatorIndex);
-  String duration = payload.substring(separatorIndex + 1, payload.length());
+  String _payload = cmd.substring(0, terminatorIndex);
+  int separatorIndex = _payload.indexOf(':');
+  String action = _payload.substring(0, separatorIndex);
+  String duration = _payload.substring(separatorIndex + 1, payload.length());
 
   Serial.println(action);
   Serial.println(duration);
