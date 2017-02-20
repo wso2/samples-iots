@@ -2,6 +2,9 @@ function onSenseMeUpdate() {
     var selectedSenseMeId = $("#senseme-listener").find(":selected").val();
     var selectedSenseMeName = $("#senseme-listener").find(":selected").text();
     var alertMeId = $(".device-id[data-deviceid]").data("deviceid");
+    if (selectedSenseMeId == "null") {
+        return;
+    }
     var devicesAPI = "/alertme/device/{deviceId}/getalerts?senseMeId=" + selectedSenseMeId;
     invokerUtil.post(devicesAPI.replace("{deviceId}", alertMeId), {},
                      function (data) {
@@ -41,6 +44,12 @@ $(document).ready(function () {
             select.setAttribute("id", "senseme-listener");
             select.setAttribute("onchange", "onSenseMeUpdate()");
 
+            var option = document.createElement('option');
+            var txt = document.createTextNode('--Change--');
+            option.innerText = txt.textContent;
+            option.setAttribute("value", "null");
+            select.appendChild(option);
+
             for (i = 0; i < data.devices.length; i++) {
                 var device = data.devices[i];
                 var option = document.createElement('option');
@@ -51,6 +60,7 @@ $(document).ready(function () {
                 // properties.VENDOR = tempDevice.deviceInfo.vendor;
                 // device.enrolmentInfo = tempDevice.enrolmentInfo;
             }
+
             label.appendChild(select);
             $('#device-listing').append(label);
         } else {
