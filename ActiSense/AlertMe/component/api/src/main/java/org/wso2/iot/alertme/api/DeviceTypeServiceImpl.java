@@ -337,6 +337,17 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         }
     }
 
+    /**
+     * Retrieve Server Time in Millis
+     *
+     * @return server time in millis
+     */
+    @Path("server-time")
+    @GET
+    public Response getServerTimeInMillis(){
+        return Response.ok().entity(System.currentTimeMillis()).build();
+    }
+
     private ZipArchive createDownloadFile(String owner, String deviceName, String sketchType)
             throws DeviceManagementException, JWTClientException, APIManagerException,
             UserStoreException {

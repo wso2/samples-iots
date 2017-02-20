@@ -122,6 +122,24 @@ public interface DeviceTypeService {
                             @QueryParam("to") long to, @QueryParam("sensorType") String sensorType);
 
     /**
+     * Retrieve Server Time in Millis
+     *
+     * @return server time in millis
+     */
+    @Path("server-time")
+    @GET
+    @Produces("text/plain")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Server Time in Millis",
+            notes = "",
+            response = Response.class,
+            tags = "senseme"
+    )
+    Response getServerTimeInMillis();
+
+    /**
      * To download device type agent source code as zip file
      *
      * @param deviceName name for the device type instance
