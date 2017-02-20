@@ -89,9 +89,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
   String action = _payload.substring(0, separatorIndex);
   String duration = _payload.substring(separatorIndex + 1, payload.length());
 
-  Serial.println(action);
-  Serial.println(duration);
-
   if (action == "LED") {
     isLED = true;
     digitalWrite(INDICATOR_LED, HIGH);
