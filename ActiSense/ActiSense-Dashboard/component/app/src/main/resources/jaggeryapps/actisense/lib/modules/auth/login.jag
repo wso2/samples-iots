@@ -28,7 +28,6 @@ require("/lib/error-pages-router.js");
         response.sendError(404);
         return;
     }
-    log.error("came here");
     var currentUser = authModule.getCurrentUser();
     if (currentUser) {
         if (log.isDebugEnabled()) {
