@@ -66,7 +66,6 @@ public class GetTokenThread implements Runnable {
         PrivilegedCarbonContext.startTenantFlow();
         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
 
-        final MqttClient client;
         MqttConnectOptions options = new MqttConnectOptions();
 
         String[] tags = {"senseme"};
@@ -78,7 +77,7 @@ public class GetTokenThread implements Runnable {
             options.setCleanSession(false);
         }
         try {
-            client = new MqttClient("tcp://localhost:1886", "SenseMeSubscription", null);
+            MqttClient client = new MqttClient("tcp://localhost:1886", "SenseMeSubscription", null);
             if(log.isDebugEnabled()){
                 log.debug("MQTT subscriber was created with ClientID : " + "SenseMeSubscription");
             }
@@ -88,7 +87,7 @@ public class GetTokenThread implements Runnable {
                     String msgString = message.toString();
                     JSONObject eventObject = new JSONObject(msgString);
                     Gson gson = new GsonBuilder().create();
-                    Event event = gson.fromJson(eventObject.getString("event"), Event.class);
+                    Event event = gson.fromJson(eventObject.getJSONObject("event").toString(), Event.class);
                     String senseMeId = event.getMetaData().getDeviceId();
                     if (msgString.contains("ULTRASONIC")) {
                         sendSoundAlert(event, senseMeId);
@@ -110,7 +109,7 @@ public class GetTokenThread implements Runnable {
 
             });
             client.connect(options);
-            client.subscribe("carbon.super/senseme/+/+");
+            client.subscribe(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME + "/senseme/+/+");
         } catch (MqttException ex) {
             log.error(ex);
         } finally {
@@ -125,24 +124,10 @@ public class GetTokenThread implements Runnable {
         List<DeviceMapping> deviceMappings = deviceTypeDAO.getDeviceTypeDAO().retrieveDeviceMappings(senseMeId);
         for (DeviceMapping deviceMapping : deviceMappings) {
             if (pirReading == 1) {
-                String alertmsg = "led:" + deviceMapping.getDuration();
+                String alertmsg = "LED:" + deviceMapping.getDuration();
                 String publishTopic = deviceMapping.getTenantDomain() + "/" + DeviceTypeConstants.DEVICE_TYPE
                                       + "/" + deviceMapping.getAlertMeId() + "/alert";
-                Operation commandOp = new CommandOperation();
-                commandOp.setCode("alert");
-                commandOp.setType(Operation.Type.COMMAND);
-                commandOp.setEnabled(true);
-                commandOp.setPayLoad(alertmsg);
-
-                Properties props = new Properties();
-                props.setProperty("mqtt.adapter.topic", publishTopic);
-                commandOp.setProperties(props);
-
-                List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
-                deviceIdentifiers.add(new DeviceIdentifier(deviceMapping.getAlertMeId(),
-                                                           DeviceTypeConstants.DEVICE_TYPE));
-                APIUtil.getDeviceManagementService()
-                        .addOperation(DeviceTypeConstants.DEVICE_TYPE, commandOp, deviceIdentifiers);
+                publishMessage(deviceMapping.getAlertMeId(), alertmsg, publishTopic, deviceMapping.getTenantDomain());
             }
         }
     }
@@ -153,25 +138,39 @@ public class GetTokenThread implements Runnable {
         List<DeviceMapping> deviceMappings = deviceTypeDAO.getDeviceTypeDAO().retrieveDeviceMappings(senseMeId);
         for (DeviceMapping deviceMapping : deviceMappings) {
             if (ultraSonicReading < deviceMapping.getDistance()) {
-                String alertmsg = "sound:" + deviceMapping.getDuration();
+                String alertmsg = "SOUND:" + deviceMapping.getDuration();
                 String publishTopic = deviceMapping.getTenantDomain() + "/" + DeviceTypeConstants.DEVICE_TYPE
                                       + "/" + deviceMapping.getAlertMeId() + "/alert";
-                Operation commandOp = new CommandOperation();
-                commandOp.setCode("alert");
-                commandOp.setType(Operation.Type.COMMAND);
-                commandOp.setEnabled(true);
-                commandOp.setPayLoad(alertmsg);
-
-                Properties props = new Properties();
-                props.setProperty("mqtt.adapter.topic", publishTopic);
-                commandOp.setProperties(props);
-
-                List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
-                deviceIdentifiers.add(new DeviceIdentifier(deviceMapping.getAlertMeId(),
-                                                           DeviceTypeConstants.DEVICE_TYPE));
-                APIUtil.getDeviceManagementService()
-                        .addOperation(DeviceTypeConstants.DEVICE_TYPE, commandOp, deviceIdentifiers);
+                publishMessage(deviceMapping.getAlertMeId(), alertmsg, publishTopic, deviceMapping.getTenantDomain());
             }
+        }
+    }
+
+    private static void publishMessage(String alertMeId, String alertmsg, String publishTopic, String tenantDomain) {
+        log.info("Topic: " + publishTopic);
+        log.info("payload: " + alertmsg);
+        try {
+            Operation commandOp = new CommandOperation();
+            commandOp.setCode("alert");
+            commandOp.setType(Operation.Type.COMMAND);
+            commandOp.setEnabled(true);
+            commandOp.setPayLoad(alertmsg);
+
+            Properties props = new Properties();
+            props.setProperty("mqtt.adapter.topic", publishTopic);
+            commandOp.setProperties(props);
+
+            List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+            deviceIdentifiers.add(new DeviceIdentifier(alertMeId,
+                                                       DeviceTypeConstants.DEVICE_TYPE));
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername("admin");
+            APIUtil.getDeviceManagementService()
+                    .addOperation(DeviceTypeConstants.DEVICE_TYPE, commandOp, deviceIdentifiers);
+            PrivilegedCarbonContext.endTenantFlow();
+        } catch (OperationManagementException | InvalidDeviceException e) {
+            log.error("Publishing to topic " + publishTopic + " failed", e);
         }
     }
 
