@@ -39,12 +39,16 @@ const char* device_id = "{DEVICE_ID}";
 const char* apiKey = "Basic {API_APPLICATION_KEY}";
 const char* accessToken = "{DEVICE_TOKEN}";
 const char* refreshToken = "{DEVICE_REFRESH_TOKEN}";
-long lastMsg = 0;
 char msg[150];
 char publishTopic[100];
 char subscribedTopic[100];
-int count = 0;
-bool isTesting = false;
+long lastMsg = 0;
+long lastTick = 0;
+int lastWorn = -1;
+int ledCount = 0;
+int soundCount = 0;
+bool isLED = false;
+bool isSound = false;
 
 void setup_wifi() {
   digitalWrite(INDICATOR_LED, HIGH);
@@ -78,12 +82,23 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println(msg);
 
-  // Switch on the LED if an 1 was received as first character
-    isTesting = true;
-    count = 5;
+  String cmd(msg);
+  int separatorIndex = cmd.indexOf(':');
+  String action = cmd.substring(0, separatorIndex);
+  String duration = cmd.substring(separatorIndex + 1, cmd.length());
+
+  Serial.println(action);
+  Serial.println(duration);
+
+  if (action == "LED") {
+    isLED = true;
     digitalWrite(INDICATOR_LED, HIGH);
+    ledCount = duration.toInt();
+  }else if (action == "SOUND"){
+    isSound = true;
     digitalWrite(BUZZER, HIGH);
-    Serial.print("Testing... ");
+    soundCount = duration.toInt();
+  }
 }
 
 String getAccessToken() {
@@ -217,23 +232,40 @@ void loop() {
   }
   client.loop();
 
+  bool isUpdated = false;
+  int isWorn = digitalRead(SWITCH);
+  if (isWorn != lastWorn) {
+    isUpdated = true;
+  }
+
   long now = millis();
-  if (now - lastMsg > 2000) {
+  if (now - lastMsg > 60000 || isUpdated) {
     lastMsg = now;
-    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"alertme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"worndetector\":%ld}}}", owner, device_id, now, digitalRead(SWITCH));
+    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"alertme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"worndetector\":%ld}}}", owner, device_id, now, isWorn);
     snprintf (publishTopic, 100, "%s/alertme/%s/worndetector", tenant_domain, device_id);
     client.publish(publishTopic, msg);
     Serial.print("Publish message: ");
     Serial.println(msg);
     Serial.println(publishTopic);
-    if (isTesting) {
-      if (count == 0) {
-        isTesting = false;
-        Serial.println("Done!");
+    lastWorn = isWorn;
+  }
+
+  if (now - lastTick > 1000) {
+    lastTick = now;
+    if (isLED) {
+      if (ledCount == 0) {
+        isLED = false;
         digitalWrite(INDICATOR_LED, LOW);
+      } else {
+        ledCount--;
+      }
+    }
+    if (isSound) {
+      if (soundCount == 0) {
+        isSound = false;
         digitalWrite(BUZZER, LOW);
       } else {
-        count--;
+        soundCount--;
       }
     }
   }
