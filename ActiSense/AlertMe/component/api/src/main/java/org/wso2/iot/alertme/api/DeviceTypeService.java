@@ -143,7 +143,7 @@ public interface DeviceTypeService {
     )
     Response alert(@PathParam("deviceId") String deviceId,
                           @QueryParam("alerttype") String alerttype,
-                          @QueryParam("duration") String duration,
+                          @QueryParam("duration") int duration,
                           @Context HttpServletResponse response);
 
     /**

@@ -73,19 +73,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-  char msg[length];
-  for (int i = 0; i < length; i++) {
-    msg[i] = (char)payload[i];
-  }
-  Serial.println(msg);
-
-  // Switch on the LED if an 1 was received as first character
-  if (strcmp(msg, "ON") == 0) {
-    isTesting = true;
-    count = 5;
-    digitalWrite(INDICATOR_LED, HIGH);
-    Serial.print("Testing... ");
-  }
+  //Testing doesn't need to have any payload
+  isTesting = true;
+  count = 5;
+  digitalWrite(INDICATOR_LED, HIGH);
+  Serial.print("Testing... ");
 }
 
 String getAccessToken() {

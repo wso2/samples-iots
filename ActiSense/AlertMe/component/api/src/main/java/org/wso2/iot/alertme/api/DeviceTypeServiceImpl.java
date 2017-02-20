@@ -177,7 +177,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     @POST
     public Response alert(@PathParam("deviceId") String deviceId,
                    @QueryParam("alerttype") String alerttype,
-                   @QueryParam("duration") String duration,
+                   @QueryParam("duration") int duration,
                    @Context HttpServletResponse response){
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
@@ -185,8 +185,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
 
-
-            String alertmsg = "type:" + alerttype.toUpperCase() + "&" + "duration:" + duration.toUpperCase();
+            String alertmsg = alerttype.toUpperCase() + ":" + duration;
 
             Map<String, String> dynamicProperties = new HashMap<>();
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
