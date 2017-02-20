@@ -147,8 +147,11 @@ public class GetTokenThread implements Runnable {
     }
 
     private static void publishMessage(String alertMeId, String alertmsg, String publishTopic, String tenantDomain) {
-        log.info("Topic: " + publishTopic);
-        log.info("payload: " + alertmsg);
+        if (log.isDebugEnabled()){
+            log.debug("Topic: " + publishTopic);
+            log.debug("payload: " + alertmsg);
+        }
+
         try {
             Operation commandOp = new CommandOperation();
             commandOp.setCode("alert");
