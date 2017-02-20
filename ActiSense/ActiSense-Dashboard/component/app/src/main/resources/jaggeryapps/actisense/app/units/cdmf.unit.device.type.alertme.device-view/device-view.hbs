@@ -38,7 +38,9 @@
 {{/zone}}
 
 {{#zone "overview-section"}}
-    <span id="device-listing-status-msg"></span>
+    <div id="device-listing-status-msg" class="alert alert-danger hidden" role="alert">
+        <i class="icon fw fw-error"></i><span></span>
+    </div>
     <div style="background: #157743; color: #fff; padding: 10px; margin-bottom: 5px">
         Device Overview</div>
     {{unit "cdmf.unit.device.type.alertme.overview-section" device=device}}
