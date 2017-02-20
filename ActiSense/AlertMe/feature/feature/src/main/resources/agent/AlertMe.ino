@@ -79,12 +79,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println(msg);
 
   // Switch on the LED if an 1 was received as first character
-  if (strcmp(msg, "ON") == 0) {
     isTesting = true;
     count = 5;
     digitalWrite(INDICATOR_LED, HIGH);
+    digitalWrite(BUZZER, HIGH);
     Serial.print("Testing... ");
-  }
 }
 
 String getAccessToken() {
