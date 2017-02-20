@@ -99,7 +99,7 @@ function connect(wsConnection, target, chartData, graph) {
         wsConnection.onmessage = function (event) {
             var dataPoint = JSON.parse(event.data);
             chartData.push({
-                x: parseInt(dataPoint[0]) / 1000000,
+                x: parseInt(dataPoint[4]) / 1000,
                 y: parseFloat(dataPoint[5])
             });
             chartData.shift();

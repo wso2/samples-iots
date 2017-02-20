@@ -49,6 +49,7 @@ long lastMsg = 0;
 long lastTest = 0;
 int lastDistance = -1;
 bool lastMovement = false;
+unsigned long initialTimeStamp = 0;
 
 void setup_wifi() {
   digitalWrite(INDICATOR_LED, HIGH);
@@ -123,7 +124,9 @@ String getAccessToken() {
   int commaIndex = response.indexOf(',');
   if (commaIndex > 0 && response.length() > 30) {
     String at = response.substring(13, commaIndex);
-    String rt = response.substring(commaIndex + 15, response.length());
+    String response2 = response.substring(commaIndex + 1, response.length());
+    commaIndex = response2.indexOf(',');
+    String rt = response2.substring(14, commaIndex);
     char __rt[rt.length() + 1];
     rt.toCharArray(__rt, sizeof(__rt));
     Serial.print("\nUpdated refresh token: ");
@@ -136,11 +139,25 @@ String getAccessToken() {
       configFile.close();
       Serial.println("Config updated");
     }
+    String _timeStampString = response2.substring(commaIndex + 12, response2.length());
+    syncTime(_timeStampString);
     return at;
   }else{
     Serial.println("\nUsing hardcoded access token");
     return accessToken;
   }
+}
+
+void syncTime(String _timeStampString){
+  Serial.print("\n_timeStampString: ");
+  Serial.println(_timeStampString);
+  char _timeStamp[10];
+  _timeStampString.toCharArray(_timeStamp, 10);
+  Serial.print("\n_timeStamp: ");
+  Serial.println(_timeStamp);
+  initialTimeStamp = atol(_timeStamp);
+  Serial.print("\nSynced time: ");
+  Serial.println(initialTimeStamp);
 }
 
 WiFiClient espClient;
@@ -251,9 +268,10 @@ void loop() {
   long now = millis();
   if (now - lastMsg > 60000 || isUpdated) {
     lastMsg = now;
+    long _timeStamp = initialTimeStamp + (now / 10000);
 
     if (lastDistance != distance || !isUpdated) {
-      snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"ULTRASONIC\":%ld.0}}}", owner, device_id, now, distance);
+      snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu0},\"payloadData\":{\"ULTRASONIC\":%ld.0}}}", owner, device_id, _timeStamp, distance);
       snprintf (publishTopic, 100, "%s/senseme/%s/ULTRASONIC", tenant_domain, device_id);
       client.publish(publishTopic, msg);
       Serial.print("Publish message: ");
@@ -263,7 +281,7 @@ void loop() {
     }
 
     if (lastMovement != isMoving || !isUpdated) {
-      snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"PIR\":%ld.0}}}", owner, device_id, now, isMoving);
+      snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu0},\"payloadData\":{\"PIR\":%ld.0}}}", owner, device_id, _timeStamp, isMoving);
       snprintf (publishTopic, 100, "%s/senseme/%s/PIR", tenant_domain, device_id);
       client.publish(publishTopic, msg);
       Serial.print("Publish message: ");

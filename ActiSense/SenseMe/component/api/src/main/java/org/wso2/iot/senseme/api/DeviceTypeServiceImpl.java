@@ -154,10 +154,10 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     @Produces("application/json")
     public Response getSensorStats(@PathParam("deviceId") String deviceId, @QueryParam("from") long from,
                                    @QueryParam("to") long to, @QueryParam("sensorType") String sensorType) {
-        String fromDate = String.valueOf(from * 1000);
-        String toDate = String.valueOf(to * 1000);
+        String fromDate = String.valueOf(from);
+        String toDate = String.valueOf(to);
         String query = "meta_deviceId:" + deviceId + " AND meta_deviceType:" +
-                       DeviceTypeConstants.DEVICE_TYPE + " AND _timestamp : [" + fromDate + " TO" +
+                       DeviceTypeConstants.DEVICE_TYPE + " AND meta_time : [" + fromDate + " TO" +
                 " " + toDate + "]";
         String sensorTableName = null;
         if (sensorType.equals(DeviceTypeConstants.SENSOR_TYPE1)) {
