@@ -27,9 +27,11 @@
             <div class="col-lg-offset-2">
             <div class="pull-left">
                 <ul class="nav navbar-right float-remove-xs text-center-xs">
+                    {{#if @user}}
                     <li class="visible-inline-block">
                         <a href="{{@app.context}}/" class="dropdown add-padding-top-3x">My Devices</a>
                     </li>
+                    {{/if}}
                     {{#if permissions.ADD_DEVICE_SENSEME}}
                     <li class="visible-inline-block">
                         <a href="{{@app.context}}/device/senseme/enroll" class="dropdown add-padding-top-3x">
