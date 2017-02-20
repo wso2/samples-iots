@@ -53,7 +53,7 @@ function drawGraph_senseme(from, to)
                 {
                     'color': palette.color(),
                     'data': [{
-                        x: parseInt(new Date().getTime() / 1000),
+                        x: parseInt(new Date().getTime() / 1000000),
                         y: 0
                     }],
                     'name': devices[i].name
@@ -63,7 +63,7 @@ function drawGraph_senseme(from, to)
                 {
                     'color': palette.color(),
                     'data': [{
-                        x: parseInt(new Date().getTime() / 1000),
+                        x: parseInt(new Date().getTime() / 1000000),
                         y: 0
                     }],
                     'name': devices[i].name
@@ -74,7 +74,7 @@ function drawGraph_senseme(from, to)
             {
                 'color': palette.color(),
                 'data': [{
-                    x: parseInt(new Date().getTime() / 1000),
+                    x: parseInt(new Date().getTime() / 1000000),
                     y: 0
                 }],
                 'name': $("#details").data("devicename")
@@ -83,7 +83,7 @@ function drawGraph_senseme(from, to)
             {
                 'color': palette.color(),
                 'data': [{
-                    x: parseInt(new Date().getTime() / 1000),
+                    x: parseInt(new Date().getTime() / 1000000),
                     y: 0
                 }],
                 'name': $("#details").data("devicename")

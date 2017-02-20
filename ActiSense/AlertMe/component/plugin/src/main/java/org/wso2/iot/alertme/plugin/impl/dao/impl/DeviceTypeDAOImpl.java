@@ -20,22 +20,19 @@ package org.wso2.iot.alertme.plugin.impl.dao.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.wso2.carbon.device.mgt.common.Device;
 import org.wso2.iot.alertme.plugin.constants.DeviceTypeConstants;
 import org.wso2.iot.alertme.plugin.exception.DeviceMgtPluginException;
 import org.wso2.iot.alertme.plugin.impl.dao.DeviceTypeDAO;
+import org.wso2.iot.alertme.plugin.impl.dto.DeviceMapping;
 import org.wso2.iot.alertme.plugin.impl.util.DeviceTypeUtils;
-
-import org.wso2.carbon.device.mgt.common.Device;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Implements IotDeviceDAO for alertme Devices.
@@ -112,28 +109,30 @@ public class DeviceTypeDAOImpl {
      * When a  mapping is added, if it exists it is updated.
      * @param senseMeDeviceId
      * @param alertMeDeviceId
-     * @param policy
+     * @param tenantDomain
      * @return
      * @throws DeviceMgtPluginException
      */
-    public boolean addDeviceMapping(String senseMeDeviceId, String alertMeDeviceId, String policy) throws
-                                                                                   DeviceMgtPluginException {
+    public boolean addDeviceMapping(String senseMeDeviceId, String alertMeDeviceId, String tenantDomain) throws DeviceMgtPluginException {
         boolean status = false;
         Connection conn;
         PreparedStatement stmt = null;
         try {
             conn = DeviceTypeDAO.getConnection();
-            String createDBQuery = "MERGE INTO SENSE_ALERT_MAPPINGS KEY(senseme_DEVICE_ID, alertme_DEVICE_ID) " +
-                                   "VALUES (?, ?, ?);";
+            String createDBQuery = "MERGE INTO SENSE_ALERT_MAPPINGS KEY(alertme_DEVICE_ID) " +
+                                   "VALUES (?, ?, ?, ?, ?);";
             stmt = conn.prepareStatement(createDBQuery);
-            stmt.setString(1, senseMeDeviceId);
-            stmt.setString(2, alertMeDeviceId);
-            stmt.setString(3, policy);
+            stmt.setString(1, alertMeDeviceId);
+            stmt.setString(2, senseMeDeviceId);
+            stmt.setInt(3, 100);
+            stmt.setInt(4, 10);
+            stmt.setString(5, tenantDomain);
             int rows = stmt.executeUpdate();
             if (rows > 0) {
                 status = true;
                 if (log.isDebugEnabled()) {
-                    log.debug("senseme device " + senseMeDeviceId + " and " + alertMeDeviceId + " mapping added to DB.");
+                    log.debug("senseme device (" + senseMeDeviceId + ") and alertme device ("
+                              + alertMeDeviceId + ") mapping added to DB.");
                 }
             }
 
@@ -149,40 +148,70 @@ public class DeviceTypeDAOImpl {
     }
 
     /**
-     * Distance policy included as a property per retrieved device.
-     * @param alertMe
+     * When a  mapping is added, if it exists it is updated.
+     * @param alertMeDeviceId
      * @return
      * @throws DeviceMgtPluginException
      */
-    public List<Device> retrieveDeviceMappings(Device alertMe) throws
-                                                               DeviceMgtPluginException {
+    public boolean updateMappingProperties(String alertMeDeviceId, int distance, int duration) throws DeviceMgtPluginException {
         boolean status = false;
         Connection conn;
         PreparedStatement stmt = null;
-        ResultSet resultSet = null;
-        Device device;
-        List<Device> deviceMappings = new ArrayList<Device>();
         try {
             conn = DeviceTypeDAO.getConnection();
-            String checkMappingQuery = "SELECT * FROM SENSE_ALERT_MAPPINGS where " +
-                                       "alertme_DEVICE_ID = ?";
+            String createDBQuery = "UPDATE SENSE_ALERT_MAPPINGS SET distance = ?, duration = ? " +
+                                   "WHERE alertme_DEVICE_ID = ?";
+            stmt = conn.prepareStatement(createDBQuery);
+            stmt.setInt(1, distance);
+            stmt.setInt(2, duration);
+            stmt.setString(3, alertMeDeviceId);
+            int rows = stmt.executeUpdate();
+            if (rows > 0) {
+                status = true;
+                if (log.isDebugEnabled()) {
+                    log.debug("Mapping properties updated for AlertMe device " + alertMeDeviceId);
+                }
+            }
+
+        } catch (SQLException e) {
+            String msg = "Error occurred while updating the mapping properties for alertme " + alertMeDeviceId;
+            log.error(msg, e);
+            throw new DeviceMgtPluginException(msg, e);
+        } finally {
+            DeviceTypeUtils.cleanupResources(stmt, null);
+        }
+        return status;
+    }
+
+    /**
+     * Distance policy included as a property per retrieved device.
+     * @param senseMeId of the senseme device
+     * @return DeviceMapping
+     * @throws DeviceMgtPluginException
+     */
+    public List<DeviceMapping> retrieveDeviceMappings(String senseMeId) throws DeviceMgtPluginException {
+        Connection conn;
+        PreparedStatement stmt = null;
+        ResultSet resultSet = null;
+        DeviceMapping deviceMapping;
+        List<DeviceMapping> deviceMappings = new ArrayList<>();
+        try {
+            conn = DeviceTypeDAO.getConnection();
+            String checkMappingQuery = "SELECT * FROM SENSE_ALERT_MAPPINGS where senseme_DEVICE_ID = ?";
             stmt = conn.prepareStatement(checkMappingQuery);
-            stmt.setString(1, alertMe.getDeviceIdentifier());
+            stmt.setString(1, senseMeId);
             resultSet = stmt.executeQuery();
-            List<Device.Property> props = new ArrayList<>();
             while (resultSet.next()) {
-                device = new Device();
-                device.setDeviceIdentifier(resultSet.getString(DeviceTypeConstants.DEVICE_PLUGIN_DEVICE_ID));
-                Device.Property prop = new Device.Property();
-                prop.setName("distance");
-                prop.setValue(resultSet.getString("policy"));
-                props.add(prop);
-                device.setProperties(props);
-                deviceMappings.add(device);
+                deviceMapping = new DeviceMapping();
+                deviceMapping.setAlertMeId(resultSet.getString("alertme_DEVICE_ID"));
+                deviceMapping.setSenseMeId(resultSet.getString("senseme_DEVICE_ID"));
+                deviceMapping.setDistance(resultSet.getInt("distance"));
+                deviceMapping.setDuration(resultSet.getInt("duration"));
+                deviceMapping.setTenantDomain(resultSet.getString("TENANT_DOMAIN"));
+                deviceMappings.add(deviceMapping);
             }
         } catch (SQLException e) {
-            String msg = "Error occurred while retrieving device mappings for alertme ID "+
-                         alertMe.getDeviceIdentifier();
+            String msg = "Error occurred while retrieving device mappings for SenseMe ID " + senseMeId;
             log.error(msg, e);
             throw new DeviceMgtPluginException(msg, e);
         } finally {

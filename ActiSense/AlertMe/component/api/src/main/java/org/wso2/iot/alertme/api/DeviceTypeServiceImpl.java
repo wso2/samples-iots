@@ -101,68 +101,13 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     }
 
     /**
-     * @param deviceId  unique identifier for given device type instance
-     * @param state     change status of sensor: on/off
-     */
-    @Path("device/{deviceId}/change-status")
-    @POST
-    public Response changeStatus(@PathParam("deviceId") String deviceId,
-                                 @QueryParam("state") String state,
-                                 @Context HttpServletResponse response) {
-        try {
-            if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
-                    DeviceTypeConstants.DEVICE_TYPE))) {
-                return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
-            }
-            String sensorState = state.toUpperCase();
-            if (!sensorState.equals(DeviceTypeConstants.STATE_ON) && !sensorState.equals(
-                    DeviceTypeConstants.STATE_OFF)) {
-                log.error("The requested state change should be either - 'ON' or 'OFF'");
-                return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
-            }
-            Map<String, String> dynamicProperties = new HashMap<>();
-            String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                    + "/" + DeviceTypeConstants.DEVICE_TYPE + "/" + deviceId + "/command";
-            dynamicProperties.put(DeviceTypeConstants.ADAPTER_TOPIC_PROPERTY, publishTopic);
-            Operation commandOp = new CommandOperation();
-            commandOp.setCode("change-status");
-            commandOp.setType(Operation.Type.COMMAND);
-            commandOp.setEnabled(true);
-            commandOp.setPayLoad(state);
-
-            Properties props = new Properties();
-            props.setProperty("mqtt.adapter.topic", publishTopic);
-            commandOp.setProperties(props);
-
-            List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
-            deviceIdentifiers.add(new DeviceIdentifier(deviceId, "alertme"));
-            APIUtil.getDeviceManagementService().addOperation("alertme", commandOp,
-                    deviceIdentifiers);
-            return Response.ok().build();
-        } catch (DeviceAccessAuthorizationException e) {
-            log.error(e.getErrorMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } catch (OperationManagementException e) {
-            String msg = "Error occurred while executing command operation upon ringing the buzzer";
-            log.error(msg, e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } catch (InvalidDeviceException e) {
-            String msg = "Error occurred while executing command operation to send keywords";
-            log.error(msg, e);
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-    }
-
-
-
-    /**
      * Retrieve Sensor data for the given time period
      * @param deviceId unique identifier for given device type instance
      * @return  response with is device worn or not
      */
     @Path("device/isworn/{deviceId}")
     @GET
-    public Response isworn(@PathParam("deviceId") String deviceId) {
+    public Response isWorn(@PathParam("deviceId") String deviceId) {
 
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
@@ -177,24 +122,22 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-
-
-
     /**
-     * @param deviceId  unique identifier for given device type instance
-     * @param alertfrom     change status of sensor: on/off
+     * @param alertMeId  unique identifier for given device type instance
+     * @param senseMeId     change status of sensor: on/off
      */
     @Path("device/{deviceId}/getalerts")
     @POST
-    public Response getAlerts(@PathParam("deviceId") String deviceId, @QueryParam("alertfrom") String alertfrom,
+    public Response getAlerts(@PathParam("deviceId") String alertMeId,
+                              @QueryParam("senseMeId") String senseMeId,
                               @Context HttpServletResponse response) {
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService()
-                    .isUserAuthorized(new DeviceIdentifier(deviceId, DeviceTypeConstants.DEVICE_TYPE))) {
+                    .isUserAuthorized(new DeviceIdentifier(alertMeId, DeviceTypeConstants.DEVICE_TYPE))) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
-            APIUtil.getDeviceTypeManagementService().getAlerts(alertfrom, deviceId, "1m");
-
+            APIUtil.getDeviceTypeManagementService()
+                    .getAlerts(senseMeId, alertMeId, APIUtil.getAuthenticatedUserTenantDomain());
         } catch (DeviceAccessAuthorizationException | DeviceManagementException e) {
             log.error("Error occurred while subscribing for alerts", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
@@ -202,34 +145,28 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-
-
-
     /**
      * @param deviceId  unique identifier for given device type instance
      * @param range     change status of sensor: on/off
      */
-    @Path("device/{deviceId}/setrange")
+    @Path("device/{deviceId}/setproperties")
     @POST
-    public Response setRange(@PathParam("deviceId") String deviceId,
-                      @QueryParam("range") String range,
-                      @Context HttpServletResponse response) {
+    public Response setProperties(@PathParam("deviceId") String deviceId,
+                                  @QueryParam("range") int range,
+                                  @QueryParam("duration") int duration,
+                                  @Context HttpServletResponse response) {
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
                     DeviceTypeConstants.DEVICE_TYPE))) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
-
-        } catch (DeviceAccessAuthorizationException e) {
-            log.error(e.getErrorMessage(), e);
+            APIUtil.getDeviceTypeManagementService().updateMappingProperties(deviceId, range, duration);
+        } catch (DeviceAccessAuthorizationException | DeviceManagementException e) {
+            log.error("Error occurred while setting alert properties", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
         return Response.status(Response.Status.ACCEPTED).build();
     }
-
-
-
-
 
     /**
      * @param deviceId  unique identifier for given device type instance

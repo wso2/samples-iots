@@ -19,6 +19,7 @@
 package org.wso2.iot.alertme.plugin.impl.util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -27,20 +28,29 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONObject;
 import org.wso2.carbon.apimgt.application.extension.APIManagementProviderService;
 import org.wso2.carbon.apimgt.application.extension.dto.ApiApplicationKey;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.device.mgt.common.Device;
+import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
+import org.wso2.carbon.device.mgt.common.InvalidDeviceException;
+import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
+import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
+import org.wso2.carbon.device.mgt.core.operation.mgt.CommandOperation;
 import org.wso2.carbon.identity.jwt.client.extension.JWTClient;
 import org.wso2.carbon.identity.jwt.client.extension.dto.AccessTokenInfo;
 import org.wso2.carbon.identity.jwt.client.extension.exception.JWTClientException;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.iot.alertme.plugin.constants.DeviceTypeConstants;
+import org.wso2.iot.alertme.plugin.exception.DeviceMgtPluginException;
 import org.wso2.iot.alertme.plugin.impl.dao.DeviceTypeDAO;
+import org.wso2.iot.alertme.plugin.impl.dto.DeviceMapping;
 import org.wso2.iot.alertme.plugin.impl.dto.Event;
 
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
 public class GetTokenThread implements Runnable {
@@ -51,15 +61,6 @@ public class GetTokenThread implements Runnable {
 
     private static ApiApplicationKey apiApplicationKey;
     private static final String KEY_TYPE = "PRODUCTION";
-
-    public void run() {
-        try {
-            Thread.sleep(15000); //Wait for APIM start
-        } catch (InterruptedException e) {
-            log.error("Waiting failed", e);
-        }
-        initSubscriber();
-    }
 
     public static void initSubscriber() {
         PrivilegedCarbonContext.startTenantFlow();
@@ -84,26 +85,17 @@ public class GetTokenThread implements Runnable {
             client.setCallback(new MqttCallback() {
 
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    Gson gson = new Gson();
-                    Event event = gson.fromJson(message.toString(), Event.class);
-                    String deviceID = event.getMetaData().getDeviceId();
-                    int ultraSonicReading = event.getPayloadData().getULTRASONIC();
-                    Device device = new Device();
-                    device.setDeviceIdentifier(deviceID);
-                    String payload = "{\n" + "\t\"activate\": true\n" + "}";
-
-                    List<Device> mappedDevice = deviceTypeDAO.getDeviceTypeDAO()
-                            .retrieveDeviceMappings
-                            (device);
-                    for(Device deviceEntry : mappedDevice){
-                        int distance = Integer.parseInt(deviceEntry.getProperties().get(0)
-                                .getValue());
-                        if(ultraSonicReading < distance){
-                            client.publish("carbon.super/alertme/"+deviceEntry.getDeviceIdentifier()+"/notify",
-                                    payload.getBytes
-                                    (StandardCharsets.UTF_8), 0,
-                                    false);
-                        }
+                    String msgString = message.toString();
+                    JSONObject eventObject = new JSONObject(msgString);
+                    Gson gson = new GsonBuilder().create();
+                    Event event = gson.fromJson(eventObject.getString("event"), Event.class);
+                    String senseMeId = event.getMetaData().getDeviceId();
+                    if (msgString.contains("ULTRASONIC")) {
+                        sendSoundAlert(event, senseMeId);
+                    } else if (msgString.contains("PIR")) {
+                        sendLedAlert(event, senseMeId);
+                    } else {
+                        log.warn("Unknown message: " + message.toString());
                     }
                 }
 
@@ -118,13 +110,78 @@ public class GetTokenThread implements Runnable {
 
             });
             client.connect(options);
-            client.subscribe("carbon.super/senseme/+/ULTRASONIC");
+            client.subscribe("carbon.super/senseme/+/+");
         } catch (MqttException ex) {
             log.error(ex);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
 
+    }
+
+    private static void sendLedAlert(Event event, String senseMeId)
+            throws OperationManagementException, InvalidDeviceException, DeviceMgtPluginException {
+        int pirReading = Math.round(event.getPayloadData().getPIR());
+        List<DeviceMapping> deviceMappings = deviceTypeDAO.getDeviceTypeDAO().retrieveDeviceMappings(senseMeId);
+        for (DeviceMapping deviceMapping : deviceMappings) {
+            if (pirReading == 1) {
+                String alertmsg = "led:" + deviceMapping.getDuration();
+                String publishTopic = deviceMapping.getTenantDomain() + "/" + DeviceTypeConstants.DEVICE_TYPE
+                                      + "/" + deviceMapping.getAlertMeId() + "/alert";
+                Operation commandOp = new CommandOperation();
+                commandOp.setCode("alert");
+                commandOp.setType(Operation.Type.COMMAND);
+                commandOp.setEnabled(true);
+                commandOp.setPayLoad(alertmsg);
+
+                Properties props = new Properties();
+                props.setProperty("mqtt.adapter.topic", publishTopic);
+                commandOp.setProperties(props);
+
+                List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+                deviceIdentifiers.add(new DeviceIdentifier(deviceMapping.getAlertMeId(),
+                                                           DeviceTypeConstants.DEVICE_TYPE));
+                APIUtil.getDeviceManagementService()
+                        .addOperation(DeviceTypeConstants.DEVICE_TYPE, commandOp, deviceIdentifiers);
+            }
+        }
+    }
+
+    private static void sendSoundAlert(Event event, String senseMeId)
+            throws OperationManagementException, InvalidDeviceException, DeviceMgtPluginException {
+        int ultraSonicReading = Math.round(event.getPayloadData().getULTRASONIC());
+        List<DeviceMapping> deviceMappings = deviceTypeDAO.getDeviceTypeDAO().retrieveDeviceMappings(senseMeId);
+        for (DeviceMapping deviceMapping : deviceMappings) {
+            if (ultraSonicReading < deviceMapping.getDistance()) {
+                String alertmsg = "sound:" + deviceMapping.getDuration();
+                String publishTopic = deviceMapping.getTenantDomain() + "/" + DeviceTypeConstants.DEVICE_TYPE
+                                      + "/" + deviceMapping.getAlertMeId() + "/alert";
+                Operation commandOp = new CommandOperation();
+                commandOp.setCode("alert");
+                commandOp.setType(Operation.Type.COMMAND);
+                commandOp.setEnabled(true);
+                commandOp.setPayLoad(alertmsg);
+
+                Properties props = new Properties();
+                props.setProperty("mqtt.adapter.topic", publishTopic);
+                commandOp.setProperties(props);
+
+                List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+                deviceIdentifiers.add(new DeviceIdentifier(deviceMapping.getAlertMeId(),
+                                                           DeviceTypeConstants.DEVICE_TYPE));
+                APIUtil.getDeviceManagementService()
+                        .addOperation(DeviceTypeConstants.DEVICE_TYPE, commandOp, deviceIdentifiers);
+            }
+        }
+    }
+
+    public void run() {
+        try {
+            Thread.sleep(15000); //Wait for APIM start
+        } catch (InterruptedException e) {
+            log.error("Waiting failed", e);
+        }
+        initSubscriber();
     }
 
     private static String generateAccessToken(String applicationName, String[] tags) {

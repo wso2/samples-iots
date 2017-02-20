@@ -132,12 +132,23 @@ public class DeviceTypeManager implements DeviceManager {
         return status;
     }
 
-    public boolean getAlerts(String senseMeDeviceId, String alertMeDeviceId, String policy)
+    public boolean getAlerts(String senseMeDeviceId, String alertMeDeviceId, String tenantDomain)
             throws DeviceManagementException {
         try {
-            return deviceTypeDAO.getDeviceTypeDAO().addDeviceMapping(senseMeDeviceId, alertMeDeviceId, policy);
+            return deviceTypeDAO.getDeviceTypeDAO().addDeviceMapping(senseMeDeviceId, alertMeDeviceId, tenantDomain);
         } catch (DeviceMgtPluginException e) {
             String msg = "Error while subscribing for alerts";
+            log.error(msg, e);
+            throw new DeviceManagementException(msg, e);
+        }
+    }
+
+    public boolean updateMappingProperties(String alertMeDeviceId, int distance, int duration)
+            throws DeviceManagementException {
+        try {
+            return deviceTypeDAO.getDeviceTypeDAO().updateMappingProperties(alertMeDeviceId, distance, duration);
+        } catch (DeviceMgtPluginException e) {
+            String msg = "Error while updating alert properties.";
             log.error(msg, e);
             throw new DeviceManagementException(msg, e);
         }

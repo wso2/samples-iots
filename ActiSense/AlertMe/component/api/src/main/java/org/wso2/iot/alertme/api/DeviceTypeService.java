@@ -28,15 +28,13 @@ import org.wso2.carbon.apimgt.annotations.api.Scope;
 import org.wso2.carbon.apimgt.annotations.api.Scopes;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Path;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.PUT;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -75,32 +73,8 @@ public interface DeviceTypeService {
     String SCOPE = "scope";
 
     /**
-     * @param deviceId  unique identifier for given device type instance
-     * @param state     change status of sensor: on/off
-     */
-    @Path("device/{deviceId}/change-status")
-    @POST
-    @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
-            httpMethod = "POST",
-            value = "Switch Status",
-            notes = "",
-            response = Response.class,
-            tags = "alertme",
-            extensions = {
-                    @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:alertme:enroll")
-                    })
-            }
-    )
-    Response changeStatus(@PathParam("deviceId") String deviceId,
-                          @QueryParam("state") String state,
-                          @Context HttpServletResponse response);
-
-
-    /**
-     * @param deviceId  unique identifier for given device type instance
-     * @param alertfrom device id to get alerts from
+     * @param alertMeId  unique identifier for given device type instance
+     * @param senseMeId device id to get alerts from
      */
     @Path("device/{deviceId}/getalerts")
     @POST
@@ -117,20 +91,22 @@ public interface DeviceTypeService {
                     })
             }
     )
-    Response getAlerts(@PathParam("deviceId") String deviceId, @QueryParam("alertfrom") String alertfrom,@Context HttpServletResponse response);
-
+    Response getAlerts(@PathParam("deviceId") String alertMeId,
+                       @QueryParam("senseMeId") String senseMeId,
+                       @Context HttpServletResponse response);
 
 
     /**
      * @param deviceId  unique identifier for given device type instance
      * @param range     range for the sensor
+     * @param duration  duration for the alerts
      */
-    @Path("device/{deviceId}/setrange")
+    @Path("device/{deviceId}/setproperties")
     @POST
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
-            value = "Switch Status",
+            value = "Set device properties",
             notes = "",
             response = Response.class,
             tags = "alertme",
@@ -140,12 +116,10 @@ public interface DeviceTypeService {
                     })
             }
     )
-    Response setRange(@PathParam("deviceId") String deviceId,
-                          @QueryParam("range") String range,
-                          @Context HttpServletResponse response);
-
-
-
+    Response setProperties(@PathParam("deviceId") String deviceId,
+                           @QueryParam("range") int range,
+                           @QueryParam("duration") int duration,
+                           @Context HttpServletResponse response);
 
     /**
      * @param deviceId  unique identifier for given device type instance
@@ -172,10 +146,6 @@ public interface DeviceTypeService {
                           @QueryParam("duration") String duration,
                           @Context HttpServletResponse response);
 
-
-
-
-
     /**
      * Retrieve Sensor data for the given time period
      * @param deviceId unique identifier for given device type instance
@@ -200,10 +170,10 @@ public interface DeviceTypeService {
                     })
             }
     )
-    Response getSensorStats(@PathParam("deviceId") String deviceId, @QueryParam("from") long from,
-                            @QueryParam("to") long to, @QueryParam("sensorType") String sensorType);
-
-
+    Response getSensorStats(@PathParam("deviceId") String deviceId,
+                            @QueryParam("from") long from,
+                            @QueryParam("to") long to,
+                            @QueryParam("sensorType") String sensorType);
 
     /**
      * Retrieve Sensor data for the given time period
@@ -225,9 +195,7 @@ public interface DeviceTypeService {
                     })
             }
     )
-    Response isworn(@PathParam("deviceId") String deviceId);
-
-
+    Response isWorn(@PathParam("deviceId") String deviceId);
 
     /**
      * To download device type agent source code as zip file

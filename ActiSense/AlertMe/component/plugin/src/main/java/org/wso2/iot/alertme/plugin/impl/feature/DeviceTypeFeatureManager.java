@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class DeviceTypeFeatureManager implements FeatureManager {
 
-    private static Feature feature = new Feature();
+    private static List<Feature> features = new ArrayList<>();
     private static final String METHOD = "method";
     private static final String URI = "uri";
     private static final String CONTENT_TYPE = "contentType";
@@ -41,19 +41,21 @@ public class DeviceTypeFeatureManager implements FeatureManager {
     private static final String FORM_PARAMS = "formParams";
 
     public DeviceTypeFeatureManager () {
-        feature.setCode("change-status");
-        feature.setName("Change status of sensor: on/off");
-        feature.setDescription("Change status of sensor: on/off");
+        //Feature for get alerts
+        Feature getAlertsFeature = new Feature();
+        getAlertsFeature.setCode("getalerts");
+        getAlertsFeature.setName("Receive alerts for a SenseMe device");
+        getAlertsFeature.setDescription("Map AlertMe device with a SenseMe device");
 
         Map<String, Object> apiParams = new HashMap<>();
         apiParams.put(METHOD, "POST");
-        apiParams.put(URI, "/alertme/device/{deviceId}/change-status");
+        apiParams.put(URI, "device/{deviceId}/getalerts");
         List<String> pathParams = new ArrayList<>();
         List<String> queryParams = new ArrayList<>();
         List<String> formParams = new ArrayList<>();
         pathParams.add("deviceId");
         apiParams.put(PATH_PARAMS, pathParams);
-        queryParams.add("state");
+        queryParams.add("senseMeId");
         apiParams.put(QUERY_PARAMS, queryParams);
         apiParams.put(FORM_PARAMS, formParams);
         List<Feature.MetadataEntry> metadataEntries = new ArrayList<>();
@@ -61,7 +63,60 @@ public class DeviceTypeFeatureManager implements FeatureManager {
         metadataEntry.setId(-1);
         metadataEntry.setValue(apiParams);
         metadataEntries.add(metadataEntry);
-        feature.setMetadataEntries(metadataEntries);
+        getAlertsFeature.setMetadataEntries(metadataEntries);
+        features.add(getAlertsFeature);
+
+        //Feature for set properties
+        Feature setPropertiesFeature = new Feature();
+        setPropertiesFeature.setCode("setproperties");
+        setPropertiesFeature.setName("Set properties for AlertMe device");
+        setPropertiesFeature.setDescription("Set SenseMe range and duration of the notification");
+
+        apiParams = new HashMap<>();
+        apiParams.put(METHOD, "POST");
+        apiParams.put(URI, "device/{deviceId}/setproperties");
+        pathParams = new ArrayList<>();
+        queryParams = new ArrayList<>();
+        formParams = new ArrayList<>();
+        pathParams.add("deviceId");
+        apiParams.put(PATH_PARAMS, pathParams);
+        queryParams.add("range");
+        queryParams.add("duration");
+        apiParams.put(QUERY_PARAMS, queryParams);
+        apiParams.put(FORM_PARAMS, formParams);
+        metadataEntries = new ArrayList<>();
+        metadataEntry = new Feature.MetadataEntry();
+        metadataEntry.setId(-1);
+        metadataEntry.setValue(apiParams);
+        metadataEntries.add(metadataEntry);
+        setPropertiesFeature.setMetadataEntries(metadataEntries);
+        features.add(setPropertiesFeature);
+
+        //Feature for alert
+        Feature alertFeature = new Feature();
+        alertFeature.setCode("alert");
+        alertFeature.setName("Test device");
+        alertFeature.setDescription("Send test alert to AlertMe device");
+
+        apiParams = new HashMap<>();
+        apiParams.put(METHOD, "POST");
+        apiParams.put(URI, "device/{deviceId}/alert");
+        pathParams = new ArrayList<>();
+        queryParams = new ArrayList<>();
+        formParams = new ArrayList<>();
+        pathParams.add("deviceId");
+        apiParams.put(PATH_PARAMS, pathParams);
+        queryParams.add("alerttype");
+        queryParams.add("duration");
+        apiParams.put(QUERY_PARAMS, queryParams);
+        apiParams.put(FORM_PARAMS, formParams);
+        metadataEntries = new ArrayList<>();
+        metadataEntry = new Feature.MetadataEntry();
+        metadataEntry.setId(-1);
+        metadataEntry.setValue(apiParams);
+        metadataEntries.add(metadataEntry);
+        alertFeature.setMetadataEntries(metadataEntries);
+        features.add(alertFeature);
     }
 
 	@Override
@@ -75,14 +130,20 @@ public class DeviceTypeFeatureManager implements FeatureManager {
 	}
 
 	@Override
-	public Feature getFeature(String name) throws DeviceManagementException {
-        return feature;
+	public Feature getFeature(String code) throws DeviceManagementException {
+        if (code == null) {
+            return null;
+        }
+        for (Feature feature : features){
+            if (code.equals(feature.getCode())){
+                return feature;
+            }
+        }
+        return null;
 	}
 
 	@Override
 	public List<Feature> getFeatures() throws DeviceManagementException {
-        List<Feature> features = new ArrayList<>();
-        features.add(feature);
         return features;
 	}
 
