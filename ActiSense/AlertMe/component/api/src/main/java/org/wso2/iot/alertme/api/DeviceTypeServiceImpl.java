@@ -220,9 +220,6 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         }
     }
 
-
-
-
     /**
      * Retrieve Sensor data for the given time period
      * @param deviceId unique identifier for given device type instance
@@ -243,8 +240,6 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         String sensorTableName = null;
         if(sensorType.equals(DeviceTypeConstants.SENSOR_TYPE1)){
             sensorTableName = DeviceTypeConstants.SENSOR_TYPE1_EVENT_TABLE;
-        }else if(sensorType.equals(DeviceTypeConstants.SENSOR_TYPE2)){
-            sensorTableName = DeviceTypeConstants.SENSOR_TYPE2_EVENT_TABLE;
         }
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
@@ -260,7 +255,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             }
         } catch (AnalyticsException e) {
             String errorMsg = "Error on retrieving stats on table " + sensorTableName + " with query " + query;
-            log.error(errorMsg);
+            log.error(errorMsg, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(errorMsg).build();
         } catch (DeviceAccessAuthorizationException e) {
             log.error(e.getErrorMessage(), e);
@@ -268,11 +263,6 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         }
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
-
-
-
-
-
 
     /**
      * To download device type agent source code as zip file
