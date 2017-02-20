@@ -9,8 +9,14 @@
             "perm:alertme:enroll"
         ],
         "features": {
-            "change-status": {
-                "icon": "fw-activate"
+            "getalerts": {
+                "icon": "fw-apn"
+            },
+            "setproperties": {
+                "icon": "fw-register"
+            },
+            "alert": {
+                "icon": "fw-check"
             }
         }
     }
