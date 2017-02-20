@@ -18,11 +18,10 @@
 
 package org.wso2.iot.alertme.api.util;
 
-import org.wso2.iot.alertme.api.dto.SensorRecord;
-
-import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
-import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SortByField;
@@ -32,12 +31,12 @@ import org.wso2.carbon.apimgt.application.extension.APIManagementProviderService
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationService;
+import org.wso2.carbon.device.mgt.common.spi.DeviceManagementService;
 import org.wso2.carbon.device.mgt.core.service.DeviceManagementProviderService;
 import org.wso2.carbon.identity.jwt.client.extension.service.JWTClientManagerService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.wso2.iot.alertme.api.dto.SensorRecord;
+import org.wso2.iot.alertme.plugin.constants.DeviceTypeConstants;
 import org.wso2.iot.alertme.plugin.impl.DeviceTypeManager;
-import org.wso2.iot.alertme.plugin.impl.DeviceTypeManagerService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -184,14 +183,21 @@ public class APIUtil {
 
     public static DeviceTypeManager getDeviceTypeManagementService() {
         PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        DeviceTypeManagerService deviceManagementProviderService =
-                (DeviceTypeManagerService) ctx.getOSGiService(DeviceTypeManagerService.class, null);
-        if (deviceManagementProviderService == null) {
+        List<Object> deviceManagementServices = ctx.getOSGiServices(DeviceManagementService.class, null);
+        DeviceTypeManager deviceTypeManager = null;
+        for (Object service : deviceManagementServices) {
+            DeviceManagementService dmService = (DeviceManagementService) service;
+            if (DeviceTypeConstants.DEVICE_TYPE.equals(dmService.getType())){
+                deviceTypeManager = (DeviceTypeManager) dmService.getDeviceManager();
+            }
+        }
+
+        if (deviceTypeManager == null) {
             String msg = "Device Type Management service has not initialized.";
             log.error(msg);
             throw new IllegalStateException(msg);
         }else{
-            return (DeviceTypeManager) deviceManagementProviderService.getDeviceManager();
+            return deviceTypeManager;
         }
     }
 }
