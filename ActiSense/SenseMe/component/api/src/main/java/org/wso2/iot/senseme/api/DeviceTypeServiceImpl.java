@@ -189,6 +189,17 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     }
 
     /**
+     * Retrieve Server Time in Millis
+     *
+     * @return server time in millis
+     */
+    @Path("server-time")
+    @GET
+    public Response getServerTimeInMillis(){
+        return Response.ok().entity(System.currentTimeMillis()).build();
+    }
+
+    /**
      * To download device type agent source code as zip file
      *
      * @param deviceName name for the device type instance
