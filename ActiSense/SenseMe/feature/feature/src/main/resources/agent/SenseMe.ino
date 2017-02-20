@@ -40,12 +40,15 @@ const char* device_id = "{DEVICE_ID}";
 const char* apiKey = "Basic {API_APPLICATION_KEY}";
 const char* accessToken = "{DEVICE_TOKEN}";
 const char* refreshToken = "{DEVICE_REFRESH_TOKEN}";
-long lastMsg = 0;
 char msg[150];
 char publishTopic[100];
 char subscribedTopic[100];
 int count = 0;
 bool isTesting = false;
+long lastMsg = 0;
+long lastTest = 0;
+int lastDistance = -1;
+bool lastMovement = false;
 
 void setup_wifi() {
   digitalWrite(INDICATOR_LED, HIGH);
@@ -236,30 +239,47 @@ void loop() {
     }
   }
 
-  long now = millis();
-  if (now - lastMsg > 2000) {
-    lastMsg = now;
-    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"ULTRASONIC\":%ld.0}}}", owner, device_id, now, measureDistance());
-    snprintf (publishTopic, 100, "%s/senseme/%s/ULTRASONIC", tenant_domain, device_id);
-    client.publish(publishTopic, msg);
-//    Serial.print("Publish message: ");
-//    Serial.println(msg);
-//    Serial.println(publishTopic);
+  bool isUpdated = false;
+  int distance = measureDistance();
 
-    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"PIR\":%ld.0}}}", owner, device_id, now, isMoving);
-    snprintf (publishTopic, 100, "%s/senseme/%s/PIR", tenant_domain, device_id);
-    client.publish(publishTopic, msg);
-//    Serial.print("Publish message: ");
-//    Serial.println(msg);
-//    Serial.println(publishTopic);
-    if (isTesting) {
-      if (count == 0) {
-        isTesting = false;
-        Serial.println("Done!");
-      } else {
-        count--;
-      }
+  if (lastDistance != distance || lastMovement != isMoving) {
+    isUpdated = true;
+  } else {
+    isUpdated = false;
+  }
+
+  long now = millis();
+  if (now - lastMsg > 60000 || isUpdated) {
+    lastMsg = now;
+
+    if (lastDistance != distance || !isUpdated) {
+      snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"ULTRASONIC\":%ld.0}}}", owner, device_id, now, distance);
+      snprintf (publishTopic, 100, "%s/senseme/%s/ULTRASONIC", tenant_domain, device_id);
+      client.publish(publishTopic, msg);
+      Serial.print("Publish message: ");
+      Serial.println(msg);
+      Serial.println(publishTopic);
+      lastDistance = distance;
+    }
+
+    if (lastMovement != isMoving || !isUpdated) {
+      snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%ld},\"payloadData\":{\"PIR\":%ld.0}}}", owner, device_id, now, isMoving);
+      snprintf (publishTopic, 100, "%s/senseme/%s/PIR", tenant_domain, device_id);
+      client.publish(publishTopic, msg);
+      Serial.print("Publish message: ");
+      Serial.println(msg);
+      Serial.println(publishTopic);
+      lastMovement = isMoving;
+    }
+  }
+
+  if (isTesting && now - lastTest > 1000) {
+    lastTest = now;
+    if (count == 0) {
+      isTesting = false;
+      Serial.println("Done!");
+    } else {
+      count--;
     }
   }
 }
-
