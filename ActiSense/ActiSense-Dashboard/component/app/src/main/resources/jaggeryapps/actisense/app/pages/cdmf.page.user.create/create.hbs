@@ -1,0 +1,161 @@
+{{!
+  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+  WSO2 Inc. licenses this file to you under the Apache License,
+  Version 2.0 (the "License"); you may not use this file except
+  in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+}}
+{{unit "cdmf.unit.ui.title" pageTitle="User Management | Add User"}}
+
+{{#zone "breadcrumbs"}}
+    <li>
+        <a href="{{@app.context}}/">
+            <i class="icon fw fw-home"></i>
+        </a>
+    </li>
+    <li>
+        <a href="{{@app.context}}/users">
+            Users
+        </a>
+    </li>
+    <li>
+        <a href="{{@app.context}}/user/add">
+            Add
+        </a>
+    </li>
+{{/zone}}
+
+{{#zone "content"}}
+    {{#if canManage}}
+        <!-- content/body -->
+        <div class="row">
+            <div class="col-md-12">
+                <!-- content -->
+                <div id="user-create-form" class="container col-centered wr-content">
+                    <div class="wr-form">
+                        <p class="page-sub-title">Add User</p>
+                        <p>Please note that * sign represents required fields of data.</p>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div id="user-create-error-msg" class="alert alert-danger hidden" role="alert">
+                                    <i class="icon fw fw-error"></i><span></span>
+                                </div>
+                                <label class="wr-input-label"
+                                       title="Select the domain of the user store from the drop-down given below. The domain of the default user store is PRIMARY">
+                                    User Store Domain
+                                    <span class="wr-help-tip glyphicon glyphicon-question-sign"></span>
+                                </label>
+                                <div class="wr-input-control">
+                                    <select id="userStore" class="form-control select">
+                                        <option value="PRIMARY">PRIMARY</option>
+                                        {{#each userStores}}
+                                            <option value="{{this}}">{{this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                                <label class="wr-input-label" title="{{usernameHelpMsg}}">
+                                    User Name *
+                                    <span class="wr-help-tip glyphicon glyphicon-question-sign"></span>
+                                </label>
+                                <div id="usernameInputField" class="form-group wr-input-control">
+                                    <input limit="{{charLimit}}" type="text" id="username"
+                                           data-regex="{{usernameJSRegEx}}"
+                                           data-errormsg="{{usernameRegExViolationErrorMsg}}" class="form-control"/>
+                                    <span class=" usernameError hidden glyphicon glyphicon-remove form-control-feedback"></span>
+                                    <label class="error usernameEmpty hidden" for="summary">This field is required.
+                                        Username should be at least 3 characters long with no white spaces.</label>
+                                </div>
+                                <label class="wr-input-label">First Name *</label>
+                                <div id="firstNameField" class="form-group wr-input-control">
+                                    <input type="text" id="firstname" data-regex="{{firstnameJSRegEx}}"
+                                           data-errormsg="{{firstnameRegExViolationErrorMsg}}" class="form-control"/>
+                                    <span class="glyphicon glyphicon-remove form-control-feedback hidden fnError"></span>
+                                    <label class=" hidden error fnError" for="summary">This field is required.</label>
+                                </div>
+                                <label class="wr-input-label">Last Name *</label>
+                                <div id="lastNameField" class="form-group wr-input-control">
+                                    <input type="text" id="lastname" data-regex="{{lastnameJSRegEx}}"
+                                           data-errormsg="{{lastnameRegExViolationErrorMsg}}" class="form-control"/>
+                                    <span class="glyphicon glyphicon-remove form-control-feedback hidden lnError"></span>
+                                    <label class=" hidden error lnError" for="summary">This field is required.</label>
+                                </div>
+                                <label class="wr-input-label" title="Ex: dan@abc.com">
+                                    Email Address *
+                                    <span class="wr-help-tip glyphicon glyphicon-question-sign"></span>
+                                </label>
+                                <div id="emailField" class=" form-group wr-input-control">
+                                    <input type="email" id="emailAddress" class="form-control"/>
+                                    <span class="glyphicon glyphicon-remove form-control-feedback hidden emailError"></span>
+                                    <label class=" hidden error email-required" for="summary">This field is
+                                        required.</label>
+                                    <label class=" hidden error email-invalid" for="summary">Invalid Email
+                                        Address.</label>
+                                </div>
+                                {{#if canViewRoles}}
+                                    <label class="wr-input-label"
+                                           title="Optional field that can have 0-to-many roles for the user">
+                                        User Roles
+                                        <span class="wr-help-tip glyphicon glyphicon-question-sign"></span>
+                                    </label>
+                                    <div class="wr-input-control">
+                                        <select id="roles" class="form-control select2" multiple="multiple">
+                                            {{#each roles}}
+                                                <option>{{this}}</option>
+                                            {{/each}}
+                                        </select>
+                                    </div>
+                                {{/if}}
+                            </div>
+                        </div>
+                        <br>
+                        <button id="add-user-btn" class="wr-btn">Add User</button>
+                    </div>
+                </div>
+                <div id="user-created-msg" class="container col-centered wr-content hidden">
+                    <div class="wr-form">
+                        <p class="page-sub-title">User was added successfully.</p>
+                        <p>
+                            An invitation mail will be sent to this user to initiate device enrollment.
+                        </p>
+
+                        <br>Please click <b>"Add Another User"</b>, if you wish to add another user or click
+                        <b>"View User List"</b> to complete the process and go back to the user list.
+                        <hr/>
+                        <button class="wr-btn" onclick="window.location.href='{{@app.context}}/users'">View User List
+                        </button>
+                        <a href="{{@app.context}}/user/add" class="cu-btn-inner">
+                        <span class="fw-stack">
+                            <i class="fw fw-circle-outline fw-stack-2x"></i>
+                            <i class="fw fw-add fw-stack-1x"></i>
+                        </span>
+                            Add Another User
+                        </a>
+                    </div>
+                </div>
+                <!-- /content -->
+            </div>
+        </div>
+    {{else}}
+        <h1 class="page-sub-title">
+            Permission Denied
+        </h1>
+        <br>
+        You not authorized to enter User Management Section.
+        <br>
+    {{/if}}
+{{/zone}}
+
+{{#zone "bottomJs"}}
+    {{js "js/bottomJs.js"}}
+{{/zone}}

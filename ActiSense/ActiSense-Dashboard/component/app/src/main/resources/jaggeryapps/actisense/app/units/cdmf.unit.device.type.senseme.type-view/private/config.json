@@ -1,0 +1,15 @@
+{
+    "deviceType": {
+        "label": "Sense Me",
+        "category": "iot",
+        "downloadAgentUri": "senseme/1.0.0/device/download",
+        "analyticsEnabled": "false",
+        "groupingEnabled": "false",
+        "scopes" : [
+            "perm:senseme:enroll"
+        ],
+        "features": {
+
+        }
+    }
+}

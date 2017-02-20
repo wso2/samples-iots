@@ -1,0 +1,17 @@
+{
+    "deviceType": {
+        "label": "Alert Me",
+        "category": "iot",
+        "downloadAgentUri": "alertme/1.0.0/device/download",
+        "analyticsEnabled": "false",
+        "groupingEnabled": "false",
+        "scopes" : [
+            "perm:alertme:enroll"
+        ],
+        "features": {
+            "change-status": {
+                "icon": "fw-activate"
+            }
+        }
+    }
+}
