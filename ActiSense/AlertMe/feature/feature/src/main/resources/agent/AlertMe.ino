@@ -88,7 +88,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   String _payload = cmd.substring(0, terminatorIndex);
   int separatorIndex = _payload.indexOf(':');
   String action = _payload.substring(0, separatorIndex);
-  String duration = _payload.substring(separatorIndex + 1, payload.length());
+  String duration = _payload.substring(separatorIndex + 1, _payload.length());
 
   if (action == "LED") {
     isLED = true;
@@ -259,7 +259,7 @@ void loop() {
     lastMsg = now;
     long _timeStamp = initialTimeStamp + (now / 10000);
 
-    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"alertme\",\"deviceId\":\"%s\",\"time\":%lu0},\"payloadData\":{\"worndetector\":%ld}}}", owner, device_id, now, isWorn);
+    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"alertme\",\"deviceId\":\"%s\",\"time\":%lu0},\"payloadData\":{\"worndetector\":%ld}}}", owner, device_id, _timeStamp, isWorn);
     snprintf (publishTopic, 100, "%s/alertme/%s/worndetector", tenant_domain, device_id);
     client.publish(publishTopic, msg);
     Serial.print("Publish message: ");

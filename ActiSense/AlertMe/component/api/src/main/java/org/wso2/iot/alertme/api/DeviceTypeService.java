@@ -198,24 +198,6 @@ public interface DeviceTypeService {
     Response isWorn(@PathParam("deviceId") String deviceId);
 
     /**
-     * Retrieve Server Time in Millis
-     *
-     * @return server time in millis
-     */
-    @Path("server-time")
-    @GET
-    @Produces("text/plain")
-    @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
-            httpMethod = "GET",
-            value = "Server Time in Millis",
-            notes = "",
-            response = Response.class,
-            tags = "alertme"
-    )
-    Response getServerTimeInMillis();
-
-    /**
      * To download device type agent source code as zip file
      * @param deviceName   name for the device type instance
      * @param sketchType   folder name where device type agent was installed into server
