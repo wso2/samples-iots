@@ -17,6 +17,9 @@ target
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+#cache folders
+cache/
+
 # Package Files #
 *.jar
 *.war
