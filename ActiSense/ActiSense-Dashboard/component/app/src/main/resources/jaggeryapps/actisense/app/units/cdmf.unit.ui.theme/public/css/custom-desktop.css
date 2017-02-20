@@ -6584,3 +6584,14 @@ select > option:hover {
 }
 
 /** End **/
+
+
+.btn-primary.disabled{
+    background-color: #33b763 !important;
+    border-color: #33b763 !important;
+}
+
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+    background: #157743 !important;
+    border-color: #157743 !important;;
+}
