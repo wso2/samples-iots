@@ -423,8 +423,13 @@ a.ctrl-filter-category:hover {
 
 .btn-primary:hover, .btn-primary:focus, .btn-primary.focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
 	color: #fff;
-	background-color: #526A84;
-	border-color: #526A84;
+	background-color: #2d7752;
+	border-color: #2d7752;
+}
+
+.btn-primary.active:focus, .btn-primary.active:hover{
+    background-color: #157743;
+    border-color: #157743;
 }
 
 .btn {

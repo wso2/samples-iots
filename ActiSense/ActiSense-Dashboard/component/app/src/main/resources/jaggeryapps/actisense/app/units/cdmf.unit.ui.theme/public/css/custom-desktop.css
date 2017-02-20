@@ -6587,8 +6587,8 @@ select > option:hover {
 
 
 .btn-primary.disabled{
-    background-color: #33b763 !important;
-    border-color: #33b763 !important;
+    background-color: #7eb797 !important;
+    border-color: #7eb797 !important;
 }
 
 .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
