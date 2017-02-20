@@ -124,7 +124,7 @@ public class GetTokenThread implements Runnable {
         List<DeviceMapping> deviceMappings = deviceTypeDAO.getDeviceTypeDAO().retrieveDeviceMappings(senseMeId);
         for (DeviceMapping deviceMapping : deviceMappings) {
             if (pirReading == 1) {
-                String alertmsg = "LED:" + deviceMapping.getDuration();
+                String alertmsg = "LED:" + deviceMapping.getDuration() + ";";
                 String publishTopic = deviceMapping.getTenantDomain() + "/" + DeviceTypeConstants.DEVICE_TYPE
                                       + "/" + deviceMapping.getAlertMeId() + "/alert";
                 publishMessage(deviceMapping.getAlertMeId(), alertmsg, publishTopic, deviceMapping.getTenantDomain());
@@ -138,7 +138,7 @@ public class GetTokenThread implements Runnable {
         List<DeviceMapping> deviceMappings = deviceTypeDAO.getDeviceTypeDAO().retrieveDeviceMappings(senseMeId);
         for (DeviceMapping deviceMapping : deviceMappings) {
             if (ultraSonicReading < deviceMapping.getDistance()) {
-                String alertmsg = "SOUND:" + deviceMapping.getDuration();
+                String alertmsg = "SOUND:" + deviceMapping.getDuration() + ";";
                 String publishTopic = deviceMapping.getTenantDomain() + "/" + DeviceTypeConstants.DEVICE_TYPE
                                       + "/" + deviceMapping.getAlertMeId() + "/alert";
                 publishMessage(deviceMapping.getAlertMeId(), alertmsg, publishTopic, deviceMapping.getTenantDomain());

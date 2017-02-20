@@ -185,7 +185,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
 
-            String alertmsg = alerttype.toUpperCase() + ":" + duration;
+            String alertmsg = alerttype.toUpperCase() + ":" + duration + ";";
 
             Map<String, String> dynamicProperties = new HashMap<>();
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
