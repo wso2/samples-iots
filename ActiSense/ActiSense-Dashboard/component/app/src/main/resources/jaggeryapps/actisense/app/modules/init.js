@@ -28,8 +28,17 @@ var carbonServer = new carbonModule.server.Server({
 
 application.put("carbonServer", carbonServer);
 
-var permissions = {
+var alertMePermissions = {
     "/permission/admin/Login": ["ui.execute"],
+    "/permission/admin/device-mgt/devices/enroll/alertme": ["ui.execute"],
+    "/permission/admin/device-mgt/devices/owning-device/view": ["ui.execute"],
+    "/permission/admin/manage/api/subscribe": ["ui.execute"]
+};
+
+var senseMePermissions = {
+    "/permission/admin/Login": ["ui.execute"],
+    "/permission/admin/device-mgt/devices/enroll/senseme": ["ui.execute"],
+    "/permission/admin/device-mgt/devices/owning-device/view": ["ui.execute"],
     "/permission/admin/manage/api/subscribe": ["ui.execute"]
 };
 
@@ -40,5 +49,7 @@ var adminPermissions = {
 //On Startup, admin user will get both roles: devicemgt-admin and devicemgt-user
 //Average user through sign-up will only receive the role: devicemgt-user.
 //Admin can setup necessary permissions for the role: devicemgt-user
-userModule.addRole("internal/devicemgt-user", ["admin"], permissions);
+userModule.addRole("internal/devicemgt-user", ["admin"], alertMePermissions);
+userModule.addRole("internal/alertme-user", ["admin"], alertMePermissions);
+userModule.addRole("internal/senseme-user", ["admin"], senseMePermissions);
 userModule.addRole("internal/devicemgt-admin", ["admin"], adminPermissions);

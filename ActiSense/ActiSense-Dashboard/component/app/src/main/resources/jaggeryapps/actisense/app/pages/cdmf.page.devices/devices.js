@@ -40,7 +40,7 @@ function onRequest(context) {
         viewModel.permissions = {};
         var uiPermissions = userModule.getUIPermissions();
         viewModel.permissions.list = stringify(uiPermissions);
-        if (uiPermissions.ADD_DEVICE) {
+        if (uiPermissions.ADD_DEVICE || uiPermissions.ADD_DEVICE_SENSEME || uiPermissions.ADD_DEVICE_ALERTME) {
             viewModel.permissions.enroll = true;
         }
         viewModel.currentUser = currentUser;
