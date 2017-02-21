@@ -1,0 +1,20 @@
+{
+  "name": "org.wso2.iot.devices.s1",
+  "version": "1.0.0",
+  "nickName": "s1",
+  "description": "s1 data received from the Device",
+  "metaData": [
+    {"name":"owner","type":"STRING"},
+    {"name":"deviceType","type":"STRING"},
+    {"name":"deviceId","type":"STRING"},
+    {"name":"time","type":"LONG"}
+  ],
+  "payloadData": [
+      {
+        "name": "s1","type": "FLOAT"
+      }
+  ]
+}
+	
+
+				                                    		

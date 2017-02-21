@@ -1,0 +1,11 @@
+
+{
+  "deviceType": {
+    "label": "androidtv",
+    "category": "virtual",
+    "downloadAgentUri": "androidtv/device/download",
+    "scopes" : [
+      "perm:androidtv:enroll"
+    ]
+  }
+}
