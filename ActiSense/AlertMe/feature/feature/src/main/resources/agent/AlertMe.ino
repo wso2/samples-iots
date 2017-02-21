@@ -21,9 +21,9 @@
 #include "PubSubClient.h"
 #include "FS.h"
 
-#define SWITCH  5
-#define INDICATOR_LED 13
-#define BUZZER 12
+#define SWITCH  5 //D01
+#define INDICATOR_LED 13 //D07
+#define BUZZER 12 //D06
 
 // Update these with values suitable for your network.
 const char* ssid = "TP-LINK_EB7F32";
@@ -168,8 +168,8 @@ String getAccessToken() {
 void syncTime(String _timeStampString){
   Serial.print("\n_timeStampString: ");
   Serial.println(_timeStampString);
-  char _timeStamp[10];
-  _timeStampString.toCharArray(_timeStamp, 10);
+  char _timeStamp[11];
+  _timeStampString.toCharArray(_timeStamp, 11);
   Serial.print("\n_timeStamp: ");
   Serial.println(_timeStamp);
   initialTimeStamp = atol(_timeStamp);
@@ -257,9 +257,9 @@ void loop() {
   long now = millis();
   if (now - lastMsg > 60000 || isUpdated) {
     lastMsg = now;
-    long _timeStamp = initialTimeStamp + (now / 10000);
+    long _timeStamp = initialTimeStamp + (now / 1000);
 
-    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"alertme\",\"deviceId\":\"%s\",\"time\":%lu0},\"payloadData\":{\"worndetector\":%ld}}}", owner, device_id, _timeStamp, isWorn);
+    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"alertme\",\"deviceId\":\"%s\",\"time\":%lu},\"payloadData\":{\"worndetector\":%ld}}}", owner, device_id, _timeStamp, isWorn);
     snprintf (publishTopic, 100, "%s/alertme/%s/worndetector", tenant_domain, device_id);
     client.publish(publishTopic, msg);
     Serial.print("Publish message: ");
