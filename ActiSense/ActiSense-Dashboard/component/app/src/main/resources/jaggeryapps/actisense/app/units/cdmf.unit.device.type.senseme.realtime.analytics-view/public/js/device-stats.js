@@ -107,8 +107,9 @@ function connect(wsConnection, target, chartData, graph) {
         graph.update();
         wsConnection.onmessage = function (event) {
             lastDataPoint = JSON.parse(event.data);
+            var tNow = new Date().getTime() / 1000;
             chartData.push({
-                x: parseInt(lastDataPoint[4]),
+                x: tNow,
                 y: parseFloat(lastDataPoint[5])
             });
             chartData.shift();
