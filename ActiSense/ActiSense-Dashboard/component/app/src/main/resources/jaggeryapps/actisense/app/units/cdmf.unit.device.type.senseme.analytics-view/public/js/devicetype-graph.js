@@ -77,7 +77,7 @@ function drawGraph_senseme(from, to)
                     x: parseInt(new Date().getTime() / 1000),
                     y: 0
                 }],
-                'name': $("#details").data("devicename")
+                'name': sensorType1
             });
         graphConfigSensorType2['series'].push(
             {
@@ -86,7 +86,7 @@ function drawGraph_senseme(from, to)
                     x: parseInt(new Date().getTime() / 1000),
                     y: 0
                 }],
-                'name': $("#details").data("devicename")
+                'name': sensorType2
             });
     }
 
@@ -187,7 +187,7 @@ function drawGraph_senseme(from, to)
             chartData.push(
                 {
                     x: parseInt(data[i].values.meta_time) - tzOffset,
-                    y: parseInt(sensorType)
+                    y: parseInt(data[i].values[sensorType])
                 }
             );
         }

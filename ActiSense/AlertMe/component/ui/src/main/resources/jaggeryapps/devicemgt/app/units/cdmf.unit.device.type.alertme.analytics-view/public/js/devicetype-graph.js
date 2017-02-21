@@ -64,7 +64,7 @@ function drawGraph_alertme(from, to)
                     x: parseInt(new Date().getTime() / 1000),
                     y: 0
                 }],
-                'name': $("#details").data("devicename")
+                'name': sensorType1
             });
     }
 
@@ -162,7 +162,7 @@ function drawGraph_alertme(from, to)
             chartData.push(
                 {
                     x: parseInt(data[i].values.meta_time) - tzOffset,
-                    y: parseInt(sensorType)
+                    y: parseInt(data[i].values[sensorType])
                 }
             );
         }
