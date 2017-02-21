@@ -24,7 +24,7 @@ var chartDataSensorType1 = [];
 var chartDataSensorType2 = [];
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
-    var tNow = new Date().getTime() / 1000000;
+    var tNow = new Date().getTime() / 1000;
     for (var i = 0; i < 30; i++) {
         chartData.push({
             x: tNow - (30 - i) * 15,
@@ -37,6 +37,7 @@ function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
         width: $(placeHolder).width() - 50,
         height: 300,
         renderer: "line",
+        interpolation: "linear",
         padding: {top: 0.2, left: 0.0, right: 0.0, bottom: 0.2},
         xScale: d3.time.scale(),
         series: [{
@@ -65,7 +66,7 @@ function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
     new Rickshaw.Graph.HoverDetail({
         graph: graph,
         formatter: function (series, x, y) {
-            var date = '<span class="date">' + moment.unix(x * 1000).format('Do MMM YYYY h:mm:ss a') + '</span>';
+            var date = '<span class="date">' + moment.unix(x).format('Do MMM YYYY h:mm:ss a') + '</span>';
             var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
             return swatch + series.name + ": " + parseInt(y) + '<br>' + date;
         }
@@ -96,15 +97,38 @@ function connect(wsConnection, target, chartData, graph) {
         console.log('WebSocket is not supported by this browser.');
     }
     if (wsConnection) {
+        var tNow = new Date().getTime() / 1000;
+        var lastDataPoint = {
+            x: tNow,
+            y: parseFloat(0)
+        };
+        chartData.push(lastDataPoint);
+        chartData.shift();
+        graph.update();
         wsConnection.onmessage = function (event) {
-            var dataPoint = JSON.parse(event.data);
+            lastDataPoint = JSON.parse(event.data);
             chartData.push({
-                x: parseInt(dataPoint[4]) / 1000,
-                y: parseFloat(dataPoint[5])
+                x: parseInt(lastDataPoint[4]),
+                y: parseFloat(lastDataPoint[5])
             });
             chartData.shift();
             graph.update();
         };
+        setInterval(function () {
+            if (lastDataPoint) {
+                var tNow = new Date().getTime() / 1000;
+                var lastTime = parseInt(lastDataPoint[4]);
+                if (tNow - lastTime > 3) {
+                    chartData.push({
+                        x: tNow,
+                        y: parseFloat(lastDataPoint[5])
+                    });
+                    chartData.shift();
+                    graph.update();
+                    lastDataPoint[4] = tNow;
+                }
+            }
+        }, 2000);
     }
 }
 

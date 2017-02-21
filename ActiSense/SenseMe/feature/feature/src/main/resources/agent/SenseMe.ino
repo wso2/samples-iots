@@ -45,6 +45,7 @@ char publishTopic[100];
 char subscribedTopic[100];
 int count = 0;
 bool isTesting = false;
+long distance = 0;
 long lastDistanceMsg = 0;
 long lastMovementMsg = 0;
 long lastDistanceCheck = 0;
@@ -259,7 +260,6 @@ void loop() {
   }
 
   long now = millis();
-  long distance = 0;
   int distanceDelta = 0;
   if (now - lastDistanceCheck > 2000) {
     distance = measureDistance();

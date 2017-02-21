@@ -37,6 +37,7 @@ function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
         width: $(placeHolder).width() - 50,
         height: 300,
         renderer: "line",
+        interpolation: "linear",
         padding: {top: 0.2, left: 0.0, right: 0.0, bottom: 0.2},
         xScale: d3.time.scale(),
         series: [{
@@ -96,15 +97,38 @@ function connect(wsConnection, target, chartData, graph) {
         console.log('WebSocket is not supported by this browser.');
     }
     if (wsConnection) {
+        var tNow = new Date().getTime() / 1000;
+        var lastDataPoint = {
+            x: tNow,
+            y: parseFloat(0)
+        };
+        chartData.push(lastDataPoint);
+        chartData.shift();
+        graph.update();
         wsConnection.onmessage = function (event) {
-            var dataPoint = JSON.parse(event.data);
+            lastDataPoint = JSON.parse(event.data);
             chartData.push({
-                x: parseInt(dataPoint[4]),
-                y: parseFloat(dataPoint[5])
+                x: parseInt(lastDataPoint[4]),
+                y: parseFloat(lastDataPoint[5])
             });
             chartData.shift();
             graph.update();
         };
+        setInterval(function () {
+            if (lastDataPoint) {
+                var tNow = new Date().getTime() / 1000;
+                var lastTime = parseInt(lastDataPoint[4]);
+                if (tNow - lastTime > 3) {
+                    chartData.push({
+                        x: tNow,
+                        y: parseFloat(lastDataPoint[5])
+                    });
+                    chartData.shift();
+                    graph.update();
+                    lastDataPoint[4] = tNow;
+                }
+            }
+        }, 2000);
     }
 }
 

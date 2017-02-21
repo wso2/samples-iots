@@ -39,10 +39,8 @@ function onRequest(context) {
 		response.addCookie(websocketToken);
 	}
 	var websocketEndpointForStream1 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.worndetector/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
-	var websocketEndpointForStream2 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.NA/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
 	return {
 		"device": device,
-		"websocketEndpointForStream1": websocketEndpointForStream1,
-		"websocketEndpointForStream2": websocketEndpointForStream2
+		"websocketEndpointForStream1": websocketEndpointForStream1
 	};
 }
