@@ -24,6 +24,8 @@ function onRequest(context) {
 
     var viewModel = {};
     var deviceModule = require("/app/modules/business-controllers/device.js")["deviceModule"];
+    var userModule = require("/app/modules/business-controllers/user.js")["userModule"];
+    var uiPermissions = userModule.getUIPermissions();
     var utility = require("/app/modules/utility.js").utility;
     var typesListResponse = deviceModule.getDeviceTypes();
     if (typesListResponse["status"] == "success") {
@@ -35,6 +37,9 @@ function onRequest(context) {
             var deviceTypesList = [], virtualDeviceTypesList = [];
             for (var i = 0; i < deviceTypes.length; i++) {
                 var deviceType = deviceTypes[i];
+                if (!uiPermissions['ADD_DEVICE_' + deviceType.toUpperCase()]) {
+                    continue;
+                }
                 var deviceTypeLabel = deviceType;
                 var configs = utility.getDeviceTypeConfig(deviceTypeLabel);
                 var deviceCategory = "device";

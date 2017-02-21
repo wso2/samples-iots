@@ -59,15 +59,6 @@ var deviceListing, currentUser, groupId;
  */
 $(document).ready(function () {
 
-    var permissionSet = {};
-    $.setPermission = function (permission) {
-        permissionSet[permission] = true;
-    };
-
-    $.hasPermission = function (permission) {
-        return permissionSet[permission];
-    };
-
     deviceListing = $("#device-listing");
     currentUser = deviceListing.data("current-user");
     
@@ -149,9 +140,9 @@ function toTitleCase(str) {
 
 function loadDevices(searchType, searchParam) {
     var serviceURL;
-    if (groupId && $.hasPermission("LIST_OWN_DEVICES")) {
+    if (groupId && permissionsUtil.hasPermission("LIST_OWN_DEVICES")) {
         serviceURL = "/api/device-mgt/v1.0/groups/id/" + groupId + "/devices";
-    } else if ($.hasPermission("LIST_DEVICES")) {
+    } else if (permissionsUtil.hasPermission("LIST_DEVICES")) {
         serviceURL = "/api/device-mgt/v1.0/devices";
     } else if (permissionsUtil.hasPermission("LIST_OWN_DEVICES")) {
         //Get authenticated users devices
@@ -488,13 +479,6 @@ $(document).ready(function () {
         addDeviceSelectedClass(this);
     });
 
-    var permissionList = $("#permission").data("permission");
-    for (var key in permissionList) {
-        if (permissionList.hasOwnProperty(key)) {
-            $.setPermission(key);
-        }
-    }
-
     loadDevices();
 
     /* for device list sorting drop down */
@@ -601,9 +585,9 @@ function attachDeviceEvents() {
             showPopup();
 
             var serviceURL;
-            if ($.hasPermission("LIST_ALL_GROUPS")) {
+            if (permissionsUtil.hasPermission("LIST_ALL_GROUPS")) {
                 serviceURL = "/api/device-mgt/v1.0/admin/groups?limit=100";
-            } else if ($.hasPermission("LIST_GROUPS")) {
+            } else if (permissionsUtil.hasPermission("LIST_GROUPS")) {
                 //Get authenticated users groups
                 serviceURL = "/api/device-mgt/v1.0/groups?limit=100";
             }
