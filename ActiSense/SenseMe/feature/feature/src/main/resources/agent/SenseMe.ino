@@ -21,10 +21,10 @@
 #include "PubSubClient.h"
 #include "FS.h"
 
-#define TRIGGER  5
-#define ECHO     4
-#define INDICATOR_LED 0
-#define PIR_OUT  14
+#define TRIGGER  5 //D1
+#define ECHO     4 //D2
+#define INDICATOR_LED 0 //D3
+#define PIR_OUT  14 //D5
 
 // Update these with values suitable for your network.
 const char* ssid = "TP-LINK_EB7F32";
@@ -45,10 +45,11 @@ char publishTopic[100];
 char subscribedTopic[100];
 int count = 0;
 bool isTesting = false;
-long lastMsg = 0;
+long lastDistanceMsg = 0;
+long lastMovementMsg = 0;
 long lastTest = 0;
 int lastDistance = -1;
-bool lastMovement = false;
+int lastMovement = -1;
 unsigned long initialTimeStamp = 0;
 
 void setup_wifi() {
@@ -151,8 +152,8 @@ String getAccessToken() {
 void syncTime(String _timeStampString){
   Serial.print("\n_timeStampString: ");
   Serial.println(_timeStampString);
-  char _timeStamp[10];
-  _timeStampString.toCharArray(_timeStamp, 10);
+  char _timeStamp[11];
+  _timeStampString.toCharArray(_timeStamp, 11);
   Serial.print("\n_timeStamp: ");
   Serial.println(_timeStamp);
   initialTimeStamp = atol(_timeStamp);
@@ -256,39 +257,37 @@ void loop() {
     }
   }
 
-  bool isUpdated = false;
-  int distance = measureDistance();
-
-  if (lastDistance != distance || lastMovement != isMoving) {
-    isUpdated = true;
-  } else {
-    isUpdated = false;
+  long now = millis();
+  long distance = 0;
+  int distanceDelta = 0;
+  if (now - lastDistanceMsg > 2000) {
+    distance = measureDistance();
+    distanceDelta = distance - lastDistance;
+    lastDistanceMsg = now;
   }
 
-  long now = millis();
-  if (now - lastMsg > 60000 || isUpdated) {
-    lastMsg = now;
-    long _timeStamp = initialTimeStamp + (now / 10000);
+  if (now - lastDistanceMsg > 20000 || abs(distanceDelta) > 3) {
+    lastDistanceMsg = now;
+    long _timeStamp = initialTimeStamp + (now / 1000);
+    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu},\"payloadData\":{\"ULTRASONIC\":%ld.0}}}", owner, device_id, _timeStamp, distance);
+    snprintf (publishTopic, 100, "%s/senseme/%s/ULTRASONIC", tenant_domain, device_id);
+    client.publish(publishTopic, msg);
+    Serial.print("Publish message: ");
+    Serial.println(msg);
+    Serial.println(publishTopic);
+    lastDistance = distance;
+  }
 
-    if (lastDistance != distance || !isUpdated) {
-      snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu0},\"payloadData\":{\"ULTRASONIC\":%ld.0}}}", owner, device_id, _timeStamp, distance);
-      snprintf (publishTopic, 100, "%s/senseme/%s/ULTRASONIC", tenant_domain, device_id);
-      client.publish(publishTopic, msg);
-      Serial.print("Publish message: ");
-      Serial.println(msg);
-      Serial.println(publishTopic);
-      lastDistance = distance;
-    }
-
-    if (lastMovement != isMoving || !isUpdated) {
-      snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu0},\"payloadData\":{\"PIR\":%ld.0}}}", owner, device_id, _timeStamp, isMoving);
-      snprintf (publishTopic, 100, "%s/senseme/%s/PIR", tenant_domain, device_id);
-      client.publish(publishTopic, msg);
-      Serial.print("Publish message: ");
-      Serial.println(msg);
-      Serial.println(publishTopic);
-      lastMovement = isMoving;
-    }
+  if (now - lastMovementMsg > 20000 || (isMoving != lastMovement && now - lastMovementMsg > 2000)) {
+    lastMovementMsg = now;
+    long _timeStamp = initialTimeStamp + (now / 1000);
+    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu},\"payloadData\":{\"PIR\":%ld.0}}}", owner, device_id, _timeStamp, isMoving);
+    snprintf (publishTopic, 100, "%s/senseme/%s/PIR", tenant_domain, device_id);
+    client.publish(publishTopic, msg);
+    Serial.print("Publish message: ");
+    Serial.println(msg);
+    Serial.println(publishTopic);
+    lastMovement = isMoving;
   }
 
   if (isTesting && now - lastTest > 1000) {

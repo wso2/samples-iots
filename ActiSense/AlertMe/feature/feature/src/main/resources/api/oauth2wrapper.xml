@@ -46,9 +46,7 @@
                 <format>
                     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
                         <soapenv:Body>
-                            <text xmlns="http://ws.apache.org/commons/ns/payload">
-                                access_token:$1,refresh_token:$2,time_stamp:$3
-                            </text>
+                            <text xmlns="http://ws.apache.org/commons/ns/payload">access_token:$1,refresh_token:$2,time_stamp:$3</text>
                         </soapenv:Body>
                     </soapenv:Envelope>
                 </format>
