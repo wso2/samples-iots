@@ -15,8 +15,7 @@
 
     <ScrollView android:id="@+id/login_form" android:layout_width="match_parent"
                 android:layout_height="153dp"
-                android:fillViewport="false"
-            >
+                android:fillViewport="false">
 
         <LinearLayout android:id="@+id/email_login_form" android:layout_width="match_parent"
                       android:layout_height="wrap_content" android:orientation="vertical">
@@ -55,17 +54,5 @@
             android:text="@string/action_sign_in_short"
             android:textStyle="bold"
             android:layout_gravity="center_horizontal"/>
-
-    <Button
-            android:text="mute"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/button2"/>
-
-    <Button
-            android:text="unmute"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/button3"/>
 
 </LinearLayout>

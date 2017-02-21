@@ -66,30 +66,11 @@ public class Register extends Activity {
         mHostView = (EditText) findViewById(R.id.hostname);
 
         deviceRegisterButton = (Button) findViewById(R.id.device_register_button);
-        muteButton = (Button) findViewById(R.id.button2);
-        unmuteButton = (Button) findViewById(R.id.button3);
-
 
         deviceRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
-            }
-        });
-
-        final AudioHandlerImpl volumeHandler = new AudioHandlerImpl(getApplicationContext());
-
-        muteButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                volumeHandler.mute();
-            }
-        });
-
-        unmuteButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                volumeHandler.unmute();
             }
         });
 
