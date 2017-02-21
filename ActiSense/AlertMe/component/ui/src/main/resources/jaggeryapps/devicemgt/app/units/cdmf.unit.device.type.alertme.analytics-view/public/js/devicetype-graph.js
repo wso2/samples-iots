@@ -98,7 +98,7 @@ function drawGraph_alertme(from, to)
             graph: graph,
             formatter: function (series, x, y) {
                 var date = '<span class="date">' +
-                    moment.unix((x + tzOffset) * 1000).format('Do MMM YYYY h:mm:ss a') + '</span>';
+                    moment.unix(x + tzOffset).format('Do MMM YYYY h:mm:ss a') + '</span>';
                 var swatch = '<span class="detail_swatch" style="background-color: ' +
                     series.color + '"></span>';
                 return swatch + series.name + ": " + parseInt(y) + '<br>' + date;
@@ -117,7 +117,6 @@ function drawGraph_alertme(from, to)
             legend: legend
         });
         var deviceIndex = 0;
-        console.log("1");
         if (devices) {
             getData(chat, deviceIndex, sensorType);
         } else {
@@ -142,7 +141,6 @@ function drawGraph_alertme(from, to)
             + "?from=" + from + "&to=" + to + "&sensorType=" + sensorType;
         var successCallback = function (data) {
             if (data) {
-                console.log("----" + data);
                 drawLineGraph(JSON.parse(data), sensorType, deviceIndex, graphConfig, graph);
             }
             deviceIndex++;
@@ -164,7 +162,7 @@ function drawGraph_alertme(from, to)
             chartData.push(
                 {
                     x: parseInt(data[i].values.meta_time) - tzOffset,
-                    y: parseInt(data[i].values[sensorType])
+                    y: parseInt(sensorType)
                 }
             );
         }
