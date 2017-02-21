@@ -47,6 +47,7 @@ int count = 0;
 bool isTesting = false;
 long lastDistanceMsg = 0;
 long lastMovementMsg = 0;
+long lastDistanceCheck = 0;
 long lastTest = 0;
 int lastDistance = -1;
 int lastMovement = -1;
@@ -260,13 +261,13 @@ void loop() {
   long now = millis();
   long distance = 0;
   int distanceDelta = 0;
-  if (now - lastDistanceMsg > 2000) {
+  if (now - lastDistanceCheck > 2000) {
     distance = measureDistance();
     distanceDelta = distance - lastDistance;
-    lastDistanceMsg = now;
+    lastDistanceCheck = now;
   }
 
-  if (now - lastDistanceMsg > 20000 || abs(distanceDelta) > 3) {
+  if (now - lastDistanceMsg > 60000 || abs(distanceDelta) > 3) {
     lastDistanceMsg = now;
     long _timeStamp = initialTimeStamp + (now / 1000);
     snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu},\"payloadData\":{\"ULTRASONIC\":%ld.0}}}", owner, device_id, _timeStamp, distance);
@@ -278,7 +279,7 @@ void loop() {
     lastDistance = distance;
   }
 
-  if (now - lastMovementMsg > 20000 || (isMoving != lastMovement && now - lastMovementMsg > 2000)) {
+  if (now - lastMovementMsg > 60000 || (isMoving != lastMovement && now - lastMovementMsg > 2000)) {
     lastMovementMsg = now;
     long _timeStamp = initialTimeStamp + (now / 1000);
     snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu},\"payloadData\":{\"PIR\":%ld.0}}}", owner, device_id, _timeStamp, isMoving);
