@@ -65,7 +65,7 @@ function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
     new Rickshaw.Graph.HoverDetail({
         graph: graph,
         formatter: function (series, x, y) {
-            var date = '<span class="date">' + moment.unix(x * 1000).format('Do MMM YYYY h:mm:ss a') + '</span>';
+            var date = '<span class="date">' + moment.unix(x).format('Do MMM YYYY h:mm:ss a') + '</span>';
             var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
             return swatch + series.name + ": " + parseInt(y) + '<br>' + date;
         }
@@ -99,7 +99,7 @@ function connect(wsConnection, target, chartData, graph) {
         wsConnection.onmessage = function (event) {
             var dataPoint = JSON.parse(event.data);
             chartData.push({
-                x: parseInt(dataPoint[4]) / 1000,
+                x: parseInt(dataPoint[4]),
                 y: parseFloat(dataPoint[5])
             });
             chartData.shift();

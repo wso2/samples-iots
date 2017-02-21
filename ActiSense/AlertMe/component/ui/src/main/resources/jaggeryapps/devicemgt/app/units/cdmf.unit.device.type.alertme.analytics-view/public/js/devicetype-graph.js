@@ -117,6 +117,7 @@ function drawGraph_alertme(from, to)
             legend: legend
         });
         var deviceIndex = 0;
+        console.log("1");
         if (devices) {
             getData(chat, deviceIndex, sensorType);
         } else {
@@ -141,6 +142,7 @@ function drawGraph_alertme(from, to)
             + "?from=" + from + "&to=" + to + "&sensorType=" + sensorType;
         var successCallback = function (data) {
             if (data) {
+                console.log("----" + data);
                 drawLineGraph(JSON.parse(data), sensorType, deviceIndex, graphConfig, graph);
             }
             deviceIndex++;
