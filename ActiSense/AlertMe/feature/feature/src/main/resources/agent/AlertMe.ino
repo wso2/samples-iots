@@ -283,6 +283,11 @@ void loop() {
         isSound = false;
         digitalWrite(BUZZER, LOW);
       } else {
+        if (soundCount % 2 == 1) {
+          digitalWrite(BUZZER, HIGH);
+        } else {
+          digitalWrite(BUZZER, LOW);
+        }
         soundCount--;
       }
     }
