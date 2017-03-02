@@ -61,15 +61,15 @@ import javax.ws.rs.core.Response;
 @SuppressWarnings("NonJaxWsWebServices")
 public interface DeviceTypeService {
     /**
-     * End point to send the key words to the device
+     * End point to send video to the device
      *
      * @param deviceId The registered device Id.
      */
     @POST
-    @Path("device/{deviceId}/volume")
+    @Path("device/{deviceId}/video")
     @ApiOperation(
             httpMethod = "POST",
-            value = "End point to mute the android TV",
+            value = "End point to send video to the android TV",
             notes = "",
             tags = "androidtv",
             extensions = {
@@ -105,26 +105,26 @@ public interface DeviceTypeService {
                             + " send keywords",
                     response = Response.class)
     })
-    Response toggleVolume(
+    Response playVideo(
             @ApiParam(
                     name = "deviceId",
                     value = "The registered device Id.",
                     required = true)
             @PathParam("deviceId") String deviceId,
             @ApiParam(
-                    name = "state",
-                    value = "The state words to be sent. (Mute/ UnMute)",
+                    name = "url",
+                    value = "Video url to be sent",
                     required = true)
-            @QueryParam("state") String state);
+            @QueryParam("url") String url);
 
     /**
-     * End point to disable the HDMI in Android TV device.
+     * End point to send message to Android TV device.
      */
     @POST
-    @Path("device/{deviceId}/hdmi")
+    @Path("device/{deviceId}/message")
     @ApiOperation(
             httpMethod = "POST",
-            value = "Disable HDMI in Android tv",
+            value = "Send message to Android tv",
             notes = "",
             response = Response.class,
             tags = "androidtv",
@@ -161,17 +161,17 @@ public interface DeviceTypeService {
                             + " send threashold",
                     response = Response.class)
     })
-    Response toggleHDMI(
+    Response sendMessage(
             @ApiParam(
                     name = "deviceId",
                     value = "The registered device Id.",
                     required = true)
             @PathParam("deviceId") String deviceId,
             @ApiParam(
-                    name = "state",
-                    value = "The state to be sent. (Enable/ Disable)",
+                    name = "message",
+                    value = "The message to be displayed.",
                     required = true)
-            @QueryParam("state") String state);
+            @QueryParam("message") String message);
 
     /**
      * Enroll devices.

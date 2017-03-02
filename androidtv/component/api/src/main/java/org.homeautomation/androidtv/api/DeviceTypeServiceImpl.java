@@ -36,6 +36,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,26 +50,26 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     private static Log log = LogFactory.getLog(DeviceTypeService.class);
 
     /**
-     * Toggle the android tv device volume.
+     * Play video on Android TV with given URL.
      * @param deviceId The registered device Id.
      * @return
      */
     @POST
-    @Path("device/{deviceId}/volume")
-    public Response toggleVolume(@PathParam("deviceId") String deviceId, @QueryParam("state") String state) {
+    @Path("device/{deviceId}/video")
+    public Response playVideo(@PathParam("deviceId") String deviceId, @QueryParam("url") String url) {
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
                     AndroidTVConstants.DEVICE_TYPE), DeviceGroupConstants.Permissions.DEFAULT_OPERATOR_PERMISSIONS)) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                    + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command/volume";
+                    + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command/video";
 
             Operation commandOp = new CommandOperation();
-            commandOp.setCode("volume");
+            commandOp.setCode("video");
             commandOp.setType(Operation.Type.COMMAND);
             commandOp.setEnabled(true);
-            commandOp.setPayLoad(state);
+            commandOp.setPayLoad(URLEncoder.encode(url, "UTF-8"));
 
             Properties props = new Properties();
             props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
@@ -78,7 +80,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             APIUtil.getDeviceManagementService().addOperation(AndroidTVConstants.DEVICE_TYPE, commandOp,
                     deviceIdentifiers);
             return Response.ok().build();
-        } catch (InvalidDeviceException e) {
+        } catch (InvalidDeviceException | UnsupportedEncodingException e) {
             String msg = "Invalid Device Identifiers found.";
             log.error(msg, e);
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -92,26 +94,26 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     }
 
     /**
-     * Disable HDMI in Android TV device.
+     * Display message in Android TV device.
      * @param deviceId : The registered device id.
      * @return
      */
     @POST
-    @Path("device/{deviceId}/hdmi")
-    public Response toggleHDMI(@PathParam("deviceId") String deviceId, @QueryParam("state") String state) {
+    @Path("device/{deviceId}/message")
+    public Response sendMessage(@PathParam("deviceId") String deviceId, @QueryParam("message") String message) {
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
                     AndroidTVConstants.DEVICE_TYPE), DeviceGroupConstants.Permissions.DEFAULT_OPERATOR_PERMISSIONS)) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                    + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command/hdmi";
+                    + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command/message";
 
             Operation commandOp = new CommandOperation();
-            commandOp.setCode("hdmi");
+            commandOp.setCode("message");
             commandOp.setType(Operation.Type.COMMAND);
             commandOp.setEnabled(true);
-            commandOp.setPayLoad(state);
+            commandOp.setPayLoad(message);
 
             Properties props = new Properties();
             props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);

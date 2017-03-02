@@ -19,21 +19,21 @@
   -->
 <DeviceTypeConfiguration name="androidtv">
     <Features>
-        <Feature code="volume">
-            <Name>Toggle volume</Name>
-            <Description>Mute/ Unmute the Android TV device</Description>
-            <Operation context="/androidtv/device/{deviceId}/volume" method="POST">
+        <Feature code="message">
+            <Name>Send message</Name>
+            <Description>Send message to the Android TV device</Description>
+            <Operation context="/androidtv/device/{deviceId}/message" method="POST">
                 <QueryParameters>
-                    <Parameter>state</Parameter>
+                    <Parameter>message</Parameter>
                 </QueryParameters>
             </Operation>
         </Feature>
-        <Feature code="hdmi">
-            <Name>Toggle HDMI</Name>
-            <Description>Enable/ Disable HDMI in the device</Description>
-            <Operation context="/androidtv/device/{deviceId}/hdmi" method="POST">
+        <Feature code="video">
+            <Name>Send Video</Name>
+            <Description>Send video url to play in the device</Description>
+            <Operation context="/androidtv/device/{deviceId}/video" method="POST">
                 <QueryParameters>
-                    <Parameter>state</Parameter>
+                    <Parameter>url</Parameter>
                 </QueryParameters>
             </Operation>
         </Feature>
