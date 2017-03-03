@@ -1,8 +1,8 @@
 
 {
   "deviceType": {
-    "label": "androidtv",
-    "category": "virtual",
+    "label": "Android TV",
+    "category": "iot",
     "downloadAgentUri": "androidtv/device/download",
     "scopes" : [
       "perm:androidtv:enroll"

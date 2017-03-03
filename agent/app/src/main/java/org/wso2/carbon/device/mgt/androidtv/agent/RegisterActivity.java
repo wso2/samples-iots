@@ -71,6 +71,7 @@ public class RegisterActivity extends Activity {
 
     public void attemptLogin() {
         showProgress(true);
+        deviceRegisterButton.setVisibility(View.INVISIBLE);
         // Reset errors.
         mUsernameView.setError(null);
         mPasswordView.setError(null);
@@ -138,6 +139,7 @@ public class RegisterActivity extends Activity {
                     mUiHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            deviceRegisterButton.setVisibility(View.INVISIBLE);
                             showProgress(false);
                         }
                     });
