@@ -1,0 +1,20 @@
+/* Enter a unique ExecutionPlan */
+@Plan:name('Floor-Analysis-Averaged-Sensors-Execution-Plan')
+
+/* Enter a unique description for ExecutionPlan */
+@Plan:description('ExecutionPlan for converting the single events into averaged event for certain time')
+
+/* define streams/tables and write queries here ... */
+
+@Import('org.wso2.floor.SensorStream:1.0.0')
+define stream dataIn (deviceId string, temperature double, motion double, humidity double, airQuality double);
+
+@Export('org.wso2.floor.average.SensorStream:1.0.0')
+define stream dataOut (deviceId string, avgTemperature double, avgMotion double, avgHumidity double, avgAirQuality
+double, timeStamp long);
+
+from dataIn#window.timeBatch(10 min)
+select deviceId, avg(temperature) as avgTemperature, avg(motion) as avgMotion, avg(humidity) as avgHumidity, avg
+(airQuality) as avgAirQuality, time:timestampInMilliseconds() as timeStamp
+group by deviceId
+insert all events into dataOut ;

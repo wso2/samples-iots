@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<artifact name="Floor-Analysis-EventSink-SensorStream" version="1.0.0" type="analytics/eventstore"
+          serverRole="FloorAnalysis">
+    <file>org_wso2_floor_average_SensorStream.xml</file>
+</artifact>
