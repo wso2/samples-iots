@@ -17,10 +17,7 @@ double, timeStamp long, floorId string, xCoordinate int, yCoordinate int);
 @from(eventtable = 'rdbms' , datasource.name = 'WSO2_FLOOR_ANALYTICS' , table.name = 'device')
 define table deviceLocationTable (deviceId string, floorId string, xCoordinate int, yCoordinate int);
 
-from dataIn as d join deviceLocationTable as l
-	on d.deviceId == l.deviceId
-select d.deviceId as deviceId, d.avgTemperature as temperature, d.avgMotion as motion, d.avgHumidity as humidity, d
-.avgAirQuality as  airQuality, d.timeStamp as timeStamp, l.floorId as floorId, l.xCoordinate as xCoordinate, l
-.yCoordinate as yCoordinate
+from dataIn as d join deviceLocationTable as l on d.deviceId == l.deviceId
+select d.deviceId as deviceId, d.avgTemperature as temperature, d.avgMotion as motion, d.avgHumidity as humidity, d.avgAirQuality as  airQuality,
+d.timeStamp as timeStamp, l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate
 insert into dataOut ;
-

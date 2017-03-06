@@ -16,7 +16,7 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<artifact name="Floor-Analysis-EventSink-SensorStream" version="1.0.0" type="analytics/eventstore"
+<artifact name="Floor-Analysis-EventSink-DeviceSensorStream" version="1.0.0" type="analytics/eventstore"
           serverRole="FloorAnalysis">
-    <file>org_wso2_floor_average_SensorStream.xml</file>
+    <file>org_wso2_floor_device_SensorStream.xml</file>
 </artifact>

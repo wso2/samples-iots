@@ -24,6 +24,8 @@
         <dependency artifact="Floor-Analysis-Sensor-Floor-Mapping-Execution-Plan" version="1.0.0" include="true"
                     serverRole="FloorAnalysis"/>
         <dependency artifact="Floor-Analysis-EventSink-SensorStream" version="1.0.0" include="true" serverRole="FloorAnalysis"/>
+        <dependency artifact="Floor-Analysis-EventSink-DeviceSensorStream" version="1.0.0" include="true"
+                    serverRole="FloorAnalysis"/>
         <dependency artifact="org.wso2.floor.SensorStream" version="1.0.0" include="true" serverRole="FloorAnalysis"/>
         <dependency artifact="org.wso2.floor.average.SensorStream" version="1.0.0" include="true" serverRole="FloorAnalysis"/>
         <dependency artifact="org.wso2.floor.device.SensorStream" version="1.0.0" include="true"
