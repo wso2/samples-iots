@@ -29,6 +29,10 @@
       "type" : "LONG"
     },
     {
+      "name" : "buildingId",
+      "type" : "STRING"
+    },
+    {
       "name" : "floorId",
       "type" : "STRING"
     },

@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<eventPublisher name="Floor-Analysis-WebSocketLocal-FloorEvent"
+<eventPublisher name="Floor-Analysis-WebSocketLocal-DeviceFloorEvent"
                 statistics="disable" trace="disable" xmlns="http://wso2.org/carbon/eventpublisher">
-    <from streamName="org.wso2.floor.perFloor.SensorStream" version="1.0.0"/>
+    <from streamName="org.wso2.floor.device.SensorStream" version="1.0.0"/>
     <mapping customMapping="enable" type="json">
         <inline>{
-            "building" : {{buildingId}},
-            "floor": {{floorId}},
+            "deviceId": {{deviceId}},
             "temperature": {{temperature}},
             "motion" : {{motion}},
             "humidity" : {{humidity}},
-            "airQuality" : {{airQuality}}
+            "airQuality" : {{airQuality}},
+            "location": {
+            "building" : {{buildingId}},
+            "floor": {{floorId}},
+            "coordinates": [{{xCoordinate}},{{yCoordinate}}]
+            }
             }</inline>
     </mapping>
     <to eventAdapterType="websocket-local"/>

@@ -31,6 +31,8 @@
                     serverRole="FloorAnalysis"/>
         <dependency artifact="Floor-Analysis-EventSink-FloorSensorStream" version="1.0.0" include="true"
                     serverRole="FloorAnalysis"/>
+        <dependency artifact="Floor-Analysis-WebSocketLocal-DeviceFloorEvent" version="1.0.0" include="true"
+                    serverRole="FloorAnalysis"/>
         <dependency artifact="Floor-Analysis-WebSocketLocal-FloorEvent" version="1.0.0" include="true"
                     serverRole="FloorAnalysis"/>
         <dependency artifact="org.wso2.floor.SensorStream" version="1.0.0" include="true" serverRole="FloorAnalysis"/>

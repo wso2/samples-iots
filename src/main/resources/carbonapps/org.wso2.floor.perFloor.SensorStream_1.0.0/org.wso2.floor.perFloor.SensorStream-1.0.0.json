@@ -5,6 +5,10 @@
   "description": "",
   "payloadData": [
     {
+      "name": "buildingId",
+      "type": "STRING"
+    },
+    {
       "name": "floorId",
       "type": "STRING"
     },

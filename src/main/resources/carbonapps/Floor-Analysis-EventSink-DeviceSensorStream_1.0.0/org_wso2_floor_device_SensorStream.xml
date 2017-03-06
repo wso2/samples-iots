@@ -50,7 +50,7 @@
             <Type>LONG</Type>
         </ColumnDefinition>
         <ColumnDefinition>
-            <Name>floorId</Name>
+            <Name>buildingId</Name>
             <IsFacet>false</IsFacet>
             <EnableIndexing>true</EnableIndexing>
             <IsPrimaryKey>false</IsPrimaryKey>
