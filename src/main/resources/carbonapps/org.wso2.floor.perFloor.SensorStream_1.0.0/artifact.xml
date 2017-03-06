@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
   ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,7 +15,7 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<artifact name="Floor-Analysis-EventSink-AverageSensorStream" version="1.0.0" type="analytics/eventstore"
-          serverRole="FloorAnalysis">
-    <file>org_wso2_floor_average_SensorStream.xml</file>
+
+<artifact name="org.wso2.floor.perFloor.SensorStream" version="1.0.0" type="event/stream" serverRole="FloorAnalysis">
+    <file>org.wso2.floor.perFloor.SensorStream-1.0.0.json</file>
 </artifact>
