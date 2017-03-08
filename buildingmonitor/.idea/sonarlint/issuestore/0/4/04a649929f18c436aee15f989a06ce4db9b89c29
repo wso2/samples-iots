@@ -1,0 +1,14 @@
+
+jjavascript:S2814"IRename "KEY_NAME" as this name is already used in declaration at line 40.(°Åİ½8¡ÑàÁª+
+javascript:S3827"o"markers" does not exist. Change its name or declare it so that its usage doesn't result in a "ReferenceError".(ÄÄ±¸8¡ÑàÁª+
+Ajavascript:S1442" Remove this usage of alert(...).(¾Ìí8¡ÑàÁª+
+Ijavascript:S1125")Remove the literal "false" boolean value.(Ã¤°:8¡ÑàÁª+
+\javascript:UnusedVariable"9Remove the declaration of the unused 'metaData' variable.(áäÎ
+j+javascript:FunctionDeclarationsWithinBlocks"/Do not use function declarations within blocks.(…ÄÎ)8¡ÑàÁª+
+Djavascript:S2228"Remove this logging statement.(²ÔÙüÿÿÿÿ8¡ÑàÁª+
+‰javascript:S3827"i"L" does not exist. Change its name or declare it so that its usage doesn't result in a "ReferenceError".(Øä®8¡ÑàÁª+
+njavascript:S3776"TRefactor this function to reduce its Cognitive Complexity from 22 to the 15 allowed.(­‹ ™
+k+javascript:FunctionDeclarationsWithinBlocks"/Do not use function declarations within blocks.(üîä8¡ÑàÁª+
+?javascript:S2228"Remove this logging statement.(æ¹Ö®8¡ÑàÁª+
+Ijavascript:S1125"(Remove the literal "true" boolean value.(€½õÓ8¡ÑàÁª+
+?javascript:S2228"Remove this logging statement.(¦ªéÂ8¡ÑàÁª+

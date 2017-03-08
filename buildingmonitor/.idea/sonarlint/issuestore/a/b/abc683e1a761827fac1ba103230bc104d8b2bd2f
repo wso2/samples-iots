@@ -1,0 +1,389 @@
+
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Œ’üşÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(ıêœë
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(áúÈüÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¿‚ª¤øÿÿÿÿ
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÌÀÚ
+
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(õşòİ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Çñá¸ÿÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(óèë¥ùÿÿÿÿ
+Cjavascript:BitwiseOperators"Remove the use of "&" operator.(‹è‹_
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(æ¶æçıÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÎÔä
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(å•¹ÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÛşÓ
+Djavascript:BitwiseOperators"Remove the use of "&" operator.(—ı–—
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÉŒĞ´øÿÿÿÿ
+5javascript:S3735"Remove "void" operator(•±Çáÿÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(â€í‡
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ŒĞ²Åøÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÀÂÀ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ë»ëï
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(æÄ½Ãøÿÿÿÿ
+sjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(È«¬W
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(„Ïçƒıÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(Ãñ¯´
+yjavascript:S1067"ZReduce the number of conditional operators (9) used in the expression (maximum allowed 3).(Í²±Æûÿÿÿÿ
+tjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(õƒÆÜ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(å‘Ùùÿÿÿÿ
+0javascript:S3735"Remove "void" operator(¯‹Ú·
+yjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(àéøÿúÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ıÿàœüÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(äÓ´ûÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¼­Éòøÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(´‹‰³
+Cjavascript:BitwiseOperators"Remove the use of "&" operator.(‹è‹_
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(’Æ‡Æ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(¾äÎ°
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¬ÚÏÃ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(İª×³ùÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ºÊ‚¥
+zjavascript:S1067"[Reduce the number of conditional operators (11) used in the expression (maximum allowed 3).(©ãŸ…øÿÿÿÿ
+Cjavascript:BitwiseOperators"Remove the use of "&" operator.(‹è‹_
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(Í²±Æûÿÿÿÿ
+ujavascript:NestedIfDepth"NRefactor this code to not nest more than 3 if/for/while/switch/try statements.(Ö‚¹áÿÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(×Œ–Ú
+yjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(ß‘Å™şÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(öôÃæüÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(“ åÅ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¶·§…üÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÀÛÅà
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(â€í‡
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(‚õÖ©øÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Ò‚Äë
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ºÊ‚¥
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¼©òıÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(Í²±Æûÿÿÿÿ
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(š¯ñP
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(È´é
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¡äË
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(Ï‹Î™
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(êÎşƒúÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Åé™şÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(äÎˆ´
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(õƒÆÜ
+tjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(Ø·«‡
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Â”“Ùùÿÿÿÿ
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "o" before this usage.(ç–‡
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "T" before this usage.(ç—áã
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(©ãŸ…øÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¯‹Ú·
+e(javascript:VariableDeclarationAfterUsage".Move the declaration of "i" before this usage.(Ç‘ Âüÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ãøêôùÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(©ãŸ…øÿÿÿÿ
+0javascript:S3735"Remove "void" operator(Ò«à
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ŠŸ¢úÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(àŸÈ”
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‡–€ú
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "w" before this usage.(ç—áã
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(ÜœÉ…şÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ŒĞÜÑ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(÷«ÆÒøÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(æÄ½Ãøÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÁÙÁ´
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(…ğõ˜
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÀìÒşşÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(¿‚ª¤øÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(éËëÍ
+0javascript:S3735"Remove "void" operator(öÊÅ
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "e" before this usage.(ñæÑ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(Ãñ¯´
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Şîƒ°
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(éËëÍ
+]javascript:S3358"DExtract this nested ternary operation into an independent statement.(ó’…b
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(äÓ´ûÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(˜Ò”
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(•±Çáÿÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(æäŸŒüÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¦«êÄøÿÿÿÿ
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(û²àt
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(—‹‘¿
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(õƒÆÜ
+yjavascript:S1067"ZReduce the number of conditional operators (7) used in the expression (maximum allowed 3).(Æåä›ÿÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ú°ğ¾üÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(–¾…éÿÿÿÿÿ
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ï›c
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(™Ñßÿÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(ºÀî°ıÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(˜Ò”
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(èõË°øÿÿÿÿ
+cjavascript:S3699"DRemove this use of the output from "t"; "t" doesn't return anything.(è†öúÿÿÿÿ
+yjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(˜ªó÷ûÿÿÿÿ
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‹è‹_
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ê¸àÔ
+Jjavascript:BitwiseOperators" Remove the use of "|=" operator.(‹¿˜´şÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ÌƒÒÂøÿÿÿÿ
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Šè¡m
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¶·§…üÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(Í²±Æûÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(­„ş€
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(àä«Ò
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(»´ûÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ö‚¹áÿÿÿÿÿ
+'javascript:TooManyBreakOrContinueInLoop"]Reduce the total number of "break" and "continue" statements in this loop to use one at most.(ˆ«Åû
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(¯¾úÃ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ÿ¼äª
+tjavascript:S1186"ZAdd a nested comment explaining why this function is empty or complete the implementation.(ÖÀ»â
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(…ÿÀûÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ø´Ÿ¿
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(’Æ‡Æ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¥÷äÖ
+0javascript:S3735"Remove "void" operator(àŸÈ”
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ĞÖì›
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "l" before this usage.(•Î’Ğ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ì»öŠ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(êÎşƒúÿÿÿÿ
+Pjavascript:S3800"6Refactor this function to always return the same type.(­¤¦©
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‹ª‘¹
+Jjavascript:S1264"+Replace this "for" loop with a "while" loop(§Ã¼ıÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(˜ââ±
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(‘»¤ï
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(û×ô‘ûÿÿÿÿ
+e(javascript:VariableDeclarationAfterUsage".Move the declaration of "x" before this usage.(¸®­±ùÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(Í²±Æûÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ŒĞÜÑ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(­±À“şÿÿÿÿ
+sjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(Šã«"
+pjavascript:S3776"VRefactor this function to reduce its Cognitive Complexity from 2357 to the 15 allowed.(¶•‡
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(Ãñ¯´
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Çû§Ïıÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(©ãŸ…øÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(áúÈüÿÿÿÿ
+Rjavascript:ForIn"9Restrict what this loop acts on by testing each property.(š¯ñP
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‰ßÒÁ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Àå÷†ıÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(„ÉäÏûÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(öôÃæüÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(óßàÌ
+tjavascript:S1186"ZAdd a nested comment explaining why this function is empty or complete the implementation.(³„Ñ×
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ÀÛÅà
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(àéøÿúÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Øõ¤—
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "n" before this usage.(ñæÑ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(øöõÁşÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(„ıÉ´
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(Ãñ¯´
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ÎÔä
+yjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(ø¾Ğæøÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¶¥˜ùÿÿÿÿ
+ujavascript:NestedIfDepth"NRefactor this code to not nest more than 3 if/for/while/switch/try statements.(±Ù†şÿÿÿÿ
+sjavascript:S1067"ZReduce the number of conditional operators (7) used in the expression (maximum allowed 3).(Æø‹
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(éËëÍ
+^javascript:S2583"DChange this condition so that it does not always evaluate to "true".(¥÷äÖ
+Djavascript:BitwiseOperators"Remove the use of "&" operator.(¾äÎ°
+0javascript:S3735"Remove "void" operator(È¢øÿ
+5javascript:S3735"Remove "void" operator(ë¿ê«ıÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ıÅŒòøÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(âŒÅêÿÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ƒñ‰Ï
+ujavascript:S1067"[Reduce the number of conditional operators (12) used in the expression (maximum allowed 3).(Ãñ¯´
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(¾äÎ°
+e(javascript:VariableDeclarationAfterUsage".Move the declaration of "P" before this usage.(¸®­±ùÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÀöºÇ
+]javascript:S3358"DExtract this nested ternary operation into an independent statement.(Æø‹
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(éßº®
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Èİîıÿÿÿÿ
+tjavascript:S1067"ZReduce the number of conditional operators (6) used in the expression (maximum allowed 3).(ıêœë
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(ıêœë
+5javascript:S3735"Remove "void" operator(±Ù†şÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ã¢Õûÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Ì‡Ÿúÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(åĞ”öüÿÿÿÿ
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(¾äÎ°
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Ì»öŠ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(Û¹“À
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(ÜœÉ…şÿÿÿÿ
+Jjavascript:S1264"+Replace this "for" loop with a "while" loop(­±À“şÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‚õÖ©øÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(èÔ‹íúÿÿÿÿ
+yjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(‚ÚºÔúÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.( ŒÛ…
+]javascript:S3358"DExtract this nested ternary operation into an independent statement.(Æø‹
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÔŠÏøÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Í¯»¦ıÿÿÿÿ
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(é½éŸ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(÷Êà¼
+yjavascript:S1067"ZReduce the number of conditional operators (6) used in the expression (maximum allowed 3).(ÜœÉ…şÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Âë÷”
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Šã«"
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(€Æ“©øÿÿÿÿ
+Rjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Šè¡m
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Âë÷”
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ù•õŞ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(Í²±Æûÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(éÍù
+Jjavascript:BitwiseOperators" Remove the use of "|=" operator.(‹¿˜´şÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(³ƒ“
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(¢®’©úÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(§Ã¼ıÿÿÿÿ
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÌÀÚ
+
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(­¿ƒÜıÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(şŸºÕÿÿÿÿÿ
+cjavascript:S3699"DRemove this use of the output from "t"; "t" doesn't return anything.(è†öúÿÿÿÿ
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "r" before this usage.(¿ù®”
+Djavascript:BitwiseOperators"Remove the use of "&" operator.(¾äÎ°
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(«öıõûÿÿÿÿ
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(¬²”Ü
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(Ãñ¯´
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ö¯Ğ´
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(êÚÃ¨
+Jjavascript:BitwiseOperators" Remove the use of "|=" operator.(‹¿˜´şÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(©ãŸ…øÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(™õ…™ıÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¨¬ÊÆÿÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(æäŸŒüÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¨å‰ûÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‚·äìÿÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(éËëÍ
+Ijavascript:BitwiseOperators"Remove the use of "|" operator.(­ÿ–‰ıÿÿÿÿ
+yjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(ê€¶Óøÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(™ÉÖ‡
+0javascript:S3735"Remove "void" operator(àŸÈ”
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(éËëÍ
+sjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(²÷ó0
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(„ıÉ´
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "m" before this usage.(Ÿ±´ù
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Éè™á
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "a" before this usage.(•Î’Ğ
+tjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(Å’„
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¼ä¦
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(—ı–—
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(©–Âñ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(èÔ‹íúÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(Ó†¾‚
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(éËëÍ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ô«ÖÆıÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(Í²±Æûÿÿÿÿ
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(’Æ‡Æ
+Ejavascript:S1264"+Replace this "for" loop with a "while" loop(½€Í
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(íŸêµ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÌƒÒÂøÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ŠÄäôùÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ò‚Äë
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(…ÑŸêøÿÿÿÿ
+yjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(Ä´´šúÿÿÿÿ
+tjavascript:S1186"ZAdd a nested comment explaining why this function is empty or complete the implementation.(ÿµÓˆ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Øª•š
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ã¢Õûÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Úæø‚úÿÿÿÿ
+yjavascript:S1067"ZReduce the number of conditional operators (6) used in the expression (maximum allowed 3).(·Í¥£üÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(©ãŸ…øÿÿÿÿ
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "_" before this usage.(Ÿ±´ù
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "f" before this usage.(Ÿ±´ù
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(–·ô½ùÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(’Æ‡Æ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Úæø‚úÿÿÿÿ
+5javascript:S3735"Remove "void" operator(Ş’ÍÏøÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(İø¿œûÿÿÿÿ
+Rjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ßñÂ+
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¶°Ì‚
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‘»¤ï
+cjavascript:S3699"DRemove this use of the output from "t"; "t" doesn't return anything.(è†öúÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(™šˆğşÿÿÿÿ
+0javascript:S3735"Remove "void" operator(‰ßÒÁ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ê¤ú
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÁÔíÙ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(şÒ×Ÿşÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(š½çİùÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(±Ù†şÿÿÿÿ
+tjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(½µ½æ
+yjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(ë¿ê«ıÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(éßº®
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(‰¤™¸úÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ëìúÿ
+_(javascript:VariableDeclarationAfterUsage".Move the declaration of "y" before this usage.(£½®5
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(İ¸£Îıÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(áúÈüÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‚Ÿâ­úÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(šÇù§
+5javascript:S3735"Remove "void" operator(ã¢Õûÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(ø„¸—ûÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(ıêœë
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ğ‘âüÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ü‡‡Œşÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.( Ğ¯ÿÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‘Ùº¦
+_(javascript:VariableDeclarationAfterUsage".Move the declaration of "g" before this usage.(£½®5
+cjavascript:S3699"DRemove this use of the output from "t"; "t" doesn't return anything.(è†öúÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(Í²±Æûÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ü »ñ
+pjavascript:NestedIfDepth"NRefactor this code to not nest more than 3 if/for/while/switch/try statements.(àä«Ò
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "h" before this usage.(•Î’Ğ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(áúÈüÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ú…¸‘
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(™‹÷ıÿÿÿÿ
+5javascript:S3735"Remove "void" operator(ã¢Õûÿÿÿÿ
+Djavascript:BitwiseOperators"Remove the use of "&" operator.(¾äÎ°
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(½€Í
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÁÔíÙ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(œáäûÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ú°ğ¾üÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(®„Ùù
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ì‡Ÿúÿÿÿÿ
+yjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(Şˆªìşÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(éËëÍ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(±Ú® 
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(‰’—
+_(javascript:VariableDeclarationAfterUsage".Move the declaration of "v" before this usage.(£½®5
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(©ãŸ…øÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Şîƒ°
+tjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(ÀØÂ®
+yjavascript:S1186"ZAdd a nested comment explaining why this function is empty or complete the implementation.(òÔÄ½ùÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ÍÂéÖÿÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(˜ââ±
+e(javascript:VariableDeclarationAfterUsage".Move the declaration of "n" before this usage.(†³éÍüÿÿÿÿ
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(©ãŸ…øÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ºıÁ‰ıÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ò«à
+ujavascript:S1067"[Reduce the number of conditional operators (14) used in the expression (maximum allowed 3).(éËëÍ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.( ˆâøÿÿÿÿ
+Sjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Ëìúÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Â¡Ûşÿÿÿÿ
+tjavascript:S1067"ZReduce the number of conditional operators (5) used in the expression (maximum allowed 3).(´¦–±
+5javascript:S3735"Remove "void" operator(ë¿ê«ıÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(…ğõ˜
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(éÍù
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(øìÆ“ıÿÿÿÿ
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Šè¡m
+Ejavascript:S1264"+Replace this "for" loop with a "while" loop(ÁÙÁ´
+^javascript:S2259"?TypeError can be thrown as "t" might be null or undefined here.(ø„¸—ûÿÿÿÿ
+]javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ßñÂ+
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(´•™ßşÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(­ÿ–‰ıÿÿÿÿ
+`(javascript:VariableDeclarationAfterUsage".Move the declaration of "b" before this usage.(ç—áã
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(™É
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‰’—
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(½µ½æ
+Jjavascript:BitwiseOperators" Remove the use of "|=" operator.(‹¿˜´şÿÿÿÿ
+5javascript:S3735"Remove "void" operator(•±Çáÿÿÿÿÿ
+zjavascript:S1067"[Reduce the number of conditional operators (10) used in the expression (maximum allowed 3).(—ÿÑÇÿÿÿÿÿ
+]javascript:S3358"DExtract this nested ternary operation into an independent statement.(Æø‹
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(¥®×ú
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(Ÿ„‹òüÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(èå¹
+_(javascript:VariableDeclarationAfterUsage".Move the declaration of "L" before this usage.(£½®5
+Rjavascript:ForIn"9Restrict what this loop acts on by testing each property.(Šè¡m
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(èí¨ã
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÃšèÚúÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ñ³ºš
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(àŸÈ”
+cjavascript:S3358"DExtract this nested ternary operation into an independent statement.(€Æ“©øÿÿÿÿ
+Djavascript:BitwiseOperators"Remove the use of "&" operator.(¾äÎ°
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ôåëÿÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(…§—ÿÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ÊÎôíşÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÿë¥‘úÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ØÙ÷úÿÿÿÿ
+0javascript:S3735"Remove "void" operator(ù•õŞ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(½µ½æ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‘ÃÄºúÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(‰¤™¸úÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(èØƒĞúÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ÊÎôíşÿÿÿÿ
+cjavascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(ø¾Ğæøÿÿÿÿ
+Xjavascript:ForIn"9Restrict what this loop acts on by testing each property.(ŒĞ²Åøÿÿÿÿ
+^javascript:S3358"DExtract this nested ternary operation into an independent statement.(õƒÆÜ
+yjavascript:S1067"ZReduce the number of conditional operators (4) used in the expression (maximum allowed 3).(ÿÇÜ¾ûÿÿÿÿ
+^javascript:OneStatementPerLine"6Reformat the code to have only one statement per line.(€úÿ
