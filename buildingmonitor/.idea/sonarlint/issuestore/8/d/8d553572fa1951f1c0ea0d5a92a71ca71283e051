@@ -1,113 +1,0 @@
-
-Hjavascript:CommentedCode"Remove this commented out code.(”®µŞ8èîÄÄª+
-^javascript:S1854"8Remove this useless assignment to local variable "right"(¦µïùÿÿÿÿ8¯Í­Âª+
-Qjavascript:DebuggerStatement"Remove this debugger statement.(ÒÓß‰ÿÿÿÿÿ8èîÄÄª+
-_'javascript:FunctionDefinitionInsideLoop"'Define this function outside of a loop.(ã­â8¯Í­Âª+
-bjavascript:SwitchWithoutDefault"2Add a "default" clause to this "switch" statement.(ÓÈŞé8¯Í­Âª+
-gjavascript:SwitchWithoutDefault"2Add a "default" clause to this "switch" statement.(éÀÌøÿÿÿÿ8Ãº¨Âª+
-_'javascript:FunctionDefinitionInsideLoop"'Define this function outside of a loop.(Ö·Û‘8¯Í­Âª+
-njavascript:S1301"MReplace this "switch" statement with "if" statements to increase readability.(ÓÈŞé8¯Í­Âª+
-Sjavascript:S1135"2Complete the task associated to this TODO comment.(ÍÍÈ8¯Í­Âª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(’£·­ıÿÿÿÿ8êØË±ª+
-Mjavascript:CommentedCode"Remove this commented out code.(¹ç¨ğøÿÿÿÿ8ƒ£ªÂª+
-Djavascript:S2228"Remove this logging statement.(£¢Ü¯øÿÿÿÿ8êØË±ª+
-gjavascript:SwitchWithoutDefault"2Add a "default" clause to this "switch" statement.(´¶€Ñüÿÿÿÿ8¯Í­Âª+
-fjavascript:UnusedVariable"7Remove the declaration of the unused 'bottom' variable.(‚‰èıùÿÿÿÿ8¯Í­Âª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(×¤öàıÿÿÿÿ8¯Í­Âª+
-?javascript:S2228"Remove this logging statement.(¦ªéÂ8êØË±ª+
-wjavascript:NestedIfDepth"NRefactor this code to not nest more than 3 if/for/while/switch/try statements.(¶¬Ñò8êØË±ª+
-Sjavascript:S1135"2Complete the task associated to this TODO comment.(ó‹´œ8¯Í­Âª+
-Hjavascript:CommentedCode"Remove this commented out code.(¡ƒéŸ8êØË±ª+
-i!javascript:UnusedFunctionArgument"2Remove the unused function parameter "attributes".(‘¹Ø×üÿÿÿÿ8¯Í­Âª+
-n(javascript:VariableDeclarationAfterUsage"0Move the declaration of "app" before this usage.(Öäƒûÿÿÿÿ8êØË±ª+
-Djavascript:S2228"Remove this logging statement.(•öÅöıÿÿÿÿ8êØË±ª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(û¿áëıÿÿÿÿ8¯Í­Âª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(’£·­ıÿÿÿÿ8êØË±ª+
-?javascript:S2228"Remove this logging statement.(¦ªéÂ8êØË±ª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(ïòÄ‰üÿÿÿÿ8¯Í­Âª+
-sjavascript:S1301"MReplace this "switch" statement with "if" statements to increase readability.(éÀÌøÿÿÿÿ8Ãº¨Âª+
-~javascript:S3699"XRemove this use of the output from this function; this function doesn't return anything.(»Úë…úÿÿÿÿ8èîÄÄª+
-Hjavascript:CommentedCode"Remove this commented out code.(á²£ô8¯Í­Âª+
-?javascript:S2228"Remove this logging statement.(èîšÔ8êØË±ª+
-Djavascript:S2228"Remove this logging statement.(éÚÀúÿÿÿÿ8¯Í­Âª+
-Djavascript:S2228"Remove this logging statement.(º·ŞÛøÿÿÿÿ8š…ôÃª+
-_"javascript:CollapsibleIfStatements",Merge this if statement with the nested one.(ı˜›¾8¯Í­Âª+
-Djavascript:S2228"Remove this logging statement.(£¢Ü¯øÿÿÿÿ8°Î­±ª+
-_"javascript:CollapsibleIfStatements",Merge this if statement with the nested one.(ªöæ‘8êØË±ª+
-_javascript:S1854"9Remove this useless assignment to local variable "bottom"(‚‰èıùÿÿÿÿ8¯Í­Âª+
-\javascript:S1854";Remove this useless assignment to local variable "editType"(ÿò˜…8¯Í­Âª+
-hjavascript:UnusedVariable"9Remove the declaration of the unused 'center_y' variable.(îõ•úÿÿÿÿ8ƒ£ªÂª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(×¤öàıÿÿÿÿ8¯Í­Âª+
-Djavascript:S2228"Remove this logging statement.(†ÍÖüÿÿÿÿ8š…ôÃª+
-bjavascript:SwitchWithoutDefault"2Add a "default" clause to this "switch" statement.(ÓÈŞé8¯Í­Âª+
-Sjavascript:S1135"2Complete the task associated to this TODO comment.(¹Ñ«Í8¯Í­Âª+
-?javascript:S2228"Remove this logging statement.(çÉ§ª8êØË±ª+
-gjavascript:SwitchWithoutDefault"2Add a "default" clause to this "switch" statement.(ÿÀõÿÿÿÿÿ8êØË±ª+
-?javascript:S2228"Remove this logging statement.(Ì±ÿ·8êØË±ª+
-ajavascript:S1854";Remove this useless assignment to local variable "center_x"(‚ˆÇïûÿÿÿÿ8ƒ£ªÂª+
-bjavascript:SwitchWithoutDefault"2Add a "default" clause to this "switch" statement.(ÓÈŞé8¯Í­Âª+
-Hjavascript:CommentedCode"Remove this commented out code.(‰êÂ´8êØË±ª+
-Hjavascript:CommentedCode"Remove this commented out code.(‚À½ª8êØË±ª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(’£·­ıÿÿÿÿ8êØË±ª+
-djavascript:S2814"CRename "i" as this name is already used in declaration at line 533.(º›•Û8êØË±ª+
-Djavascript:S2228"Remove this logging statement.(ÆÓñüıÿÿÿÿ8êØË±ª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(ïòÄ‰üÿÿÿÿ8¯Í­Âª+
-Mjavascript:CommentedCode"Remove this commented out code.(ûùşêûÿÿÿÿ8êØË±ª+
-Djavascript:S2228"Remove this logging statement.(£¢Ü¯øÿÿÿÿ8êØË±ª+
-Ajavascript:CommentedCode"Remove this commented out code.(–úí
-Djavascript:S2228"Remove this logging statement.(ÅÚ‡øÿÿÿÿ8¯Í­Âª+
-j(javascript:VariableDeclarationAfterUsage"1Move the declaration of "info" before this usage.(Òƒ’ 8êØË±ª+
-{javascript:S1186"ZAdd a nested comment explaining why this function is empty or complete the implementation.(ê¹–À8°Î­±ª+
-Šjavascript:S1871"dEither merge this branch with the identical one on line "2862" or change one of the implementations.(¨ıçúÿÿÿÿÿ8ƒ£ªÂª+
-?javascript:S2228"Remove this logging statement.(Ôß¤Õ8¯Í­Âª+
-bjavascript:SwitchWithoutDefault"2Add a "default" clause to this "switch" statement.(ÜŸ•8¯Í­Âª+
-„javascript:S1871"dEither merge this branch with the identical one on line "2853" or change one of the implementations.(ÑÏ‘8ƒ£ªÂª+
-gjavascript:UnusedVariable"8Remove the declaration of the unused 'buttons' variable.(»Úë…úÿÿÿÿ8èîÄÄª+
-Djavascript:S2228"Remove this logging statement.(£¢Ü¯øÿÿÿÿ8èîÄÄª+
-[!javascript:UnusedFunctionArgument")Remove the unused function parameter "i".(Ö·Û‘8¯Í­Âª+
-Fjavascript:CommentedCode"Remove this commented out code.(ê‚Şåüÿÿÿÿ
-ejavascript:UnusedVariable"6Remove the declaration of the unused 'right' variable.(¦µïùÿÿÿÿ8¯Í­Âª+
-Mjavascript:CommentedCode"Remove this commented out code.(‡î®¨úÿÿÿÿ8šÿ¤Âª+
-j(javascript:VariableDeclarationAfterUsage"1Move the declaration of "code" before this usage.(ãŒíê8êØË±ª+
-Mjavascript:CommentedCode"Remove this commented out code.(†— Æùÿÿÿÿ8ë¿¥Âª+
-Hjavascript:CommentedCode"Remove this commented out code.(Œ®±á8êØË±ª+
-o(javascript:VariableDeclarationAfterUsage"6Move the declaration of "get_image" before this usage.(éŒïİ8êØË±ª+
-njavascript:S1301"MReplace this "switch" statement with "if" statements to increase readability.(ÓÈŞé8¯Í­Âª+
-njavascript:S1301"MReplace this "switch" statement with "if" statements to increase readability.(ÜŸ•8¯Í­Âª+
-cjavascript:UnusedVariable"9Remove the declaration of the unused 'editType' variable.(ÿò˜…8¯Í­Âª+
-`javascript:S1854":Remove this useless assignment to local variable "buttons"(»Úë…úÿÿÿÿ8èîÄÄª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(’£·­ıÿÿÿÿ8êØË±ª+
-t(javascript:VariableDeclarationAfterUsage"6Move the declaration of "url_input" before this usage.(×³ÎÄüÿÿÿÿ8¯Í­Âª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(’£·­ıÿÿÿÿ8êØË±ª+
-o(javascript:VariableDeclarationAfterUsage"1Move the declaration of "help" before this usage.(™¢Ğ²ÿÿÿÿÿ8êØË±ª+
-?javascript:S2228"Remove this logging statement.(Ì±ÿ·8êØË±ª+
-?javascript:S2228"Remove this logging statement.(ïÚÃ8êØË±ª+
-?javascript:S2228"Remove this logging statement.(õ¦Ôû8êØË±ª+
-Sjavascript:S1135"2Complete the task associated to this TODO comment.(¹Ñ«Í8¯Í­Âª+
-Mjavascript:CommentedCode"Remove this commented out code.(¤…ì½ùÿÿÿÿ8šÿ¤Âª+
-Djavascript:S2228"Remove this logging statement.(³ıŞ¼üÿÿÿÿ8êØË±ª+
-hjavascript:UnusedVariable"9Remove the declaration of the unused 'center_x' variable.(‚ˆÇïûÿÿÿÿ8ƒ£ªÂª+
-Djavascript:S2228"Remove this logging statement.(£¢Ü¯øÿÿÿÿ8°Î­±ª+
-Djavascript:S2228"Remove this logging statement.(ÔŠˆÓÿÿÿÿÿ8êØË±ª+
-[!javascript:UnusedFunctionArgument")Remove the unused function parameter "e".(µÙæÂ8èîÄÄª+
-”javascript:S3827"s"domElements" does not exist. Change its name or declare it so that its usage doesn't result in a "ReferenceError".(Í°Èé8èîÄÄª+
-Ajavascript:S1442" Remove this usage of alert(...).(¾Ìí8êØË±ª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(’£·­ıÿÿÿÿ8êØË±ª+
-Mjavascript:CommentedCode"Remove this commented out code.(ˆÿ½Ïşÿÿÿÿ8ë¿¥Âª+
-Mjavascript:CommentedCode"Remove this commented out code.(É‘Ä†úÿÿÿÿ8°Î­±ª+
-tjavascript:S3776"TRefactor this function to reduce its Cognitive Complexity from 28 to the 15 allowed.(Ì™‡8êØË±ª+
-Ajavascript:S1442" Remove this usage of alert(...).(ä£®ş8êØË±ª+
-Hjavascript:CommentedCode"Remove this commented out code.(ó™µ„8°Î­±ª+
-?javascript:S2228"Remove this logging statement.(¦ªéÂ8êØË±ª+
-Xjavascript:S1135"2Complete the task associated to this TODO comment.(’£·­ıÿÿÿÿ8êØË±ª+
-Hjavascript:CommentedCode"Remove this commented out code.(±”†8êØË±ª+
-Hjavascript:CommentedCode"Remove this commented out code.(àõÔ¨8ƒ£ªÂª+
-Mjavascript:CommentedCode"Remove this commented out code.(Ò™ò³ÿÿÿÿÿ8¯Í­Âª+
-Hjavascript:CommentedCode"Remove this commented out code.(‚À½ª8êØË±ª+
-Mjavascript:CommentedCode"Remove this commented out code.(Èè€Ãùÿÿÿÿ8¯Í­Âª+
-djavascript:S2814"CRename "i" as this name is already used in declaration at line 477.(º›•Û8êØË±ª+
-zjavascript:S3776"TRefactor this function to reduce its Cognitive Complexity from 36 to the 15 allowed.(˜«ùÿÿÿÿ8¯Í­Âª+
-ajavascript:S1854";Remove this useless assignment to local variable "center_y"(îõ•úÿÿÿÿ8ƒ£ªÂª+
-bjavascript:SwitchWithoutDefault"2Add a "default" clause to this "switch" statement.(ÓÈŞé8¯Í­Âª+
-Djavascript:S2228"Remove this logging statement.(ƒÅ©Úıÿÿÿÿ8¯Í­Âª+
->javascript:S2228"Remove this logging statement.(¶„ì68èîÄÄª+

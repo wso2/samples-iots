@@ -1,29 +1,0 @@
-
-bjavascript:UnusedVariable"8Remove the declaration of the unused 'sidebar' variable.(ò–’á8¢º‚¦ª+
-bjavascript:HtmlComments"5Replace this HTML-style comment by a standard comment(ú·¡şÿÿÿÿ8¢º‚¦ª+
-Zjavascript:ForIn"9Restrict what this loop acts on by testing each property.(•ô©È8¢º‚¦ª+
-j(javascript:VariableDeclarationAfterUsage"2Move the declaration of "popup" before this usage.(¶ ãa8¢º‚¦ª+
-Fjavascript:S1442" Remove this usage of alert(...).(ÛÔ™’úÿÿÿÿ8¢º‚¦ª+
-Hjavascript:CommentedCode"Remove this commented out code.(×¬ƒš8¢º‚¦ª+
-Djavascript:S2228"Remove this logging statement.(ƒ½ûÿÿÿÿ8¢º‚¦ª+
-^javascript:S1854"=Remove this useless assignment to local variable "tempMarker"(Æş™“8¢º‚¦ª+
-Hjavascript:CommentedCode"Remove this commented out code.(ıÂ•é8¢º‚¦ª+
-javascript:S3827"i"L" does not exist. Change its name or declare it so that its usage doesn't result in a "ReferenceError".(£×’ßûÿÿÿÿ8¢º‚¦ª+
-ejavascript:UnusedVariable";Remove the declaration of the unused 'tempMarker' variable.(Æş™“8¢º‚¦ª+
-?javascript:S2228"Remove this logging statement.(¦ªéÂ8¢º‚¦ª+
-Djavascript:S2228"Remove this logging statement.(€Ñéøÿÿÿÿ8¢º‚¦ª+
-`!javascript:UnusedFunctionArgument")Remove the unused function parameter "e".(Š»°–øÿÿÿÿ8¢º‚¦ª+
-Zjavascript:ForIn"9Restrict what this loop acts on by testing each property.(•ô©È8¢º‚¦ª+
-Djavascript:S2228"Remove this logging statement.(ªŠÃ«üÿÿÿÿ8¢º‚¦ª+
-Djavascript:S2228"Remove this logging statement.(¡ú·Ùÿÿÿÿÿ8¢º‚¦ª+
-^javascript:S1854"=Remove this useless assignment to local variable "markerInfo"(á–®§8¢º‚¦ª+
-Mjavascript:CommentedCode"Remove this commented out code.(ÃÚ¸ƒùÿÿÿÿ8ÜĞ¿ª+
-[javascript:S1854":Remove this useless assignment to local variable "sidebar"(ò–’á8¢º‚¦ª+
-Mjavascript:CommentedCode"Remove this commented out code.(òãÔüÿÿÿÿ8¢º‚¦ª+
-]javascript:HtmlComments"5Replace this HTML-style comment by a standard comment(ÙŒŞ¿8¢º‚¦ª+
-Hjavascript:CommentedCode"Remove this commented out code.(Îù©¨8¢º‚¦ª+
-ejavascript:UnusedVariable";Remove the declaration of the unused 'markerInfo' variable.(á–®§8¢º‚¦ª+
-?javascript:S2228"Remove this logging statement.(ßï³Û8¢º‚¦ª+
-Djavascript:S2228"Remove this logging statement.(»Ë¿ğÿÿÿÿÿ8¢º‚¦ª+
-Ojavascript:EmptyBlock")Either remove or fill this block of code.(áË©˜8¢º‚¦ª+
-?javascript:S2228"Remove this logging statement.(¦ªéÂ8¢º‚¦ª+
