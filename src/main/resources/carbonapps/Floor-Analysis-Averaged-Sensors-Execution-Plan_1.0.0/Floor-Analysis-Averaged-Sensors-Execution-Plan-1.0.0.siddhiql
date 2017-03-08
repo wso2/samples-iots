@@ -13,7 +13,7 @@ define stream dataIn (deviceId string, temperature double, motion double, humidi
 define stream dataOut (deviceId string, avgTemperature double, avgMotion double, avgHumidity double, avgAirQuality
 double, timeStamp long);
 
-from dataIn#window.timeBatch(10 min)
+from dataIn#window.timeBatch(30 sec)
 select deviceId, avg(temperature) as avgTemperature, avg(motion) as avgMotion, avg(humidity) as avgHumidity, avg
 (airQuality) as avgAirQuality, time:timestampInMilliseconds() as timeStamp
 group by deviceId

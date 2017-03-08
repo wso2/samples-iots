@@ -14,7 +14,7 @@ double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoo
 define stream dataOut (buildingId string, floorId string, temperature double, motion double, humidity double, airQuality
 double, timeStamp long);
 
-from dataIn#window.timeBatch(5 min)
+from dataIn#window.timeBatch(1 min)
 select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
 (airQuality) as airQuality, time:timestampInMilliseconds() as timeStamp
 group by floorId insert all events into dataOut ;
