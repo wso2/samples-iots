@@ -139,6 +139,39 @@ background-color: #ecf0f1;
 padding:0px 5px 0px 5px;
 }
 
+.heatmap-info{
+    position: absolute;
+    right: 0%;
+    bottom: 50%;
+    transition: bottom 0.1s linear,margin-bottom 0.1s linear;
+    -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
+    border: 3px solid #73AD21;
+}
+
+#draw-tools{
+    display:none;
+}
+
+#show-visualization{
+    display:none;
+}
+
+#new_image{
+    display:none;
+}
+
+#clear{
+    display:none;
+}
+
+#save{
+    display:none;
+}
+
+#preview{
+    display:none;
+}
 /*device.selected{*/
     /*pointer-events: none;*/
 /*}*/

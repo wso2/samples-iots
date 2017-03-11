@@ -2,16 +2,10 @@
 <html lang="en">
 
 <%
-var uri = request.getRequestURI();
 var contextPath = request.getContextPath();
-var uriMatcher = new URIMatcher(String(uri));
-var log = new Log();
-log.info(uri);
-
+var constants = require("/utils/constants.js");
+var user = session.get(constants.USER_CACHE_KEY);
 %>
-
-
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -54,6 +48,21 @@ log.info(uri);
                 <span>IoT Server Floorplan Tool</span>
             </a>
         </div>
+         <ul class="nav navbar-right float-remove-xs hidden-xs">
+            <li class="visible-inline-block">
+                <a class="dropdown" data-toggle="dropdown">
+                    <span class="icon fw-stack fw-lg">
+                       <i class="fw fw-circle fw-stack-2x"></i>
+                       <i class="fw fw-user fw-stack-1x fw-inverse"></i>
+                    </span>
+                    <span class="caret"><%=user.username%></span></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right float-remove-xs position-static-xs text-center-xs remove-margin-xs slideInDown" role="menu">
+                 <li><a href="<%=urlPrefix%>logout?destination=<%=dest%>"><i class="icon fw fw-sign-out"></i><%= i18n.localize("logout.label")%></a></li>
+                </ul>
+            </li>
+        </ul>
+
     </div>
 </header>
 <!-- /header -->
@@ -78,24 +87,13 @@ log.info(uri);
                     <li>
                         <a id="happy" href="#" onclick="onAddMarker()" title="Add a building">
                                 <span class="icon fw-stack">
-                                    <i class="fw fw-add fw-helper fw-helper-circle-outline"></i>
+                                    <i class="fw fw-add fw-h
+                                    elper fw-helper-circle-outline"></i>
                                 </span>
                             Add Building
                         </a>
                     </li>
                 </ul>
-                <ul class="nav pull-right">
-                  <li >
-                      <form class="form" id="formLogin">
-                        <input name="username" id="username" type="text" placeholder="Username">
-                        <input name="password" id="password" type="password" placeholder="Password"><br>
-                        <!--<button type="button" id="btnLogin" class="btn">Login</button>-->
-                        <input type="submit" class="btn btn-md btn-primary btn-block" value="Sign in">
-
-                      </form>
-                  </li>
-                </ul>
-
             </div><!--/.nav-collapse -->
         </div>
     </nav>

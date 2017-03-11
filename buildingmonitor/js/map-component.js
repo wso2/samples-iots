@@ -151,8 +151,6 @@ function addingMarker(e, d) {
     }
 
     markers[markerId] = marker;
-    console.log(markerId);
-    console.log(markers[markerId]);
 
     //append the information to the sidebar
     $('#home').append(
@@ -175,13 +173,6 @@ function addingMarker(e, d) {
         'Delete Building</button>' +
         '<div class="clearfix"></div>'+
         '</div>' +
-//                            '<a href="#" class="remove" id="' + markerId + '">' +
-//                                '<span class="icon fw-stack">' +
-//                                '<i class="fw fw-delete fw-stack-1x"></i>' +
-//                                '</span> Remove' +
-//                            '</a>' +
-//                            '<button type="button" class="btn btn-secondary" data-toggle="edit-floors">Edit Floors</button>' +
-
         '</div>'+
         '<div id="accordion' + markerId + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading' + markerId + '">'+
         '<div class="panel-body">'+
@@ -302,8 +293,6 @@ function onMarkerClick(e) {
 function onAddMarker() {
 
     baseMap.once('click', addingMarker);
-//        if(click !== null){
     $('body.fixed ').addClass('marker-cursor');
     $('#openStreetMapId').addClass('marker-cursor');
-//        }
 }

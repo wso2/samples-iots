@@ -21,8 +21,23 @@
     <!--image mapper css-->
     <link href="css/image-mapper.css" rel="stylesheet" type="text/css"/>
 
+    <!--bootstrap css-->
+    <!--<link href="libs/bootstrap_3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>-->
+
+    <!--Bootstrap editable css-->
     <link href="libs/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
+
+    <!--Bootstrap slider css-->
+    <link href="libs/bootstrap-slider/css/bootstrap-slider.min.css" rel="stylesheet" type="text/css"/>
+
+    <!--bootstrap date range picker-->
+    <link href="libs/bootstrap_daterange_picker/css/daterangepicker.css" rel="stylesheet" type="text/css"/>
+
+    <!--custom scripts-->
     <link href="css/custom.css" rel="stylesheet" type="text/css"/>
+    <link href="css/slider.css" rel="stylesheet" type="text/css"/>
+
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -268,7 +283,7 @@
     </div>
 
 
-    <!-- right-sidebar-toggle-buttons -->
+    <!-- right-sidebar-toggle-buttons -->n
     <!--<button class="btn btn-primary sidebar-toggle-btn" data-toggle="sidebar" data-target="#right-sidebar-overlay" aria-expanded="false" rel="notifications-sidebar">-->
         <!--Right sidebar overlay-->
     <!--</button>-->
@@ -354,6 +369,46 @@
         </div>
         <!--plugin component end-->
     </div>
+    <div class = "slider-wrapper" >
+        <div class="slider-horizontal add-padding-bottom-2x">
+
+            <div class ="row">
+                <div class = "col-md-7">
+                    <div class = "slider-container add-padding-left-3x add-padding-top-2x">
+                        <label for="slider" class="col-sm-3 control-label">Frames: </label>
+                        <div class="col-sm-9">
+                        <input id="temp-slider" name="slider" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="60" data-slider-step="5" data-slider-value="60"/>
+                        </div>
+                        </div>
+                </div>
+                <div class = "col-md-5">
+                    <div class="form-group add-padding-top-2x">
+                        <div class="col-sm-12 form-inline">
+                            <label class="control-label">Historical View</label>
+                            <label class="switch">
+                                <input type="checkbox" id="historic-toggle">
+                                <span class="helper"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="date-picker">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="datepicker-container add-padding-left-3x">
+
+                                <label for="daterange" class="col-sm-3 control-label"> Dates: </label>
+                                <input type="text" name="daterange" placeholder="01/02/2016 to 01/03/2016" />
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+
 </div>
 
 <footer class="footer">
@@ -370,10 +425,18 @@
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="libs/bootstrap_3.3.6/js/bootstrap.min.js"></script>
+<!--wso2 theme-->
 <script src="libs/theme-wso2_2.0.0/js/theme-wso2.min.js"></script>
+<!--bootstrap slider-->
+<script src="libs/bootstrap-slider/bootstrap-slider.min.js"></script>
+<!--moment js-->
+<script src="libs/moment/moment.min.js"></script>
 
-<!-- custom js-->
+<!-- bootstrap date range picker-->
+<script src="libs/bootstrap_daterange_picker/js/daterangepicker.js"></script>
+
 <script type="text/javascript" src="js/summerHTMLImageMapCreator.js"></script>
+<script type="text/javascript" src="js/slider.js"></script>
 
 <!--Heatmaps.js-->
 <script type="text/javascript" src="libs/heatmap/heatmap.min.js"></script>

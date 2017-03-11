@@ -1,13 +1,35 @@
+/*
+ * Summer html image map creator
+ * http://github.com/summerstyle/summer
+ *
+ * Copyright 2016 Vera Lobacheva (http://iamvera.com)
+ * Released under the MIT license
+ */
+
+//get's the URL query parameter that was sent from the GeoMap component
 var floorNo;
 var floorText;
 var heatmapInstance;
+var currentHeatMap;
 var ws;
+var heatMapData = [];
+var rangeSlider;
+var isSliderChanged = false;
+var currentSliderValue = 60;
 
 /**
  * To get the real-time data using websocket
  */
 function intializeWebsocketUrls() {
-    var webSocketURL = 'ws://localhost:9763/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceTemperatureEvent';
+    var config = {
+        container: document.getElementById('image'),
+        radius: 200,
+        maxOpacity: .5,
+        minOpacity: 0,
+        blur: .75
+    };
+    var count = 0;
+    var webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceTemperatureEvent';
     ws = new WebSocket(webSocketURL);
     ws.onopen = function () {
         console.log("opened");
@@ -20,9 +42,22 @@ function intializeWebsocketUrls() {
                 y: dataValues.location.coordinates[1],
                 value: dataValues.temperature
             };
-            heatmapInstance.addData(dataPoint);
-        }
+            currentHeatMap.addData(dataPoint);
 
+            if (!isSliderChanged) {
+                heatmapInstance.addData(dataPoint);
+            } else if (currentSliderValue == 10) {
+                heatmapInstance.addData(dataPoint);
+            }
+            count++;
+
+
+                if (heatMapData.length == 10) {
+                    heatMapData.shift();
+                }
+                heatMapData.push(currentHeatMap.getData());
+
+        }
     };
     ws.onclose = function () {
         console.log("closed!");
@@ -35,8 +70,67 @@ function intializeWebsocketUrls() {
 /**
  * When reloading the browser window, web socket need to be closed.
  */
-window.onbeforeunload = function() {
+window.onbeforeunload = function () {
     ws.close();
+};
+
+
+$(document).ready(function () {
+    var KEY_NAME = "yesin";
+    var obJSON = JSON.parse(window.localStorage.getItem(KEY_NAME));
+    var buildingId = getUrlParameter("id");
+    $.each(obJSON.metaData, function (index, value) {
+        if (value.id == buildingId) {
+            var floors = value.floors;
+            for (var i = 1; i <= floors; i++) {
+                $('#floors-dropdown').append(
+                    '<li><a value="floor' + i + '">' +
+                    'Floor ' + i + '</a></li>'
+                );
+
+            }
+        }
+    });
+    rangeSlider = $("#ex1Slider").bootstrapSlider();
+    rangeSlider.bootstrapSlider("setAttribute", "min", 1);
+    rangeSlider.bootstrapSlider("setAttribute", "max", 10);
+    rangeSlider.bootstrapSlider("setValue", 10);
+
+    $('#ex1Slider').on("slide", function (event) {
+        onSlideChange(event);
+
+    }).on("change", function (event) {
+        onSlideChange(event);
+    });
+
+    intializeWebsocketUrls();
+});
+
+
+function onSlideChange (event) {
+    var config = {
+        container: document.getElementById('image'),
+        radius: 200,
+        maxOpacity: .5,
+        minOpacity: 0,
+        blur: .75
+    };
+    isSliderChanged = true;
+    var max = rangeSlider.bootstrapSlider("getAttribute", 'max');
+    var min = rangeSlider.bootstrapSlider("getAttribute", 'min');
+    currentSliderValue = rangeSlider.bootstrapSlider("getValue");
+
+    heatmapInstance.setData({data:[]});
+    heatmapInstance = h337.create(config);
+    heatmapInstance.setData(heatMapData[currentSliderValue-1]);
+
+    if (currentSliderValue == 10) {
+        heatmapInstance.setData({data:[]});
+        heatmapInstance = h337.create(config);
+        heatmapInstance.setData(currentHeatMap.getData());
+    }
+
+
 };
 
 
@@ -55,8 +149,10 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
+
 var summerHtmlImageMapCreator = (function () {
     'use strict';
+
 
     /* Utilities */
     var utils = {
@@ -277,10 +373,15 @@ var summerHtmlImageMapCreator = (function () {
             };
         })();
 
+
         /*on mousemove the coords will be displayed*/
         domElements.container.addEventListener('mousemove', function (e) {
             cursor_position_info.set(utils.getRightCoords(e.pageX, e.pageY));
         }, false);
+
+        // domElements.container.addEventListener('click', function(e){
+        //     on_click_info.set(utils.getRightCoords(e.pageX, e.pageY));
+        // }, false);
 
         /*on mousemleave the coords will be cleared*/
         domElements.container.addEventListener('mouseleave', function () {
@@ -301,25 +402,46 @@ var summerHtmlImageMapCreator = (function () {
                         y: e.pageY
                     };
 
+
                     if (e.target.classList.contains('helper')) {
                         var helper = e.target;
                         state.editType = helper.action;
+
+                        // console.log(helper);
 
                         if (helper.n >= 0) { // if typeof selected_area == polygon
                             state.selectedArea.selected_point = helper.n;
                         }
 
-                        app.addEvent(app.domElements.container, 'mousemove',
+                        app.addEvent(app.domElements.container,
+                            'mousemove',
                             state.selectedArea.onProcessEditing.bind(state.selectedArea))
-                            .addEvent(app.domElements.container, 'mouseup',
+                            .addEvent(app.domElements.container,
+                                'mouseup',
                                 state.selectedArea.onStopEditing.bind(state.selectedArea));
                     } else if (e.target.tagName === 'rect' || e.target.tagName === 'circle' || e.target.tagName === 'polygon') {
                         state.editType = 'move';
 
-                        app.addEvent(app.domElements.container, 'mousemove',
+                        app.addEvent(app.domElements.container,
+                            'mousemove',
                             state.selectedArea.onProcessEditing.bind(state.selectedArea))
-                            .addEvent(app.domElements.container, 'mouseup',
+                            .addEvent(app.domElements.container,
+                                'mouseup',
                                 state.selectedArea.onStopEditing.bind(state.selectedArea));
+
+                        // if(e.target.tagName === '.device-marker'){
+                        //     console.log(e.target.tagName);
+                        //     if (e.target.tagName === 'rect' || e.target.tagName === 'circle' || e.target.tagName === 'polygon') {
+                        //         app.state.selectedArea = e.target.parentNode.obj;
+                        //         //Displays the area attribute form
+                        //         console.log(app.state.selectedArea);
+                        //         // console.log(state.newArea);
+                        //         // info.load(state.selectedArea, e.pageX, e.pageY);
+                        //     }else{
+                        //         console.log("please place inside a room");
+                        //     }
+                        //
+                        // }
                     }
                 } else {
                     app.deselectAll();
@@ -327,6 +449,7 @@ var summerHtmlImageMapCreator = (function () {
                 }
             }
         }
+
 
         domElements.container.addEventListener('mousedown', onSvgMousedown, false);
 
@@ -362,20 +485,44 @@ var summerHtmlImageMapCreator = (function () {
 
         domElements.container.addEventListener('click', onSvgClick, false);
 
+        // /*get the coordinates on SVG layer click*/
+        // function placeDevice(e){
+        //     if(state.appMode === 'editing'){
+        //         utils.getRightCoords(e.pageX, e.pageY)
+        //     };
+        // }
+        // domElements.container.addEventListener('click', placeDevice, false);
+
         /* Add dblclick event for svg */
         function onAreaDblClick(e) {
             if (state.appMode === 'editing') {
                 //checking on double click whether element is of type rect
                 if (e.target.tagName === 'rect' || e.target.tagName === 'circle' || e.target.tagName === 'polygon') {
                     state.selectedArea = e.target.parentNode.obj;
+                    console.log(state.selectedArea);
                     //Displays the area attribute form
                     // console.log(state.selectedArea._attributes.title);
                     info.load(state.selectedArea, e.pageX, e.pageY);
                 }
             }
+
+            if (state.appMode === 'editing') {
+                // var KEY_NAME = "yesin";
+                // var obJSON = JSON.parse(window.localStorage.getItem(KEY_NAME));
+                //
+                // console.log(typeof obJSON);
+                // console.log(obJSON.metaData);
+                //
+                // var buildingId = getUrlParameter("id");
+                // $.each(obJSON.metaData, function(index, value){
+                //     if(value.buildingPlan.area)
+                // });
+                // console.log(this);
+            }
         }
 
         domElements.container.addEventListener('dblclick', onAreaDblClick, false);
+
 
         /* Add keydown event for document */
         function onDocumentKeyDown(e) {
@@ -499,13 +646,9 @@ var summerHtmlImageMapCreator = (function () {
             }
         };
 
+
         // Will moved from the main module
         var localStorageWrapper = (function () {
-
-            /***
-             *
-             * Local storage accessing
-             */
 
             var KEY_NAME = "yesin";
             var buildingId = getUrlParameter("id");
@@ -539,10 +682,23 @@ var summerHtmlImageMapCreator = (function () {
 
                     alert('Saved');
                     console.log(objectJSON);
-                },
+                    //console.log(JSON.stringify(result));
 
+                },
                 restore: function () {
                     console.log(objectJSON);
+
+                    // $.get('result.json', function (data) {
+
+                    // var floorNo;
+
+                    // $.each(data.metaData, function(i, val){
+                    //     if(val.id == parseInt(buildingId)){
+                    //         $.each(val.floorplan, function(i, val) {
+                    //             console.log(val[floorNo]);
+                    //         });
+                    //     }
+                    // });
 
                     $.each(objectJSON.metaData, function (i, val) {
                         if (val.id == parseInt(buildingId)) {
@@ -560,14 +716,19 @@ var summerHtmlImageMapCreator = (function () {
                                     get_image.show();
                                 } else {
                                     areasIO.fromJSON(JSON.stringify(val[floorNo]));
+                                    $('#draw-tools').show(1000);
+                                    $('#show-visualization').show(500);
+                                    $('#new_image').show(500);
+                                    $('#clear').show(500);
+                                    $('#save').show(500);
+                                    $('#preview').show(500);
                                 }
                             });
                         }
                     });
 
-                    // }); //JSON get end
+                    // }); //JSOON get end
                 },
-
                 remove: function () {
 
                     $.each(objectJSON.metaData, function (i, val) {
@@ -584,12 +745,105 @@ var summerHtmlImageMapCreator = (function () {
                                         console.log(element[floorNo]);
                                     }
                                 }
-                            })
+                            });
                         }
                     });
                     var altJSON = JSON.stringify(objectJSON);
                     window.localStorage.setItem(KEY_NAME, altJSON);
                     //console.info('Editor ' + result + ' saved');
+
+                    $('#draw-tools').hide(500);
+                    $('#show-visualization').hide(500);
+                    $('#new_image').hide(500);
+                    $('#clear').hide(500);
+                    $('#save').hide(500);
+                    $('#preview').hide(500);
+
+
+                    alert('Removed');
+                }
+            };
+        })();
+
+        var buildingStorage = (function () {
+            var KEY_NAME = "yesin";
+            var buildingId = getUrlParameter("id");
+            var objectJSON = JSON.parse(window.localStorage.getItem(KEY_NAME));
+            return {
+                save: function () {
+                    $.each(objectJSON.metaData, function (i, val) {
+                        if (val.id == parseInt(buildingId)) {
+                            var result = areasIO.toJSON();
+                            val.buildingPlan = result;
+                        }
+                    });
+
+                    var altJSON = JSON.stringify(objectJSON);
+                    window.localStorage.setItem(KEY_NAME, altJSON);
+                    //console.info('Editor ' + result + ' saved');
+
+                    alert('Saved');
+
+
+                },
+                restore: function () {
+                    $.each(objectJSON.metaData, function (i, val) {
+                        if (val.id == parseInt(buildingId)) {
+                            // $.each(val.floorplan, function(i, val) {
+                            //     console.log(val[floorNo]);
+                            if (val.buildingPlan == "") {
+                                app.setMode(null)
+                                    .setDefaultClass()
+                                    .setShape(null)
+                                    .setIsDraw(false)
+                                    .clear()
+                                    .hide()
+                                    .hidePreview();
+                                // buttons.deselectAll();
+                                get_image.show();
+                            } else {
+                                areasIO.fromJSON(JSON.stringify(val.buildingPlan));
+
+                                $('#draw-tools').show(1000);
+                                $('#show-visualization').show(500);
+                                $('#new_image').show(500);
+                                $('#clear').show(500);
+                                $('#save').show(500);
+                                $('#preview').show(500);
+                            }
+                            // });
+                        }
+                    });
+                },
+                remove: function () {
+                    $.each(objectJSON.metaData, function (i, val) {
+                        if (val.id == parseInt(buildingId)) {
+                            val.buildingPlan = "";
+                            // $.each(val.floorplan, function(i, element){
+                            //     console.log(floorNo);
+                            //     console.log(Object.keys(element));
+                            //     var floorNames = Object.keys(element);
+
+                            // for(var i=0; i< floorNames.length; i++){
+                            //     if( floorNames[i] == floorNo){
+                            //         console.log(floorNo);
+                            //         element[floorNo] = "";
+                            //         // console.log(element[floorNo]);
+                            //     }
+                            // }
+                            // });
+                        }
+                    });
+                    var altJSON = JSON.stringify(objectJSON);
+                    window.localStorage.setItem(KEY_NAME, altJSON);
+                    //console.info('Editor ' + result + ' saved');
+
+                    $('#draw-tools').hide(500);
+                    $('#show-visualization').hide(500);
+                    $('#new_image').hide(500);
+                    $('#clear').hide(500);
+                    $('#save').hide(500);
+                    $('#preview').hide(500);
 
                     alert('Removed');
                 }
@@ -598,7 +852,6 @@ var summerHtmlImageMapCreator = (function () {
 
         // show heatmap visualizations
         var visuals = (function () {
-            heatmapInstance;
             return {
                 configVisual: function () {
                     return heatmapInstance
@@ -614,8 +867,18 @@ var summerHtmlImageMapCreator = (function () {
                     if (heatmapInstance == null) {
                         heatmapInstance = window.h337.create(config);
                     }
+                    if (currentHeatMap == null) {
+                        var config = {
+                            container: document.getElementById('heat-map-hidden'),
+                            radius: 200,
+                            maxOpacity: .5,
+                            minOpacity: 0,
+                            blur: .75
+                        };
+                        currentHeatMap = window.h337.create(config);
+                    }
                 },
-                repazintVisuals: function () {
+                repaintVisuals: function () {
                     heatmapInstance.repaint();
                 }
             };
@@ -629,24 +892,21 @@ var summerHtmlImageMapCreator = (function () {
             // configVisuals: visuals.configVisual,
             setVisuals: visuals.setVisualData,
             resetVisuals: visuals.repaintVisuals,
-            /*get the coordinates on SVG*/
-            // clickPic: on_click_info.set(utils.getRightCoords(e.pageX,e.pageY)),
-
+            saveBuildingPlan: buildingStorage.save,
+            loadBuildingPlan: buildingStorage.restore,
+            removeBuildingPlan: buildingStorage.remove,
             hide: function () {
                 utils.hide(domElements.container);
                 return this;
             },
-
             show: function () {
                 utils.show(domElements.container);
                 return this;
             },
-
             recalcOffsetValues: function () {
                 recalcOffsetValues();
                 return this;
             },
-
             setDimensions: function (width, height) {
                 domElements.svg.setAttribute('width', width);
                 domElements.svg.setAttribute('height', height);
@@ -655,9 +915,9 @@ var summerHtmlImageMapCreator = (function () {
                 domElements.container.style.width = width + 'px';
                 domElements.container.style.height = height + 'px';
 
+
                 return this;
             },
-
             loadImage: function (url) {
                 get_image.showLoadIndicator();
                 domElements.img.src = url;
@@ -671,7 +931,6 @@ var summerHtmlImageMapCreator = (function () {
                 };
                 return this;
             },
-
             preview: (function () {
                 domElements.img.setAttribute('usemap', '#map');
                 domElements.map = document.createElement('map');
@@ -688,23 +947,19 @@ var summerHtmlImageMapCreator = (function () {
                     return this;
                 };
             })(),
-
             hidePreview: function () {
                 utils.show(domElements.svg);
                 domElements.map.innerHTML = '';
                 return this;
             },
-
             addNodeToSvg: function (node) {
                 domElements.svg.appendChild(node);
                 return this;
             },
-
             removeNodeFromSvg: function (node) {
                 domElements.svg.removeChild(node);
                 return this;
             },
-
             getOffset: function (arg) {
                 switch (arg) {
                     case 'x':
@@ -712,7 +967,6 @@ var summerHtmlImageMapCreator = (function () {
                         return state.offset[arg];
                 }
             },
-
             clear: function () {
                 //remove all areas
                 state.areas.length = 0;
@@ -723,7 +977,6 @@ var summerHtmlImageMapCreator = (function () {
                 info.unload();
                 return this;
             },
-
             removeObject: function (obj) {
                 utils.foreach(state.areas, function (x, i) {
                     if (x === obj) {
@@ -733,99 +986,80 @@ var summerHtmlImageMapCreator = (function () {
                 obj.remove();
                 return this;
             },
-
             deselectAll: function () {
                 utils.foreach(state.areas, function (x) {
                     x.deselect();
                 });
                 return this;
             },
-
             getIsDraw: function () {
                 return state.isDraw;
             },
-
             setIsDraw: function (arg) {
                 state.isDraw = arg;
                 return this;
             },
-
             setMode: function (arg) {
                 state.appMode = arg;
                 return this;
             },
-
             getMode: function () {
                 return state.appMode;
             },
-
             setShape: function (arg) {
                 state.currentType = arg;
                 return this;
             },
-
             getShape: function () {
                 return state.currentType;
             },
-
             addObject: function (object) {
                 state.areas.push(object);
                 return this;
             },
-
             getNewArea: function () {
                 return state.newArea;
             },
-
             resetNewArea: function () {
                 state.newArea = null;
                 return this;
             },
-
             getSelectedArea: function () {
                 return state.selectedArea;
             },
-
             setSelectedArea: function (obj) {
                 state.selectedArea = obj;
                 return this;
             },
-
             getEditType: function () {
                 return state.editType;
             },
-
             setFilename: function (str) {
                 state.image.filename = str;
                 return this;
             },
-
             setEditClass: function () {
                 domElements.container.classList.remove('draw');
                 domElements.container.classList.add('edit');
 
                 return this;
             },
-
             setDrawClass: function () {
                 domElements.container.classList.remove('edit');
                 domElements.container.classList.add('draw');
 
                 return this;
             },
-
             setDefaultClass: function () {
                 domElements.container.classList.remove('edit');
                 domElements.container.classList.remove('draw');
 
                 return this;
             },
-
             addEvent: function (target, eventType, func) {
                 state.events.push(new AppEvent(target, eventType, func));
                 return this;
             },
-
             removeAllEvents: function () {
                 utils.foreach(state.events, function (x) {
                     x.remove();
@@ -833,7 +1067,6 @@ var summerHtmlImageMapCreator = (function () {
                 state.events.length = 0;
                 return this;
             },
-
             //printing html map in a lower div
             getHTMLCode: function (arg) {
                 var html_code = '';
@@ -883,6 +1116,14 @@ var summerHtmlImageMapCreator = (function () {
         this.target.removeEventListener(this.eventType, this.func, false);
     };
 
+
+    /*
+     *
+     *
+     * marker modification
+     *
+     * */
+
     /**
      * The constructor of helpers points
      * Helper is small svg-rectangle with some actions
@@ -910,7 +1151,7 @@ var summerHtmlImageMapCreator = (function () {
     Marking.SIZE = 9;
     Marking.OFFSET = -Math.ceil(Marking.SIZE / 2);
     Marking.CLASS_NAME = 'device-marker';
-    //cursor graphics
+//cursor graphics
     Marking.ACTIONS_TO_CURSORS = {
         'move': 'move',
         'editLeft': 'e-resize',
@@ -950,6 +1191,13 @@ var summerHtmlImageMapCreator = (function () {
 
         return this;
     };
+
+    /*
+     *
+     *
+     * marker modification
+     *
+     * */
 
     /**
      * The constructor of helpers points
@@ -1165,8 +1413,21 @@ var summerHtmlImageMapCreator = (function () {
         this._el.classList.add(Area.CLASS_NAMES.SELECTED);
         console.info(this.toString() + ' is selected now');
         console.log('Marker has moved to ' + this._attributes.title);
+        // if(state.currentType === 'marker'){
+        //     if (e.target.tagName === 'rect' || e.target.tagName === 'circle' || e.target.tagName === 'polygon') {
+        //         state.selectedArea = e.target.parentNode.obj;
+        //         //Displays the area attribute form
+        //         console.log(state.selectedArea._attributes.title);
+        //         // console.log(state.newArea);
+        //         // info.load(state.selectedArea, e.pageX, e.pageY);
+        //     }else{
+        //         console.log("please place marker inside a room");
+        //     }
+        //
+        // }
         return this;
     };
+
 
     /**
      * Remove class name for selected areas from this area
@@ -1328,6 +1589,13 @@ var summerHtmlImageMapCreator = (function () {
         return Area.fromJSON(originalArea.toJSON()).move(10, 10).select();
     };
 
+    /* ---------- Constructors for real areas ---------- */
+
+    /*
+     *
+     * Adding Markers
+     *
+     * */
     /**
      * The constructor for marker
      *
@@ -1354,6 +1622,8 @@ var summerHtmlImageMapCreator = (function () {
         this._coords = {
             x: coords.x || 0,
             y: coords.y || 0,
+            // width : coords.width || 0,
+            // height : coords.height || 0
             width: coords.width || 0,
             height: coords.height || 0
         };
@@ -1370,7 +1640,7 @@ var summerHtmlImageMapCreator = (function () {
             // bottom : new Helper(this._groupEl, x, y, 'editBottom'),
             // left : new Helper(this._groupEl, x, y, 'editLeft'),
             // right : new Helper(this._groupEl, x, y, 'editRight'),
-            topLeft: new Marking(this._groupEl, x, y, 'move'),
+            topLeft: new Marking(this._groupEl, x, y, 'move')
             // topRight : new Helper(this._groupEl, x, y, 'editTopRight'),
             // bottomLeft : new Helper(this._groupEl, x, y, 'editBottomLeft'),
             // bottomRight : new Helper(this._groupEl, x, y, 'editBottomRight')
@@ -1501,6 +1771,48 @@ var summerHtmlImageMapCreator = (function () {
                 tempParams.x += dx;
                 tempParams.y += dy;
                 break;
+
+            // case 'editLeft':
+            //     tempParams.x += dx;
+            //     tempParams.width -= dx;
+            //     break;
+            //
+            // case 'editRight':
+            //     tempParams.width += dx;
+            //     break;
+            //
+            // case 'editTop':
+            //     tempParams.y += dy;
+            //     tempParams.height -= dy;
+            //     break;
+            //
+            // case 'editBottom':
+            //     tempParams.height += dy;
+            //     break;
+            //
+            // case 'editTopLeft':
+            //     tempParams.x += dx;
+            //     tempParams.y += dy;
+            //     tempParams.width -= dx;
+            //     tempParams.height -= dy;
+            //     break;
+            //
+            // case 'editTopRight':
+            //     tempParams.y += dy;
+            //     tempParams.width += dx;
+            //     tempParams.height -= dy;
+            //     break;
+            //
+            // case 'editBottomLeft':
+            //     tempParams.x += dx;
+            //     tempParams.width -= dx;
+            //     tempParams.height += dy;
+            //     break;
+            //
+            //     tempParams.height += dy;
+            //     break;
+            // case 'editBottomRight':
+            //     tempParams.width += dx;
         }
 
         return tempParams;
@@ -1555,6 +1867,9 @@ var summerHtmlImageMapCreator = (function () {
         this.setCoords(this.onProcessEditing(e));
         app.removeAllEvents();
         $("rect.selected").siblings("rect").css({"pointer-events": "none"});
+        // console.log(this._attributes.title);
+        // app.detectingShape(e);
+        // $("rect.selected").siblings("rect").css({"pointer-events": "auto"});
     };
 
     /**l
@@ -1565,7 +1880,7 @@ var summerHtmlImageMapCreator = (function () {
     Marker.prototype.toString = function () {
         return 'Marker {x: ' + this._coords.x +
             ', y: ' + this._coords.y;
-    };
+    }
 
     /**
      * Returns html-string of area html element with params of this rectangle
@@ -1713,7 +2028,7 @@ var summerHtmlImageMapCreator = (function () {
     Marker.createAndStartDrawing = function (firstPointCoords) {
         var newArea = new Marker({
             x: firstPointCoords.x,
-            y: firstPointCoords.y
+            y: firstPointCoords.y,
         });
 
         app.addEvent(app.domElements.container, 'mousedown', newArea.onProcessDrawing.bind(newArea))
@@ -1721,6 +2036,13 @@ var summerHtmlImageMapCreator = (function () {
 
         return newArea;
     };
+
+    /*
+     *
+     * close adding markers
+     *
+     * */
+
 
     /**
      * The constructor for rectangles
@@ -2005,7 +2327,7 @@ var summerHtmlImageMapCreator = (function () {
             ', y: ' + this._coords.y +
             ', width: ' + this._coords.width +
             ', height: ' + this._coords.height + '}';
-    };
+    }
 
     /**
      * Returns html-string of area html element with params of this rectangle
@@ -2163,6 +2485,7 @@ var summerHtmlImageMapCreator = (function () {
 
         return newArea;
     };
+
 
     /**
      * The constructor for circles
@@ -2390,7 +2713,7 @@ var summerHtmlImageMapCreator = (function () {
         return 'Circle {cx: ' + this._coords.cx +
             ', cy: ' + this._coords.cy +
             ', radius: ' + this._coords.radius + '}';
-    };
+    }
 
     /**
      * Returns html-string of area html element with params of this circle
@@ -2761,7 +3084,7 @@ var summerHtmlImageMapCreator = (function () {
             this._coords.points.map(function (item) {
                 return '[' + item.x + ', ' + item.y + ']'
             }).join(', ') + ']}';
-    };
+    }
 
     /**
      * Returns html-string of area html element with params of this polygon
@@ -2989,6 +3312,7 @@ var summerHtmlImageMapCreator = (function () {
         };
     })();
 
+
     /* Edit selected area info */
     /*Area context menu*/
     var info = (function () {
@@ -3100,6 +3424,7 @@ var summerHtmlImageMapCreator = (function () {
             unload: unload
         };
     })();
+
 
     /* Load areas from html code */
     var from_html_form = (function () {
@@ -3296,6 +3621,7 @@ var summerHtmlImageMapCreator = (function () {
             };
         })();
 
+
         /* Block init */
         function init() {
             utils.hide(loading_indicator);
@@ -3318,6 +3644,13 @@ var summerHtmlImageMapCreator = (function () {
                 app.loadImage(url_input.getImage()).setFilename(filename);
             } else if (last_changed === drag_n_drop && drag_n_drop.test()) {
                 app.loadImage(drag_n_drop.getImage()).setFilename(filename);
+
+                $('#draw-tools').show(1000);
+                $('#show-visualization').show(500);
+                $('#new_image').show(500);
+                $('#clear').show(500);
+                $('#save').show(500);
+                $('#preview').show(500);
             }
 
             e.preventDefault();
@@ -3364,6 +3697,7 @@ var summerHtmlImageMapCreator = (function () {
     })();
     get_image.show();
 
+
     /* Buttons and actions */
     var buttons = (function () {
         var all = utils.id('nav').getElementsByTagName('li'),
@@ -3381,7 +3715,8 @@ var summerHtmlImageMapCreator = (function () {
             show_help = utils.id('show_help'),
             marker = utils.id('marker'),
             show_visualization = utils.id('show-visualization'),
-            hide_visualization = utils.id('hide-visualization');
+            hide_visualization = utils.id('hide-visualization'),
+            view_building = utils.id('building-view');
 
         function deselectAll() {
             utils.foreach(all, function (x) {
@@ -3396,7 +3731,11 @@ var summerHtmlImageMapCreator = (function () {
 
         function onSaveButtonClick(e) {
             // Save in localStorage
-            app.saveInLocalStorage();
+            if (floorText = "Building View") {
+                app.saveBuildingPlan();
+            } else {
+                app.saveInLocalStorage();
+            }
 
             e.preventDefault();
         }
@@ -3423,7 +3762,7 @@ var summerHtmlImageMapCreator = (function () {
             info.unload();
 
             selectOne(this);
-            debugger;
+            // debugger;
             e.preventDefault();
         }
 
@@ -3491,21 +3830,43 @@ var summerHtmlImageMapCreator = (function () {
 
         function onNewImageButtonClick(e) {
             // New image - clear all and back to loading image screen
-            if (confirm('Discard all changes?')) {
-                app.setMode(null)
-                    .setDefaultClass()
-                    .setShape(null)
-                    .setIsDraw(false)
-                    .clear()
-                    .hide()
-                    .hidePreview()
-                    .removeFromLocalStorage();
-                deselectAll();
-                get_image.show();
-                console.log(floorNo);
+
+            if (floorText = "Building View") {
+                if (confirm('Discard all changes?')) {
+                    app.setMode(null)
+                        .setDefaultClass()
+                        .setShape(null)
+                        .setIsDraw(false)
+                        .clear()
+                        .hide()
+                        .hidePreview()
+                        .removeBuildingPlan;
+                    deselectAll();
+                    get_image.show();
+                    // console.log(floorNo);
+                }
+
+                e.preventDefault();
+
+            } else {
+
+                if (confirm('Discard all changes?')) {
+                    app.setMode(null)
+                        .setDefaultClass()
+                        .setShape(null)
+                        .setIsDraw(false)
+                        .clear()
+                        .hide()
+                        .hidePreview()
+                        .removeFromLocalStorage();
+                    deselectAll();
+                    get_image.show();
+                    console.log(floorNo);
+                }
+
+                e.preventDefault();
             }
 
-            e.preventDefault();
         }
 
         function onShowHelpButtonClick(e) {
@@ -3529,15 +3890,24 @@ var summerHtmlImageMapCreator = (function () {
         function showHeatMap() {
             app.setVisuals();
             $('#image canvas').removeClass('hidden');
+            $('.slider-wrapper').show(1000);
             $('#hide-visualization').removeClass('hidden');
             $('#show-visualization').addClass('hidden');
         }
 
         function hideHeatMap() {
             $('#image canvas').addClass('hidden');
+            $('.slider-wrapper').hide(1000);
             $('#hide-visualization').addClass('hidden');
             $('#show-visualization').removeClass('hidden');
 
+        }
+
+        function showBuilding() {
+            app.clear()
+                .loadBuildingPlan();
+            floorText = "Building View"
+            $('#file_reader_support > h3').html(floorText + ' - Please upload the building Plan');
         }
 
         save.addEventListener('click', onSaveButtonClick, false);
@@ -3555,60 +3925,33 @@ var summerHtmlImageMapCreator = (function () {
         marker.addEventListener('click', addMarker, false);
         show_visualization.addEventListener('click', showHeatMap, false);
         hide_visualization.addEventListener('click', hideHeatMap, false);
+        view_building.addEventListener('click', showBuilding, false);
 
         $(document).ready(function () {
             floorNo = "floor1";
-            app.clear().loadFromLocalStorage();
+            floorText = "Floor 1";
+            app.clear()
+                .loadFromLocalStorage();
+            $('#file_reader_support > h3').html(floorText + ' - Please upload the building Plan');
         });
 
         $(document).on('click', '#floors-dropdown li a', function (e) {
-
             floorNo = $(this).attr('value');
+
             floorText = $(this).text();
-
-            console.log(floorText);
-
-            $('.main-dropdown-toggle').closest('a').html(
-                '<span class="icon fw-stack add-margin-right-1x">' +
+            $('.main-dropdown-toggle').closest('a').html('<span class="icon fw-stack add-margin-right-1x">' +
                 '<i class="fw fw-enterprise fw-helper fw-helper-circle-outline"></i>' +
-                '</span>' + $(this).text() + ' <span class="caret"></span>');
+                '</span>' +
+                $(this).text() +
+                ' <span class="caret"></span>');
+            $('#file_reader_support > h3').html(floorText + ' - Please upload a floorplan');
 
-            if (floorNo !== 'building') {
+            app.clear().loadFromLocalStorage();
 
-                $('#file_reader_support > h3').html(floorText + ' - Please upload a floorplan');
-
-                app.clear().loadFromLocalStorage();
-
-                e.preventDefault();
-            } else {
-                window.location.href = "building.jag";
-            }
-
+            e.preventDefault();
         });
 
 
     })();
 
 })();
-
-$(document).ready(function () {
-    intializeWebsocketUrls();
-    var KEY_NAME = "yesin";
-    var obJSON = JSON.parse(window.localStorage.getItem(KEY_NAME));
-
-    console.log(typeof obJSON);
-    console.log(obJSON.metaData);
-
-    var buildingId = getUrlParameter("id");
-    $.each(obJSON.metaData, function (index, value) {
-        if (value.id == buildingId) {
-            var floors = value.floors;
-            for (var i = 1; i <= floors; i++) {
-                $('#floors-dropdown').append(
-                    '<li><a value="floor' + i + '">' + 'Floor ' + i + '</a></li>');
-            }
-            $('#floors-dropdown').append(
-                '<li><a value="building">' + 'Building</a></li>');
-        }
-    });
-});

@@ -1,0 +1,35 @@
+<%
+
+(function () {
+    var authModule = require("/modules/auth/auth.js").module;
+    var isAuthenticated = authModule.login(request, response);
+    dest = request.getParameter("destination");
+    var constants = require("/utils/constants.js").constants;
+
+    if (!isAuthenticated) {
+        response.sendRedirect("../login-controller?destination=" + dest + "&message=Authentication failed.");
+        return;
+    }
+    if (dest) {
+        // Check whether the dest. URL starts with either http:// or https://. If so remove the authority and get
+        // the rest of the URL.
+        if (/^https?:\/\//i.test(dest)) {
+            var url = new Packages.java.net.URL(dest),
+                authority = url.getAuthority();
+            dest = dest.substring(dest.indexOf(authority) + authority.length());
+        }
+        // Check whether the dest. URL starts with '/'. If not prepend the '/'.
+        if (!/^\//i.test(dest)) {
+            dest = '/' + dest;
+        }
+        // Check whether the dest. URL starts with '/portal'. if not set the url to '/portal'.
+        if (!/^\/buildingmonitor/i.test(dest)) {
+            dest = '/' + constants.APP_NAME + '/';
+        }
+    } else {
+        dest = '/' + constants.APP_NAME + '/';
+    }
+
+    response.sendRedirect(dest)
+})();
+%>

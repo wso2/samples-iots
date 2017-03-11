@@ -1,0 +1,11 @@
+.body-wrapper {
+    padding: 0 !important;
+}
+
+.container-fluid {
+    margin: 0 !important;
+}
+
+.body-wrapper > #build-location {
+    height : calc(100vh - 120px);
+}

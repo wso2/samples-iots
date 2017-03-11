@@ -21,8 +21,23 @@
     <!--image mapper css-->
     <link href="css/image-mapper.css" rel="stylesheet" type="text/css"/>
 
+    <!--bootstrap css-->
+    <!--<link href="libs/bootstrap_3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>-->
+
+    <!--Bootstrap editable css-->
     <link href="libs/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
+
+    <!--Bootstrap slider css-->
+    <link href="libs/bootstrap-slider/css/bootstrap-slider.min.css" rel="stylesheet" type="text/css"/>
+
+    <!--bootstrap date range picker-->
+    <link href="libs/bootstrap_daterange_picker/css/daterangepicker.css" rel="stylesheet" type="text/css"/>
+
+    <!--custom scripts-->
     <link href="css/custom.css" rel="stylesheet" type="text/css"/>
+    <link href="css/slider.css" rel="stylesheet" type="text/css"/>
+
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -104,6 +119,14 @@
                         </ul>
 
                     </li>
+                    <li id="building-view">
+                        <a href="#" title="Building View">
+                            <span class="icon fw-stack add-margin-right-1x">
+                                <i class="fw fw-enterprise fw-helper fw-helper-circle-outline"></i>
+                            </span>
+                            Building View
+                        </a>
+                    </li>
                     <li id="save">
                         <a href="#" title="Save changes">
                             <span class="icon fw-stack add-margin-right-1x">
@@ -161,6 +184,7 @@
                             <!--Place Device-->
                         <!--</a>-->
                     <!--</li>-->
+
                     <li id="show-visualization">
                         <a href="#" title="Device Status">
                             <span class="icon fw-stack add-margin-right-1x">
@@ -179,6 +203,10 @@
                         </a>
                     </li>
 
+
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
                     <li id="show_help">
                         <a href="#" title="View user guide for tool">
                             <span class="icon fw-stack add-margin-right-1x">
@@ -187,7 +215,14 @@
                             User guide
                         </a>
                     </li>
-
+                    <li id="notifications" class="sidebar-toggle-btn" data-toggle="sidebar" data-target="#right-sidebar-overlay" aria-expanded="false" rel="notifications-sidebar">
+                        <a href="#" title="View notifications">
+                            <!--<span class="icon fw-stack add-margin-right-1x">-->
+                            <i class="fw fw-notification fw-helper fw-helper-circle-outline"></i>
+                            <span class="badge badge-bubble">4</span>
+                            <!--</span>-->
+                        </a>
+                    </li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div>
@@ -195,12 +230,14 @@
 </div>
 <!-- /navbar -->
 
+
+
 <div class="page-content-wrapper">
 
     <div id="coords"></div>
     <div id="click-coords"></div>
 
-    <div class="sidebar-wrapper sidebar-nav toggled" data-side="left" data-width="51" data-container=".page-content-wrapper" data-container-divide="true" data-fixed-offset-top="0" data-offset-top="80">
+    <div id="draw-tools" class="sidebar-wrapper sidebar-nav toggled" data-side="left" data-width="51" data-container=".page-content-wrapper" data-container-divide="true" data-fixed-offset-top="0" data-offset-top="80">
         <div class="nano">
             <div class="nano-content">
                 <ul class="nav nav-pills nav-stacked pages">
@@ -257,10 +294,11 @@
                             <svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" id="svg"></svg>
                             <!--<canvas id="heatmap"> </canvas>-->
                         </div>
+                        <div id="heat-map-hidden" class="hidden">
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-2 col-sm-12 col-xs-12">
-
 
                 </div>
             </div>
@@ -268,17 +306,39 @@
     </div>
 
 
-    <!-- right-sidebar-toggle-buttons -->
-    <!--<button class="btn btn-primary sidebar-toggle-btn" data-toggle="sidebar" data-target="#right-sidebar-overlay" aria-expanded="false" rel="notifications-sidebar">-->
-        <!--Right sidebar overlay-->
-    <!--</button>-->
+    <!--
+        <!-- right-sidebar-toggle-buttons -->
+
     <!-- /right-sidebar-toggle-buttons -->
 
     <!-- right-sidebars -->
     <div class="sidebar-wrapper example-sidebar" id="right-sidebar-overlay" data-side="right" data-width="260" style="height: 786px;">
-        ...
+        <!-- example message -->
+        <ul class="sidebar-messages">
+            <li class="message message-success">
+                <h4><i class="icon fw fw-success"></i>Minor Information Message</h4>
+                <p>Alerts don't have default classes, only base and modifier classes.</p>
+            </li>
+            <li class="message message-info">
+                <h4><i class="icon fw fw-info"></i>Minor Information Message</h4>
+                <p>Alerts don't have default classes, only base and modifier classes.</p>
+            </li>
+            <li class="message message-warning">
+                <h4><i class="icon fw fw-warning"></i>Major Information Message</h4>
+                <p>Alerts don't have default classes, only base and modifier classes.</p>
+            </li>
+            <li class="message message-danger">
+                <h4><i class="icon fw fw-error"></i>Critical Information Message</h4>
+                <p>Alerts don't have default classes, only base and modifier classes.</p>
+            </li>
+        </ul>
+
     </div>
     <!-- /right-sidebars -->
+
+
+
+
 
     <!-- For html image map code -->
     <div id="code">
@@ -352,6 +412,46 @@
         </div>
         <!--plugin component end-->
     </div>
+    <div class = "slider-wrapper" >
+        <div class="slider-horizontal add-padding-bottom-2x">
+
+            <div class ="row">
+                <div class = "col-md-7">
+                    <div class = "slider-container add-padding-left-3x add-padding-top-2x">
+                        <label for="slider" class="col-sm-3 control-label">Frames: </label>
+                        <div class="col-sm-9">
+                        <input id="temp-slider" name="slider" data-slider-id='ex1Slider' type="text"/>
+                        </div>
+                        </div>
+                </div>
+                <div class = "col-md-5">
+                    <div class="form-group add-padding-top-2x">
+                        <div class="col-sm-12 form-inline">
+                            <label class="control-label">Historical View</label>
+                            <label class="switch">
+                                <input type="checkbox" id="historic-toggle">
+                                <span class="helper"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="date-picker">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="datepicker-container add-padding-left-3x">
+
+                                <label for="daterange" class="col-sm-3 control-label"> Dates: </label>
+                                <input type="text" name="daterange" placeholder="01/02/2016 to 01/03/2016" />
+                        </div>
+                    </div>lide
+                </div>
+        </div>
+    </div>
+
+
 </div>
 
 <footer class="footer">
@@ -365,17 +465,23 @@
 
 <!-- jQuery (necessary for Bootstrap and WSO2 Theme JavaScript plugins) -->
 <script src="libs/jquery_1.11.0/jquery-1.11.3.min.js"></script>
-
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="libs/bootstrap_3.3.6/js/bootstrap.min.js"></script>
+<!--wso2 theme-->
 <script src="libs/theme-wso2_2.0.0/js/theme-wso2.min.js"></script>
+<!--bootstrap slider-->
+<script src="libs/bootstrap-slider/bootstrap-slider.min.js"></script>
+<!--moment js-->
+<script src="libs/moment/moment.min.js"></script>
 
-<!-- custom js-->
+<!-- bootstrap date range picker-->
+<script src="libs/bootstrap_daterange_picker/js/daterangepicker.js"></script>
+
 <script type="text/javascript" src="js/summerHTMLImageMapCreator.js"></script>
+<script type="text/javascript" src="js/slider.js"></script>
 
 <!--Heatmaps.js-->
 <script type="text/javascript" src="libs/heatmap/heatmap.min.js"></script>
-
 </body>
 
 </html>
