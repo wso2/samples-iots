@@ -13,30 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var batchProviders;
+var getSchema, getData;
 
-batchProviders = function () {
-    var operations = {};
+(function () {
     var CONTENT_TYPE_JSON = "application/json";
+    var AUTHORIZATION_HEADER = "Authorization";
+    var USER_TOKEN = "user";
+    var TENANT_DOMAIN = "domain";
+    var CONST_AT = "@";
+    var USERNAME = "username";
+    var HTTP_USER_NOT_AUTHENTICATED = 403;
     var JS_MAX_VALUE = "9007199254740992";
     var JS_MIN_VALUE = "-9007199254740992";
-
-    var TABLENAME_ANDROID = "ORG_WSO2_GEO_FUSEDSPATIALEVENT";
-    var TABLENAME_ANDROID_SENSE = "ORG_WSO2_IOT_ANDROID_LOCATION";
-
-    var tableName = function (deviceType) {
-        switch (deviceType) {
-            case "android" :
-                return TABLENAME_ANDROID;
-                break;
-            case "android_sense" :
-                return TABLENAME_ANDROID_SENSE;
-                break;
-            default:
-                return null;
-
-        }
-    };
+    var tableName = "ORG_WSO2_FLOOR_DEVICE_SENSORSTREAM";
 
     var typeMap = {
         "bool": "string",
@@ -56,10 +45,28 @@ batchProviders = function () {
     var AnalyticsCachedJSServiceConnector = Packages.org.wso2.carbon.analytics.jsservice.AnalyticsCachedJSServiceConnector;
     var AnalyticsCache = Packages.org.wso2.carbon.analytics.jsservice.AnalyticsCachedJSServiceConnector.AnalyticsCache;
     var cacheTimeoutSeconds = 5;
+    var loggedInUser = null;
+    var constants = require("/utils/constants.js").constants;
+
 
     var cacheSizeBytes = 1024 * 1024 * 1024; // 1GB
     response.contentType = CONTENT_TYPE_JSON;
 
+    var authParam = request.getHeader(AUTHORIZATION_HEADER);
+    if (authParam != null) {
+        credentials = JSUtils.authenticate(authParam);
+        loggedInUser = credentials[0];
+    } else {
+        var token = session.get(constants.USER_CACHE_KEY);
+        if (token != null) {
+            loggedInUser = token[USERNAME] + CONST_AT + token[TENANT_DOMAIN];
+        } else {
+            log.error("user is not authenticated!");
+            response.status = HTTP_USER_NOT_AUTHENTICATED;
+            print('{ "status": "Failed", "message": "User is not authenticated." }');
+            return;
+        }
+    }
 
     var cache = application.get("AnalyticsWebServiceCache");
     if (cache == null) {
@@ -73,13 +80,9 @@ batchProviders = function () {
      * returns an array of column names & types
      * @param providerConfig
      */
-    operations.getSchema = function (loggedInUser) {
-        var tablename = tableName(deviceType);
-        if (tablename == null) {
-            return [];
-        }
+    getSchema = function () {
         var schema = [];
-        var result = connector.getTableSchema(loggedInUser, tablename).getMessage();
+        var result = connector.getTableSchema(loggedInUser, tableName).getMessage();
         result = JSON.parse(result);
 
         var columns = result.columns;
@@ -102,36 +105,29 @@ batchProviders = function () {
      * @param providerConfig
      * @param limit
      */
-    operations.getData = function (loggedInUser, deviceId, deviceType) {
-        var luceneQuery = "";
+    getData = function (buildingId, floorId, fromTime, toTime) {
+        var luceneQuery = "timeStamp:[" + fromTime + " TO " + toTime + "]";
         var limit = 100;
         var result;
-        var tablename = tableName(deviceType);
-        if (tablename == null) {
-            return [];
-        }
         //if there's a filter present, we should perform a Lucene search instead of reading the table
         if (luceneQuery) {
-            luceneQuery = 'id:"' + deviceId + '" AND type:"' + deviceType + '"';
+            luceneQuery = 'buildingId:"' + buildingId + '" AND floorId:"' + floorId + '" AND ' + luceneQuery;
             var filter = {
                 "query": luceneQuery,
                 "start": 0,
-                "count": limit
+                "count": limit,
+                "sortBy" : [{
+                    "field" : "timeStamp",
+                    "sortType" : "ASC"
+                }]
             };
-            result = connector.search(loggedInUser, tablename, stringify(filter)).getMessage();
+            result = connector.search(loggedInUser, tableName, stringify(filter)).getMessage();
         } else {
             var from = JS_MIN_VALUE;
             var to = JS_MAX_VALUE;
-            result = connector.getRecordsByRange(loggedInUser, tablename, from, to, 0, limit, null).getMessage();
+            result = connector.getRecordsByRange(loggedInUser, tableName, from, to, 0, limit, null).getMessage();
 
         }
-
-        // error handling ----
-        var resultString = result.toString();
-        if (resultString.contains("Failed to get records from table")) {
-            return null;
-        }
-
         result = JSON.parse(result);
         var data = [];
         for (var i = 0; i < result.length; i++) {
@@ -141,7 +137,4 @@ batchProviders = function () {
         return data;
     };
 
-
-
-    return operations;
-}();
+}());

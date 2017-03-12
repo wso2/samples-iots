@@ -130,7 +130,6 @@ var utils = function () {
                             setCachedTenantBasedClientAppCredentials(tenantDomain, tenantBasedClientAppCredentials);
                         return tenantBasedClientAppCredentials;
                     } else {
-                        new Log().info(xhr["responseText"] + " " + xhr["status"]);
                         log.error("{/app/modules/oauth/token-handler-utils.js} Error in retrieving tenant " +
                             "based client application credentials from API " +
                                 "Manager - getTenantBasedClientAppCredentials(x, y)");

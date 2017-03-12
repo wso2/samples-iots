@@ -27,7 +27,7 @@ function initialiseMap() {
     var sidebar = L.control.sidebar('sidebar', {position: 'right'}).addTo(baseMap);
 
     //Rendering resources
-    L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: 'Map data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, CC-BY-SA.'
     }).addTo(baseMap);
@@ -75,7 +75,7 @@ $(document).ready(function () {
 });
 
 function openWin(id) {
-    window.open("floor.jag?id=" + id);
+    window.open("floor?id=" + id);
 }
 
 // Script for adding marker

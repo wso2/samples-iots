@@ -1,5 +1,10 @@
 <!DOCTYPE html>
+<%
+var constants = require("/utils/constants.js").constants;
+var floorId = request.getParameter("id");
+var user = session.get(constants.USER_CACHE_KEY);
 
+%>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,34 +14,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>WSO2 Stream Processor</title>
-    <link href="libs/theme-wso2_2.0.0/images/favicon.png" rel="icon" type="image/png" sizes="16x16"/>
+    <link href="<%=urlPrefix%>libs/theme-wso2_2.0.0/images/favicon.png" rel="icon" type="image/png" sizes="16x16"/>
     <!-- WSO2 Theme -->
-    <link href="libs/theme-wso2_2.0.0/css/theme-wso2.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=urlPrefix%>libs/theme-wso2_2.0.0/css/theme-wso2.css" rel="stylesheet" type="text/css"/>
 
     <!-- Font WSO2 CSS -->
-    <link href="libs/font-wso2-1.2.1/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=urlPrefix%>libs/font-wso2-1.2.1/css/font-wso2.min.css" rel="stylesheet" type="text/css"/>
 
     <!--fontawesome-->
-    <link href="libs/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="<%=urlPrefix%>libs/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
     <!--image mapper css-->
-    <link href="css/image-mapper.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=urlPrefix%>css/image-mapper.css" rel="stylesheet" type="text/css"/>
 
     <!--bootstrap css-->
     <!--<link href="libs/bootstrap_3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>-->
 
     <!--Bootstrap editable css-->
-    <link href="libs/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
+    <link href="<%=urlPrefix%>libs/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
 
     <!--Bootstrap slider css-->
-    <link href="libs/bootstrap-slider/css/bootstrap-slider.min.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=urlPrefix%>libs/bootstrap-slider/css/bootstrap-slider.min.css" rel="stylesheet" type="text/css"/>
 
     <!--bootstrap date range picker-->
-    <link href="libs/bootstrap_daterange_picker/css/daterangepicker.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=urlPrefix%>libs/bootstrap_daterange_picker/css/daterangepicker.css" rel="stylesheet" type="text/css"/>
 
     <!--custom scripts-->
-    <link href="css/custom.css" rel="stylesheet" type="text/css"/>
-    <link href="css/slider.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=urlPrefix%>css/custom.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=urlPrefix%>css/slider.css" rel="stylesheet" type="text/css"/>
 
 
 
@@ -59,21 +64,21 @@
                 <span>IoT Server Floorplan Visualizer</span>
             </a>
         </div>
-        <!--<ul class="nav navbar-right">
+         <ul class="nav navbar-right float-remove-xs hidden-xs">
             <li class="visible-inline-block">
-                <a class="dropdown" data-toggle="dropdown" aria-expanded="false">
-                       <span class="icon fw-stack">
-                          <i class="fw fw-circle fw-stack-2x"></i>
-                          <i class="fw fw-user fw-stack-1x fw-inverse"></i>
-                       </span>
-                    <span class="hidden-xs add-margin-left-1x">John Doe <span class="caret"></span></span>
+                <a class="dropdown" data-toggle="dropdown">
+                    <span class="icon fw-stack fw-lg">
+                       <i class="fw fw-circle fw-stack-2x"></i>
+                       <i class="fw fw-user fw-stack-1x fw-inverse"></i>
+                    </span>
+                    <span><%=user.username%><span class="caret"></span></span>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-right slideInDown" role="menu">
-                    <li><a href="#">Profile Settings</a></li>
-                    <li><a href="#">Logout</a></li>
+                <ul class="dropdown-menu dropdown-menu-right float-remove-xs position-static-xs text-center-xs remove-margin-xs slideInDown" role="menu">
+                 <li><a href="<%=urlPrefix%>logout?destination=<%=dest%>"><i class="icon fw
+                 fw-sign-out"></i>log-out</a></li>
                 </ul>
             </li>
-        </ul>-->
+        </ul>
     </div>
 </header>
 <!-- /header -->
@@ -443,7 +448,6 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="datepicker-container add-padding-left-3x">
-
                                 <label for="daterange" class="col-sm-3 control-label"> Dates: </label>
                                 <input type="text" name="daterange" placeholder="01/02/2016 to 01/03/2016" />
                         </div>
@@ -464,25 +468,29 @@
     </div>
 </footer>
 
+<script>
+ var floorId = <%= floorId%>;
+</script>
 <!-- jQuery (necessary for Bootstrap and WSO2 Theme JavaScript plugins) -->
-<script src="libs/jquery_1.11.0/jquery-1.11.3.min.js"></script>
+<script src="<%=urlPrefix%>libs/jquery_1.11.0/jquery-1.11.3.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="libs/bootstrap_3.3.6/js/bootstrap.min.js"></script>
+<script src="<%=urlPrefix%>libs/bootstrap_3.3.6/js/bootstrap.min.js"></script>
 <!--wso2 theme-->
-<script src="libs/theme-wso2_2.0.0/js/theme-wso2.min.js"></script>
+<script src="<%=urlPrefix%>libs/theme-wso2_2.0.0/js/theme-wso2.min.js"></script>
 <!--bootstrap slider-->
-<script src="libs/bootstrap-slider/bootstrap-slider.min.js"></script>
+<script src="<%=urlPrefix%>libs/bootstrap-slider/bootstrap-slider.min.js"></script>
 <!--moment js-->
-<script src="libs/moment/moment.min.js"></script>
+<script src="<%=urlPrefix%>libs/moment/moment.min.js"></script>
 
 <!-- bootstrap date range picker-->
-<script src="libs/bootstrap_daterange_picker/js/daterangepicker.js"></script>
+<script src="<%=urlPrefix%>libs/bootstrap_daterange_picker/js/daterangepicker.js"></script>
 
-<script type="text/javascript" src="js/summerHTMLImageMapCreator.js"></script>
-<script type="text/javascript" src="js/slider.js"></script>
+<script type="text/javascript" src="<%=urlPrefix%>js/summerHTMLImageMapCreator.js"></script>
+<script type="text/javascript" src="<%=urlPrefix%>js/slider.js"></script>
 
 <!--Heatmaps.js-->
-<script type="text/javascript" src="libs/heatmap/heatmap.min.js"></script>
+<script type="text/javascript" src="<%=urlPrefix%>libs/heatmap/heatmap.min.js"></script>
+
 </body>
 
 </html>

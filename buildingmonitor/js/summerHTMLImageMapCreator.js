@@ -16,9 +16,11 @@ var heatMapData = [];
 var rangeSlider;
 var isSliderChanged = false;
 var currentSliderValue = 60;
+var historicalData;
+var isHistoricalView = false;
 
 /**
- * To get the real-time data using websocket
+ * To get the real-time data using websocket.
  */
 function intializeWebsocketUrls() {
     var config = {
@@ -74,11 +76,51 @@ window.onbeforeunload = function () {
     ws.close();
 };
 
+var enableDisableHistoricalData = function() {
+  isHistoricalView = !isHistoricalView;
+};
+
+var getProviderData = function (timeFrom, timeTo) {
+    var tableData;
+    $.ajax({
+        url: '/buildingmonitor/apis/batch-provider.jag?action=getData&timeFrom=' + timeFrom + '&timeTo=' + timeTo,
+        method: "GET",
+        contentType: "application/json",
+        async: false,
+        success: function (data) {
+            //console.log(data);
+            tableData = data;
+            historicalData = data;
+            var config = {
+                container: document.getElementById('image'),
+                radius: 200,
+                maxOpacity: .5,
+                minOpacity: 0,
+                blur: .75
+            };
+            heatmapInstance.setData({data:[]});
+            heatmapInstance = h337.create(config);
+
+            for (var data in historicalData) {
+                var dataPoint = {
+                    x: historicalData[data].xCoordinate,
+                    y: historicalData[data].yCoordinate,
+                    value: historicalData[data].temperature
+                };
+                heatmapInstance.addData(dataPoint);
+            }
+
+
+        }
+    });
+    return tableData;
+};
+
 
 $(document).ready(function () {
     var KEY_NAME = "yesin";
     var obJSON = JSON.parse(window.localStorage.getItem(KEY_NAME));
-    var buildingId = getUrlParameter("id");
+    var buildingId = floorId;
     $.each(obJSON.metaData, function (index, value) {
         if (value.id == buildingId) {
             var floors = value.floors;
@@ -122,12 +164,31 @@ function onSlideChange (event) {
 
     heatmapInstance.setData({data:[]});
     heatmapInstance = h337.create(config);
-    heatmapInstance.setData(heatMapData[currentSliderValue-1]);
 
-    if (currentSliderValue == 10) {
-        heatmapInstance.setData({data:[]});
-        heatmapInstance = h337.create(config);
-        heatmapInstance.setData(currentHeatMap.getData());
+    if (!isHistoricalView) {
+        heatmapInstance.setData(heatMapData[currentSliderValue - 1]);
+
+        if (currentSliderValue == 10) {
+            heatmapInstance.setData({data: []});
+            heatmapInstance = h337.create(config);
+            heatmapInstance.setData(currentHeatMap.getData());
+        }
+    } else {
+        if (historicalData) {
+            heatmapInstance.setData({data: []});
+            heatmapInstance = h337.create(config);
+            var length = historicalData.length * ((currentSliderValue-min) / (max-min));
+            for (var i = 0; i < length; i++) {
+                var dataPoint = {
+                    x: historicalData[i].xCoordinate,
+                    y: historicalData[i].yCoordinate,
+                    value: historicalData[i].temperature
+                };
+                heatmapInstance.addData(dataPoint);
+            }
+        } else {
+
+        }
     }
 
 
@@ -651,7 +712,7 @@ var summerHtmlImageMapCreator = (function () {
         var localStorageWrapper = (function () {
 
             var KEY_NAME = "yesin";
-            var buildingId = getUrlParameter("id");
+            var buildingId = floorId;
             var objectJSON = JSON.parse(window.localStorage.getItem(KEY_NAME));
 
             return {
@@ -767,7 +828,7 @@ var summerHtmlImageMapCreator = (function () {
 
         var buildingStorage = (function () {
             var KEY_NAME = "yesin";
-            var buildingId = getUrlParameter("id");
+            var buildingId = floorId;
             var objectJSON = JSON.parse(window.localStorage.getItem(KEY_NAME));
             return {
                 save: function () {
