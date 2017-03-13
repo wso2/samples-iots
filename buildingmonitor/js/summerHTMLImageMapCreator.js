@@ -1,9 +1,17 @@
 /*
- * Summer html image map creator
- * http://github.com/summerstyle/summer
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Copyright 2016 Vera Lobacheva (http://iamvera.com)
- * Released under the MIT license
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 //get's the URL query parameter that was sent from the GeoMap component
@@ -23,14 +31,6 @@ var isHistoricalView = false;
  * To get the real-time data using websocket.
  */
 function intializeWebsocketUrls() {
-    var config = {
-        container: document.getElementById('image'),
-        radius: 200,
-        maxOpacity: .5,
-        minOpacity: 0,
-        blur: .75
-    };
-    var count = 0;
     var webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceTemperatureEvent';
     ws = new WebSocket(webSocketURL);
     ws.onopen = function () {
@@ -48,16 +48,13 @@ function intializeWebsocketUrls() {
 
             if (!isSliderChanged) {
                 heatmapInstance.addData(dataPoint);
-            } else if (currentSliderValue == 10) {
+            } else if (!isHistoricalView && currentSliderValue == 10) {
                 heatmapInstance.addData(dataPoint);
             }
-            count++;
-
-
-                if (heatMapData.length == 10) {
-                    heatMapData.shift();
-                }
-                heatMapData.push(currentHeatMap.getData());
+            if (heatMapData.length == 10) {
+                heatMapData.shift();
+            }
+            heatMapData.push(currentHeatMap.getData());
 
         }
     };
@@ -192,22 +189,6 @@ function onSlideChange (event) {
     }
 
 
-};
-
-
-var getUrlParameter = function getUrlParameter(sParam) {
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
-
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : sParameterName[1];
-        }
-    }
 };
 
 
