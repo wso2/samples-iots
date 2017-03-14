@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eventPublisher name="Floor-Analysis-WebSocketLocal-AlertTemperatureEvent"
+                statistics="disable" trace="disable" xmlns="http://wso2.org/carbon/eventpublisher">
+    <from streamName="org.wso2.floor.alertNotifications" version="1.0.0"/>
+    <mapping customMapping="enable" type="json">
+        <inline>{
+            "buildingId": {{buildingId}},
+            "floorId": {{floorId}},
+            "temperature": {{temperature}},
+            "information" : {{information}},
+            "timeStamp" : {{timeStamp}}
+            }</inline>
+    </mapping>
+    <to eventAdapterType="websocket-local"/>
+</eventPublisher>

@@ -44,6 +44,10 @@
             <from jsonPath="$.airQuality"/>
             <to name="airQuality" type="double"/>
         </property>
+        <property>
+            <from jsonPath="$.light"/>
+            <to name="light" type="double"/>
+        </property>
     </mapping>
     <to streamName="org.wso2.floor.SensorStream" version="1.0.0"/>
 </eventReceiver>

@@ -8,7 +8,7 @@ var user = session.get(constants.USER_CACHE_KEY);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Floor Monitor</title>
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -484,7 +484,9 @@ var user = session.get(constants.USER_CACHE_KEY);
 
 <!-- bootstrap date range picker-->
 <script src="<%=urlPrefix%>libs/bootstrap_daterange_picker/js/daterangepicker.js"></script>
-
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="<%=urlPrefix%>js/heatMapManagement.js"></script>
+<script type="text/javascript" src="<%=urlPrefix%>js/custom.js"></script>
 <script type="text/javascript" src="<%=urlPrefix%>js/summerHTMLImageMapCreator.js"></script>
 <script type="text/javascript" src="<%=urlPrefix%>js/slider.js"></script>
 

@@ -16,7 +16,7 @@ $(document).ready( function () {
     },function(start, end, label) {
         var fromDate = new Date(start).valueOf();
         var endDate = new Date(end).valueOf();
-        getProviderData(fromDate, endDate);
+        custom.functions.getProviderData(fromDate, endDate);
 
     });
 });
@@ -24,7 +24,7 @@ $(document).ready( function () {
 
 $(document).ready(function(){
     $("#historic-toggle").click(function(){
-        enableDisableHistoricalData();
+        heatMapManagement.functions.enableDisableHistoricalData();
         $(".date-picker").slideToggle("slow");
     });
 });

@@ -9,6 +9,7 @@
             "motion" : {{motion}},
             "humidity" : {{humidity}},
             "airQuality" : {{airQuality}},
+            "light" : {{light}},
             "location": {
             "building" : {{buildingId}},
             "floor": {{floorId}},

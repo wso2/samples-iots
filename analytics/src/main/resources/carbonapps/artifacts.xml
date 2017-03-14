@@ -39,11 +39,15 @@
                     serverRole="FloorAnalysis"/>
         <dependency artifact="Floor-Analysis-WebSocketLocal-FloorTemperatureEvent" version="1.0.0" include="true"
                     serverRole="FloorAnalysis"/>
+        <dependency artifact="Floor-Analysis-WebSocketLocal-AlertTemperatureEvent" version="1.0.0" include="true"
+                    serverRole="FloorAnalysis"/>
         <dependency artifact="org.wso2.floor.SensorStream" version="1.0.0" include="true" serverRole="FloorAnalysis"/>
         <dependency artifact="org.wso2.floor.average.SensorStream" version="1.0.0" include="true" serverRole="FloorAnalysis"/>
         <dependency artifact="org.wso2.floor.device.SensorStream" version="1.0.0" include="true"
                     serverRole="FloorAnalysis" />
         <dependency artifact="org.wso2.floor.perFloor.SensorStream" version="1.0.0" include="true"
+                    serverRole="FloorAnalysis" />
+        <dependency artifact="org.wso2.floor.alertNotifications" version="1.0.0" include="true"
                     serverRole="FloorAnalysis" />
     </artifact>
 </artifacts>

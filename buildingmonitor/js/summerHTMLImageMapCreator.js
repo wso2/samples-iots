@@ -17,102 +17,13 @@
 //get's the URL query parameter that was sent from the GeoMap component
 var floorNo;
 var floorText;
-var heatmapInstance;
-var currentHeatMap;
-var ws;
-var heatMapData = [];
-var rangeSlider;
-var isSliderChanged = false;
-var currentSliderValue = 60;
-var historicalData;
-var isHistoricalView = false;
-
-/**
- * To get the real-time data using websocket.
- */
-function intializeWebsocketUrls() {
-    var webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceTemperatureEvent';
-    ws = new WebSocket(webSocketURL);
-    ws.onopen = function () {
-        console.log("opened");
-    };
-    ws.onmessage = function (evt) {
-        var dataValues = JSON.parse(evt.data);
-        if (heatmapInstance != null && dataValues.temperature > 0) {
-            var dataPoint = {
-                x: dataValues.location.coordinates[0],
-                y: dataValues.location.coordinates[1],
-                value: dataValues.temperature
-            };
-            currentHeatMap.addData(dataPoint);
-
-            if (!isSliderChanged) {
-                heatmapInstance.addData(dataPoint);
-            } else if (!isHistoricalView && currentSliderValue == 10) {
-                heatmapInstance.addData(dataPoint);
-            }
-            if (heatMapData.length == 10) {
-                heatMapData.shift();
-            }
-            heatMapData.push(currentHeatMap.getData());
-
-        }
-    };
-    ws.onclose = function () {
-        console.log("closed!");
-    };
-    ws.onerror = function (err) {
-        console.log("Error: " + err);
-    };
-}
 
 /**
  * When reloading the browser window, web socket need to be closed.
  */
 window.onbeforeunload = function () {
-    ws.close();
+    custom.functions.closeWebSockets();
 };
-
-var enableDisableHistoricalData = function() {
-  isHistoricalView = !isHistoricalView;
-};
-
-var getProviderData = function (timeFrom, timeTo) {
-    var tableData;
-    $.ajax({
-        url: '/buildingmonitor/apis/batch-provider.jag?action=getData&timeFrom=' + timeFrom + '&timeTo=' + timeTo,
-        method: "GET",
-        contentType: "application/json",
-        async: false,
-        success: function (data) {
-            //console.log(data);
-            tableData = data;
-            historicalData = data;
-            var config = {
-                container: document.getElementById('image'),
-                radius: 200,
-                maxOpacity: .5,
-                minOpacity: 0,
-                blur: .75
-            };
-            heatmapInstance.setData({data:[]});
-            heatmapInstance = h337.create(config);
-
-            for (var data in historicalData) {
-                var dataPoint = {
-                    x: historicalData[data].xCoordinate,
-                    y: historicalData[data].yCoordinate,
-                    value: historicalData[data].temperature
-                };
-                heatmapInstance.addData(dataPoint);
-            }
-
-
-        }
-    });
-    return tableData;
-};
-
 
 $(document).ready(function () {
     var KEY_NAME = "yesin";
@@ -126,70 +37,12 @@ $(document).ready(function () {
                     '<li><a value="floor' + i + '">' +
                     'Floor ' + i + '</a></li>'
                 );
-
             }
         }
     });
-    rangeSlider = $("#ex1Slider").bootstrapSlider();
-    rangeSlider.bootstrapSlider("setAttribute", "min", 1);
-    rangeSlider.bootstrapSlider("setAttribute", "max", 10);
-    rangeSlider.bootstrapSlider("setValue", 10);
-
-    $('#ex1Slider').on("slide", function (event) {
-        onSlideChange(event);
-
-    }).on("change", function (event) {
-        onSlideChange(event);
-    });
-
-    intializeWebsocketUrls();
+    heatMapManagement.functions.initializeSlider();
+    custom.functions.initializeWebSockets();
 });
-
-
-function onSlideChange (event) {
-    var config = {
-        container: document.getElementById('image'),
-        radius: 200,
-        maxOpacity: .5,
-        minOpacity: 0,
-        blur: .75
-    };
-    isSliderChanged = true;
-    var max = rangeSlider.bootstrapSlider("getAttribute", 'max');
-    var min = rangeSlider.bootstrapSlider("getAttribute", 'min');
-    currentSliderValue = rangeSlider.bootstrapSlider("getValue");
-
-    heatmapInstance.setData({data:[]});
-    heatmapInstance = h337.create(config);
-
-    if (!isHistoricalView) {
-        heatmapInstance.setData(heatMapData[currentSliderValue - 1]);
-
-        if (currentSliderValue == 10) {
-            heatmapInstance.setData({data: []});
-            heatmapInstance = h337.create(config);
-            heatmapInstance.setData(currentHeatMap.getData());
-        }
-    } else {
-        if (historicalData) {
-            heatmapInstance.setData({data: []});
-            heatmapInstance = h337.create(config);
-            var length = historicalData.length * ((currentSliderValue-min) / (max-min));
-            for (var i = 0; i < length; i++) {
-                var dataPoint = {
-                    x: historicalData[i].xCoordinate,
-                    y: historicalData[i].yCoordinate,
-                    value: historicalData[i].temperature
-                };
-                heatmapInstance.addData(dataPoint);
-            }
-        } else {
-
-        }
-    }
-
-
-};
 
 
 var summerHtmlImageMapCreator = (function () {
@@ -896,32 +749,13 @@ var summerHtmlImageMapCreator = (function () {
         var visuals = (function () {
             return {
                 configVisual: function () {
-                    return heatmapInstance
+                    return heatMapManagement.functions.getHeatMap();
                 },
                 setVisualData: function () {
-                    var config = {
-                        container: document.getElementById('image'),
-                        radius: 200,
-                        maxOpacity: .5,
-                        minOpacity: 0,
-                        blur: .75
-                    };
-                    if (heatmapInstance == null) {
-                        heatmapInstance = window.h337.create(config);
-                    }
-                    if (currentHeatMap == null) {
-                        var config = {
-                            container: document.getElementById('heat-map-hidden'),
-                            radius: 200,
-                            maxOpacity: .5,
-                            minOpacity: 0,
-                            blur: .75
-                        };
-                        currentHeatMap = window.h337.create(config);
-                    }
+                    heatMapManagement.functions.createHeatMap();
                 },
                 repaintVisuals: function () {
-                    heatmapInstance.repaint();
+                    heatMapManagement.functions.getHeatMap().repaint();
                 }
             };
         })();

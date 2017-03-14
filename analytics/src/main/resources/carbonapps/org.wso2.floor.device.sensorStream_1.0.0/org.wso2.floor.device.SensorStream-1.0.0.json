@@ -25,6 +25,10 @@
       "type": "DOUBLE"
     },
     {
+      "name": "light",
+      "type": "DOUBLE"
+    },
+    {
       "name" : "timeStamp",
       "type" : "LONG"
     },

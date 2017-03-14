@@ -23,6 +23,10 @@
     {
       "name": "airQuality",
       "type": "DOUBLE"
+    },
+    {
+      "name" : "light",
+      "type" : "DOUBLE"
     }
   ]
 }

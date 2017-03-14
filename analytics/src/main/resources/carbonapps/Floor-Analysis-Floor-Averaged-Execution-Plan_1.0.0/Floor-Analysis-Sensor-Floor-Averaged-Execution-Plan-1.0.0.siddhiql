@@ -8,13 +8,24 @@
 
 @Import('org.wso2.floor.device.SensorStream:1.0.0')
 define stream dataIn (deviceId string, temperature double, motion double, humidity double, airQuality
-double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
 
 @Export('org.wso2.floor.perFloor.SensorStream:1.0.0')
 define stream dataOut (buildingId string, floorId string, temperature double, motion double, humidity double, airQuality
-double, timeStamp long);
+double, light double, timeStamp long);
+
+@Export('org.wso2.floor.alertNotifications:1.0.0')
+define stream alertOut (buildingId string, floorId string, temperature double, information string, timeStamp long);
 
 from dataIn#window.timeBatch(1 min)
 select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
-(airQuality) as airQuality, time:timestampInMilliseconds() as timeStamp
+(airQuality) as airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
 group by floorId insert all events into dataOut ;
+
+from dataOut[temperature < 22]
+select buildingId, floorId, temperature as temperature, "Floor is very cool. Please increase the temperature" as
+information, timeStamp insert into alertOut ;
+
+from dataOut[temperature > 25]
+select buildingId, floorId, temperature as temperature, "Floor is very hot. Please decrease the temperature" as
+information, timeStamp insert into alertOut ;

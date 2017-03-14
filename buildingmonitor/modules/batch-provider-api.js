@@ -105,17 +105,18 @@ var getSchema, getData;
      * @param providerConfig
      * @param limit
      */
-    getData = function (buildingId, floorId, fromTime, toTime) {
+    getData = function (buildingId, floorId, fromTime, toTime, start, limit) {
         var luceneQuery = "timeStamp:[" + fromTime + " TO " + toTime + "]";
-        var limit = 100;
+        var limitCount = limit | 100;
+        var startCount = start | 0;
         var result;
         //if there's a filter present, we should perform a Lucene search instead of reading the table
         if (luceneQuery) {
             luceneQuery = 'buildingId:"' + buildingId + '" AND floorId:"' + floorId + '" AND ' + luceneQuery;
             var filter = {
                 "query": luceneQuery,
-                "start": 0,
-                "count": limit,
+                "start": startCount,
+                "count": limitCount,
                 "sortBy" : [{
                     "field" : "timeStamp",
                     "sortType" : "ASC"
@@ -125,7 +126,7 @@ var getSchema, getData;
         } else {
             var from = JS_MIN_VALUE;
             var to = JS_MAX_VALUE;
-            result = connector.getRecordsByRange(loggedInUser, tableName, from, to, 0, limit, null).getMessage();
+            result = connector.getRecordsByRange(loggedInUser, tableName, from, to, startCount, limitCount, null).getMessage();
 
         }
         result = JSON.parse(result);

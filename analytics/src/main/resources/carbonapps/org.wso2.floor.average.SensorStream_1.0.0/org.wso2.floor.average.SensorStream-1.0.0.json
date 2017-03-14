@@ -25,6 +25,10 @@
       "type": "DOUBLE"
     },
     {
+      "name": "avgLight",
+      "type": "DOUBLE"
+    },
+    {
       "name" : "timeStamp",
       "type" : "LONG"
     }
