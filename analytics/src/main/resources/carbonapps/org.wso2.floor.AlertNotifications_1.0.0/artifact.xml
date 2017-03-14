@@ -16,6 +16,7 @@
   ~ under the License.
   -->
 
-<artifact name="org.wso2.floor.alertNotifications" version="1.0.0" type="event/stream" serverRole="FloorAnalysis">
-    <file>org.wso2.floor.alertNotifications-1.0.0.json</file>
+<artifact name="org.wso2.floor.AlertNotifications" version="1.0.0" type="event/stream"
+          serverRole="FloorAnalysis">
+    <file>org.wso2.floor.AlertNotifications-1.0.0.json</file>
 </artifact>

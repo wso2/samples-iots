@@ -22,14 +22,6 @@ var custom = custom || {};
     var data = undefined;
     var timeline = undefined;
     var webSockets = [];
-    var heatmapInstance;
-    var currentHeatMap;
-    var heatMapData = [];
-    var rangeSlider;
-    var isSliderChanged = false;
-    var currentSliderValue = 60;
-    var historicalData;
-    var isHistoricalView = false;
 
     // Set callback to run when API is loaded
 //    google.setOnLoadCallback(drawVisualization);
@@ -68,9 +60,9 @@ var custom = custom || {};
      * @param timeTo End time
      *
      */
-    var getProviderData = function (timeFrom, timeTo) {
+    var getProviderData = function (tableName, timeFrom, timeTo) {
         $.ajax({
-            url: '/buildingmonitor/apis/batch-provider.jag?action=getData&timeFrom=' + timeFrom + '&timeTo=' + timeTo,
+            url: '/buildingmonitor/apis/batch-provider.jag?action=getData&timeFrom=' + timeFrom + '&timeTo=' + timeTo + "&tableName=" + tableName,
             method: "GET",
             contentType: "application/json",
             async: false,
@@ -107,7 +99,9 @@ var custom = custom || {};
             console.log("opened");
         };
         wsAlert.onmessage = function (evt) {
-            console.log(evt.data);
+            var alertData = JSON.parse(evt.data);
+            notifyAlert("Alert from " + alertData.buildingId + " building, " + alertData.floorId +
+                " floor. " + alertData.information);
         };
         wsAlert.onclose = function () {
             console.log("closed!");
@@ -126,6 +120,15 @@ var custom = custom || {};
             webSockets[index].close();
         }
     };
+
+    function notifyAlert(message) {
+        $.UIkit.notify({
+            message: "Alert: " + message,
+            status: 'warning',
+            timeout: 60000,
+            pos: 'bottom-left'
+        });
+    }
 
     custom.functions = {
         getProviderData : getProviderData,

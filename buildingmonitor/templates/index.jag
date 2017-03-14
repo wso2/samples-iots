@@ -88,8 +88,7 @@ var user = session.get(constants.USER_CACHE_KEY);
                     <li>
                         <a id="happy" href="#" onclick="onAddMarker()" title="Add a building">
                                 <span class="icon fw-stack">
-                                    <i class="fw fw-add fw-h
-                                    elper fw-helper-circle-outline"></i>
+                                    <i class="fw fw-add fw-helper fw-helper-circle-outline"></i>
                                 </span>
                             Add Building
                         </a>

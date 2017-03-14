@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var getSchema, getData;
+
+var getData;
 
 (function () {
     var CONTENT_TYPE_JSON = "application/json";
     var AUTHORIZATION_HEADER = "Authorization";
-    var USER_TOKEN = "user";
     var TENANT_DOMAIN = "domain";
     var CONST_AT = "@";
     var USERNAME = "username";
     var HTTP_USER_NOT_AUTHENTICATED = 403;
     var JS_MAX_VALUE = "9007199254740992";
     var JS_MIN_VALUE = "-9007199254740992";
-    var tableName = "ORG_WSO2_FLOOR_DEVICE_SENSORSTREAM";
 
     var typeMap = {
         "bool": "string",
@@ -75,37 +74,17 @@ var getSchema, getData;
     }
     var connector = new AnalyticsCachedJSServiceConnector(cache);
 
-
     /**
-     * returns an array of column names & types
-     * @param providerConfig
+     * To get the data from the event store
+     * @param buildingId Building Id
+     * @param floorId Floor id
+     * @param fromTime Start time
+     * @param toTime end time
+     * @param start start index
+     * @param limit Limit
+     * @returns {Array} the retrived data
      */
-    getSchema = function () {
-        var schema = [];
-        var result = connector.getTableSchema(loggedInUser, tableName).getMessage();
-        result = JSON.parse(result);
-
-        var columns = result.columns;
-        Object.getOwnPropertyNames(columns).forEach(function (name, idx, array) {
-            var type = "ordinal";
-            if (columns[name]['type']) {
-                type = columns[name]['type'];
-            }
-            schema.push({
-                fieldName: name,
-                fieldType: typeMap[type.toLowerCase()]
-            });
-        });
-        // log.info(schema);
-        return schema;
-    };
-
-    /**
-     * returns the actual data
-     * @param providerConfig
-     * @param limit
-     */
-    getData = function (buildingId, floorId, fromTime, toTime, start, limit) {
+    getData = function (tableName, buildingId, floorId, fromTime, toTime, start, limit) {
         var luceneQuery = "timeStamp:[" + fromTime + " TO " + toTime + "]";
         var limitCount = limit | 100;
         var startCount = start | 0;

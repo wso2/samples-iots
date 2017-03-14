@@ -1,5 +1,5 @@
 {
-  "name": "org.wso2.floor.alertNotifications",
+  "name": "org.wso2.floor.AlertNotifications",
   "version": "1.0.0",
   "nickName": "",
   "description": "",
@@ -11,10 +11,6 @@
     {
       "name": "floorId",
       "type": "STRING"
-    },
-    {
-      "name": "temperature",
-      "type": "DOUBLE"
     },
     {
       "name": "information",

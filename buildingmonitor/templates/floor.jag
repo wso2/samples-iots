@@ -42,6 +42,8 @@ var user = session.get(constants.USER_CACHE_KEY);
     <!--custom scripts-->
     <link href="<%=urlPrefix%>css/custom.css" rel="stylesheet" type="text/css"/>
     <link href="<%=urlPrefix%>css/slider.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="<%=urlPrefix%>libs/uikit/css/uikit.min.css" type="text/css"/>
+    <link rel="stylesheet" href="<%=urlPrefix%>libs/uikit/addons/uikit.addons.min.css" type="text/css"/>
 
 
 
@@ -311,12 +313,6 @@ var user = session.get(constants.USER_CACHE_KEY);
         </div>
     </div>
 
-
-    <!--
-        <!-- right-sidebar-toggle-buttons -->
-
-    <!-- /right-sidebar-toggle-buttons -->
-
     <!-- right-sidebars -->
     <div class="sidebar-wrapper example-sidebar" id="right-sidebar-overlay" data-side="right" data-width="260" style="height: 786px;">
         <!-- example message -->
@@ -341,10 +337,6 @@ var user = session.get(constants.USER_CACHE_KEY);
 
     </div>
     <!-- /right-sidebars -->
-
-
-
-
 
     <!-- For html image map code -->
     <div id="code">
@@ -482,6 +474,9 @@ var user = session.get(constants.USER_CACHE_KEY);
 <!--moment js-->
 <script src="<%=urlPrefix%>libs/moment/moment.min.js"></script>
 
+<!-- UIkit libraries -->
+<script src="<%=urlPrefix%>libs/uikit/js/uikit.min.js"></script>
+<script src="<%=urlPrefix%>libs/uikit/addons/notify.min.js"></script>
 <!-- bootstrap date range picker-->
 <script src="<%=urlPrefix%>libs/bootstrap_daterange_picker/js/daterangepicker.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>

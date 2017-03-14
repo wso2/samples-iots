@@ -14,8 +14,8 @@ double, light double, timeStamp long, buildingId string, floorId string, xCoordi
 define stream dataOut (buildingId string, floorId string, temperature double, motion double, humidity double, airQuality
 double, light double, timeStamp long);
 
-@Export('org.wso2.floor.alertNotifications:1.0.0')
-define stream alertOut (buildingId string, floorId string, temperature double, information string, timeStamp long);
+@Export('org.wso2.floor.AlertNotifications:1.0.0')
+define stream alertOut (buildingId string, floorId string, information string, timeStamp long);
 
 from dataIn#window.timeBatch(1 min)
 select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
@@ -23,9 +23,9 @@ select buildingId, floorId, avg(temperature) as temperature, avg(motion) as moti
 group by floorId insert all events into dataOut ;
 
 from dataOut[temperature < 22]
-select buildingId, floorId, temperature as temperature, "Floor is very cool. Please increase the temperature" as
-information, timeStamp insert into alertOut ;
+select buildingId, floorId, str:concat(str:concat("Current temperature is ", temperature),
+". Floor is very cool. Please increase the temperature") as information, timeStamp insert into alertOut ;
 
 from dataOut[temperature > 25]
-select buildingId, floorId, temperature as temperature, "Floor is very hot. Please decrease the temperature" as
-information, timeStamp insert into alertOut ;
+select buildingId, floorId, str:concat(str:concat("Current temperature is ", temperature),
+". Floor is very hot. Please decrease the temperature") as information, timeStamp insert into alertOut ;

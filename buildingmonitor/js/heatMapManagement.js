@@ -69,19 +69,22 @@ var heatMapManagement = heatMapManagement || {};
         var min = rangeSlider.bootstrapSlider("getAttribute", 'min');
         currentSliderValue = rangeSlider.bootstrapSlider("getValue");
 
-        heatmapInstance.setData({data:[]});
+        var data = {data: []};
+        heatmapInstance.setData(data);
         heatmapInstance = h337.create(heatMapConfig);
 
         if (!isHistoricalView) {
-            heatmapInstance.setData(heatMapData[currentSliderValue - 1]);
             if (currentSliderValue == 10) {
-                heatmapInstance.setData({data: []});
+                heatmapInstance.setData(data);
                 heatmapInstance = h337.create(heatMapConfig);
                 heatmapInstance.setData(currentHeatMap.getData());
+            } else {
+                heatmapInstance.setData(heatMapData[currentSliderValue - 1]);
             }
         } else {
             if (historicalData) {
-                heatmapInstance.setData({data: []});
+                data = {data: []};
+                heatmapInstance.setData(data);
                 heatmapInstance = h337.create(heatMapConfig);
                 var length = historicalData.length * ((currentSliderValue-min) / (max-min));
                 for (var i = 0; i < length; i++) {
