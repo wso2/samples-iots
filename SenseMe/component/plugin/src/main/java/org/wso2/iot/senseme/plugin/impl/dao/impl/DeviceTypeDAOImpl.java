@@ -21,7 +21,7 @@ package org.wso2.iot.senseme.plugin.impl.dao.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.wso2.iot.senseme.plugin.constants.DeviceTypeConstants;
+import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.plugin.exception.DeviceMgtPluginException;
 import org.wso2.iot.senseme.plugin.impl.dao.DeviceTypeDAO;
 import org.wso2.iot.senseme.plugin.impl.util.DeviceTypeUtils;
@@ -33,9 +33,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Implements IotDeviceDAO for senseme Devices.
