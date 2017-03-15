@@ -18,32 +18,21 @@
 
 package org.wso2.iot.senseme.plugin.impl.util;
 
-import org.wso2.iot.senseme.plugin.constants.DeviceTypeConstants;
+import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.plugin.exception.DeviceMgtPluginException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.Utils;
-import org.wso2.carbon.event.output.adapter.core.MessageType;
-import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterConfiguration;
-import org.wso2.carbon.event.output.adapter.core.exception.OutputEventAdapterException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Contains utility methods used by senseme plugin.

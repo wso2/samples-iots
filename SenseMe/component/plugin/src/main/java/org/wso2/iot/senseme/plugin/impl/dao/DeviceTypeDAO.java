@@ -21,7 +21,7 @@ package org.wso2.iot.senseme.plugin.impl.dao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.wso2.iot.senseme.plugin.constants.DeviceTypeConstants;
+import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.plugin.impl.dao.impl.DeviceTypeDAOImpl;
 import org.wso2.iot.senseme.plugin.exception.DeviceMgtPluginException;
 

@@ -30,7 +30,7 @@
 	<artifactId>${project-base-package}.api</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>${project-base-package}.api</name>
+	<name>senseme</name>
 	<url>http://wso2.com</url>
 	<build>
 		<plugins>
@@ -48,7 +48,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>${maven-war-plugin.version}</version>
 				<configuration>
-					<warName>${project-base-package}.api</warName>
+					<warName>${project-package}</warName>
 				</configuration>
 			</plugin>
 		</plugins>

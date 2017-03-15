@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.iot.senseme.plugin.constants;
+package org.wso2.iot.senseme.api.constants;
 
 import org.wso2.carbon.utils.CarbonUtils;
 import java.io.File;
@@ -31,6 +31,15 @@ public class DeviceTypeConstants {
     public final static String DEVICE_PLUGIN_DEVICE_ID = "senseme_DEVICE_ID";
     public final static String STATE_ON = "ON";
     public final static String STATE_OFF = "OFF";
+    public final static String BUILDING_GROUP_ID = "building_%s";
+    public final static String BUILDING_GROUP_NAME = "BUILDING_%s";
+    public final static String FLOOR_GROUP_ID = "floor_%s";
+    public final static String FLOOR_GROUP_NAME = "BUILDING_%s_FLOOR_%s";
+    public final static String BUILDING_ID = "buildingId";
+    public final static String FLOOR_ID = "floorId";
+    public final static String X_COORDINATE = "xCoordinate";
+    public final static String Y_COORDINATE = "yCoordinate";
+
 
     //sensor events summerized table name
     public static final String SENSOR_TYPE1_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_PIR";
@@ -72,5 +81,8 @@ public class DeviceTypeConstants {
 
     public static final String MQTT_CONFIG_LOCATION = CarbonUtils.getEtcCarbonConfigDirPath() + File.separator
             + "mqtt.properties";
+
+    public static final String[] DEFAULT_ADMIN_PERMISSIONS =
+            {"/permission/device-mgt/groups", "/permission/device-mgt/user/groups"};
 }
 

@@ -29,15 +29,15 @@ import org.wso2.carbon.apimgt.application.extension.dto.ApiApplicationKey;
 import org.wso2.carbon.apimgt.application.extension.exception.APIManagerException;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.device.mgt.common.Device;
-import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
-import org.wso2.carbon.device.mgt.common.DeviceManagementException;
-import org.wso2.carbon.device.mgt.common.EnrolmentInfo;
-import org.wso2.carbon.device.mgt.common.InvalidDeviceException;
+import org.wso2.carbon.device.mgt.common.*;
 import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationException;
+import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroup;
+import org.wso2.carbon.device.mgt.common.group.mgt.GroupAlreadyExistException;
+import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
 import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
 import org.wso2.carbon.device.mgt.core.operation.mgt.CommandOperation;
+import org.wso2.carbon.device.mgt.core.service.GroupManagementProviderService;
 import org.wso2.carbon.identity.jwt.client.extension.JWTClient;
 import org.wso2.carbon.identity.jwt.client.extension.dto.AccessTokenInfo;
 import org.wso2.carbon.identity.jwt.client.extension.exception.JWTClientException;
@@ -47,7 +47,7 @@ import org.wso2.iot.senseme.api.dto.SenseMe;
 import org.wso2.iot.senseme.api.dto.SensorRecord;
 import org.wso2.iot.senseme.api.dto.TokenInfo;
 import org.wso2.iot.senseme.api.util.APIUtil;
-import org.wso2.iot.senseme.plugin.constants.DeviceTypeConstants;
+import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -60,7 +60,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -200,8 +199,84 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     @Produces("application/json")
     public Response partialEnrollment(SenseMe senseMe) {
         boolean status = partialRegister(senseMe);
+        List<DeviceIdentifier> deviceIdentifierList = new ArrayList<>();
+
         if (status) {
-            return Response.status(Response.Status.OK.getStatusCode()).build();
+            String buildingId = null;
+            String floorId = null;
+            try {
+                DeviceIdentifier deviceIdentifier = new DeviceIdentifier(senseMe.getDeviceId(), DeviceTypeConstants
+                        .DEVICE_TYPE);
+                deviceIdentifierList.add(deviceIdentifier);
+                Device device = APIUtil.getDeviceManagementService().getDevice(deviceIdentifier);
+
+                if (device != null) {
+                    List<Device.Property> deviceProperties = device.getProperties();
+                    for (Device.Property p : deviceProperties) {
+                        if (p.getName().contains(DeviceTypeConstants.BUILDING_ID)) {
+                            buildingId = p.getValue();
+                        } else if (p.getName().contains(DeviceTypeConstants.FLOOR_ID)) {
+                            floorId = p.getValue();
+                        }
+                    }
+                } else {
+                    log.error("Device for device identifier " + deviceIdentifier.getId() + " is not found.");
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+                }
+
+                if (floorId == null || buildingId == null) {
+                    log.error("Building ID and Floor ID not found.");
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+                }
+
+                GroupManagementProviderService groupManagementProviderService = APIUtil
+                        .getGroupManagementProviderService();
+                DeviceGroup buildingDeviceGroup;
+                DeviceGroup floorDeviceGroup;
+
+                if ((buildingDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
+                        .BUILDING_GROUP_NAME,
+                        buildingId))) != null) {
+                    groupManagementProviderService.addDevices(buildingDeviceGroup.getGroupId(), deviceIdentifierList);
+
+                } else {
+                    buildingDeviceGroup = new DeviceGroup();
+                    buildingDeviceGroup.setName(String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId));
+                    buildingDeviceGroup.setOwner(device.getEnrolmentInfo().getOwner());
+                    buildingDeviceGroup.setDescription("Device group for building id " + buildingId);
+                    groupManagementProviderService.createGroup(buildingDeviceGroup, "admin", DeviceTypeConstants.DEFAULT_ADMIN_PERMISSIONS);
+                    groupManagementProviderService.addDevices(Integer.valueOf(buildingId), deviceIdentifierList);
+                }
+
+                if ((floorDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
+                        .FLOOR_GROUP_NAME, buildingId, floorId))) != null) {
+                    groupManagementProviderService.addDevices(floorDeviceGroup.getGroupId(), deviceIdentifierList);
+
+                } else {
+                    floorDeviceGroup = new DeviceGroup();
+                    floorDeviceGroup.setName(String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId));
+                    floorDeviceGroup.setOwner(device.getEnrolmentInfo().getOwner());
+                    floorDeviceGroup.setDescription("Device group for floor " + floorId + "of building " + buildingId);
+                    groupManagementProviderService.createGroup(floorDeviceGroup, "admin", DeviceTypeConstants.DEFAULT_ADMIN_PERMISSIONS);
+                    floorDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
+                            .FLOOR_GROUP_NAME, buildingId, floorId));
+                    groupManagementProviderService.addDevices(floorDeviceGroup.getGroupId(), deviceIdentifierList);
+                }
+
+                return Response.status(Response.Status.OK).build();
+            } catch (DeviceManagementException e) {
+                log.error(e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+            } catch (GroupManagementException e) {
+                log.error(e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+            } catch (GroupAlreadyExistException e) {
+                log.error(e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+            } catch (DeviceNotFoundException e) {
+                log.error(e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+            }
         } else {
             return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         }
@@ -358,19 +433,19 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             List<Device.Property> properties = new ArrayList<>();
 
             Device.Property buildingId = new Device.Property();
-            buildingId.setName("buildingId");
+            buildingId.setName(DeviceTypeConstants.BUILDING_ID);
             buildingId.setValue(senseMe.getBuildingId());
 
             Device.Property floorId = new Device.Property();
-            floorId.setName("floorId");
+            floorId.setName(DeviceTypeConstants.FLOOR_ID);
             floorId.setValue(senseMe.getFloorNumber());
 
             Device.Property xCoordinate = new Device.Property();
-            xCoordinate.setName("xCoordinate");
+            xCoordinate.setName(DeviceTypeConstants.X_COORDINATE);
             xCoordinate.setValue(senseMe.getxCord());
 
             Device.Property yCoordinate = new Device.Property();
-            yCoordinate.setName("yCoordinate");
+            yCoordinate.setName(DeviceTypeConstants.Y_COORDINATE);
             yCoordinate.setValue(senseMe.getyCord());
 
             properties.add(buildingId);
