@@ -581,19 +581,7 @@ var summerHtmlImageMapCreator = (function () {
 
                 },
                 restore: function () {
-                    console.log(objectJSON);
 
-                    // $.get('result.json', function (data) {
-
-                    // var floorNo;
-
-                    // $.each(data.metaData, function(i, val){
-                    //     if(val.id == parseInt(buildingId)){
-                    //         $.each(val.floorplan, function(i, val) {
-                    //             console.log(val[floorNo]);
-                    //         });
-                    //     }
-                    // });
 
                     $.each(objectJSON.metaData, function (i, val) {
                         if (val.id == parseInt(buildingId)) {

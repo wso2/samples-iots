@@ -13,6 +13,14 @@
       "type": "STRING"
     },
     {
+      "name": "type",
+      "type": "STRING"
+    },
+    {
+      "name": "value",
+      "type": "DOUBLE"
+    },
+    {
       "name": "information",
       "type": "STRING"
     },

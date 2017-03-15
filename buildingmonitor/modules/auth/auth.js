@@ -64,7 +64,6 @@ var module = {};
         var isAuthenticated;
         try {
             isAuthenticated = (new carbonServer.Server()).authenticate(username, password);
-            log.info(isAuthenticated + " isAutheticated reply");
         } catch (e) {
             log.error(e.message);
             var messageForNotExistingDomain = "Could not find a domain for the username";

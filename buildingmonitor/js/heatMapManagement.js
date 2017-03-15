@@ -25,6 +25,7 @@ var heatMapManagement = heatMapManagement || {};
     var currentSliderValue = 60;
     var historicalData;
     var isHistoricalView = false;
+    var timouts = [];
     var heatMapConfig = {
         container: document.getElementById('image'),
         radius: 200,
@@ -168,6 +169,44 @@ var heatMapManagement = heatMapManagement || {};
     var enableDisableHistoricalData = function() {
         isHistoricalView = !isHistoricalView;
     };
+
+    $( "#play" ).click(function(e) {
+        e.preventDefault();
+
+        if ($("#play").hasClass('play')) {
+            timouts = [];
+            $(this).addClass('pause').removeClass('play').attr('value', 'Pause');
+            var currentSliderValue = rangeSlider.bootstrapSlider("getValue");
+
+            if (currentSliderValue == 10) {
+                rangeSlider.bootstrapSlider("setValue", 0, true);
+                currentSliderValue = 0;
+            }
+
+            for (var i = 0, len = rangeSlider.bootstrapSlider("getAttribute", "max"); currentSliderValue <= len; currentSliderValue++, i++) {
+                 timouts.push(setTimeout(function(y) {
+                    rangeSlider.bootstrapSlider("setValue", y);
+                    updateHeatMapOnSlideChange();
+                    if (y == 10) {
+                        $("#play").attr('value', 'Play').addClass('play').removeClass('pause');
+                    }
+                }, i * 500, currentSliderValue));
+            }
+        } else {
+            $(this).attr('value', 'Play');
+            if (timouts) {
+                for (var i = 0;i < timouts.length; i++) {
+                    clearTimeout(timouts[i]);
+                }
+            }
+            $(this).addClass('play').removeClass('pause');
+
+        }
+
+    });
+
+
+
 
     heatMapManagement.functions = {
         getHeatMap : getHeatMap,

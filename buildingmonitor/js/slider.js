@@ -23,14 +23,13 @@ $('#temp-slider').slider({
 
 // date range pcker
 $(document).ready( function () {
-    $('input[name="daterange"]').daterangepicker({
-        opens:"center",
-        drops:"up"
-    },function(start, end, label) {
-        var fromDate = new Date(start).valueOf();
-        var endDate = new Date(end).valueOf();
-        custom.functions.getProviderData("ORG_WSO2_FLOOR_DEVICE_SENSORSTREAM", fromDate, endDate);
-
+    $('input[name="daterange"]').datepicker({
+        orientation: "auto"
+    }).on("changeDate", function(e) {
+        var endDate = new Date(e.date);
+        endDate.setHours(endDate.getHours() + 24);
+        var fromDate = e.date;
+        custom.functions.getProviderData("ORG_WSO2_FLOOR_DEVICE_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
     });
 });
 

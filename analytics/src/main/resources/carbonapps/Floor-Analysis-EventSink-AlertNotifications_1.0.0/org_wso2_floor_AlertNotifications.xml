@@ -18,6 +18,22 @@
             <Type>STRING</Type>
         </ColumnDefinition>
         <ColumnDefinition>
+            <Name>type</Name>
+            <IsFacet>false</IsFacet>
+            <EnableIndexing>false</EnableIndexing>
+            <IsPrimaryKey>false</IsPrimaryKey>
+            <EnableScoreParam>false</EnableScoreParam>
+            <Type>STRING</Type>
+        </ColumnDefinition>
+        <ColumnDefinition>
+            <Name>value</Name>
+            <IsFacet>false</IsFacet>
+            <EnableIndexing>true</EnableIndexing>
+            <IsPrimaryKey>false</IsPrimaryKey>
+            <EnableScoreParam>false</EnableScoreParam>
+            <Type>DOUBLE</Type>
+        </ColumnDefinition>
+        <ColumnDefinition>
             <Name>information</Name>
             <IsFacet>false</IsFacet>
             <EnableIndexing>false</EnableIndexing>

@@ -33,6 +33,8 @@
                     serverRole="FloorAnalysis"/>
         <dependency artifact="Floor-Analysis-EventSink-AlertNotifications" version="1.0.0" include="true"
                     serverRole="FloorAnalysis"/>
+        <dependency artifact="Floor-Analysis-EventSink-SummarizedDeviceSensorStream" version="1.0.0" include="true"
+                    serverRole="FloorAnalysis"/>
         <dependency artifact="Floor-Analysis-WebSocketLocal-DeviceFloorEvent" version="1.0.0" include="true"
                     serverRole="FloorAnalysis"/>
         <dependency artifact="Floor-Analysis-WebSocketLocal-FloorEvent" version="1.0.0" include="true"
@@ -41,7 +43,7 @@
                     serverRole="FloorAnalysis"/>
         <dependency artifact="Floor-Analysis-WebSocketLocal-FloorTemperatureEvent" version="1.0.0" include="true"
                     serverRole="FloorAnalysis"/>
-        <dependency artifact="Floor-Analysis-WebSocketLocal-AlertTemperatureEvent" version="1.0.0" include="true"
+        <dependency artifact="Floor-Analysis-WebSocketLocal-AlertEvent" version="1.0.0" include="true"
                     serverRole="FloorAnalysis"/>
         <dependency artifact="org.wso2.floor.SensorStream" version="1.0.0" include="true" serverRole="FloorAnalysis"/>
         <dependency artifact="org.wso2.floor.average.SensorStream" version="1.0.0" include="true" serverRole="FloorAnalysis"/>
@@ -50,6 +52,10 @@
         <dependency artifact="org.wso2.floor.perFloor.SensorStream" version="1.0.0" include="true"
                     serverRole="FloorAnalysis" />
         <dependency artifact="org.wso2.floor.AlertNotifications" version="1.0.0" include="true"
+                    serverRole="FloorAnalysis" />
+        <dependency artifact="org.wso2.floor.summarized.SensorStream" version="1.0.0" include="true"
+                    serverRole="FloorAnalysis" />
+        <dependency artifact="org.wso2.floor.summarized.device.floor.SensorStream" version="1.0.0" include="true"
                     serverRole="FloorAnalysis" />
     </artifact>
 </artifacts>

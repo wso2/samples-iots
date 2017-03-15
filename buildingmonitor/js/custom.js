@@ -80,34 +80,35 @@ var custom = custom || {};
         var webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceTemperatureEvent';
         var ws = new WebSocket(webSocketURL);
         ws.onopen = function () {
-            console.log("opened");
+            notifyUser("You are now connected to Sensor stream!", "success", constants.SUCCESS_TIMEOUT, "top-center");
         };
         ws.onmessage = function (evt) {
             heatMapManagement.functions.handleRealTimeData(JSON.parse(evt.data));
         };
         ws.onclose = function () {
-            console.log("closed!");
+            notifyUser("Sense stream connection lost with the server", "danger", constants.DANGER_TIMEOUT, "top-center");
         };
         ws.onerror = function (err) {
-            console.log("Error: " + err);
+            notifyUser(err, "danger", constants.DANGER_TIMEOUT, "top-center");
         };
         webSockets.push(ws);
 
-        webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertTemperatureEvent';
+        webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertEvent';
         var wsAlert = new WebSocket(webSocketURL);
         wsAlert.onopen = function () {
-            console.log("opened");
+            notifyUser("You are now connected to Alert stream!", "success", constants.SUCCESS_TIMEOUT, "top-center");
         };
         wsAlert.onmessage = function (evt) {
             var alertData = JSON.parse(evt.data);
-            notifyAlert("Alert from " + alertData.buildingId + " building, " + alertData.floorId +
-                " floor. " + alertData.information);
+            notifyUser("Alert from " + alertData.buildingId + " building, " + alertData.floorId +
+                " floor. " + alertData.type + " value is " + alertData.value.toFixed(2) + ". " + alertData.information,
+                "warning", constants.WARNING_TIMEOUT, "bottom-left");
         };
         wsAlert.onclose = function () {
-            console.log("closed!");
+            notifyUser("Alert stream connection lost with the server", "danger", constants.DANGER_TIMEOUT, "top-center");
         };
         wsAlert.onerror = function (err) {
-            console.log("Error: " + err);
+            notifyUser(err, "danger", constants.DANGER_TIMEOUT, "top-center");
         };
         webSockets.push(wsAlert);
     };
@@ -121,13 +122,24 @@ var custom = custom || {};
         }
     };
 
-    function notifyAlert(message) {
+    /**
+     * To notify the user.
+     * @param message Message that need to be passed in the notification.
+     * @param status Status level of the message
+     * @param timeout Time-out to close this particular alert
+     * @param pos Position to display the alery
+     */
+    function notifyUser(message, status, timeout, pos) {
         $.UIkit.notify({
-            message: "Alert: " + message,
-            status: 'warning',
-            timeout: 60000,
-            pos: 'bottom-left'
+            message: message,
+            status: status,
+            timeout: timeout,
+            pos: pos
         });
+    }
+
+    function handlePlay() {
+
     }
 
     custom.functions = {
@@ -137,5 +149,3 @@ var custom = custom || {};
     }
 
 })();
-
-
