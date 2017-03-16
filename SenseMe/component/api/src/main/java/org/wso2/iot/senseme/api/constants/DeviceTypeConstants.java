@@ -82,6 +82,10 @@ public class DeviceTypeConstants {
     public static final String MQTT_CONFIG_LOCATION = CarbonUtils.getEtcCarbonConfigDirPath() + File.separator
             + "mqtt.properties";
 
+    public static final String BUILDING_ROLE = "building_%s";
+    public static final String FLOOR_ROLE = "building_%s_floor_%s";
+    public static final String REALTIME_ANALYTICS_PERMISSION = "/permission/admin/device-mgt/realtime_analytics";
+    public static final String PERMISSION_ACTION = "ui.execute";
     public static final String[] DEFAULT_ADMIN_PERMISSIONS =
             {"/permission/device-mgt/groups", "/permission/device-mgt/user/groups"};
 }

@@ -34,6 +34,10 @@ import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorization
 import org.wso2.carbon.device.mgt.core.service.DeviceManagementProviderService;
 import org.wso2.carbon.device.mgt.core.service.GroupManagementProviderService;
 import org.wso2.carbon.identity.jwt.client.extension.service.JWTClientManagerService;
+import org.wso2.carbon.user.api.AuthorizationManager;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.iot.senseme.api.dto.SensorRecord;
 
 import java.util.ArrayList;
@@ -191,5 +195,41 @@ public class APIUtil {
     public static String getAuthenticatedUserTenantDomain() {
         PrivilegedCarbonContext threadLocalCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         return threadLocalCarbonContext.getTenantDomain();
+    }
+
+    public static UserStoreManager getUserStoreManager() throws UserStoreException {
+        RealmService realmService;
+        UserStoreManager userStoreManager;
+        PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        realmService = (RealmService) ctx.getOSGiService(RealmService.class, null);
+        if (realmService == null) {
+            String msg = "Realm service has not initialized.";
+            log.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        int tenantId = ctx.getTenantId();
+        userStoreManager = realmService.getTenantUserRealm(tenantId).getUserStoreManager();
+        return userStoreManager;
+    }
+
+    public static AuthorizationManager getAuthorizationManager() {
+        RealmService realmService;
+        AuthorizationManager authorizationManager;
+        try {
+            PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            realmService = (RealmService) ctx.getOSGiService(RealmService.class, null);
+            if (realmService == null) {
+                String msg = "Realm service has not initialized.";
+                log.error(msg);
+                throw new IllegalStateException(msg);
+            }
+            int tenantId = ctx.getTenantId();
+            authorizationManager = realmService.getTenantUserRealm(tenantId).getAuthorizationManager();
+        } catch (UserStoreException e) {
+            String msg = "Error occurred while retrieving current user store manager";
+            log.error(msg, e);
+            throw new IllegalStateException(msg);
+        }
+        return authorizationManager;
     }
 }
