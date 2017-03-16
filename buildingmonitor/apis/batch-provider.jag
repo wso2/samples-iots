@@ -24,10 +24,13 @@
     var action = request.getParameter("action");
     var timeFrom = request.getParameter("timeFrom");
     var timeTo = request.getParameter("timeTo");
+    var start = request.getParameter("start");
+    var limit = request.getParameter("limit");
+    var sortBy = request.getParameter("sortBy");
 
     var providerAPI = require('/modules/batch-provider-api.js');
     if(action === 'getData'){
-        print(providerAPI.getData(tableName, "WSO2", "floor5", timeFrom, timeTo));
+        print(providerAPI.getData(tableName, "WSO2", "floor5", timeFrom, timeTo, start, limit, sortBy));
         return;
     }
 }());

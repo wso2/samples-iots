@@ -55,22 +55,41 @@ var custom = custom || {};
     }
 
     /**
-     * To get the historical data for a certain period of time
+     * To get the historical data for a certain period of time.
+     * @param tableName Name of the table to fetch the data from
      * @param timeFrom Start time
      * @param timeTo End time
      *
      */
-    var getProviderData = function (tableName, timeFrom, timeTo) {
+    var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortBy) {
+        var providerData = null;
+        var providerUrl = '/buildingmonitor/apis/batch-provider.jag?action=getData&tableName=' + tableName;
+
+        if (timeFrom && timeTo) {
+            providerUrl += '&timeFrom=' + timeFrom + '&timeTo=' + timeTo;
+        }
+        if (start) {
+            providerUrl += "&start=" + start;
+        }
+        if (limit) {
+            providerUrl += "&limit=" + limit;
+        }
+        if (sortBy) {
+            providerUrl += "&sortBy="  +sortBy
+        }
         $.ajax({
-            url: '/buildingmonitor/apis/batch-provider.jag?action=getData&timeFrom=' + timeFrom + '&timeTo=' + timeTo + "&tableName=" + tableName,
+            url:providerUrl,
             method: "GET",
             contentType: "application/json",
             async: false,
             success: function (data) {
-                heatMapManagement.functions.updateHistoricalData(data);
+                providerData = data;
+            },
+            error : function (err) {
+                notifyUser(err, "danger", constants.DANGER_TIMEOUT, "top-center");
             }
         });
-
+        return providerData;
     };
 
     /**

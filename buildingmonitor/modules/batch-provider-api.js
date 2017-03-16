@@ -78,36 +78,39 @@ var getData;
      * To get the data from the event store
      * @param buildingId Building Id
      * @param floorId Floor id
+     * @param tableName table Name
      * @param fromTime Start time
      * @param toTime end time
      * @param start start index
      * @param limit Limit
+     * @param sortBy sort order [ASC, DSC]
      * @returns {Array} the retrived data
      */
-    getData = function (tableName, buildingId, floorId, fromTime, toTime, start, limit) {
-        var luceneQuery = "timeStamp:[" + fromTime + " TO " + toTime + "]";
-        var limitCount = limit | 100;
-        var startCount = start | 0;
+    getData = function (tableName, buildingId, floorId, fromTime, toTime, start, limit, sortBy) {
+        var luceneQuery = null;
+        var sort = sortBy || "ASC";
+        if (fromTime && toTime) {
+            luceneQuery = "timeStamp:[" + fromTime + " TO " + toTime + "]";
+        } else {
+            luceneQuery = "timeStamp:[" + JS_MIN_VALUE + " TO " + JS_MAX_VALUE + "]";
+        }
+        var limitCount = limit || 100;
+        var startCount = start || 0;
         var result;
         //if there's a filter present, we should perform a Lucene search instead of reading the table
-        if (luceneQuery) {
-            luceneQuery = 'buildingId:"' + buildingId + '" AND floorId:"' + floorId + '" AND ' + luceneQuery;
-            var filter = {
-                "query": luceneQuery,
-                "start": startCount,
-                "count": limitCount,
-                "sortBy" : [{
-                    "field" : "timeStamp",
-                    "sortType" : "ASC"
-                }]
-            };
-            result = connector.search(loggedInUser, tableName, stringify(filter)).getMessage();
-        } else {
-            var from = JS_MIN_VALUE;
-            var to = JS_MAX_VALUE;
-            result = connector.getRecordsByRange(loggedInUser, tableName, from, to, startCount, limitCount, null).getMessage();
 
-        }
+        luceneQuery = 'buildingId:"' + buildingId + '" AND floorId:"' + floorId + '" AND ' + luceneQuery;
+        var filter = {
+            "query": luceneQuery,
+            "start": startCount,
+            "count": limitCount,
+            "sortBy" : [{
+                "field" : "timeStamp",
+                "sortType" : sort
+            }]
+        };
+        result = connector.search(loggedInUser, tableName, stringify(filter)).getMessage();
+
         result = JSON.parse(result);
         var data = [];
         for (var i = 0; i < result.length; i++) {

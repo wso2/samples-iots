@@ -18,6 +18,8 @@
 var floorNo;
 var floorText;
 
+var notificationItem  = Handlebars.compile($("#notification-item-hbs").html());
+
 /**
  * When reloading the browser window, web socket need to be closed.
  */
@@ -44,6 +46,19 @@ $(document).ready(function () {
     custom.functions.initializeWebSockets();
 });
 
+$("#notifications").click(function(e) {
+    var notificationList = custom.functions.getProviderData("ORG_WSO2_FLOOR_ALERTNOTIFICATIONS",null, null, null, 10, "DESC");
+    $("#notification-messages").html();
+
+    for (var notificationData in notificationList) {
+        $("#notification-messages").append(notificationItem({
+            title: notificationList[notificationData].type + " Alert",
+            message: notificationList[notificationData].type + " is " + notificationList[notificationData].value.toFixed(2) + ". " +
+            notificationList[notificationData].information,
+            time : new Date(notificationList[notificationData].timeStamp)
+        }));
+    }
+});
 
 var summerHtmlImageMapCreator = (function () {
     'use strict';

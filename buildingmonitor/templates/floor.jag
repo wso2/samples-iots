@@ -228,7 +228,7 @@ var user = session.get(constants.USER_CACHE_KEY);
                         <a href="#" title="View notifications">
                             <!--<span class="icon fw-stack add-margin-right-1x">-->
                             <i class="fw fw-notification fw-helper fw-helper-circle-outline"></i>
-                            <span class="badge badge-bubble">4</span>
+                            <span class="badge badge-bubble"></span>
                             <!--</span>-->
                         </a>
                     </li>
@@ -290,9 +290,9 @@ var user = session.get(constants.USER_CACHE_KEY);
                                 </div>
                                 <label for="url">type a url</label>
                                 <span id="url_wrapper">
-            <span class="clear_button" title="clear">x</span>
-            <input type="text" id="url"/>
-        </span>
+                                       <span class="clear_button" title="clear">x</span>
+                                        <input type="text" id="url"/>
+                                </span>
                                 <button id="button" class="btn btn-primary" title="Use floorplan">Proceed</button>
 
                             </div>
@@ -317,23 +317,7 @@ var user = session.get(constants.USER_CACHE_KEY);
     <!-- right-sidebars -->
     <div class="sidebar-wrapper example-sidebar" id="right-sidebar-overlay" data-side="right" data-width="260" style="height: 786px;">
         <!-- example message -->
-        <ul class="sidebar-messages">
-            <li class="message message-success">
-                <h4><i class="icon fw fw-success"></i>Minor Information Message</h4>
-                <p>Alerts don't have default classes, only base and modifier classes.</p>
-            </li>
-            <li class="message message-info">
-                <h4><i class="icon fw fw-info"></i>Minor Information Message</h4>
-                <p>Alerts don't have default classes, only base and modifier classes.</p>
-            </li>
-            <li class="message message-warning">
-                <h4><i class="icon fw fw-warning"></i>Major Information Message</h4>
-                <p>Alerts don't have default classes, only base and modifier classes.</p>
-            </li>
-            <li class="message message-danger">
-                <h4><i class="icon fw fw-error"></i>Critical Information Message</h4>
-                <p>Alerts don't have default classes, only base and modifier classes.</p>
-            </li>
+        <ul id = "notification-messages" class="sidebar-messages">
         </ul>
 
     </div>
@@ -461,9 +445,19 @@ var user = session.get(constants.USER_CACHE_KEY);
     </div>
 </footer>
 
+<script id="notification-item-hbs" type="text/x-handlebars-template">
+    <li class="message message-warning">
+        <h4><i class="icon fw fw-warning"></i>{{title}}</h4>
+        <p>{{message}}</p>
+        <p>{{time}}</p>
+    </li>
+</script>
+
 <script>
  var floorId = <%= floorId%>;
 </script>
+
+
 <!-- jQuery (necessary for Bootstrap and WSO2 Theme JavaScript plugins) -->
 <script src="<%=urlPrefix%>libs/jquery_1.11.0/jquery-1.11.3.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -472,6 +466,8 @@ var user = session.get(constants.USER_CACHE_KEY);
 <script src="<%=urlPrefix%>libs/theme-wso2_2.0.0/js/theme-wso2.min.js"></script>
 <!--bootstrap slider-->
 <script src="<%=urlPrefix%>libs/bootstrap-slider/bootstrap-slider.min.js"></script>
+<!-- handlebar -->
+<script src="<%=urlPrefix%>libs/handlebars-v4.0.2/handlebars.min.js"></script>
 <!--moment js-->
 <script src="<%=urlPrefix%>libs/moment/moment.min.js"></script>
 

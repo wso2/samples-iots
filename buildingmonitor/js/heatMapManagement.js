@@ -170,6 +170,9 @@ var heatMapManagement = heatMapManagement || {};
         isHistoricalView = !isHistoricalView;
     };
 
+    /**
+     * To make animation out of the heat-map for the real-time data.
+     */
     $( "#play" ).click(function(e) {
         e.preventDefault();
 
@@ -204,9 +207,6 @@ var heatMapManagement = heatMapManagement || {};
         }
 
     });
-
-
-
 
     heatMapManagement.functions = {
         getHeatMap : getHeatMap,
