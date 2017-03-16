@@ -34,12 +34,11 @@
     background: #222c31;
 }
 
-.slider-handle{
-    background-color: #d8d4dc;
-    background-image: -webkit-linear-gradient(top,#0d0f10 0,#3e4346 100%);
-    background-image: linear-gradient(to bottom,#eaeaea 0,#eaeaea 100%);
-}
+
 
 .date-picker{
+    display:none;
+}
+.date-abc{
     display:none;
 }

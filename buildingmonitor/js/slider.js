@@ -29,7 +29,7 @@ $(document).ready( function () {
         var endDate = new Date(e.date);
         endDate.setHours(endDate.getHours() + 24);
         var fromDate = e.date;
-        var data = custom.functions.getProviderData("ORG_WSO2_FLOOR_DEVICE_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
+        var data = custom.functions.getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
         if (data) {
             heatMapManagement.functions.updateHistoricalData(data);
         }
@@ -40,7 +40,7 @@ $(document).ready( function () {
 $(document).ready(function(){
     $("#historic-toggle").click(function(){
         heatMapManagement.functions.enableDisableHistoricalData();
-        $(".date-picker").slideToggle("slow");
+        $('.date-picker').slideToggle("slow");
     });
 });
 

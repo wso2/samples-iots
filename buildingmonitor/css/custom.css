@@ -172,6 +172,10 @@ padding:0px 5px 0px 5px;
 #preview{
     display:none;
 }
+
+.slider.slider-horizontal {
+    width: 400px;
+}
 /*device.selected{*/
     /*pointer-events: none;*/
 /*}*/

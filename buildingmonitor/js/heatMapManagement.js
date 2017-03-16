@@ -178,25 +178,32 @@ var heatMapManagement = heatMapManagement || {};
 
         if ($("#play").hasClass('play')) {
             timouts = [];
-            $(this).addClass('pause').removeClass('play').attr('value', 'Pause');
+            $(this).addClass('pause').removeClass('play');
+            $("#pau").removeClass("hidden");
+            $("#pla").addClass("hidden");
             var currentSliderValue = rangeSlider.bootstrapSlider("getValue");
 
             if (currentSliderValue == 10) {
-                rangeSlider.bootstrapSlider("setValue", 0, true);
+                rangeSlider.bootstrapSlider("setValue", 0);
                 currentSliderValue = 0;
+                updateHeatMapOnSlideChange();
             }
 
             for (var i = 0, len = rangeSlider.bootstrapSlider("getAttribute", "max"); currentSliderValue <= len; currentSliderValue++, i++) {
                  timouts.push(setTimeout(function(y) {
                     rangeSlider.bootstrapSlider("setValue", y);
-                    updateHeatMapOnSlideChange();
+                     updateHeatMapOnSlideChange();
+
                     if (y == 10) {
-                        $("#play").attr('value', 'Play').addClass('play').removeClass('pause');
+                        $("#pla").removeClass("hidden");
+                        $("#pau").addClass("hidden");
+                        $("#play").addClass('play').removeClass('pause');
                     }
                 }, i * 500, currentSliderValue));
             }
         } else {
-            $(this).attr('value', 'Play');
+            $("#pla").removeClass("hidden");
+            $("#pau").addClass("hidden");
             if (timouts) {
                 for (var i = 0;i < timouts.length; i++) {
                     clearTimeout(timouts[i]);

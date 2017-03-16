@@ -45,6 +45,7 @@ var user = session.get(constants.USER_CACHE_KEY);
     <link href="<%=urlPrefix%>css/slider.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="<%=urlPrefix%>libs/uikit/css/uikit.min.css" type="text/css"/>
     <link rel="stylesheet" href="<%=urlPrefix%>libs/uikit/addons/uikit.addons.min.css" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="<%=urlPrefix%>libs/timeline/timeline.css">
 
 
 
@@ -399,15 +400,22 @@ var user = session.get(constants.USER_CACHE_KEY);
         <div class="slider-horizontal add-padding-bottom-2x">
 
             <div class ="row">
-                <div class = "col-md-7">
+                <div class = "col-md-8">
                     <div class = "slider-container add-padding-left-3x add-padding-top-2x">
-                        <input id="play" class="col-sm-3 control-label play" type='button' value='Play'/>
-                        <div class="col-sm-9">
+                         <a id="play" class = "col-sm-1 play" href="#" title="Play">
+                                <span id = "pla" class="icon fw-stack">
+                                    <i class="fw fw-start fw-helper fw-helper-circle-outline"></i>
+                                </span>
+                                <span id = "pau" class="icon fw-stack hidden">
+                                    <i class="fw fw-stop fw-helper fw-helper-circle-outline"></i>
+                                </span>
+                        </a>
+                        <div class="col-sm-11">
                         <input id="temp-slider" name="slider" data-slider-id='ex1Slider' type="text"/>
                         </div>
                         </div>
                 </div>
-                <div class = "col-md-5">
+                <div class = "col-md-4">
                     <div class="form-group add-padding-top-2x">
                         <div class="col-sm-12 form-inline">
                             <label class="control-label">Historical View</label>
@@ -426,9 +434,9 @@ var user = session.get(constants.USER_CACHE_KEY);
                     <div class="col-md-12">
                         <div class="datepicker-container add-padding-left-3x">
                                 <label for="daterange" class="col-sm-3 control-label"> Dates: </label>
-                                <input type="text" name="daterange" placeholder="01/02/2016 to 01/03/2016" />
+                                <input type="text" name="daterange" placeholder="03/22/2017" />
                         </div>
-                    </div>lide
+                    </div>
                 </div>
         </div>
     </div>
@@ -470,6 +478,7 @@ var user = session.get(constants.USER_CACHE_KEY);
 <script src="<%=urlPrefix%>libs/handlebars-v4.0.2/handlebars.min.js"></script>
 <!--moment js-->
 <script src="<%=urlPrefix%>libs/moment/moment.min.js"></script>
+<script type="text/javascript" src="<%=urlPrefix%>libs/timeline/timeline.js"></script>
 
 <!-- UIkit libraries -->
 <script src="<%=urlPrefix%>libs/uikit/js/uikit.min.js"></script>
@@ -477,6 +486,7 @@ var user = session.get(constants.USER_CACHE_KEY);
 <!-- bootstrap date range picker-->
 <script src="<%=urlPrefix%>libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
 <script type="text/javascript" src="<%=urlPrefix%>js/constants.js"></script>
 <script type="text/javascript" src="<%=urlPrefix%>js/heatMapManagement.js"></script>
 <script type="text/javascript" src="<%=urlPrefix%>js/custom.js"></script>
