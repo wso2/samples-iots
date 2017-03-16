@@ -15,7 +15,7 @@ define stream dataOut (buildingId string, floorId string, temperature double, mo
 double, light double, timeStamp long);
 
 @Export('org.wso2.floor.AlertNotifications:1.0.0')
-define stream alertOut (buildingId string, floorId string, information string, timeStamp long);
+define stream alertOut (buildingId string, floorId string, type string, value double, information string, timeStamp long);
 
 from dataIn#window.timeBatch(1 min)
 select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
@@ -23,9 +23,18 @@ select buildingId, floorId, avg(temperature) as temperature, avg(motion) as moti
 group by floorId insert all events into dataOut ;
 
 from dataOut[temperature < 22]
-select buildingId, floorId, str:concat(str:concat("Current temperature is ", temperature),
-". Floor is very cool. Please increase the temperature") as information, timeStamp insert into alertOut ;
+select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very cool. Please increase the temperature" as information,
+timeStamp insert into alertOut ;
 
 from dataOut[temperature > 25]
-select buildingId, floorId, str:concat(str:concat("Current temperature is ", temperature),
-". Floor is very hot. Please decrease the temperature") as information, timeStamp insert into alertOut ;
+select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very hot. Please decrease the temperature" as information,
+timeStamp insert into alertOut ;
+
+from dataOut[temperature > 25]
+select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very hot. Please decrease the temperature" as information,
+timeStamp insert into alertOut ;
+
+from dataOut[motion == 0 and light > 0]
+select buildingId, floorId, "Light" as type, light as value,
+"Floor seem to be empty. Human motion seem to be nil. But lights are switched on. Please switch off the lights." as
+information, timeStamp insert into alertOut ;

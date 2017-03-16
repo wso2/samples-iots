@@ -46,18 +46,17 @@ $('form').validate({
         }
         , floors: {
             required: "Please provide floor number",
-            min:"Please enter a value greater than 0"
+            min: "Please enter a value greater than 0"
         }
     }
 });
 
-$('#home').on('click', '[data-toggle=update-data]', function(e){
+$('#home').on('click', '[data-toggle=update-data]', function (e) {
     var KEY_NAME = "yesin";
     var objectJSON;
     var metaData;
 
-    if($(e.target).closest('form').valid()) {
-
+    if ($(e.target).closest('form').valid()) {
         var markerDetails = {};
         var coordinates = {};
         var element = $(e.target).closest('.item');
@@ -77,19 +76,19 @@ $('#home').on('click', '[data-toggle=update-data]', function(e){
         var floors = element.find('[name=floors]').val();
 
         // updates panel heading title on save
-        $('#heading'+ markerId).find('.panel-title').text(name);
+        $('#heading' + markerId).find('.panel-title').text(name);
 
         //check whether a JSON is stored inside local storage
-        if(window.localStorage.getItem(KEY_NAME) === null){
+        if (window.localStorage.getItem(KEY_NAME) === null) {
             objectJSON = {
-                metaData : []
+                metaData: []
             };
 
             var floorplan = [];
             var floorObjs = {};
 
-            for(var i = 1; i <= floors; i++){
-                floorObjs["floor"+ i] = "";
+            for (var i = 1; i <= floors; i++) {
+                floorObjs["floor" + i] = "";
             }
 
             // floorObjs["floor1"] = "";
@@ -108,19 +107,19 @@ $('#home').on('click', '[data-toggle=update-data]', function(e){
 
             objectJSON.metaData.push(markerDetails);
 
-        }else if(window.localStorage.getItem(KEY_NAME) !== null){
+        } else if (window.localStorage.getItem(KEY_NAME) !== null) {
             objectJSON = JSON.parse(window.localStorage.getItem(KEY_NAME));
             createMarkerObj(markerId, name, address, floors);
         }
 
         //Add new marker details to existing JSON
-        function createMarkerObj(markerId, name, address, floors){
-            var existing  = false;
+        function createMarkerObj(markerId, name, address, floors) {
+            var existing = false;
             var noReplicate = false;
 
-            $.each(objectJSON.metaData, function(i, val){
+            $.each(objectJSON.metaData, function (i, val) {
                 console.log("Adding to existing JSON");
-                if(val.id == markerId){
+                if (val.id == markerId) {
                     existing = true;
                     //update properties of saved object
                     val.locationName = name;
@@ -130,19 +129,19 @@ $('#home').on('click', '[data-toggle=update-data]', function(e){
                     bindPopUpInfo(name, floors, address);
                 }
 
-                if(existing == true){
+                if (existing == true) {
                     noReplicate = true
                 }
 
             });
 
-            if(noReplicate == false){
+            if (noReplicate == false) {
                 console.log("No similar object found. Creating New");
                 var floorplan = [];
                 var floorObjs = {};
 
-                for(var i = 1; i <= floors; i++){
-                    floorObjs["floor"+ i] = "";
+                for (var i = 1; i <= floors; i++) {
+                    floorObjs["floor" + i] = "";
                 }
 
                 // floorObjs["floor1"] = "";
@@ -164,85 +163,38 @@ $('#home').on('click', '[data-toggle=update-data]', function(e){
         }
 
 
-        //obj array to be inside markerInfo obj array
-
-        //After you've done fiddling with the object you can pass the object into the JSON array
-        // markerInfo.metaData.push(markerDetails);
-
-        //object is created to be pushed to result JSON
-        // console.log(markerDetails);
-
-
-        //get the JSON obj array
-        //     $.get('result.json', function (objectJSON) {
-
         //append form details to marker popup
-        function bindPopUpInfo(name, floors, address){
-            var popupContent = '<h4>'+ name +'</h4>' +
+        function bindPopUpInfo(name, floors, address) {
+            var popupContent = '<h4>' + name + '</h4>' +
                 '<ul>' +
-                '<li>No of Floors: '+ floors+' </li>' +
-                '<li> Address: '+ address+'</li>' +
+                '<li>No of Floors: ' + floors + ' </li>' +
+                '<li> Address: ' + address + '</li>' +
                 '</ul>';
 
             var popup = L.popup({
                 autoPan: true,
                 keepInView: true,
-                className: markerId})
+                className: markerId
+            })
                 .setContent(popupContent);
 
 
-            var markerObj =  markers[markerId];
+            var markerObj = markers[markerId];
             markerObj.unbindPopup();
             markerObj.bindPopup(popup);
 
             console.log(popup.className);
 
-            // $(this).attr("id", markerId);
+
+            console.log(objectJSON);
+
+            var KEY_NAME = 'yesin';
+            var result = JSON.stringify(objectJSON);
+            window.localStorage.setItem(KEY_NAME, result);
+
+            alert('Saved');
+
+
         }
 
-
-                // markers[markerId]._popup._content = popupContent;
-                // console.log( markers[markerId]._popup._content);
-
-
-                //collapse panel
-                // $('#'+$('.item').attr('id')+' .panel-default > .panel-heading').attr("aria-expanded", "false");
-                // $('#'+$(this).attr('id')+' .panel-default > .panel-heading').attr("expanded", "false");
-                // $('#'+$('.item').attr('id')+' .panel-default > .panel-heading').accordion({active: false}).click();
-
-                console.log(objectJSON);
-
-                var KEY_NAME = 'yesin';
-                var result = JSON.stringify(objectJSON);
-                window.localStorage.setItem(KEY_NAME, result);
-
-                alert('Saved');
-
-            // });
-
-        // markers[markerId]._popup._content
-
-        // //update popup
-        // $.get('result.json', function (data) {
-        //     $.each(data.metaData, function(i, n){
-        //         if(n.id = markerId){
-        //
-        //             // baseMap.removeLayer(markers[$(this).attr('id')]);
-        //             //
-        //             // var idNo = $(this).attr('id');
-        //             // // Remove the link
-        //             // $(this).parent('div').remove();
-        //             //
-        //             // $('#home').find('#' + idNo).remove();
-        //             // console.log(markers);
-        //             //     markers.splice(idNo,1);
-        //             //
-        //
-        //
-        //             // addingMarker(null, n[i]);
-        //         }
-        //     });
-        // });
-    }
-
-});
+    );

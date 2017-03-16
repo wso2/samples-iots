@@ -37,7 +37,8 @@ var user = session.get(constants.USER_CACHE_KEY);
     <link href="<%=urlPrefix%>libs/bootstrap-slider/css/bootstrap-slider.min.css" rel="stylesheet" type="text/css"/>
 
     <!--bootstrap date range picker-->
-    <link href="<%=urlPrefix%>libs/bootstrap_daterange_picker/css/daterangepicker.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=urlPrefix%>libs/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet"
+    type="text/css"/>
 
     <!--custom scripts-->
     <link href="<%=urlPrefix%>css/custom.css" rel="stylesheet" type="text/css"/>
@@ -416,7 +417,7 @@ var user = session.get(constants.USER_CACHE_KEY);
             <div class ="row">
                 <div class = "col-md-7">
                     <div class = "slider-container add-padding-left-3x add-padding-top-2x">
-                        <label for="slider" class="col-sm-3 control-label">Frames: </label>
+                        <input id="play" class="col-sm-3 control-label play" type='button' value='Play'/>
                         <div class="col-sm-9">
                         <input id="temp-slider" name="slider" data-slider-id='ex1Slider' type="text"/>
                         </div>
@@ -478,8 +479,9 @@ var user = session.get(constants.USER_CACHE_KEY);
 <script src="<%=urlPrefix%>libs/uikit/js/uikit.min.js"></script>
 <script src="<%=urlPrefix%>libs/uikit/addons/notify.min.js"></script>
 <!-- bootstrap date range picker-->
-<script src="<%=urlPrefix%>libs/bootstrap_daterange_picker/js/daterangepicker.js"></script>
+<script src="<%=urlPrefix%>libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="<%=urlPrefix%>js/constants.js"></script>
 <script type="text/javascript" src="<%=urlPrefix%>js/heatMapManagement.js"></script>
 <script type="text/javascript" src="<%=urlPrefix%>js/custom.js"></script>
 <script type="text/javascript" src="<%=urlPrefix%>js/summerHTMLImageMapCreator.js"></script>

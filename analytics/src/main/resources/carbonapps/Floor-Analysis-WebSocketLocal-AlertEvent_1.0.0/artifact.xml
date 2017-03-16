@@ -16,7 +16,7 @@
   ~ under the License.
   -->
 
-<artifact name="Floor-Analysis-WebSocketLocal-AlertTemperatureEvent" version="1.0.0" type="event/publisher"
+<artifact name="Floor-Analysis-WebSocketLocal-AlertEvent" version="1.0.0" type="event/publisher"
           serverRole="FloorAnalysis">
-    <file>Floor-Analysis-WebSocketLocal-AlertTemperatureEvent-1.0.0.xml</file>
+    <file>Floor-Analysis-WebSocketLocal-AlertEvent-1.0.0.xml</file>
 </artifact>

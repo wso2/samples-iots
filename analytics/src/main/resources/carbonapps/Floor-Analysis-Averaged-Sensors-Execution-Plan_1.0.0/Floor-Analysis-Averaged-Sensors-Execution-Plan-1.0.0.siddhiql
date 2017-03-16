@@ -13,8 +13,18 @@ define stream dataIn (deviceId string, temperature double, motion double, humidi
 define stream dataOut (deviceId string, avgTemperature double, avgMotion double, avgHumidity double, avgAirQuality
 double, avgLight double, timeStamp long);
 
+@Export('org.wso2.floor.summarized.SensorStream:1.0.0')
+define stream summarizedDataOut (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long);
+
 from dataIn#window.timeBatch(30 sec)
 select deviceId, avg(temperature) as avgTemperature, avg(motion) as avgMotion, avg(humidity) as avgHumidity, avg
 (airQuality) as avgAirQuality, avg(light) as avgLight, time:timestampInMilliseconds() as timeStamp
 group by deviceId
-insert all events into dataOut ;
+insert all events into dataOut;
+
+from dataIn#window.timeBatch(15 min)
+select deviceId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg(airQuality) as
+airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
+group by deviceId
+insert all events into summarizedDataOut;
