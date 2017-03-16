@@ -21,6 +21,7 @@ package org.wso2.iot.senseme.api;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SortType;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
@@ -41,32 +42,24 @@ import org.wso2.carbon.device.mgt.core.service.GroupManagementProviderService;
 import org.wso2.carbon.identity.jwt.client.extension.JWTClient;
 import org.wso2.carbon.identity.jwt.client.extension.dto.AccessTokenInfo;
 import org.wso2.carbon.identity.jwt.client.extension.exception.JWTClientException;
+import org.wso2.carbon.user.api.Permission;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.api.dto.DeviceJSON;
 import org.wso2.iot.senseme.api.dto.SenseMe;
 import org.wso2.iot.senseme.api.dto.SensorRecord;
 import org.wso2.iot.senseme.api.dto.TokenInfo;
 import org.wso2.iot.senseme.api.util.APIUtil;
-import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This is the API which is used to control and manage device type functionality
@@ -201,9 +194,10 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         boolean status = partialRegister(senseMe);
         List<DeviceIdentifier> deviceIdentifierList = new ArrayList<>();
 
+        String buildingId = null, floorId = null, floorRole, buildingRole;
+
         if (status) {
-            String buildingId = null;
-            String floorId = null;
+
             try {
                 DeviceIdentifier deviceIdentifier = new DeviceIdentifier(senseMe.getDeviceId(), DeviceTypeConstants
                         .DEVICE_TYPE);
@@ -229,39 +223,11 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
                 }
 
-                GroupManagementProviderService groupManagementProviderService = APIUtil
-                        .getGroupManagementProviderService();
-                DeviceGroup buildingDeviceGroup;
-                DeviceGroup floorDeviceGroup;
+                buildingRole = String.format(DeviceTypeConstants.BUILDING_ROLE, buildingId);
+                floorRole = String.format(DeviceTypeConstants.FLOOR_ROLE, buildingId, floorId);
 
-                if ((buildingDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
-                        .BUILDING_GROUP_NAME,
-                        buildingId))) != null) {
-                    groupManagementProviderService.addDevices(buildingDeviceGroup.getGroupId(), deviceIdentifierList);
-
-                } else {
-                    buildingDeviceGroup = new DeviceGroup();
-                    buildingDeviceGroup.setName(String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId));
-                    buildingDeviceGroup.setOwner(device.getEnrolmentInfo().getOwner());
-                    buildingDeviceGroup.setDescription("Device group for building id " + buildingId);
-                    groupManagementProviderService.createGroup(buildingDeviceGroup, "admin", DeviceTypeConstants.DEFAULT_ADMIN_PERMISSIONS);
-                    groupManagementProviderService.addDevices(Integer.valueOf(buildingId), deviceIdentifierList);
-                }
-
-                if ((floorDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
-                        .FLOOR_GROUP_NAME, buildingId, floorId))) != null) {
-                    groupManagementProviderService.addDevices(floorDeviceGroup.getGroupId(), deviceIdentifierList);
-
-                } else {
-                    floorDeviceGroup = new DeviceGroup();
-                    floorDeviceGroup.setName(String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId));
-                    floorDeviceGroup.setOwner(device.getEnrolmentInfo().getOwner());
-                    floorDeviceGroup.setDescription("Device group for floor " + floorId + "of building " + buildingId);
-                    groupManagementProviderService.createGroup(floorDeviceGroup, "admin", DeviceTypeConstants.DEFAULT_ADMIN_PERMISSIONS);
-                    floorDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
-                            .FLOOR_GROUP_NAME, buildingId, floorId));
-                    groupManagementProviderService.addDevices(floorDeviceGroup.getGroupId(), deviceIdentifierList);
-                }
+                createAndAddRoles(buildingRole, floorRole);
+                createAndAddGroups(device, buildingId, floorId, buildingRole, floorRole, deviceIdentifierList);
 
                 return Response.status(Response.Status.OK).build();
             } catch (DeviceManagementException e) {
@@ -274,6 +240,9 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 log.error(e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
             } catch (DeviceNotFoundException e) {
+                log.error(e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+            } catch (UserStoreException e) {
                 log.error(e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
             }
@@ -465,4 +434,85 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         }
     }
 
+    private Permission[] getPermissions() {
+        Permission realTimeAnalytics = new Permission(DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION, CarbonConstants
+                .UI_PERMISSION_ACTION);
+        return new Permission[]{realTimeAnalytics};
+
+    }
+
+    /**
+     * Create device groups for building and floor and assign the given list of devices.
+     * @param device : Device object that is being enrolled.
+     * @param buildingId : The building Id which the device is enrolled.
+     * @param floorId : The floorId where the device is enrolled.
+     * @param buildingRole : The role name of the building.
+     * @param floorRole : The role name of the floor.
+     * @param deviceIdentifiers : List of device ids to be added to the device group.
+     * @throws GroupManagementException
+     * @throws DeviceNotFoundException
+     * @throws GroupAlreadyExistException
+     */
+    private void createAndAddGroups(Device device, String buildingId, String floorId, String buildingRole, String
+            floorRole, List<DeviceIdentifier> deviceIdentifiers)
+            throws GroupManagementException, DeviceNotFoundException, GroupAlreadyExistException {
+        DeviceGroup buildingDeviceGroup, floorDeviceGroup;
+        GroupManagementProviderService groupManagementProviderService = APIUtil
+                .getGroupManagementProviderService();
+
+        if ((buildingDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
+                .BUILDING_GROUP_NAME, buildingId))) != null) {
+            groupManagementProviderService.addDevices(buildingDeviceGroup.getGroupId(), deviceIdentifiers);
+
+        } else {
+            buildingDeviceGroup = new DeviceGroup();
+            buildingDeviceGroup.setName(String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId));
+            buildingDeviceGroup.setOwner(device.getEnrolmentInfo().getOwner());
+            buildingDeviceGroup.setDescription("Device group for building id " + buildingId);
+            groupManagementProviderService.createGroup(buildingDeviceGroup, buildingRole, new
+                    String[]{DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION});
+            buildingDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
+                    .BUILDING_GROUP_NAME, buildingId));
+            groupManagementProviderService.addDevices(buildingDeviceGroup.getGroupId(), deviceIdentifiers);
+        }
+
+        if ((floorDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
+                .FLOOR_GROUP_NAME, buildingId, floorId))) != null) {
+            groupManagementProviderService.addDevices(floorDeviceGroup.getGroupId(), deviceIdentifiers);
+
+        } else {
+            floorDeviceGroup = new DeviceGroup();
+            floorDeviceGroup.setName(String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId));
+            floorDeviceGroup.setOwner(device.getEnrolmentInfo().getOwner());
+            floorDeviceGroup.setDescription("Device group for floor " + floorId + "of building " + buildingId);
+            groupManagementProviderService.createGroup(floorDeviceGroup, floorRole, new
+                    String[]{DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION });
+            floorDeviceGroup = groupManagementProviderService.getGroup(String.format(DeviceTypeConstants
+                    .FLOOR_GROUP_NAME, buildingId, floorId));
+            groupManagementProviderService.addDevices(floorDeviceGroup.getGroupId(), deviceIdentifiers);
+        }
+    }
+
+    /**
+     * Create user roles for building and floors.
+     * @param buildingRole : Building role name which is to be created.
+     * @param floorRole : Floor role name which is to be created.
+     * @throws UserStoreException
+     */
+    private void createAndAddRoles(String buildingRole, String floorRole) throws
+            UserStoreException {
+
+        UserStoreManager userStoreManager = APIUtil.getUserStoreManager();
+        if (userStoreManager != null) {
+            if (!userStoreManager.isExistingRole(buildingRole)) {
+                userStoreManager.addRole(buildingRole, null, getPermissions());
+            }
+            if (!userStoreManager.isExistingRole(floorRole)){
+                userStoreManager.addRole(floorRole, null, getPermissions());
+            }
+
+        } else {
+            log.error("User Store Manager cannot found.");
+        }
+    }
 }
