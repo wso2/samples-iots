@@ -174,4 +174,22 @@ public interface BuildingService {
 
     Response getRegisteredBuildings();
 
+    @GET
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "get building data",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+
+    Response getBuildingData(int buildingId);
+
 }

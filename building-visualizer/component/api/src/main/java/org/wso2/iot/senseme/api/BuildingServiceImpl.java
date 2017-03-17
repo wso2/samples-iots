@@ -106,6 +106,22 @@ public class BuildingServiceImpl implements BuildingService {
         }
     }
 
+    @Override
+    @Path("/{buildingId}")
+    @GET
+    @Produces("application/json")
+    public Response getBuildingData(@PathParam("buildingId") int buildingId) {
+        try {
+
+            BuildingInfo buildingObj = building.getBuildingData(buildingId);
+            return Response.status(Response.Status.OK).entity(buildingObj).build();
+
+
+        } catch (IllegalArgumentException ex) {
+            return Response.status(400).entity(ex.getMessage()).build();//bad request
+        }
+    }
+
     @POST
     @Path("/{buildingId}/{floorId}")
     @Consumes("multipart/form-data")
