@@ -25,6 +25,8 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAO;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAOManager;
+import org.wso2.iot.senseme.api.dto.BuildingInfo;
+import org.wso2.iot.senseme.api.dto.FloorInfo;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;

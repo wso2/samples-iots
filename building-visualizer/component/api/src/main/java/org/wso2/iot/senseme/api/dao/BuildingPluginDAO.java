@@ -32,6 +32,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implements CRUD operations for Buildings.
@@ -74,6 +76,36 @@ public class BuildingPluginDAO {
             DeviceTypeUtils.cleanupResources(stmt, null,conn);
         }
         return buildingId;
+    }
+
+    public List<BuildingInfo> getAllBuildings() {
+        List<BuildingInfo> buildingList = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement stmt = null;
+
+        try {
+            connection = BuildingDAOHandler.getConnection();
+            String getAllBuildingsQuery = "SELECT * FROM building";
+            stmt = connection.prepareStatement(getAllBuildingsQuery);
+
+            ResultSet resultSet = stmt.executeQuery();
+
+            while (resultSet.next()) {
+                BuildingInfo building = new BuildingInfo();
+                building.setBuildingId(resultSet.getInt("buildingId"));
+                building.setOwner(resultSet.getString("owner"));
+                building.setBuildingName(resultSet.getString("buildingName"));
+                building.setLatitude(resultSet.getString("latitude"));
+                building.setLongitude(resultSet.getString("longitude"));
+                building.setNumFloors(resultSet.getInt("numFloors"));
+                buildingList.add(building);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return buildingList;
     }
 
     public boolean addFloor(FloorInfo floor){
@@ -124,7 +156,7 @@ public class BuildingPluginDAO {
             while (rows.next()) {
                 buildingId = rows.getInt("buildingId");
                 if (log.isDebugEnabled()) {
-                    log.debug("BUilding Id "+buildingId+" for "+buildingName);
+                    log.debug("Building Id " + buildingId + " for " + buildingName);
                 }
             }
         } catch (SQLException e) {
