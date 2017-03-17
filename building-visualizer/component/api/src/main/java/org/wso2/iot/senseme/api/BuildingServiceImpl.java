@@ -54,38 +54,7 @@ public class BuildingServiceImpl implements BuildingService {
             building.setOwner(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
             id = this.building.addBuilding(building);
             if (id!=0){
-                for (int i=0; i<building.getNumFloors();i++){
-                    boolean tmpStatus;
-                    FloorInfo tmp = new FloorInfo();
-                    tmp.setBuildingId(id);
-                    tmp.setFloorNum(i);
-                    tmpStatus=this.building.addFloor(tmp);
-                    if (tmpStatus==false){
-                        log.error("Floors didn't add correctly");
-                        break;
-                    }
-                }
                 return Response.status(Response.Status.OK).entity(id).build();
-            }else{
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-            }
-        }catch (Exception e){
-            log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-        }
-    }
-
-    @POST
-    @Path("/{buildingId}")
-    @Produces("application/json")
-    @Override
-    public Response addFloor(@PathParam("buildingId") int buildingId, FloorInfo floor){
-        try {
-            boolean status;
-            floor.setBuildingId(buildingId);
-            status = this.building.addFloor(floor);
-            if (status){
-                return Response.status(Response.Status.OK).entity(floor.getFloorNum()).build();
             }else{
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
             }
@@ -123,18 +92,23 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @POST
-    @Path("/{buildingId}/{floorId}/upload")
+    @Path("/{buildingId}/{floorId}")
     @Consumes("multipart/form-data")
     @Produces("application/json")
     @Override
-    public Response uploadFloorPlan(@PathParam("buildingId") int buildingId,@PathParam("floorId") int floorId, InputStream fileInputStream, Attachment fileDetail){
+    public Response addFloor(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId, InputStream fileInputStream, Attachment fileDetail){
 
         boolean status = false ;
 
         try {
             String fileName = fileDetail.getContentDisposition().getParameter("filename");
+
+            FloorInfo floor = new FloorInfo();
+            floor.setBuildingId(buildingId);
+            floor.setFloorNum(floorId);
+
             byte[] imageBytes = IOUtils.toByteArray(fileInputStream);
-            status = building.updateFloorPlan(buildingId,floorId, imageBytes);
+            status = building.insertFloorDetails(buildingId,floorId, imageBytes);
 
             if (status){
                 return Response.status(Response.Status.OK.getStatusCode()).build();

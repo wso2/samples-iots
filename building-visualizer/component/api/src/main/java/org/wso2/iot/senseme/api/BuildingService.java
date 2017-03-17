@@ -89,32 +89,6 @@ public interface BuildingService {
     Response addBuilding(BuildingInfo building);
 
     /**
-     * To insert floor data into db
-     *
-     * @param floor for the building
-     * @return response
-     */
-
-    @Path("/{buildingId}")
-    @POST
-    @Produces("application/json")
-    @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
-            httpMethod = "POST",
-            value = "Download agent",
-            notes = "",
-            response = Response.class,
-            tags = "senseme",
-            extensions = {
-                    @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
-                    })
-            }
-    )
-    Response addFloor(int buildingId, FloorInfo floor);
-
-
-    /**
      * To update building image into db
      *
      * @param buildingId for the building identifier
@@ -124,7 +98,7 @@ public interface BuildingService {
      * @return response
      */
 
-    @Path("/{buildingId}/{floorId}/upload")
+    @Path("/{buildingId}/{floorId}")
     @POST
     @Consumes("multipart/form-data")
     @Produces("application/json")
@@ -141,7 +115,7 @@ public interface BuildingService {
                     })
             }
     )
-    Response uploadFloorPlan(int buildingId, int floorId, InputStream fileInputStream, Attachment fileDetail);
+    Response addFloor(int buildingId, int floorId, InputStream fileInputStream, Attachment fileDetail);
 
     @Path("/test")
     @GET
@@ -162,7 +136,7 @@ public interface BuildingService {
     Response test();
 
 
-    @Path("/{buildingId}/{floorId}/download")
+    @Path("/{buildingId}/{floorId}")
     @GET
     @Produces("image/*")
     @ApiOperation(

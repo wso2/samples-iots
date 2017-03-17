@@ -84,14 +84,12 @@ public class BuildingPluginDAO {
         try {
 
             conn = BuildingDAOHandler.getConnection();
-            String createDBQuery = "INSERT INTO floor(FLOORNUM,BUILDINGID,XCORDS,YCORDS)" +
-                    " VALUES (?, ?, ?, ?)";
+            String createDBQuery = "INSERT INTO floor(FLOORNUM,BUILDINGID)" +
+                    " VALUES (?, ?)";
 
             stmt = conn.prepareStatement(createDBQuery);
             stmt.setInt(1,floor.getFloorNum());
             stmt.setInt(2,floor.getBuildingId());
-            stmt.setString(3,floor.getxCords());
-            stmt.setString(4,floor.getyCords());
 
             int rows = stmt.executeUpdate();
             if (rows >0) {
@@ -189,6 +187,42 @@ public class BuildingPluginDAO {
                 status = true;
                 if (log.isDebugEnabled()) {
                     log.debug("Image updated for BUilding Id "+buildingId);
+                }
+            }
+        } catch (SQLException e) {
+            String msg = "SQL Exception";
+            log.error(msg, e);
+        } finally {
+            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+        }
+        return status;
+    }
+
+    public boolean insertFloorDetails(int buildingId, int floorId, byte[] imageBytes){
+
+        boolean status = false;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = BuildingDAOHandler.getConnection();
+//            String insertDBQuery = "UPDATE floor "
+//                    + "SET image = ? "
+//                    + "WHERE buildingId=? "+ "AND floorId=? ";
+            String insertDBQuery = "INSERT INTO floor(FLOORNUM,BUILDINGID,IMAGE)" +
+                    " VALUES (?,?,?)";
+            stmt = conn.prepareStatement(insertDBQuery);
+            stmt.setInt(1, floorId);
+            stmt.setInt(2, buildingId);
+            stmt.setBytes(3, imageBytes);
+
+
+
+            int rows = stmt.executeUpdate();
+            if (rows > 0) {
+                status = true;
+                if (log.isDebugEnabled()) {
+                    log.debug("Floor updated in "+buildingId+" floor "+floorId);
                 }
             }
         } catch (SQLException e) {
