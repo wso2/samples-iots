@@ -110,6 +110,36 @@ public class BuildingPluginDAO {
         return buildingList;
     }
 
+    public boolean addFloor(FloorInfo floor){
+        boolean status = false;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            conn = BuildingDAOHandler.getConnection();
+          
+            String createDBQuery = "INSERT INTO floor(FLOORNUM,BUILDINGID)" +
+                    " VALUES (?, ?)";
+
+
+            stmt = conn.prepareStatement(createDBQuery);
+            stmt.setInt(1,floor.getFloorNum());
+            stmt.setInt(2,floor.getBuildingId());
+
+            int rows = stmt.executeUpdate();
+            if (rows >0) {
+                status=true;
+            }
+
+        } catch (SQLException e) {
+            String msg = "SQL Exception";
+            log.error(msg, e);
+        } finally {
+            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+        }
+        return status;
+    }
 
     public int getBuildingId(String buildingName){
 
