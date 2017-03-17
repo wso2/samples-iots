@@ -64,23 +64,18 @@ import java.util.*;
 /**
  * This is the API which is used to control and manage device type functionality
  */
+@Path("device")
 public class DeviceTypeServiceImpl implements DeviceTypeService {
 
     private static final String KEY_TYPE = "PRODUCTION";
     private static Log log = LogFactory.getLog(DeviceTypeService.class);
     private static ApiApplicationKey apiApplicationKey;
 
-    private static String shortUUID() {
-        UUID uuid = UUID.randomUUID();
-        long l = ByteBuffer.wrap(uuid.toString().getBytes(StandardCharsets.UTF_8)).getLong();
-        return Long.toString(l, Character.MAX_RADIX);
-    }
-
     /**
      * @param agentInfo device owner,id
      * @return true if device instance is added to map
      */
-    @Path("device/register")
+    @Path("/register")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerDevice(final DeviceJSON agentInfo) {
@@ -88,49 +83,6 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             return Response.status(Response.Status.OK).build();
         }
         return Response.status(Response.Status.NOT_ACCEPTABLE).build();
-    }
-
-    /**
-     * @param deviceId unique identifier for given device type instance
-     */
-    @Path("device/{deviceId}/test")
-    @POST
-    public Response test(@PathParam("deviceId") String deviceId,
-                         @Context HttpServletResponse response) {
-        try {
-            if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
-                                                                                                     DeviceTypeConstants.DEVICE_TYPE))) {
-                return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
-            }
-            String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                                  + "/" + DeviceTypeConstants.DEVICE_TYPE + "/" + deviceId + "/command";
-            Operation commandOp = new CommandOperation();
-            commandOp.setCode("test");
-            commandOp.setType(Operation.Type.COMMAND);
-            commandOp.setEnabled(true);
-            commandOp.setPayLoad("");
-
-            Properties props = new Properties();
-            props.setProperty("mqtt.adapter.topic", publishTopic);
-            commandOp.setProperties(props);
-
-            List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
-            deviceIdentifiers.add(new DeviceIdentifier(deviceId, DeviceTypeConstants.DEVICE_TYPE));
-            APIUtil.getDeviceManagementService().addOperation(DeviceTypeConstants.DEVICE_TYPE, commandOp,
-                                                              deviceIdentifiers);
-            return Response.ok().build();
-        } catch (DeviceAccessAuthorizationException e) {
-            log.error(e.getErrorMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } catch (OperationManagementException e) {
-            String msg = "Error occurred while executing command operation upon ringing the buzzer";
-            log.error(msg, e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } catch (InvalidDeviceException e) {
-            String msg = "Error occurred while executing command operation to send keywords";
-            log.error(msg, e);
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
     }
 
     /**
@@ -187,7 +139,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
      * @param senseMe name for the device type instance
      * @return
      */
-    @Path("/device/enroll")
+    @Path("/enroll")
     @POST
     @Produces("application/json")
     public Response partialEnrollment(SenseMe senseMe) {
@@ -257,7 +209,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
      * @param deviceId name for the device type instance
      * @return
      */
-    @Path("/device/enrollme")
+    @Path("/enrollme")
     @POST
     @Produces("application/text")
     public Response enrollDevice(@QueryParam("deviceId") String deviceId) {

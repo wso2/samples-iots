@@ -46,7 +46,7 @@ import java.io.InputStream;
                 }
         ),
         tags = {
-                @Tag(name = "senseme, device_management", description = "")
+                @Tag(name = "device_management", description = "")
         }
 )
 @Scopes(

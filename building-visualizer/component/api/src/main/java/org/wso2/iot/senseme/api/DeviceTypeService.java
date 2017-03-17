@@ -50,8 +50,8 @@ import javax.ws.rs.core.Response;
                 title = "",
                 extensions = {
                         @Extension(properties = {
-                                @ExtensionProperty(name = "name", value = "senseme"),
-                                @ExtensionProperty(name = "context", value = "/senseme"),
+                                @ExtensionProperty(name = "name", value = "sensemedevice"),
+                                @ExtensionProperty(name = "context", value = "/senseme/device"),
                         })
                 }
         ),
@@ -70,29 +70,9 @@ import javax.ws.rs.core.Response;
         }
 )
 @SuppressWarnings("NonJaxWsWebServices")
+@Path("device")
 public interface DeviceTypeService {
     String SCOPE = "scope";
-
-    /**
-     * @param deviceId unique identifier for given device type instance
-     */
-    @Path("device/{deviceId}/test")
-    @POST
-    @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
-            httpMethod = "POST",
-            value = "Test device",
-            notes = "",
-            response = Response.class,
-            tags = "senseme",
-            extensions = {
-                    @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
-                    })
-            }
-    )
-    Response test(@PathParam("deviceId") String deviceId,
-                          @Context HttpServletResponse response);
 
     /**
      * Retrieve Sensor data for the given time period
@@ -102,7 +82,7 @@ public interface DeviceTypeService {
      * @param to       ending time
      * @return response with List<SensorRecord> object which includes sensor data which is requested
      */
-    @Path("device/stats/{deviceId}")
+    @Path("/stats/{deviceId}")
     @GET
     @Consumes("application/json")
     @Produces("application/json")
@@ -128,7 +108,7 @@ public interface DeviceTypeService {
      * @param senseMe for the device type instance
      * @return Agent source code as zip file
      */
-    @Path("/device/enroll")
+    @Path("/enroll")
     @POST
     @Produces("application/json")
     @ApiOperation(
@@ -153,7 +133,7 @@ public interface DeviceTypeService {
      * @param deviceId name for the device type instance
      * @return Agent source code as zip file
      */
-    @Path("/device/enrollme")
+    @Path("/enrollme")
     @POST
     @Produces("application/json")
     Response enrollDevice(@QueryParam("deviceId") String deviceId);
