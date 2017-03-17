@@ -31,10 +31,10 @@ public class DeviceTypeConstants {
     public final static String DEVICE_PLUGIN_DEVICE_ID = "senseme_DEVICE_ID";
     public final static String STATE_ON = "ON";
     public final static String STATE_OFF = "OFF";
-    public final static String BUILDING_GROUP_ID = "building_%s";
-    public final static String BUILDING_GROUP_NAME = "BUILDING_%s";
-    public final static String FLOOR_GROUP_ID = "floor_%s";
-    public final static String FLOOR_GROUP_NAME = "BUILDING_%s_FLOOR_%s";
+    public final static String BUILDING_GROUP_ID = "building-%s";
+    public final static String BUILDING_GROUP_NAME = "BUILDING-%s";
+    public final static String FLOOR_GROUP_ID = "floor-%s";
+    public final static String FLOOR_GROUP_NAME = "BUILDING-%s-FLOOR-%s";
     public final static String BUILDING_ID = "buildingId";
     public final static String FLOOR_ID = "floorId";
     public final static String X_COORDINATE = "xCoordinate";
@@ -82,8 +82,8 @@ public class DeviceTypeConstants {
     public static final String MQTT_CONFIG_LOCATION = CarbonUtils.getEtcCarbonConfigDirPath() + File.separator
             + "mqtt.properties";
 
-    public static final String BUILDING_ROLE = "building_%s";
-    public static final String FLOOR_ROLE = "building_%s_floor_%s";
+    public static final String BUILDING_ROLE = "building-%s";
+    public static final String FLOOR_ROLE = "building-%s-floor-%s";
     public static final String REALTIME_ANALYTICS_PERMISSION = "/permission/admin/device-mgt/realtime_analytics";
     public static final String PERMISSION_ACTION = "ui.execute";
     public static final String[] DEFAULT_ADMIN_PERMISSIONS =
