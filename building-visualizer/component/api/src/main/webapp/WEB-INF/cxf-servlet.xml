@@ -28,6 +28,9 @@
             <bean id="DeviceTypeService"
                   class="org.wso2.iot.senseme.api.DeviceTypeServiceImpl">
             </bean>
+            <bean id="BuildingService"
+                  class="org.wso2.iot.senseme.api.BuildingServiceImpl">
+            </bean>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
