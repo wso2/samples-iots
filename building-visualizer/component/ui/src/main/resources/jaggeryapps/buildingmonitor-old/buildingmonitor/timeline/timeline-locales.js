@@ -1,4 +1,4 @@
-﻿if (typeof links === 'undefined') {
+﻿﻿if (typeof links === 'undefined') {
     links = {};
     links.locales = {};
 } else if (typeof links.locales === 'undefined') {

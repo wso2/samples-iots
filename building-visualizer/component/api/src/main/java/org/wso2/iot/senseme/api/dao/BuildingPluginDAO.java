@@ -32,6 +32,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implements CRUD operations for Buildings.
@@ -76,6 +78,36 @@ public class BuildingPluginDAO {
         return buildingId;
     }
 
+    public List<BuildingInfo> getAllBuildings() {
+        List<BuildingInfo> buildingList = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement stmt = null;
+
+        try {
+            connection = BuildingDAOHandler.getConnection();
+            String getAllBuildingsQuery = "SELECT * FROM building";
+            stmt = connection.prepareStatement(getAllBuildingsQuery);
+
+            ResultSet resultSet = stmt.executeQuery();
+
+            while (resultSet.next()) {
+                BuildingInfo building = new BuildingInfo();
+                building.setBuildingId(resultSet.getInt("buildingId"));
+                building.setOwner(resultSet.getString("owner"));
+                building.setBuildingName(resultSet.getString("buildingName"));
+                building.setLatitude(resultSet.getString("latitude"));
+                building.setLongitude(resultSet.getString("longitude"));
+                building.setNumFloors(resultSet.getInt("numFloors"));
+                buildingList.add(building);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return buildingList;
+    }
+
     public boolean addFloor(FloorInfo floor){
         boolean status = false;
         Connection conn = null;
@@ -86,7 +118,7 @@ public class BuildingPluginDAO {
             conn = BuildingDAOHandler.getConnection();
             String createDBQuery = "INSERT INTO floor(FLOORNUM,BUILDINGID)" +
                     " VALUES (?, ?)";
-
+            
             stmt = conn.prepareStatement(createDBQuery);
             stmt.setInt(1,floor.getFloorNum());
             stmt.setInt(2,floor.getBuildingId());
@@ -113,8 +145,7 @@ public class BuildingPluginDAO {
 
         try {
             conn = BuildingDAOHandler.getConnection();
-            String selectDBQuery = "SELECT buildingId FROM building "+
-                    "WHERE buildingName=?" ;
+            String selectDBQuery = "SELECT buildingId FROM building WHERE buildingName=?" ;
             stmt = conn.prepareStatement(selectDBQuery);
             stmt.setString(1, buildingName);
 
@@ -122,7 +153,7 @@ public class BuildingPluginDAO {
             while (rows.next()) {
                 buildingId = rows.getInt("buildingId");
                 if (log.isDebugEnabled()) {
-                    log.debug("BUilding Id "+buildingId+" for "+buildingName);
+                    log.debug("Building Id " + buildingId + " for " + buildingName);
                 }
             }
         } catch (SQLException e) {
@@ -142,9 +173,7 @@ public class BuildingPluginDAO {
 
         try {
             conn = BuildingDAOHandler.getConnection();
-            String updateDBQuery = "UPDATE building "
-                    + "SET image = ? "
-                    + "WHERE buildingId=?";
+            String updateDBQuery = "UPDATE building SET image = ? WHERE buildingId=?";
             stmt = conn.prepareStatement(updateDBQuery);
             stmt.setBytes(1, imageBytes);
             stmt.setInt(2, buildingId);
@@ -173,9 +202,7 @@ public class BuildingPluginDAO {
 
         try {
             conn = BuildingDAOHandler.getConnection();
-            String updateDBQuery = "UPDATE floor "
-                    + "SET image = ? "
-                    + "WHERE buildingId=? "+ "AND floorId=? ";
+            String updateDBQuery = "UPDATE floor SET image = ? WHERE buildingId=? AND floorId=? ";
             stmt = conn.prepareStatement(updateDBQuery);
             stmt.setBytes(1, imageBytes);
             stmt.setInt(2, buildingId);
