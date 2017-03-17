@@ -25,6 +25,8 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAO;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAOManager;
+import org.wso2.iot.senseme.api.dto.BuildingInfo;
+import org.wso2.iot.senseme.api.dto.FloorInfo;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -52,6 +54,17 @@ public class BuildingServiceImpl implements BuildingService {
             building.setOwner(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
             id = this.building.addBuilding(building);
             if (id!=0){
+                for (int i=0; i<building.getNumFloors();i++){
+                    boolean tmpStatus;
+                    FloorInfo tmp = new FloorInfo();
+                    tmp.setBuildingId(id);
+                    tmp.setFloorNum(i);
+                    tmpStatus=this.building.addFloor(tmp);
+                    if (tmpStatus==false){
+                        log.error("Floors didn't add correctly");
+                        break;
+                    }
+                }
                 return Response.status(Response.Status.OK).entity(id).build();
             }else{
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
@@ -59,35 +72,6 @@ public class BuildingServiceImpl implements BuildingService {
         }catch (Exception e){
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-        }
-    }
-
-    @POST
-    @Path("/{buildingId}/upload")
-    @Consumes("multipart/form-data")
-    @Produces("application/json")
-    @Override
-    public Response uploadBuildingImage(@PathParam("buildingId") int buildingId, InputStream fileInputStream, Attachment fileDetail){
-
-        boolean status = false ;
-
-        try {
-            String fileName = fileDetail.getContentDisposition().getParameter("filename");
-            byte[] imageBytes = IOUtils.toByteArray(fileInputStream);
-            status = building.updateBuildingImage(buildingId, imageBytes);
-
-            if (status){
-                return Response.status(Response.Status.OK.getStatusCode()).build();
-            }else{
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-            }
-        }catch (IOException e){
-            log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-        }
-        catch (Exception e){
-            log.error(e.getMessage());
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
         }
     }
 
@@ -112,13 +96,13 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    @Path("/{buildingId}/download")
+    @Path("/{buildingId}/{floorId}/download")
     @GET
     @Produces("image/*")
-    public Response downloadImage(@PathParam("buildingId") int buildingId) {
+    public Response getFloorPlan(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId) {
         try {
 
-            File file = building.getBuildingImage(buildingId);
+            File file = building.getFloorPlan(buildingId, floorId);
 
             if (file!=null){
                 Response.ResponseBuilder response = Response.ok((Object) file);

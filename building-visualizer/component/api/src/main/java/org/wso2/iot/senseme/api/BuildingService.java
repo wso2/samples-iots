@@ -94,6 +94,8 @@ public interface BuildingService {
      * @param floor for the building
      * @return response
      */
+
+    @Path("/{buildingId}")
     @POST
     @Produces("application/json")
     @ApiOperation(
@@ -111,40 +113,18 @@ public interface BuildingService {
     )
     Response addFloor(int buildingId, FloorInfo floor);
 
-    /**
-     * To update building image into db
-     *
-     * @param buildingId for the building identifier
-     * @param fileInputStream for File stream
-     * @param fileDetail for Attachment details
-     * @return response
-     */
-    @POST
-    @Consumes("multipart/form-data")
-    @Produces("application/json")
-    @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
-            httpMethod = "POST",
-            value = "upload image",
-            notes = "",
-            response = Response.class,
-            tags = "senseme",
-            extensions = {
-                    @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
-                    })
-            }
-    )
-    Response uploadBuildingImage(int buildingId, InputStream fileInputStream, Attachment fileDetail);
 
     /**
      * To update building image into db
      *
      * @param buildingId for the building identifier
+     * @param floorId for the floor identifier
      * @param fileInputStream for File stream
      * @param fileDetail for Attachment details
      * @return response
      */
+
+    @Path("/{buildingId}/{floorId}/upload")
     @POST
     @Consumes("multipart/form-data")
     @Produces("application/json")
@@ -182,7 +162,7 @@ public interface BuildingService {
     Response test();
 
 
-    @Path("/{buildingId}/download")
+    @Path("/{buildingId}/{floorId}/download")
     @GET
     @Produces("image/*")
     @ApiOperation(
@@ -199,6 +179,6 @@ public interface BuildingService {
             }
     )
 
-    Response downloadImage(int buildingId);
+    Response getFloorPlan(int buildingId, int floorId);
 
 }

@@ -200,7 +200,7 @@ public class BuildingPluginDAO {
         return status;
     }
 
-    public File getBuildingImage(int buildingId){
+    public File getFloorPlan(int buildingId, int floorId){
 
         boolean status = false;
         Connection conn = null;
@@ -210,9 +210,11 @@ public class BuildingPluginDAO {
 
         try {
             conn = BuildingDAOHandler.getConnection();
-            String updateDBQuery = "SELECT image FROM building WHERE buildingId=?";
+            String updateDBQuery = "SELECT image FROM floor WHERE buildingId=? "+"And floorId=?";
             stmt = conn.prepareStatement(updateDBQuery);
             stmt.setInt(1, buildingId);
+            stmt.setInt(2, floorId);
+
 
             ResultSet rows = stmt.executeQuery();
 
