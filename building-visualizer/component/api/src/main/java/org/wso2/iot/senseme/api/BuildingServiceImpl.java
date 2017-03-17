@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * This is the API which is used to control and manage building data
@@ -64,8 +65,22 @@ public class BuildingServiceImpl implements BuildingService {
         }
     }
 
+    @GET
+    @Produces("application/json")
     @Override
-    @Path("/{buildingId}/{floorId}/download")
+    public Response getRegisteredBuildings(){
+        try {
+            List<BuildingInfo> buildingList = this.building.getAllBuildings();
+            return Response.status(Response.Status.OK).entity(buildingList).build();
+
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        }
+    }
+
+    @Override
+    @Path("/{buildingId}/{floorId}")
     @GET
     @Produces("image/*")
     public Response getFloorPlan(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId) {

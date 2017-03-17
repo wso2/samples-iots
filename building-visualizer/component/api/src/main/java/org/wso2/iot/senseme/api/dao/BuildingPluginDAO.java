@@ -80,29 +80,31 @@ public class BuildingPluginDAO {
 
     public List<BuildingInfo> getAllBuildings() {
         List<BuildingInfo> buildingList = new ArrayList<>();
-        Connection connection = null;
+        Connection conn = null;
         PreparedStatement stmt = null;
 
         try {
-            connection = BuildingDAOHandler.getConnection();
+            conn = BuildingDAOHandler.getConnection();
             String getAllBuildingsQuery = "SELECT * FROM building";
-            stmt = connection.prepareStatement(getAllBuildingsQuery);
+            stmt = conn.prepareStatement(getAllBuildingsQuery);
 
             ResultSet resultSet = stmt.executeQuery();
 
             while (resultSet.next()) {
                 BuildingInfo building = new BuildingInfo();
-                building.setBuildingId(resultSet.getInt("buildingId"));
-                building.setOwner(resultSet.getString("owner"));
-                building.setBuildingName(resultSet.getString("buildingName"));
-                building.setLatitude(resultSet.getString("latitude"));
-                building.setLongitude(resultSet.getString("longitude"));
-                building.setNumFloors(resultSet.getInt("numFloors"));
+                building.setBuildingId(resultSet.getInt("BUILDINGID"));
+                building.setOwner(resultSet.getString("OWNER"));
+                building.setBuildingName(resultSet.getString("BUILDINGNAME"));
+                building.setLatitude(resultSet.getString("LNG"));
+                building.setLongitude(resultSet.getString("LAT"));
+                building.setNumFloors(resultSet.getInt("NUMOFFLOORS"));
                 buildingList.add(building);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            DeviceTypeUtils.cleanupResources(stmt, null,conn);
         }
 
         return buildingList;
@@ -167,35 +169,6 @@ public class BuildingPluginDAO {
         return buildingId;
     }
 
-    public boolean updateBuildingImage(int buildingId, byte[] imageBytes){
-
-        boolean status = false;
-        Connection conn = null;
-        PreparedStatement stmt = null;
-
-        try {
-            conn = BuildingDAOHandler.getConnection();
-            String updateDBQuery = "UPDATE building SET image = ? WHERE buildingId=?";
-            stmt = conn.prepareStatement(updateDBQuery);
-            stmt.setBytes(1, imageBytes);
-            stmt.setInt(2, buildingId);
-
-            int rows = stmt.executeUpdate();
-            if (rows > 0) {
-                status = true;
-                if (log.isDebugEnabled()) {
-                    log.debug("Image updated for BUilding Id "+buildingId);
-                }
-            }
-        } catch (SQLException e) {
-            String msg = "SQL Exception";
-            log.error(msg, e);
-        } finally {
-            DeviceTypeUtils.cleanupResources(stmt, null,conn);
-        }
-        return status;
-    }
-
     public boolean updateFloorPlan(int buildingId, int floorId, byte[] imageBytes){
 
         boolean status = false;
@@ -235,9 +208,6 @@ public class BuildingPluginDAO {
 
         try {
             conn = BuildingDAOHandler.getConnection();
-//            String insertDBQuery = "UPDATE floor "
-//                    + "SET image = ? "
-//                    + "WHERE buildingId=? "+ "AND floorId=? ";
             String insertDBQuery = "INSERT INTO floor(FLOORNUM,BUILDINGID,IMAGE)" +
                     " VALUES (?,?,?)";
             stmt = conn.prepareStatement(insertDBQuery);
@@ -273,7 +243,7 @@ public class BuildingPluginDAO {
 
         try {
             conn = BuildingDAOHandler.getConnection();
-            String updateDBQuery = "SELECT image FROM floor WHERE buildingId=? "+"And floorId=?";
+            String updateDBQuery = "SELECT image FROM floor WHERE buildingId=? "+"And FLOORNUM=?";
             stmt = conn.prepareStatement(updateDBQuery);
             stmt.setInt(1, buildingId);
             stmt.setInt(2, floorId);
