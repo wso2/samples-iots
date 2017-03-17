@@ -174,7 +174,7 @@ var userModule = function () {
         }
         try {
             utility.startTenantFlow(carbonUser);
-            var url = devicemgtProps["httpsURL"] + devicemgtProps["backendRestEndpoints"]["deviceMgt"] + "/users/count";
+            var url = devicemgtProps["httpsURL"] + devicemgtProps["backendRestEndpoints"]["deviceMgt"] + "/users?offset=0&limit=1";
             return serviceInvokers.XMLHttp.get(
                 url, function (responsePayload) {
                     return parse(responsePayload["responseText"])["count"];
@@ -511,7 +511,7 @@ var userModule = function () {
             permissions["LIST_DEVICES"] = true;
             permissions["LIST_OWN_DEVICES"] = true;
         }
-        if (publicMethods.isAuthorized("/permission/admin/device-mgt/devices/owning-device")) {
+        if (publicMethods.isAuthorized("/permission/admin/device-mgt/devices/owning-device/view")) {
             permissions["LIST_OWN_DEVICES"] = true;
         }
         if (publicMethods.isAuthorized("/permission/admin/device-mgt/admin/groups/view")) {
@@ -582,9 +582,6 @@ var userModule = function () {
         }
         if (publicMethods.isAuthorized("/permission/admin/device-mgt/platform-configs/view")) {
             permissions["TENANT_CONFIGURATION"] = true;
-        }
-        if (publicMethods.isAuthorized("/permission/admin/device-mgt/devices/change-status")) {
-            permissions["CHANGE_DEVICE_STATUS"] = true;
         }
 
         return permissions;

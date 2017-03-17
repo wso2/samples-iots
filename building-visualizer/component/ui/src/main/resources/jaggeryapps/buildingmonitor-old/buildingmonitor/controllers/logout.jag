@@ -1,0 +1,15 @@
+<%
+(function () {
+    var authModule = require("/modules/auth/auth.js").module;
+    var constants = require("/utils/constants.js").constants;
+    var isLoggedOut = authModule.logout();
+    var dest = request.getParameter("destination");
+
+    if (isLoggedOut) {
+        if (!dest) {
+            response.sendRedirect("/" + constants.APP_NAME);
+        }
+        response.sendRedirect(dest);
+    }
+})();
+%>

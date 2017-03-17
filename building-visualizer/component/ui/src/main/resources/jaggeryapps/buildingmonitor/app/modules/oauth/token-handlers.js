@@ -40,6 +40,7 @@ var handlers = function () {
                     "as input - setupTokenPairByPasswordGrantType(x, y)");
         } else {
             privateMethods.setUpEncodedTenantBasedClientAppCredentials(username);
+            //privateMethods.setUpEncodedTenantBasedWebSocketClientAppCredentials(username);
             var encodedClientAppCredentials = session.get(constants["ENCODED_TENANT_BASED_CLIENT_APP_CREDENTIALS"]);
             if (!encodedClientAppCredentials) {
                 throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up access token pair by " +
@@ -75,6 +76,95 @@ var handlers = function () {
             }
         }
     };
+
+    publicMethods["setupTokenPairBySamlGrantType"] = function (username, samlToken) {
+        if (!username || !samlToken) {
+            throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up access token pair by " +
+                            "saml grant type. Either username of logged in user, samlToken or both are missing " +
+                            "as input - setupTokenPairBySamlGrantType(x, y)");
+        } else {
+            privateMethods.setUpEncodedTenantBasedClientAppCredentials(username);
+            //privateMethods.setUpEncodedTenantBasedWebSocketClientAppCredentials(username);
+            var encodedClientAppCredentials = session.get(constants["ENCODED_TENANT_BASED_CLIENT_APP_CREDENTIALS"]);
+            if (!encodedClientAppCredentials) {
+                throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up access token pair " +
+                                "by saml grant type. Encoded client credentials are " +
+                                "missing - setupTokenPairBySamlGrantType(x, y)");
+            } else {
+                var tokenData;
+                var arrayOfScopes = devicemgtProps["scopes"];
+                arrayOfScopes = arrayOfScopes.concat(utility.getDeviceTypesScopesList());
+                var stringOfScopes = "";
+                arrayOfScopes.forEach(function (entry) {
+                    stringOfScopes += entry + " ";
+                });
+
+                // accessTokenPair will include current access token as well as current refresh token
+                tokenData = tokenUtil.
+                getTokenPairAndScopesBySAMLGrantType(samlToken, encodedClientAppCredentials, stringOfScopes);
+                if (!tokenData) {
+                    throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up token " +
+                                    "pair by password grant type. Error in token " +
+                                    "retrieval - setupTokenPairBySamlGrantType(x, y)");
+                } else {
+                    var tokenPair = {};
+                    tokenPair["accessToken"] = tokenData["accessToken"];
+                    tokenPair["refreshToken"] = tokenData["refreshToken"];
+                    // setting up access token pair into session context as a string
+                    session.put(constants["TOKEN_PAIR"], stringify(tokenPair));
+
+                    var scopes = tokenData.scopes.split(" ");
+                    // adding allowed scopes to the session
+                    session.put(constants["ALLOWED_SCOPES"], scopes);
+                }
+            }
+        }
+    };
+
+	publicMethods["setupTokenPairByJWTGrantType"] = function (username, samlToken) {
+		//samlToken is used to validate then if the user is a valid user then token is issued with JWT Grant Type.
+		if (!username || !samlToken) {
+			throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up access token pair by " +
+			"saml grant type. Either username of logged in user, samlToken or both are missing " +
+			"as input - setupTokenPairBySamlGrantType(x, y)");
+		} else {
+			privateMethods.setUpEncodedTenantBasedClientAppCredentials(username);
+			//privateMethods.setUpEncodedTenantBasedWebSocketClientAppCredentials(username);
+			var encodedClientAppCredentials = session.get(constants["ENCODED_TENANT_BASED_CLIENT_APP_CREDENTIALS"]);
+			if (!encodedClientAppCredentials) {
+				throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up access token pair " +
+				"by saml grant type. Encoded client credentials are " +
+				"missing - setupTokenPairBySamlGrantType(x, y)");
+			} else {
+				var tokenData;
+				var arrayOfScopes = devicemgtProps["scopes"];
+				arrayOfScopes = arrayOfScopes.concat(utility.getDeviceTypesScopesList());
+				var stringOfScopes = "";
+				arrayOfScopes.forEach(function (entry) {
+					stringOfScopes += entry + " ";
+				});
+
+				// accessTokenPair will include current access token as well as current refresh token
+				tokenData = tokenUtil.
+					getTokenPairAndScopesByJWTGrantType(samlToken, encodedClientAppCredentials, stringOfScopes);
+				if (!tokenData) {
+					throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up token " +
+					"pair by password grant type. Error in token " +
+					"retrieval - setupTokenPairBySamlGrantType(x, y)");
+				} else {
+					var tokenPair = {};
+					tokenPair["accessToken"] = tokenData["accessToken"];
+					tokenPair["refreshToken"] = tokenData["refreshToken"];
+					// setting up access token pair into session context as a string
+					session.put(constants["TOKEN_PAIR"], stringify(tokenPair));
+
+					var scopes = tokenData.scopes.split(" ");
+					// adding allowed scopes to the session
+					session.put(constants["ALLOWED_SCOPES"], scopes);
+				}
+			}
+		}
+	};
 
     publicMethods["refreshTokenPair"] = function () {
         var currentTokenPair = parse(session.get(constants["TOKEN_PAIR"]));
@@ -133,6 +223,45 @@ var handlers = function () {
 
         }
     };
+
+//     privateMethods["setUpEncodedTenantBasedWebSocketClientAppCredentials"] = function (username) {
+//         if (!username) {
+//             throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up encoded tenant based " +
+//                 "client credentials to session context. No username of logged in user is found as " +
+//                 "input - setUpEncodedTenantBasedWebSocketClientAppCredentials(x)");
+//         } else {
+//             if (devicemgtProps["gatewayEnabled"]) {
+//                 var tenantBasedWebSocketClientAppCredentials
+//                     = tokenUtil.getTenantBasedWebSocketClientAppCredentials(username);
+//                 if (!tenantBasedWebSocketClientAppCredentials) {
+//                     throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up encoded tenant " +
+//                         "based client credentials to session context as the server is unable " +
+//                         "to obtain such credentials - setUpEncodedTenantBasedWebSocketClientAppCredentials(x)");
+//                 } else {
+//                     var encodedTenantBasedWebSocketClientAppCredentials =
+//                         tokenUtil.encode(tenantBasedWebSocketClientAppCredentials["clientId"] + ":" +
+//                             tenantBasedWebSocketClientAppCredentials["clientSecret"]);
+//                     // setting up encoded tenant based client credentials to session context.
+//                     session.put(constants["ENCODED_TENANT_BASED_WEB_SOCKET_CLIENT_CREDENTIALS"],
+//                         encodedTenantBasedWebSocketClientAppCredentials);
+//                 }
+//             } else {
+//                 var dynamicClientAppCredentials = tokenUtil.getDynamicClientAppCredentials();
+//                 if (!dynamicClientAppCredentials) {
+//                     throw new Error("{/app/modules/oauth/token-handlers.js} Could not set up encoded tenant based " +
+//                         "client credentials to session context as the server is unable to obtain " +
+//                         "dynamic client credentials - setUpEncodedTenantBasedWebSocketClientAppCredentials(x)");
+//                 }
+//                 var encodedTenantBasedWebSocketClientAppCredentials =
+//                     tokenUtil.encode(dynamicClientAppCredentials["clientId"] + ":" +
+//                         dynamicClientAppCredentials["clientSecret"]);
+//                 // setting up encoded tenant based client credentials to session context.
+//                 session.put(constants["ENCODED_TENANT_BASED_WEB_SOCKET_CLIENT_CREDENTIALS"],
+//                     encodedTenantBasedWebSocketClientAppCredentials);
+//             }
+
+//         }
+//     };
 
     return publicMethods;
 }();

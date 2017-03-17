@@ -1,0 +1,115 @@
+{{!
+  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+  WSO2 Inc. licenses this file to you under the Apache License,
+  Version 2.0 (the "License"); you may not use this file except
+  in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+}}
+{{unit "cdmf.unit.lib.leaflet"}}
+{{unit "cdmf.unit.ui.title" pageTitle="Home"}}
+{{unit "uuf.unit.lib.form-validation"}}
+{{#zone "breadcrumbs"}}
+    <li>
+        <a href="{{@app.context}}/">
+            <i class="icon fw fw-home"></i>
+        </a>
+    </li>
+{{/zone}}
+
+{{#zone "navbarActions"}}
+    <li>
+        <!--suppress HtmlUnknownTarget -->
+        <a href="#" class="cu-btn" onclick="onAddMarker()">
+        <span class="icon fw-stack">
+            <i class="fw fw-add fw-stack-1x"></i>
+            <i class="fw fw-circle-outline fw-stack-2x"></i>
+        </span>
+            Add Building
+        </a>
+    </li>
+{{/zone}}
+
+{{#zone "body"}}
+    <div id="device-location"></div>
+    <div id="building-response-template" style="display: none">
+        <!--<div class="item panel-group add-margin-bottom-2x" role="tablist" aria-multiselectable="false" id="' + markerId + '" data-lat="' + marker._latlng.lat + '" data-lng="' + marker._latlng.lng + '" >-->
+            <!--<div class="panel panel-default">-->
+                <!--<div class="panel-heading" role="tab" id="heading' + markerId + '" data-toggle="collapse" href="#accordion' + markerId + '" aria-controls="accordion' + markerId + '">-->
+                    <!--<h4 class="panel-title">New Building</h4>-->
+                    <!--<div class="btn-group">-->
+                        <!--<button type="button" class="btn btn-primary add-margin-right-2x" data-toggle="edit-floors">-->
+		<!--<span class="icon fw-stack add-margin-right-1x">-->
+		<!--<i class="fw fw-edit  fw-helper fw-helper-circle-outline"></i>-->
+		<!--</span>Edit Floors-->
+                        <!--</button>-->
+                        <!--<button type="button" class="btn btn-secondary remove add-margin-right-2x" data-toggle="" id="' + markerId + '">-->
+		<!--<span class="icon fw-stack add-margin-right-1x">-->
+		<!--<i class="fw fw-delete  fw-helper fw-helper-circle-outline"></i>-->
+		<!--</span>-->
+                            <!--Delete Building</button>-->
+                        <!--<div class="clearfix"></div>-->
+                    <!---->
+
+                <!--</div>-->
+
+        <div class="row">
+            <div class="col-lg-5 col-md-6 col-centered">
+                <form action="" method="post" id="register-form-'+ markerId +'" novalidate="novalidate">
+                    <div class="form-group">
+                        <label for="locationName">Location Name *</label>
+                        <input type="text" class="form-control" id="locationName" name="locationName" placeholder="e.g.: Home" >
+                    </div>
+                    <div class="form-group">
+                        <label for="floors">No. of Floors *</label>
+                        <input type="number" class="form-control required" id="floors" name="floors" placeholder="e.g.: Number of floors">
+                    </div>
+                    <div id="building-button" class="form-group">
+                        <!--<button type="button" class="btn btn-primary" data-toggle="update-data">Save</button>-->
+                    </div>
+                </form>
+            </div>
+        </div>
+            <!--</div>-->
+        <!--</div>-->
+    </div>
+    <div id="sidebar" class="sidebar collapsed">
+        <!-- Nav tabs -->
+        <div class="sidebar-tabs hidden">
+            <ul role="tablist">
+                <li><a href="#home" role="tab" title="View buildings"><i class="fw fw-enterprise"></i></a></li>
+                <!--<li><a href="#info" role="tab"><i class="fa fa-info-circle"></i></a></li>-->
+                <li class="disabled"><a href="#messages" role="tab"><i class="fa fa-envelope"></i></a></li>
+            </ul>
+
+        </div>
+
+        <!-- Tab panes -->
+        <div class="sidebar-content hidden">
+            <div class="sidebar-pane" id="home">
+                <h1 class="sidebar-header">
+                    Buildings
+                    <span class="sidebar-close"><i class="fa fa-caret-right"></i></span>
+                </h1>
+            </div>
+            <div class="sidebar-pane" id="messages">
+                <h1 class="sidebar-header">Messages<span class="sidebar-close"><i class="fa fa-caret-right"></i></span>
+                </h1>
+            </div>
+        </div>
+    </div>
+        <!--<div id="openStreetMapId" style="height:100%"></div>-->
+{{/zone}}
+
+{{#zone "bottomJs"}}
+    {{js "js/load-map.js"}}
+{{/zone}}

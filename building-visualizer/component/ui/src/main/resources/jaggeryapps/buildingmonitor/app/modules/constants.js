@@ -21,10 +21,31 @@ var UNSPECIFIED = "Unspecified";
 var httpURL = "httpURL";
 var httpsURL = "httpsURL";
 
-
+var DEVICE_IDENTIFIER = "deviceIdentifier";
+var DEVICE_NAME = "name";
+var DEVICE_OWNERSHIP = "ownership";
+var DEVICE_OWNER = "owner";
+var DEVICE_TYPE = "type";
+var DEVICE_VENDOR = "vendor";
+var DEVICE_MODEL = "model";
+var DEVICE_PRODUCT = "PRODUCT";
+var DEVICE_OS_VERSION = "osVersion";
+var DEVICE_OS_BUILD_DATE = "osBuildDate";
+var DEVICE_PROPERTIES = "properties";
+var DEVICE_ENROLLMENT_INFO = "enrolmentInfo";
+var DEVICE_STATUS = "status";
 var DEVICE_INFO = "deviceInfo";
 
+var FEATURE_NAME = "featureName";
+var FEATURE_DESCRIPTION = "featureDescription";
+
+var PLATFORM_ANDROID = "android";
+var PLATFORM_WINDOWS = "windows";
 var PLATFORM_IOS = "ios";
+
+var LANGUAGE_US = "en_US";
+
+var VENDOR_APPLE = "Apple";
 var ERRORS = {
     "USER_NOT_FOUND": "USER_NOT_FOUND"
 };
@@ -39,7 +60,11 @@ var WEB_SERVICE_ADDRESSING_VERSION = 1.0;
 var TOKEN_PAIR = "tokenPair";
 var ENCODED_TENANT_BASED_CLIENT_APP_CREDENTIALS = "encodedTenantBasedClientAppCredentials";
 var CONTENT_TYPE_IDENTIFIER = "Content-Type";
+var ENCODED_TENANT_BASED_WEB_SOCKET_CLIENT_CREDENTIALS = "encodedTenantBasedWebSocketClientCredentials";
+
+var CONTENT_DISPOSITION_IDENTIFIER = "Content-Disposition";
 var APPLICATION_JSON = "application/json";
+var APPLICATION_ZIP = "application/zip";
 var STREAMING_FILES_ACCEPT_HEADERS = ["application/zip", "application/pdf", "application/octet-stream"];
 var ACCEPT_IDENTIFIER = "Accept";
 var AUTHORIZATION_HEADER= "Authorization";
@@ -49,8 +74,10 @@ var HTTP_POST = "POST";
 var HTTP_PUT = "PUT";
 var HTTP_DELETE = "DELETE";
 
+var HTTP_CONFLICT = 409;
+var HTTP_CREATED = 201;
 
 var CACHED_CREDENTIALS = "tenantBasedCredentials";
-
+var CACHED_CREDENTIALS_FOR_WEBSOCKET_APP = "tenantBasedWebSocketClientCredentials";
 
 var ALLOWED_SCOPES = "scopes";

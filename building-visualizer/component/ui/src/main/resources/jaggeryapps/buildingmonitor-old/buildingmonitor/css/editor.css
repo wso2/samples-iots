@@ -1,0 +1,56 @@
+html, body, .container-fluid, .row {
+    height: 100%;
+    min-height: 100%;
+}
+
+body {
+    padding-top: 100px;
+
+}
+
+.main-dropdown {
+    width: 400px;
+
+}
+
+.main-dropdown-toggle {
+    align-content: center;
+}
+
+/*We are giving a unique identifier to "dropdown-menu" whilst simultaneously*/
+/*getting the properties of "main dropdown"*/
+
+.main-dropdown .dropdown-menu {
+    min-width: 400px;
+}
+
+.get-image-wrapper .panel-body {
+    text-align: center;
+}
+
+.action-bar {
+    background: #4a4a4a;
+}
+
+.header {
+    position: relative;
+}
+
+.sides-wild {
+    /*display: -webkit-box;*/
+    /*display: -webkit-flex;*/
+    /*display: -ms-flexbox;*/
+    /*display:         flex;*/
+    /*overflow: hidden;*/
+
+}
+
+.sides-wild > [class*='col-'] {
+
+    padding-right: 0px;
+    padding-left: 0px;
+    /*display: flex;*/
+    /*flex-direction: column;*/
+
+}
+
