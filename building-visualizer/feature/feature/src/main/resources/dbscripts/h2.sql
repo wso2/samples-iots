@@ -15,7 +15,6 @@ CREATE  TABLE IF NOT EXISTS `building` (
   `owner` VARCHAR(100) NULL DEFAULT NULL,
   `lng` VARCHAR(100) NULL DEFAULT NULL,
   `lat` VARCHAR(100) NULL DEFAULT NULL,
-  `image` BLOB NULL DEFAULT NULL,
   `numOfFloors` INTEGER NOT NULL,
   PRIMARY KEY (`buildingId`) ) ;
 
@@ -23,7 +22,5 @@ CREATE  TABLE IF NOT EXISTS `floor` (
   `floorNum` INTEGER NOT NULL ,
   `buildingId` INTEGER NOT NULL ,
   `image` BLOB NULL DEFAULT NULL,
-  `xCords` VARCHAR(100) NULL DEFAULT NULL,
-  `yCords` VARCHAR (100) NULL DEFAULT NULL,
   PRIMARY KEY (`buildingId`,`floorNum`),
   FOREIGN KEY (`buildingId`) REFERENCES building(`buildingId`)) ;

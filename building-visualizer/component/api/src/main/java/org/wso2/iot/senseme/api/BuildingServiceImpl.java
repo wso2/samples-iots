@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * This is the API which is used to control and manage building data
@@ -64,49 +65,14 @@ public class BuildingServiceImpl implements BuildingService {
         }
     }
 
-    @POST
-    @Path("/{buildingId}/upload")
-    @Consumes("multipart/form-data")
+    @GET
     @Produces("application/json")
     @Override
-    public Response uploadBuildingImage(@PathParam("buildingId") int buildingId, InputStream fileInputStream, Attachment fileDetail){
-
-        boolean status = false ;
-
+    public Response getRegisteredBuildings(){
         try {
-            String fileName = fileDetail.getContentDisposition().getParameter("filename");
-            byte[] imageBytes = IOUtils.toByteArray(fileInputStream);
-            status = building.updateBuildingImage(buildingId, imageBytes);
+            List<BuildingInfo> buildingList = this.building.getAllBuildings();
+            return Response.status(Response.Status.OK).entity(buildingList).build();
 
-            if (status){
-                return Response.status(Response.Status.OK.getStatusCode()).build();
-            }else{
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-            }
-        }catch (IOException e){
-            log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-        }
-        catch (Exception e){
-            log.error(e.getMessage());
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
-        }
-    }
-
-    @POST
-    @Path("/{buildingId}")
-    @Produces("application/json")
-    @Override
-    public Response addFloor(@PathParam("buildingId") int buildingId, FloorInfo floor){
-        try {
-            boolean status;
-            floor.setBuildingId(buildingId);
-            status = this.building.addFloor(floor);
-            if (status){
-                return Response.status(Response.Status.OK).entity(floor.getFloorNum()).build();
-            }else{
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-            }
         }catch (Exception e){
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
@@ -114,13 +80,13 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    @Path("/{buildingId}/download")
+    @Path("/{buildingId}/{floorId}")
     @GET
     @Produces("image/*")
-    public Response downloadImage(@PathParam("buildingId") int buildingId) {
+    public Response getFloorPlan(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId) {
         try {
 
-            File file = building.getBuildingImage(buildingId);
+            File file = building.getFloorPlan(buildingId, floorId);
 
             if (file!=null){
                 Response.ResponseBuilder response = Response.ok((Object) file);
@@ -141,18 +107,23 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @POST
-    @Path("/{buildingId}/{floorId}/upload")
+    @Path("/{buildingId}/{floorId}")
     @Consumes("multipart/form-data")
     @Produces("application/json")
     @Override
-    public Response uploadFloorPlan(@PathParam("buildingId") int buildingId,@PathParam("floorId") int floorId, InputStream fileInputStream, Attachment fileDetail){
+    public Response addFloor(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId, InputStream fileInputStream, Attachment fileDetail){
 
         boolean status = false ;
 
         try {
             String fileName = fileDetail.getContentDisposition().getParameter("filename");
+
+            FloorInfo floor = new FloorInfo();
+            floor.setBuildingId(buildingId);
+            floor.setFloorNum(floorId);
+
             byte[] imageBytes = IOUtils.toByteArray(fileInputStream);
-            status = building.updateFloorPlan(buildingId,floorId, imageBytes);
+            status = building.insertFloorDetails(buildingId,floorId, imageBytes);
 
             if (status){
                 return Response.status(Response.Status.OK.getStatusCode()).build();
