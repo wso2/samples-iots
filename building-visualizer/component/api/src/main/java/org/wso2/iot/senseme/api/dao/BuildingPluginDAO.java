@@ -116,8 +116,7 @@ public class BuildingPluginDAO {
         try {
 
             conn = BuildingDAOHandler.getConnection();
-            String createDBQuery = "INSERT INTO floor(FLOORNUM,BUILDINGID,XCORDS,YCORDS)" +
-                    " VALUES (?, ?, ?, ?)";
+            String createDBQuery = "INSERT INTO floor(FLOORNUM,BUILDINGID,XCORDS,YCORDS) VALUES (?, ?, ?, ?)";
 
             stmt = conn.prepareStatement(createDBQuery);
             stmt.setInt(1,floor.getFloorNum());
@@ -147,8 +146,7 @@ public class BuildingPluginDAO {
 
         try {
             conn = BuildingDAOHandler.getConnection();
-            String selectDBQuery = "SELECT buildingId FROM building "+
-                    "WHERE buildingName=?" ;
+            String selectDBQuery = "SELECT buildingId FROM building WHERE buildingName=?" ;
             stmt = conn.prepareStatement(selectDBQuery);
             stmt.setString(1, buildingName);
 
@@ -176,9 +174,7 @@ public class BuildingPluginDAO {
 
         try {
             conn = BuildingDAOHandler.getConnection();
-            String updateDBQuery = "UPDATE building "
-                    + "SET image = ? "
-                    + "WHERE buildingId=?";
+            String updateDBQuery = "UPDATE building SET image = ? WHERE buildingId=?";
             stmt = conn.prepareStatement(updateDBQuery);
             stmt.setBytes(1, imageBytes);
             stmt.setInt(2, buildingId);
@@ -207,9 +203,7 @@ public class BuildingPluginDAO {
 
         try {
             conn = BuildingDAOHandler.getConnection();
-            String updateDBQuery = "UPDATE floor "
-                    + "SET image = ? "
-                    + "WHERE buildingId=? "+ "AND floorId=? ";
+            String updateDBQuery = "UPDATE floor SET image = ? WHERE buildingId=? AND floorId=? ";
             stmt = conn.prepareStatement(updateDBQuery);
             stmt.setBytes(1, imageBytes);
             stmt.setInt(2, buildingId);
