@@ -63,9 +63,45 @@ function loadLeafletMap() {
 	L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
 	setTimeout(function(){ map.invalidateSize()}, 400);
 
-	//TODo : When loading the map, call to backend and get all the buildings available and show them on the map.
-	var getAllBuildingsAPI = "";
-    invokerUtil.get();
+	var addBuildingApi = "/senseme/building";
+	//var buildingdata = {buildingName:buildingName, longitude:cords.lat, latitude:cords.lng, noFloors:noOffloors};
+
+	var popup, marker;
+
+	invokerUtil.get(addBuildingApi, function(jqXHR){
+		console.log(jqXHR);
+
+		buildings = JSON.parse(jqXHR);
+		console.log(buildings[1]);
+		if (buildings != null) {
+			for (var i = 0; i < buildings.length; i++) {
+
+				/**TODO: Refine the marker content,
+				 * ToDO: Show building data on the page.
+				 */
+				popup = L.popup({
+						autoPan: true,
+						keepInView: true})
+					.setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId=' + buildings[i].buildingId + '" class="btn' +
+						' btn-primary">' + "Get into " + buildings[i].buildingName + '</a></p>');
+
+
+				marker = new L.marker([buildings[i].longitude, buildings[i].latitude]).
+				bindPopup(popup).
+				addTo(map);
+
+			}
+
+		}
+	}, function(jqXHR){
+		if (jqXHR.status == 400) {
+			console.log("error")
+		} else {
+			var response = JSON.parse(jqXHR.responseText).message;
+
+		}
+	},"application/json","application/json");
+
 }
 
 $(document).ready(function () {
@@ -130,7 +166,7 @@ function saveBuilding () {
 	addingMarker(tmpEventStore, buildingName);
 
 	var addBuildingApi = "/senseme/building";
-	var buildingdata = {buildingName:buildingName, longitude:cords.lat, latitude:cords.lng, noFloors:noOffloors};
+	var buildingdata = {buildingName:buildingName, longitude:cords.lat, latitude:cords.lng, numFloors:noOffloors};
 
 	console.log(buildingdata);
 
