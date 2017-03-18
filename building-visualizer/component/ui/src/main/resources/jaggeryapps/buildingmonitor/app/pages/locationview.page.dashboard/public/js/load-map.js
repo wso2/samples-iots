@@ -54,58 +54,38 @@ function hidePopup() {
 }
 
 function loadLeafletMap() {
-    var deviceLocationID = "#device-location"
-        container = "device-location",
-        zoomLevel = 13,
-        tileSet = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attribution = "&copy; <a href='https://openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
+	var deviceLocationID = "#device-location"
+	container = "device-location",
+		zoomLevel = 13,
+		tileSet = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+		attribution = "&copy; <a href='https://openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
 	map = L.map(container).locate({setView: true, maxZoom: 17, animate: true, duration: 3});
 	L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
 	setTimeout(function(){ map.invalidateSize()}, 400);
 
-	var addBuildingApi = "/senseme/building";
-	//var buildingdata = {buildingName:buildingName, longitude:cords.lat, latitude:cords.lng, noFloors:noOffloors};
+	//TODo : When loading the map, call to backend and get all the buildings available and show them on the map.
+	preLoadBuildings();
+}
 
-	var popup, marker;
-
-	invokerUtil.get(addBuildingApi, function(jqXHR){
-		console.log(jqXHR);
-
-		buildings = JSON.parse(jqXHR);
-		console.log(buildings[1]);
-		if (buildings != null) {
-			for (var i = 0; i < buildings.length; i++) {
-
-				/**TODO: Refine the marker content,
-				 * ToDO: Show building data on the page.
-				 */
-				popup = L.popup({
-						autoPan: true,
-						keepInView: true})
-					.setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId=' + buildings[i].buildingId + '" class="btn' +
-						' btn-primary">' + "Get into " + buildings[i].buildingName + '</a></p>');
-
-
-				marker = new L.marker([buildings[i].longitude, buildings[i].latitude]).
-				bindPopup(popup).
-				addTo(map);
-
+function preLoadBuildings() {
+	var getBuildingApi = "/senseme/building";
+	invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
+		if (jqXHR.status == 200) {
+			//[{"buildingId":1,"buildingName":"ayyoobs1","owner":"admin","longitude":"79.97607422294095","latitude":"6.995539474716988","numFloors":4}
+			var buildings = JSON.parse(data);
+			for(var i = 0; i < buildings.length; i++) {
+				var obj = buildings[i];
+				var cord = {"lat" : obj.latitude, "lng" : obj.longitude}
+				addingMarker(cord, obj.buildingName, obj.buildingId);
 			}
-
 		}
-	}, function(jqXHR){
-		if (jqXHR.status == 400) {
-			console.log("error")
-		} else {
-			var response = JSON.parse(jqXHR.responseText).message;
-
-		}
-	},"application/json","application/json");
+	}, function (jqXHR) {
+	}, "application/json");
 
 }
 
 $(document).ready(function () {
-        loadLeafletMap();
+	loadLeafletMap();
 
 });
 
@@ -130,48 +110,12 @@ function onMarkerClick(e) {
 
 var tmpEventStore;
 
-function addBuilding (e) {
-
-	tmpEventStore = e;
-	var content = $("#building-response-template");
-	var buttonme = content.find("#buttonme");
-	if (buttonme) {
-		buttonme.remove();
-	}
-
-	var button = '<button id="buttonme" type="button" class="btn btn-primary" data-toggle="update-data" onclick="saveBuilding()">Save</button>';
-	content.find("#building-button").append(button);
-	$(modalPopupContent).html(content.html());
-
-
-	showPopup();
-	setTimeout(function () {
-		hidePopup();
-		// location.reload(true);
-
-	}, 20000);
-}
-
 function saveBuilding () {
-	//save building here.
-	var e = document.getElementsByName('locationName')[0];
+	var buildingName = document.getElementsByName('locationName')[0].value
 	var noOffloors = document.getElementsByName('floors')[0].value;
-	var buildingName = e.value;
 	var cords = tmpEventStore.latlng;
-
-	console.log(buildingName);
-	console.log(noOffloors);
-	console.log(cords);
-
-	addingMarker(tmpEventStore, buildingName);
-
 	var addBuildingApi = "/senseme/building";
 	var buildingdata = {buildingName:buildingName, longitude:cords.lat, latitude:cords.lng, numFloors:noOffloors};
-
-	console.log(buildingdata);
-
-	var buildingId;
-
 	invokerUtil.post(addBuildingApi, buildingdata, function(data, textStatus, jqXHR){
 		if (jqXHR.status == 200 && data) {
 			console.log(jqXHR);
@@ -186,28 +130,38 @@ function saveBuilding () {
 	},"application/json","application/json");
 
 	hidePopup();
-	console.log("Building added");
-	//ToDo : Send the building info to backend and get the building Id.
-	location.href = "/buildingmonitor/buildings?buildingId=1";
+}
+
+function addBuilding (e) {
+	//save building here.
+	tmpEventStore = e;
+	var cord = e.latlng;
+	var content = $("#building-response-template");
+
+	$(modalPopupContent).html(content.html());
+	showPopup();
+	setTimeout(function () {
+		hidePopup();
+		// location.reload(true);
+
+	}, 20000);
+	addingMarker(cord, null, null);
 }
 
 // Script for adding marker
-function addingMarker(e, locationName) {
+function addingMarker(cord, locationName, buildingId) {
 
-	var cord,
-		markerId,
+	var markerId,
 		popup;
-
 	$('body.fixed ').removeClass('marker-cursor');
 	$('#device-location').removeClass('marker-cursor');
-	cord = e.latlng;
-
 
 	popup = L.popup({
 		autoPan: true,
-		keepInView: true})
-		.setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId=1" class="btn btn-primary">' +
-		"Get into " + locationName + '</a></p>');
+		keepInView: true
+	})
+		.setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId='" + buildingId + '" class="btn btn-primary">' +
+	"Get into " + locationName + '</a></p>');
 
 	//variable for marker
 	var marker;
@@ -226,10 +180,9 @@ function addingMarker(e, locationName) {
 
 	marker._leaflet_id = markerId;
 
-
 	marker.on('click', onMarkerClick);
 	//marker.on("popupopen", onPopupOpen);
-	marker.addTo(map).openPopup();
+	marker.addTo(map);
 	markerId = marker._leaflet_id;
 	console.log(marker._leaflet_id);
 
@@ -238,9 +191,9 @@ function addingMarker(e, locationName) {
 	console.log(markers[markerId]);
 
 	//Adding panel heading on load only
-	if(e == null){
-		$('#heading'+markerId).find('.panel-title').text(locationName);
-	}
+	//if(e == null){
+	//	$('#heading'+markerId).find('.panel-title').text(locationName);
+	//}
 
 
 	// Remove Marker
@@ -285,7 +238,4 @@ function addingMarker(e, locationName) {
 		var offset = baseMap.panTo(LatLng);
 		baseMap.panBy(offset);
 	});
-
-
-
 }
