@@ -44,7 +44,7 @@ public class DeviceTypeConstants {
     //sensor events summerized table name
     public static final String SENSOR_TYPE1_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_PIR";
     public static final String SENSOR_TYPE2_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_ULTRASONIC";
-    public static final String DATA_SOURCE_NAME = "jdbc/sensemeDM_DB";
+    public static final String DATA_SOURCE_NAME = "jdbc/WSO2_FLOOR_ANALYTICS";
     public final static String DEVICE_TYPE_PROVIDER_DOMAIN = "carbon.super";
     public final static String SENSOR_TYPE1 = "PIR";
     public final static String SENSOR_TYPE2 = "ULTRASONIC";
