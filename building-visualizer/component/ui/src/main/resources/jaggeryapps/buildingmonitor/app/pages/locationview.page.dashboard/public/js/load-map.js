@@ -166,7 +166,7 @@ function saveBuilding () {
 	addingMarker(tmpEventStore, buildingName);
 
 	var addBuildingApi = "/senseme/building";
-	var buildingdata = {buildingName:buildingName, longitude:cords.lat, latitude:cords.lng, noFloors:noOffloors};
+	var buildingdata = {buildingName:buildingName, longitude:cords.lat, latitude:cords.lng, numFloors:noOffloors};
 
 	console.log(buildingdata);
 
