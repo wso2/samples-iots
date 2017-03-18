@@ -55,7 +55,7 @@
 				form.addEventListener( event, function( e )
 				{
 					// preventing the unwanted behaviours
-					//e.preventDefault();
+					e.preventDefault();
 					e.stopPropagation();
 				});
 			});
@@ -93,7 +93,7 @@
 
 			if( isAdvancedUpload ) // ajax file upload for modern browsers
 			{
-				//e.preventDefault();
+				e.preventDefault();
 
 				// gathering the form data
 				var ajaxData = new FormData( form );
@@ -160,7 +160,7 @@
 		{
 			entry.addEventListener( 'click', function( e )
 			{
-				//e.preventDefault();
+				e.preventDefault();
 				form.classList.remove( 'is-error', 'is-success' );
 				input.click();
 			});
