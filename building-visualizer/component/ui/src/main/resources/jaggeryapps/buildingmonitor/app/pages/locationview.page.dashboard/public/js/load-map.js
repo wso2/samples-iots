@@ -130,6 +130,7 @@ function saveBuilding () {
 	},"application/json","application/json");
 
 	hidePopup();
+	location.reload();
 }
 
 function addBuilding (e) {
@@ -160,8 +161,8 @@ function addingMarker(cord, locationName, buildingId) {
 		autoPan: true,
 		keepInView: true
 	})
-		.setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId='" + buildingId + '" class="btn btn-primary">' +
-	"Get into " + locationName + '</a></p>');
+		.setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId=' + buildingId + '" class="btn btn-primary">' +
+		"Get into " + locationName + '</a></p>');
 
 	//variable for marker
 	var marker;
