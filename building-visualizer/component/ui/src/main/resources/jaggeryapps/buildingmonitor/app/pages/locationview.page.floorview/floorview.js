@@ -28,7 +28,25 @@ function onRequest() {
         response.sendRedirect(devicemgtProps["appContext"] + "devices");
         return;
     }
-	
-    var viewModel = {};
+	var buildingId = request.getParameter("buildingId");
+	var floorId = request.getParameter("floorId");
+
+	var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
+	var hearders = [{"name": constants["ACCEPT_IDENTIFIER"], "value": "image/*"}];
+	var url = devicemgtProps["httpsURL"] + "/senseme/building/" + buildingId +"/" + floorId;
+
+	var viewModel = {};
+	viewModel["buildingId"] = buildingId;
+	viewModel["floorId"] = floorId;
+	serviceInvokers.HttpClient.get(url , function (responsePayload, responseHeaders, status) {
+			new Log().error(status);
+			if (status == 200) {
+				var streamObject = new Stream(responsePayload);
+				var IOUtils = Packages.org.apache.commons.io.IOUtils;
+				var Base64 = Packages.org.apache.commons.codec.binary.Base64
+				viewModel["imageObj"] = Base64.encodeBase64String(IOUtils.toByteArray(streamObject.getStream()));
+			}
+		}, function (responsePayload) {
+		}, hearders);
     return viewModel;
 }

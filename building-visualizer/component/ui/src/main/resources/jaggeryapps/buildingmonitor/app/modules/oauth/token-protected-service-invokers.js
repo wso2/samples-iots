@@ -297,6 +297,25 @@ var invokers = function () {
      */
     privateMethods["initiateHTTPClientRequest"] =
         function (method, url, successCallback, errorCallback, payload, headers) {
+			//noinspection JSUnresolvedVariable
+
+			var contentTypeFound = false;
+			var acceptTypeFound = false;
+			var acceptTypeValue = constants["APPLICATION_JSON"];
+			var contentTypeValue = constants["APPLICATION_JSON"];
+			var Header = Packages.org.apache.commons.httpclient.Header;
+			for (var i in headers) {
+
+				if(constants["CONTENT_TYPE_IDENTIFIER"] == headers[i].name){
+					contentTypeValue = headers[i].value;
+					contentTypeFound = true;
+				}
+				if(constants["ACCEPT_IDENTIFIER"] == headers[i].name){
+					acceptTypeFound = true;
+					acceptTypeValue = headers[i].value;
+				}
+			}
+
             //noinspection JSUnresolvedVariable
             var HttpClient = Packages.org.apache.commons.httpclient.HttpClient;
             var httpMethodObject;
@@ -308,7 +327,11 @@ var invokers = function () {
                     break;
                 case constants["HTTP_POST"]:
                     //noinspection JSUnresolvedVariable
-                    var PostMethod = Packages.org.apache.commons.httpclient.methods.PostMethod;
+					var PostMethod = Packages.org.apache.commons.httpclient.methods.PostMethod;
+					if (contentTypeValue.indexOf("multipart/form-data") !== -1) {
+						PostMethod = Packages.org.apache.commons.httpclient.methods.MultipartPostMethod;
+					}
+
                     httpMethodObject = new PostMethod(url);
                     break;
                 case constants["HTTP_PUT"]:
@@ -325,42 +348,29 @@ var invokers = function () {
                     //noinspection JSUnresolvedFunction
                     throw new IllegalArgumentException("Invalid HTTP request method: " + method);
             }
+			var Header = Packages.org.apache.commons.httpclient.Header;
+			for (var i in headers) {
+				var header = new Header();
+				header.setName(headers[i].name);
+				header.setValue(headers[i].value);
+				httpMethodObject.addRequestHeader(header);
+			}
 
-            //noinspection JSUnresolvedVariable
-            var Header = Packages.org.apache.commons.httpclient.Header;
-            var contentTypeFound = false;
-            var acceptTypeFound = false;
-            var acceptTypeValue = constants["APPLICATION_JSON"];
-            for (var i in headers) {
-                var header = new Header();
-                header.setName(headers[i].name);
-                header.setValue(headers[i].value);
-                httpMethodObject.addRequestHeader(header);
+			var header = new Header();
+			if(!contentTypeFound){
+				header.setName(constants["CONTENT_TYPE_IDENTIFIER"]);
+				header.setValue(constants["APPLICATION_JSON"]);
+				//noinspection JSUnresolvedFunction
+				httpMethodObject.addRequestHeader(header);
+			}
 
-                if(constants["CONTENT_TYPE_IDENTIFIER"] == headers[i].name){
-                    contentTypeFound = true;
-                }
-                if(constants["ACCEPT_IDENTIFIER"] == headers[i].name){
-                    acceptTypeFound = true;
-                    acceptTypeValue = headers[i].value;
-                }
-            }
-
-            var header = new Header();
-            if(!contentTypeFound){
-                header.setName(constants["CONTENT_TYPE_IDENTIFIER"]);
-                header.setValue(constants["APPLICATION_JSON"]);
-                //noinspection JSUnresolvedFunction
-                httpMethodObject.addRequestHeader(header);
-            }
-
-            if(!acceptTypeFound) {
-                header = new Header();
-                header.setName(constants["ACCEPT_IDENTIFIER"]);
-                header.setValue(constants["APPLICATION_JSON"]);
-                //noinspection JSUnresolvedFunction
-                httpMethodObject.addRequestHeader(header);
-            }
+			if(!acceptTypeFound) {
+				header = new Header();
+				header.setName(constants["ACCEPT_IDENTIFIER"]);
+				header.setValue(constants["APPLICATION_JSON"]);
+				//noinspection JSUnresolvedFunction
+				httpMethodObject.addRequestHeader(header);
+			}
 
             if (devicemgtProps["isOAuthEnabled"]) {
                 var accessToken = privateMethods.getAccessToken();
@@ -376,10 +386,27 @@ var invokers = function () {
             }
             //noinspection JSUnresolvedFunction
             if (payload != null) {
-                var StringRequestEntity = Packages.org.apache.commons.httpclient.methods.StringRequestEntity;
-                var stringRequestEntity = new StringRequestEntity(stringify(payload));
-                //noinspection JSUnresolvedFunction
-                httpMethodObject.setRequestEntity(stringRequestEntity);
+				if (contentTypeValue.indexOf("multipart/form-data") !== -1) {
+					var File = Packages.java.io.File;
+					var tempFile = File.createTempFile("stream2file", payload.getName() + ".tmp");
+					tempFile.deleteOnExit();
+					var FileOutputStream = Packages.java.io.FileOutputStream;
+					var out = new FileOutputStream(tempFile);
+					var IOUtils = Packages.org.apache.commons.io.IOUtils;
+					IOUtils.copy(payload.getStream().getStream(), out);
+					httpMethodObject.addParameter("file", tempFile);
+
+					//
+					//
+					////noinspection JSUnresolvedFunction
+					//httpMethodObject.setRequestBody(payload.getStream().getStream());
+				} else {
+					var StringRequestEntity = Packages.org.apache.commons.httpclient.methods.StringRequestEntity;
+					var stringRequestEntity = new StringRequestEntity(stringify(payload));
+					//noinspection JSUnresolvedFunction
+					httpMethodObject.setRequestEntity(stringRequestEntity);
+				}
+
             }
             var client = new HttpClient();
             try {
@@ -390,7 +417,7 @@ var invokers = function () {
                 if (status >= 200 && status < 300) {
                     if (constants["STREAMING_FILES_ACCEPT_HEADERS"].indexOf(acceptTypeValue) > -1) {
                         return successCallback(httpMethodObject.getResponseBodyAsStream(),
-                                               httpMethodObject.getResponseHeaders());
+                                               httpMethodObject.getResponseHeaders(), status);
                     } else {
                         return successCallback(httpMethodObject.getResponseBodyAsString(),
                                                httpMethodObject.getResponseHeaders());
@@ -403,7 +430,7 @@ var invokers = function () {
                 return errorCallback(response);
             } finally {
                 //noinspection JSUnresolvedFunction
-                if (method != constants["HTTP_GET"]) {
+                if (method != constants["HTTP_GET"] && method != constants["HTTP_POST"]) {
                     method.releaseConnection();
                 }
             }

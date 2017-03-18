@@ -2,6 +2,7 @@ package org.wso2.iot.senseme.api.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.device.mgt.common.IllegalTransactionStateException;
 import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 
 import javax.naming.Context;
@@ -47,6 +48,22 @@ public class BuildingDAOHandler {
         } catch (SQLException e) {
             log.debug(e.getMessage());
         }
+    }
+
+    /**
+     * Open connection to the datasource for read data
+     *
+     * @throws SQLException
+     */
+    public void openConnection() throws SQLException {
+        Connection conn = currentConnection.get();
+        if (conn != null) {
+            throw new IllegalTransactionStateException("A transaction is already active within the context of " +
+                                                               "this particular thread. Therefore, calling 'beginTransaction/openConnection' while another " +
+                                                               "transaction is already active is a sign of improper transaction handling");
+        }
+        conn = dataSource.getConnection();
+        currentConnection.set(conn);
     }
 
     public static Connection getConnection()  {

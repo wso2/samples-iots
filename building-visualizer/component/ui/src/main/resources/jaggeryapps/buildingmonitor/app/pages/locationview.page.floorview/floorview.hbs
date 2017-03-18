@@ -39,7 +39,11 @@
 {{/zone}}
 
 {{#zone "content"}}
-
+    {{#if imageObj}}
+        {{unit "locationview.unit.floorview" imageObj=imageObj }}
+    {{else}}
+        {{unit "locationview.unit.floorcreate"}}
+    {{/if}}
 {{/zone}}
 
 {{#zone "bottomJs"}}
