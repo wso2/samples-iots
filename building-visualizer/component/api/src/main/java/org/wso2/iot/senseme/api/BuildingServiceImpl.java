@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -53,7 +54,9 @@ public class BuildingServiceImpl implements BuildingService {
         try {
             int id;
             building.setOwner(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
+            manager.getBuildingDAOHandler().beginTransaction();
             id = this.building.addBuilding(building);
+            manager.getBuildingDAOHandler().commitTransaction();
             if (id!=0){
                 return Response.status(Response.Status.OK).entity(id).build();
             }else{
@@ -62,6 +65,8 @@ public class BuildingServiceImpl implements BuildingService {
         }catch (Exception e){
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } finally {
+            manager.getBuildingDAOHandler().closeConnection();
         }
     }
 
@@ -70,12 +75,36 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public Response getRegisteredBuildings(){
         try {
+            manager.getBuildingDAOHandler().openConnection();
             List<BuildingInfo> buildingList = this.building.getAllBuildings();
             return Response.status(Response.Status.OK).entity(buildingList).build();
 
         }catch (Exception e){
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } finally {
+            manager.getBuildingDAOHandler().closeConnection();
+        }
+    }
+
+    @GET
+    @Path("/{buildingId}")
+    @Produces("application/json")
+    @Override
+    public Response getRegisteredBuildings(@PathParam("buildingId") int buildingId){
+        try {
+            manager.getBuildingDAOHandler().openConnection();
+            BuildingInfo buildingInfo = this.building.getBuilding(buildingId);
+            if (buildingInfo == null) {
+                return Response.status(Response.Status.NO_CONTENT).entity(buildingInfo).build();
+            }
+            return Response.status(Response.Status.OK).entity(buildingInfo).build();
+
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } finally {
+            manager.getBuildingDAOHandler().closeConnection();
         }
     }
 
@@ -85,24 +114,23 @@ public class BuildingServiceImpl implements BuildingService {
     @Produces("image/*")
     public Response getFloorPlan(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId) {
         try {
-
+            manager.getBuildingDAOHandler().openConnection();
             File file = building.getFloorPlan(buildingId, floorId);
-
-            if (file!=null){
+            if (file != null) {
                 Response.ResponseBuilder response = Response.ok((Object) file);
                 response.status(Response.Status.OK);
                 response.type("image/*");
                 response.header("Content-Disposition",
-                        "attachment; filename=image_from_server.jpg");
+                                "attachment; filename=image_from_server.jpg");
                 return response.build();
-
-            }else{
-                Response.ResponseBuilder response = Response.status(500);
+            } else {
+                Response.ResponseBuilder response = Response.status(Response.Status.NO_CONTENT);
                 return response.build();
             }
-
-        } catch (IllegalArgumentException ex) {
-            return Response.status(400).entity(ex.getMessage()).build();//bad request
+        } catch (SQLException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } finally {
+            manager.getBuildingDAOHandler().closeConnection();
         }
     }
 
@@ -139,6 +167,7 @@ public class BuildingServiceImpl implements BuildingService {
             floor.setFloorNum(floorId);
 
             byte[] imageBytes = IOUtils.toByteArray(fileInputStream);
+            manager.getBuildingDAOHandler().openConnection();
             status = building.insertFloorDetails(buildingId,floorId, imageBytes);
 
             if (status){
@@ -153,6 +182,8 @@ public class BuildingServiceImpl implements BuildingService {
         catch (Exception e){
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } finally {
+            manager.getBuildingDAOHandler().closeConnection();
         }
     }
 

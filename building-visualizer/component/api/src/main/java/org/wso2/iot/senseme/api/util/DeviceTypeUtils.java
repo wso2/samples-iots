@@ -65,6 +65,10 @@ public class DeviceTypeUtils {
         }
     }
 
+    public static void cleanupResources(PreparedStatement stmt, ResultSet rs) {
+        cleanupResources(stmt, rs, null);
+    }
+
     public static void cleanupResources(PreparedStatement stmt, ResultSet rs, Connection conn) {
         cleanupResources(conn, stmt, rs);
     }

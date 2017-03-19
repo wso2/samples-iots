@@ -16,7 +16,7 @@
  * under the License.
  */
 
-function onRequest(context) {
+function onRequest() {
     var constants = require("/app/modules/constants.js");
     var userModule = require("/app/modules/business-controllers/user.js")["userModule"];
     var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
@@ -28,27 +28,11 @@ function onRequest(context) {
         response.sendRedirect(devicemgtProps["appContext"] + "devices");
         return;
     }
+	var buildingId = request.getParameter("buildingId");
+	var floorId = request.getParameter("floorId");
 
-	context.handlebars.registerHelper('times', function(n, block) {
-		var accum = '';
-		for(var i = n; i >= 1; --i)
-			accum += block.fn(i);
-		return accum;
-	});
 	var viewModel = {};
-	viewModel["buildingId"] = request.getParameter("buildingId");;
-	var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
-	var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
-	var url = devicemgtProps["httpsURL"] + "/senseme/building/" + viewModel["buildingId"];
-	serviceInvokers.XMLHttp.get(
-		url, function (responsePayload) {
-			var building = JSON.parse(responsePayload.responseText);
-			viewModel["floorCount"] = building.numFloors;
-		},
-		function (responsePayload) {
-			viewModel["floorCount"] = "0";
-		}
-	);
-	new Log().error(viewModel);
-	return viewModel;
+	viewModel["buildingId"] = buildingId;
+	viewModel["floorId"] = floorId;
+    return viewModel;
 }

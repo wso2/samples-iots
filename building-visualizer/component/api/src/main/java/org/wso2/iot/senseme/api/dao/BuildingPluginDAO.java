@@ -73,7 +73,7 @@ public class BuildingPluginDAO {
             String msg = "SQL Exception";
             log.error(msg, e);
         } finally {
-            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+            DeviceTypeUtils.cleanupResources(stmt, null);
         }
         return buildingId;
     }
@@ -104,10 +104,41 @@ public class BuildingPluginDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }finally {
-            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+            DeviceTypeUtils.cleanupResources(stmt, null);
         }
 
         return buildingList;
+    }
+
+    public BuildingInfo getBuilding(int buildingId) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = BuildingDAOHandler.getConnection();
+            String getAllBuildingsQuery = "SELECT * FROM building where BUILDINGID = ?";
+            stmt = conn.prepareStatement(getAllBuildingsQuery);
+            stmt.setInt(1, buildingId);
+            ResultSet resultSet = stmt.executeQuery();
+
+            if (resultSet.next()) {
+                BuildingInfo building = new BuildingInfo();
+                building.setBuildingId(resultSet.getInt("BUILDINGID"));
+                building.setOwner(resultSet.getString("OWNER"));
+                building.setBuildingName(resultSet.getString("BUILDINGNAME"));
+                building.setLatitude(resultSet.getString("LNG"));
+                building.setLongitude(resultSet.getString("LAT"));
+                building.setNumFloors(resultSet.getInt("NUMOFFLOORS"));
+                return building;
+            }
+
+        } catch (SQLException e) {
+            log.error("failed to retireve building details for building id " + buildingId);
+            return null;
+        }finally {
+            DeviceTypeUtils.cleanupResources(stmt, null);
+        }
+        return null;
     }
 
     public boolean addFloor(FloorInfo floor){
@@ -136,7 +167,7 @@ public class BuildingPluginDAO {
             String msg = "SQL Exception";
             log.error(msg, e);
         } finally {
-            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+            DeviceTypeUtils.cleanupResources(stmt, null);
         }
         return status;
     }
@@ -164,7 +195,7 @@ public class BuildingPluginDAO {
             String msg = "SQL Exception";
             log.error(msg, e);
         } finally {
-            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+            DeviceTypeUtils.cleanupResources(stmt, null);
         }
         return buildingId;
     }
@@ -227,7 +258,7 @@ public class BuildingPluginDAO {
             String msg = "SQL Exception";
             log.error(msg, e);
         } finally {
-            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+            DeviceTypeUtils.cleanupResources(stmt, null);
         }
         return status;
     }
@@ -260,7 +291,7 @@ public class BuildingPluginDAO {
             String msg = "SQL Exception";
             log.error(msg, e);
         } finally {
-            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+            DeviceTypeUtils.cleanupResources(stmt, null);
         }
         return status;
     }
@@ -279,14 +310,10 @@ public class BuildingPluginDAO {
             stmt = conn.prepareStatement(updateDBQuery);
             stmt.setInt(1, buildingId);
             stmt.setInt(2, floorId);
-
-
             ResultSet rows = stmt.executeQuery();
-
-            file = new File("image");
-            fos = new FileOutputStream(file);
-
-            while (rows.next()) {
+            if (rows.next()) {
+                file = new File("image");
+                fos = new FileOutputStream(file);
                 InputStream input = rows.getBinaryStream("image");
                 byte[] buffer = new byte[1024];
                 while (input.read(buffer) > 0) {
@@ -301,7 +328,7 @@ public class BuildingPluginDAO {
             log.error(msg, e);
         }finally {
 
-            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+            DeviceTypeUtils.cleanupResources(stmt, null);
 
             if (fos != null){
                 try{

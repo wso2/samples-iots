@@ -51,7 +51,7 @@
 
 #define DHTTYPE DHT11
 
-DHT dht(DHT11_PIN, DHTTYPE); 
+DHT dht(DHT11_PIN, DHTTYPE, 30); 
 
 unsigned long previousMillis = 0;        // will store last temp was read
 const long interval = 12200;              // interval at which to read sensor
@@ -93,21 +93,11 @@ int isMoving = 0;
 
 void setup_wifi() {
   delay(10);
-  // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
   }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 }
 
@@ -277,15 +267,16 @@ WiFiClient espClient;
 PubSubClient client(mqtt_server, mqtt_port, callback, espClient);
 
 void setup() {
+  dht.begin();
+  setup_wifi();
   snprintf (device_id, 100, "%i", ESP.getChipId());
   pinMode(GAS, INPUT);
   pinMode(LIGHT, INPUT);
-  pinMode(DHT11_PIN, INPUT);
   pinMode(PIR_OUT, INPUT);
 
   Serial.begin(115200);
-  setup_wifi();
-  dht.begin();
+  
+  
   Serial.print("device id :");
   Serial.println(device_id);
   if (!SPIFFS.begin()) {

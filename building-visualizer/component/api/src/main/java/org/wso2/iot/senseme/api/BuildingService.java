@@ -46,7 +46,7 @@ import java.io.InputStream;
                 }
         ),
         tags = {
-                @Tag(name = "senseme, device_management", description = "")
+                @Tag(name = "device_management", description = "")
         }
 )
 @Scopes(
@@ -87,6 +87,24 @@ public interface BuildingService {
             }
     )
     Response addBuilding(BuildingInfo building);
+
+    @GET
+    @Path("/{buildingId}")
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Retrieve building ",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+    Response getRegisteredBuildings(@PathParam("buildingId") int buildingId);
 
     /**
      * To update building image into db

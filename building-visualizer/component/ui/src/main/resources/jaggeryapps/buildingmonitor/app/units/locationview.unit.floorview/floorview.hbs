@@ -15,33 +15,13 @@
   specific language governing permissions and limitations
   under the License.
 }}
-
-{{unit "cdmf.unit.ui.title" pageTitle="Home"}}
-{{#zone "breadcrumbs"}}
-    <li>
-        <a href="{{@app.context}}/">
-            <i class="icon fw fw-home"></i>
-        </a>
-    </li>
+{{#zone "topCss"}}
 {{/zone}}
-
-{{#zone "navbarActions"}}
-    <li>
-        <!--suppress HtmlUnknownTarget -->
-        <a href="/buildings" class="cu-btn">
-        <span class="icon fw-stack">
-            <i class="fw fw-back fw-stack-1x"></i>
-            <i class="fw fw-circle-outline fw-stack-2x"></i>
-        </span>
-            Goto BuildingView View
-        </a>
-    </li>
-{{/zone}}
-
-{{#zone "content"}}
-
-{{/zone}}
-
-{{#zone "bottomJs"}}
-
+<!--end of image drag drop-->
+<div id="image">
+    <img src="data:image/png;base64,{{imageObj}}" alt="#" id="img"/>
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" id="svg"></svg>
+    <!--<canvas id="heatmap"> </canvas>-->
+</div>
+{{~#zone "bottomJs"}}
 {{/zone}}
