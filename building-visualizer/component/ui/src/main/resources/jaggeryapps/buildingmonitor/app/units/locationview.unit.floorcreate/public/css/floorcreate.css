@@ -153,3 +153,9 @@
 {
 	background-color: #0f3c4b;
 }
+
+#floor-plan-preview
+{
+	width: 100%;
+	padding-top: 20px;
+}

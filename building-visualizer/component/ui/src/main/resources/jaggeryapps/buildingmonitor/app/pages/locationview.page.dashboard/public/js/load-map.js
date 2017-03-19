@@ -111,11 +111,13 @@ function onMarkerClick(e) {
 var tmpEventStore;
 
 function saveBuilding () {
-	var buildingName = document.getElementsByName('locationName')[0].value
+	var buildingName = document.getElementsByName('locationName')[0].value;
 	var noOffloors = document.getElementsByName('floors')[0].value;
 	var cords = tmpEventStore.latlng;
 	var addBuildingApi = "/senseme/building";
 	var buildingdata = {buildingName:buildingName, longitude:cords.lat, latitude:cords.lng, numFloors:noOffloors};
+
+   console.log(buildingdata);
 	invokerUtil.post(addBuildingApi, buildingdata, function(data, textStatus, jqXHR){
 		if (jqXHR.status == 200 && data) {
 			console.log(jqXHR);
