@@ -102,7 +102,7 @@ var invokers = function () {
                 });
             } else {
                 xmlHttpRequest.setRequestHeader(constants["AUTHORIZATION_HEADER"],
-                                                constants["BEARER_PREFIX"] + accessToken);
+                    constants["BEARER_PREFIX"] + accessToken);
             }
         }
 
@@ -126,9 +126,9 @@ var invokers = function () {
                 tokenUtil.refreshTokenPair();
                 return privateMethods.execute(httpMethod, requestPayload, endpoint, responseCallback, ++count, headers);
             }
-         } else {
+        } else {
             return responseCallback(xmlHttpRequest);
-         }
+        }
     };
 
 
@@ -175,7 +175,7 @@ var invokers = function () {
     publicXMLHTTPInvokers["get"] = function (endpoint, responseCallback, headers) {
         var requestPayload = null;
         return privateMethods.initiateXMLHTTPRequest(constants["HTTP_GET"], requestPayload, endpoint, responseCallback,
-                                                     headers);
+            headers);
     };
 
     /**
@@ -186,7 +186,7 @@ var invokers = function () {
      */
     publicXMLHTTPInvokers["post"] = function (endpoint, requestPayload, responseCallback, headers) {
         return privateMethods.initiateXMLHTTPRequest(constants["HTTP_POST"], requestPayload, endpoint, responseCallback,
-                                                     headers);
+            headers);
     };
 
     /**
@@ -197,7 +197,7 @@ var invokers = function () {
      */
     publicXMLHTTPInvokers["put"] = function (endpoint, requestPayload, responseCallback, headers) {
         return privateMethods.initiateXMLHTTPRequest(constants["HTTP_PUT"], requestPayload, endpoint, responseCallback,
-                                                     headers);
+            headers);
     };
 
     /**
@@ -208,7 +208,7 @@ var invokers = function () {
     publicXMLHTTPInvokers["delete"] = function (endpoint, responseCallback, headers) {
         var requestPayload = null;
         return privateMethods.initiateXMLHTTPRequest(constants["HTTP_DELETE"], requestPayload, endpoint,
-                                                     responseCallback, headers);
+            responseCallback, headers);
     };
 
     /**
@@ -277,7 +277,7 @@ var invokers = function () {
     publicWSInvokers["soapRequest"] = function (action, requestPayload, endpoint,
                                                 successCallback, errorCallback, soapVersion) {
         return privateMethods.initiateWSRequest(action, endpoint, successCallback,
-                                                errorCallback, soapVersion, requestPayload);
+            errorCallback, soapVersion, requestPayload);
     };
 
     /**
@@ -297,24 +297,24 @@ var invokers = function () {
      */
     privateMethods["initiateHTTPClientRequest"] =
         function (method, url, successCallback, errorCallback, payload, headers) {
-			//noinspection JSUnresolvedVariable
+            //noinspection JSUnresolvedVariable
 
-			var contentTypeFound = false;
-			var acceptTypeFound = false;
-			var acceptTypeValue = constants["APPLICATION_JSON"];
-			var contentTypeValue = constants["APPLICATION_JSON"];
-			var Header = Packages.org.apache.commons.httpclient.Header;
-			for (var i in headers) {
+            var contentTypeFound = false;
+            var acceptTypeFound = false;
+            var acceptTypeValue = constants["APPLICATION_JSON"];
+            var contentTypeValue = constants["APPLICATION_JSON"];
+            var Header = Packages.org.apache.commons.httpclient.Header;
+            for (var i in headers) {
 
-				if(constants["CONTENT_TYPE_IDENTIFIER"] == headers[i].name){
-					contentTypeValue = headers[i].value;
-					contentTypeFound = true;
-				}
-				if(constants["ACCEPT_IDENTIFIER"] == headers[i].name){
-					acceptTypeFound = true;
-					acceptTypeValue = headers[i].value;
-				}
-			}
+                if(constants["CONTENT_TYPE_IDENTIFIER"] == headers[i].name){
+                    contentTypeValue = headers[i].value;
+                    contentTypeFound = true;
+                }
+                if(constants["ACCEPT_IDENTIFIER"] == headers[i].name){
+                    acceptTypeFound = true;
+                    acceptTypeValue = headers[i].value;
+                }
+            }
 
             //noinspection JSUnresolvedVariable
             var HttpClient = Packages.org.apache.commons.httpclient.HttpClient;
@@ -327,10 +327,10 @@ var invokers = function () {
                     break;
                 case constants["HTTP_POST"]:
                     //noinspection JSUnresolvedVariable
-					var PostMethod = Packages.org.apache.commons.httpclient.methods.PostMethod;
-					if (contentTypeValue.indexOf("multipart/form-data") !== -1) {
-						PostMethod = Packages.org.apache.commons.httpclient.methods.MultipartPostMethod;
-					}
+                    var PostMethod = Packages.org.apache.commons.httpclient.methods.PostMethod;
+                    if (contentTypeValue.indexOf("multipart/form-data") !== -1) {
+                        PostMethod = Packages.org.apache.commons.httpclient.methods.MultipartPostMethod;
+                    }
 
                     httpMethodObject = new PostMethod(url);
                     break;
@@ -348,29 +348,29 @@ var invokers = function () {
                     //noinspection JSUnresolvedFunction
                     throw new IllegalArgumentException("Invalid HTTP request method: " + method);
             }
-			var Header = Packages.org.apache.commons.httpclient.Header;
-			for (var i in headers) {
-				var header = new Header();
-				header.setName(headers[i].name);
-				header.setValue(headers[i].value);
-				httpMethodObject.addRequestHeader(header);
-			}
+            var Header = Packages.org.apache.commons.httpclient.Header;
+            for (var i in headers) {
+                var header = new Header();
+                header.setName(headers[i].name);
+                header.setValue(headers[i].value);
+                httpMethodObject.addRequestHeader(header);
+            }
 
-			var header = new Header();
-			if(!contentTypeFound){
-				header.setName(constants["CONTENT_TYPE_IDENTIFIER"]);
-				header.setValue(constants["APPLICATION_JSON"]);
-				//noinspection JSUnresolvedFunction
-				httpMethodObject.addRequestHeader(header);
-			}
+            var header = new Header();
+            if(!contentTypeFound){
+                header.setName(constants["CONTENT_TYPE_IDENTIFIER"]);
+                header.setValue(constants["APPLICATION_JSON"]);
+                //noinspection JSUnresolvedFunction
+                httpMethodObject.addRequestHeader(header);
+            }
 
-			if(!acceptTypeFound) {
-				header = new Header();
-				header.setName(constants["ACCEPT_IDENTIFIER"]);
-				header.setValue(constants["APPLICATION_JSON"]);
-				//noinspection JSUnresolvedFunction
-				httpMethodObject.addRequestHeader(header);
-			}
+            if(!acceptTypeFound) {
+                header = new Header();
+                header.setName(constants["ACCEPT_IDENTIFIER"]);
+                header.setValue(constants["APPLICATION_JSON"]);
+                //noinspection JSUnresolvedFunction
+                httpMethodObject.addRequestHeader(header);
+            }
 
             if (devicemgtProps["isOAuthEnabled"]) {
                 var accessToken = privateMethods.getAccessToken();
@@ -386,26 +386,26 @@ var invokers = function () {
             }
             //noinspection JSUnresolvedFunction
             if (payload != null) {
-				if (contentTypeValue.indexOf("multipart/form-data") !== -1) {
-					var File = Packages.java.io.File;
-					var tempFile = File.createTempFile("stream2file", payload.getName() + ".tmp");
-					tempFile.deleteOnExit();
-					var FileOutputStream = Packages.java.io.FileOutputStream;
-					var out = new FileOutputStream(tempFile);
-					var IOUtils = Packages.org.apache.commons.io.IOUtils;
-					IOUtils.copy(payload.getStream().getStream(), out);
-					httpMethodObject.addParameter("file", tempFile);
+                if (contentTypeValue.indexOf("multipart/form-data") !== -1) {
+                    var File = Packages.java.io.File;
+                    var tempFile = File.createTempFile("stream2file", payload.getName() + ".tmp");
+                    tempFile.deleteOnExit();
+                    var FileOutputStream = Packages.java.io.FileOutputStream;
+                    var out = new FileOutputStream(tempFile);
+                    var IOUtils = Packages.org.apache.commons.io.IOUtils;
+                    IOUtils.copy(payload.getStream().getStream(), out);
+                    httpMethodObject.addParameter("file", tempFile);
 
-					//
-					//
-					////noinspection JSUnresolvedFunction
-					//httpMethodObject.setRequestBody(payload.getStream().getStream());
-				} else {
-					var StringRequestEntity = Packages.org.apache.commons.httpclient.methods.StringRequestEntity;
-					var stringRequestEntity = new StringRequestEntity(stringify(payload));
-					//noinspection JSUnresolvedFunction
-					httpMethodObject.setRequestEntity(stringRequestEntity);
-				}
+                    //
+                    //
+                    ////noinspection JSUnresolvedFunction
+                    //httpMethodObject.setRequestBody(payload.getStream().getStream());
+                } else {
+                    var StringRequestEntity = Packages.org.apache.commons.httpclient.methods.StringRequestEntity;
+                    var stringRequestEntity = new StringRequestEntity(stringify(payload));
+                    //noinspection JSUnresolvedFunction
+                    httpMethodObject.setRequestEntity(stringRequestEntity);
+                }
 
             }
             var client = new HttpClient();
@@ -417,16 +417,21 @@ var invokers = function () {
                 if (status >= 200 && status < 300) {
                     if (constants["STREAMING_FILES_ACCEPT_HEADERS"].indexOf(acceptTypeValue) > -1) {
                         return successCallback(httpMethodObject.getResponseBodyAsStream(),
-                                               httpMethodObject.getResponseHeaders(), status);
+                            httpMethodObject.getResponseHeaders(), status);
                     } else {
                         return successCallback(httpMethodObject.getResponseBodyAsString(),
-                                               httpMethodObject.getResponseHeaders());
+                            httpMethodObject.getResponseHeaders());
                     }
                 } else {
                     return errorCallback(httpMethodObject.getResponseBodyAsString(),
-                                         httpMethodObject.getResponseHeaders());
+                        httpMethodObject.getResponseHeaders());
                 }
             } catch (e) {
+                var status = httpMethodObject.getStatusCode();
+
+                if (status >= 200 && status < 300) {
+                    return successCallback(response);
+                }
                 return errorCallback(response);
             } finally {
                 //noinspection JSUnresolvedFunction
@@ -446,7 +451,7 @@ var invokers = function () {
     publicHTTPClientInvokers["get"] = function (url, successCallback, errorCallback, headers) {
         var requestPayload = null;
         return privateMethods.initiateHTTPClientRequest(constants["HTTP_GET"], url, successCallback, errorCallback,
-                                                        requestPayload, headers);
+            requestPayload, headers);
     };
 
     /**
@@ -459,7 +464,7 @@ var invokers = function () {
      */
     publicHTTPClientInvokers["post"] = function (url, payload, successCallback, errorCallback, headers) {
         return privateMethods.initiateHTTPClientRequest(constants["HTTP_POST"], url, successCallback, errorCallback,
-                                                        payload, headers);
+            payload, headers);
     };
 
     /**
@@ -472,7 +477,7 @@ var invokers = function () {
      */
     publicHTTPClientInvokers["put"] = function (url, payload, successCallback, errorCallback, headers) {
         return privateMethods.initiateHTTPClientRequest(constants["HTTP_PUT"], url, successCallback, errorCallback,
-                                                        payload, headers);
+            payload, headers);
     };
 
     /**
@@ -485,7 +490,7 @@ var invokers = function () {
     publicHTTPClientInvokers["delete"] = function (url, successCallback, errorCallback, headers) {
         var requestPayload = null;
         return privateMethods.initiateHTTPClientRequest(constants["HTTP_DELETE"], url, successCallback, errorCallback,
-                                                        requestPayload, headers);
+            requestPayload, headers);
     };
 
     var publicMethods = {};

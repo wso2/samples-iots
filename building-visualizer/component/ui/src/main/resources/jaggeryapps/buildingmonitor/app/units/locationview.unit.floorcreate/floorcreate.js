@@ -20,6 +20,7 @@ function onRequest() {
     var constants = require("/app/modules/constants.js");
     var userModule = require("/app/modules/business-controllers/user.js")["userModule"];
     var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
+    var errorMessage = request.getParameter("errorMessage");
 
     var user = session.get(constants["USER_SESSION_KEY"]);
     var permissions = userModule.getUIPermissions();
@@ -34,5 +35,9 @@ function onRequest() {
 	var viewModel = {};
 	viewModel["buildingId"] = buildingId;
 	viewModel["floorId"] = floorId;
+
+	if (errorMessage) {
+	    viewModel["errorMessage"] = errorMessage;
+    }
     return viewModel;
 }
