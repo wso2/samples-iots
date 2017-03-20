@@ -192,4 +192,25 @@ public interface BuildingService {
 
     Response getRegisteredBuildings();
 
+    @POST
+    @Path("/update")
+    @Produces("application/json")
+    @Consumes("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Update existing building",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+
+    Response updateBuilding(BuildingInfo buildingInfo);
+
 }
