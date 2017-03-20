@@ -44,8 +44,8 @@ public class BuildingServiceImpl implements BuildingService {
 
     private static final String KEY_TYPE = "PRODUCTION";
     private static Log log = LogFactory.getLog(BuildingServiceImpl.class);
-    BuildingPluginDAOManager manager = new BuildingPluginDAOManager();
-    BuildingPluginDAO building = manager.getDeviceDAO();
+    BuildingPluginDAOManager buildingDAOManager = new BuildingPluginDAOManager();
+    BuildingPluginDAO buildingDAO = buildingDAOManager.getDeviceDAO();
 
     @POST
     @Produces("application/json")
@@ -54,9 +54,9 @@ public class BuildingServiceImpl implements BuildingService {
         try {
             int id;
             building.setOwner(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
-            manager.getBuildingDAOHandler().beginTransaction();
-            id = this.building.addBuilding(building);
-            manager.getBuildingDAOHandler().commitTransaction();
+            buildingDAOManager.getBuildingDAOHandler().beginTransaction();
+            id = this.buildingDAO.addBuilding(building);
+            buildingDAOManager.getBuildingDAOHandler().commitTransaction();
             if (id!=0){
                 return Response.status(Response.Status.OK).entity(id).build();
             }else{
@@ -66,7 +66,7 @@ public class BuildingServiceImpl implements BuildingService {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
-            manager.getBuildingDAOHandler().closeConnection();
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
     }
 
@@ -75,15 +75,41 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public Response getRegisteredBuildings(){
         try {
-            manager.getBuildingDAOHandler().openConnection();
-            List<BuildingInfo> buildingList = this.building.getAllBuildings();
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            List<BuildingInfo> buildingList = this.buildingDAO.getAllBuildings();
             return Response.status(Response.Status.OK).entity(buildingList).build();
 
         }catch (Exception e){
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
-            manager.getBuildingDAOHandler().closeConnection();
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
+        }
+    }
+
+    @POST
+    @Path("/update")
+    @Produces("application/json")
+    @Consumes("application/json")
+    @Override
+    public Response updateBuilding(BuildingInfo buildingInfo) {
+        BuildingInfo building = null;
+        try {
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            buildingDAOManager.getBuildingDAOHandler().beginTransaction();
+            building = this.buildingDAO.updateBuilding(buildingInfo);
+            buildingDAOManager.getBuildingDAOHandler().commitTransaction();
+
+            if (building != null) {
+                return Response.status(Response.Status.OK).entity(building).build();
+            }
+            return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            buildingDAOManager.getBuildingDAOHandler().rollbackTransaction();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
     }
 
@@ -93,8 +119,8 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public Response getRegisteredBuildings(@PathParam("buildingId") int buildingId){
         try {
-            manager.getBuildingDAOHandler().openConnection();
-            BuildingInfo buildingInfo = this.building.getBuilding(buildingId);
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
             if (buildingInfo == null) {
                 return Response.status(Response.Status.NO_CONTENT).entity(buildingInfo).build();
             }
@@ -104,7 +130,7 @@ public class BuildingServiceImpl implements BuildingService {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
-            manager.getBuildingDAOHandler().closeConnection();
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
     }
 
@@ -114,8 +140,8 @@ public class BuildingServiceImpl implements BuildingService {
     @Produces("image/*")
     public Response getFloorPlan(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId) {
         try {
-            manager.getBuildingDAOHandler().openConnection();
-            File file = building.getFloorPlan(buildingId, floorId);
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            File file = buildingDAO.getFloorPlan(buildingId, floorId);
             if (file != null) {
                 Response.ResponseBuilder response = Response.ok((Object) file);
                 response.status(Response.Status.OK);
@@ -130,7 +156,7 @@ public class BuildingServiceImpl implements BuildingService {
         } catch (SQLException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
-            manager.getBuildingDAOHandler().closeConnection();
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
     }
 
@@ -151,8 +177,8 @@ public class BuildingServiceImpl implements BuildingService {
             floor.setFloorNum(floorId);
 
             byte[] imageBytes = IOUtils.toByteArray(fileInputStream);
-            manager.getBuildingDAOHandler().openConnection();
-            status = building.insertFloorDetails(buildingId,floorId, imageBytes);
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            status = buildingDAO.insertFloorDetails(buildingId,floorId, imageBytes);
 
             if (status){
                 return Response.status(Response.Status.OK.getStatusCode()).build();
@@ -167,7 +193,7 @@ public class BuildingServiceImpl implements BuildingService {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
-            manager.getBuildingDAOHandler().closeConnection();
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
     }
 

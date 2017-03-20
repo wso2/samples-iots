@@ -55,7 +55,7 @@ public class BuildingPluginDAO {
         try {
 
             conn = BuildingDAOHandler.getConnection();
-            String createDBQuery = "INSERT INTO building(buildingName,owner,lng,lat,numOfFloors)" +
+            String createDBQuery = "INSERT INTO building(buildingName, owner, lng, lat, numOfFloors)" +
                     " VALUES (?, ?, ?, ?, ?)";
 
             stmt = conn.prepareStatement(createDBQuery);
@@ -108,6 +108,32 @@ public class BuildingPluginDAO {
         }
 
         return buildingList;
+    }
+
+    public BuildingInfo updateBuilding(BuildingInfo building) {
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        BuildingInfo buildingInfo;
+
+        try {
+            conn = BuildingDAOHandler.getConnection();
+            String updateBuildingQuery = "UPDATE building SET buildingName = ?, lng = ?, lat = ? WHERE buildingId = ?";
+            stmt = conn.prepareStatement(updateBuildingQuery);
+            stmt.setString(1, building.getBuildingName());
+            stmt.setString(2, building.getLongitude());
+            stmt.setString(3, building.getLatitude());
+            stmt.setInt(4, building.getBuildingId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            buildingInfo = getBuilding(building.getBuildingId());
+            DeviceTypeUtils.cleanupResources(stmt, null);
+        }
+
+        return buildingInfo;
+
     }
 
     public BuildingInfo getBuilding(int buildingId) {
