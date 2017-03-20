@@ -1,4 +1,4 @@
-(function (window) {
+(function (window, document) {
     var webSockets = [];
     var DANGER_TIMEOUT = 20000;
     var WARNING_TIMEOUT = 15000;
@@ -6,7 +6,16 @@
     var ws;
     var wsAlert;
     var temperatureMapInstance;
+    var motionMapInstance;
+    var lightMapInstance;
+    var humidityMapInstance;
     var currentTemperatureMap;
+    var currentMotionMap;
+    var currentLightMap;
+    var currentHumidityMap;
+    var floorId;
+    var buildingId;
+    var currentSelection = "Temperature";
     var heatMapConfig = {
         container: document.getElementById('image'),
         radius: 200,
@@ -18,15 +27,15 @@
 
     $("#show-analytics").on('click', function () {
         if ($("#show-analytics").hasClass("show-analytics")) {
-            intializeWebsockets();
-            createHeatMap();
+            $("#radio-selections").removeClass("hidden");
             $('#image canvas').removeClass('hidden');
             $("#show-analytics").addClass("hide-analytics").removeClass("show-analytics");
-            $("#show-analytics").html("Hide Analytics");
+            $("#analytics").html("Hide Analytics");
         } else {
+            $("#radio-selections").addClass("hidden");
             $('#image canvas').addClass('hidden');
             $("#show-analytics").removeClass("hide-analytics").addClass("show-analytics");
-            $("#show-analytics").html("Show Analytics");
+            $("#analytics").html("Show Analytics");
         }
     });
 
@@ -35,7 +44,28 @@
      */
     var createHeatMap = function () {
         if (!temperatureMapInstance) {
+            heatMapConfig.gradient = {
+                '0': 'rgb(212, 210, 218)',
+                '.1': 'rgb(190, 189, 196)',
+                '.2': 'rgb(169, 168, 174)',
+                '.3': 'rgb(151, 148, 152)',
+                '.4': 'rgb(130, 127, 130)',
+                '.5': 'rgb(109, 107, 108)',
+                '.6': 'rgb(87, 85, 86)',
+                '.7': 'rgb(65, 64, 65))',
+                '.8': 'rgb(43, 43, 43)',
+                '.9': 'rgb(0, 0, 0)'
+            };
             temperatureMapInstance = h337.create(heatMapConfig);
+            motionMapInstance = h337.create(heatMapConfig);
+            lightMapInstance = h337.create(heatMapConfig);
+            humidityMapInstance = h337.create(heatMapConfig);
+            motionMapInstance.setDataMin(0);
+            motionMapInstance.setDataMax(1);
+            lightMapInstance.setDataMin(0);
+            lightMapInstance.setDataMax(1);
+            humidityMapInstance.setDataMin(0);
+            humidityMapInstance.setDataMax(1);
         }
         if (!currentTemperatureMap) {
             var config = {
@@ -46,32 +76,63 @@
                 blur: .75
             };
             currentTemperatureMap = window.h337.create(config);
+            currentHumidityMap = window.h337.create(config);
+            currentLightMap = window.h337.create(config);
+            currentMotionMap = window.h337.create(config);
         }
     };
-
 
     /**
      * To handle the real-time data.
      * @param dataValues
      */
     var handleRealTimeData = function(dataValues) {
-        if (temperatureMapInstance != null && dataValues.temperature > 0) {
-            var dataPoint = {
-                x: dataValues.location.coordinates[0],
-                y: dataValues.location.coordinates[1],
-                value: dataValues.temperature
-            };
-            currentTemperatureMap.addData(dataPoint);
+        if (dataValues.location.building != buildingId || dataValues.location.floor != floorId) {
+            return;
+        }
 
-           /* if (!isSliderChanged) {
-                heatmapInstance.addData(dataPoint);
-            } else if (!isHistoricalView && currentSliderValue == 10) {*/
-            temperatureMapInstance.addData(dataPoint);
-          /*  }
-            if (heatMapData.length == 10) {
-                heatMapData.shift();
-            }
-            heatMapData.push(currentHeatMap.getData());*/
+        var temperatureDataPoint = {
+            x: dataValues.location.coordinates[0],
+            y: dataValues.location.coordinates[1],
+            value: dataValues.temperature
+        };
+        currentTemperatureMap.addData(temperatureDataPoint);
+        /* if (!isSliderChanged) {
+         heatmapInstance.addData(dataPoint);
+         } else if (!isHistoricalView && currentSliderValue == 10) {*/
+
+        /*  }
+         if (heatMapData.length == 10) {
+         heatMapData.shift();
+         }
+         heatMapData.push(currentHeatMap.getData());*/
+
+        var humidityDataPoint = {
+            x: dataValues.location.coordinates[0],
+            y: dataValues.location.coordinates[1],
+            value: dataValues.humidity
+        };
+        currentHumidityMap.addData(humidityDataPoint);
+
+        var lightDataPoint = {
+            x: dataValues.location.coordinates[0],
+            y: dataValues.location.coordinates[1],
+            value: dataValues.light
+        };
+        currentLightMap.addData(lightDataPoint);
+
+        var motionDataPoint = {
+            x: dataValues.location.coordinates[0],
+            y: dataValues.location.coordinates[1],
+            value: dataValues.motion
+        };
+        currentMotionMap.addData(motionDataPoint);
+
+        switch (currentSelection) {
+            case "Temperature" : temperatureMapInstance.addData(temperatureDataPoint); break;
+            case "Motion" : motionMapInstance.addData(motionDataPoint); break;
+            case "Humidity" : humidityMapInstance.addData(humidityDataPoint); break;
+            case "Light" : lightMapInstance.addData(lightDataPoint); break;
         }
     };
 
@@ -79,46 +140,44 @@
      * To initialize the web-sockets to get the real-time data.
      */
     var intializeWebsockets = function () {
-        var webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceTemperatureEvent';
+        var webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceFloorEvent';
 
-        if (!ws) {
-            ws = new WebSocket(webSocketURL);
-            ws.onopen = function () {
-                notifyUser("You are now connected to Sensor stream!", "success", SUCCESS_TIMEOUT, "top-center");
-            };
-            ws.onmessage = function (evt) {
-                handleRealTimeData(JSON.parse(evt.data));
-                //  heatMapManagement.functions.handleRealTimeData(JSON.parse(evt.data));
-            };
-            ws.onclose = function () {
-                notifyUser("Sense stream connection lost with the server", "danger", DANGER_TIMEOUT, "top-center");
-            };
-            ws.onerror = function (err) {
-                notifyUser(err, "danger", DANGER_TIMEOUT, "top-center");
-            };
-            webSockets.push(ws);
-        }
+        ws = new WebSocket(webSocketURL);
+        ws.onopen = function () {
+            notifyUser("You are now connected to Sensor stream!", "success", SUCCESS_TIMEOUT, "top-center");
+        };
+        ws.onmessage = function (evt) {
+            handleRealTimeData(JSON.parse(evt.data));
+            //  heatMapManagement.functions.handleRealTimeData(JSON.parse(evt.data));
+        };
+        ws.onclose = function () {
+            notifyUser("Sense stream connection lost with the server", "danger", DANGER_TIMEOUT, "top-center");
+        };
+        ws.onerror = function (err) {
+            notifyUser(err, "danger", DANGER_TIMEOUT, "top-center");
+        };
+        webSockets.push(ws);
 
-        if (!wsAlert) {
-            webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertEvent';
-            wsAlert = new WebSocket(webSocketURL);
-            wsAlert.onopen = function () {
-                notifyUser("You are now connected to Alert stream!", "success", SUCCESS_TIMEOUT, "top-center");
-            };
-            wsAlert.onmessage = function (evt) {
-                var alertData = JSON.parse(evt.data);
+        webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertEvent';
+        wsAlert = new WebSocket(webSocketURL);
+        wsAlert.onopen = function () {
+            notifyUser("You are now connected to Alert stream!", "success", SUCCESS_TIMEOUT, "top-center");
+        };
+        wsAlert.onmessage = function (evt) {
+            var alertData = JSON.parse(evt.data);
+            if (alertData.buildingId == buildingId && alertData.floorId == floorId) {
                 notifyUser("Alert from " + alertData.buildingId + " building, " + alertData.floorId +
                     " floor. " + alertData.type + " value is " + alertData.value.toFixed(2) + ". " + alertData.information,
                     "warning", WARNING_TIMEOUT, "bottom-left");
-            };
-            wsAlert.onclose = function () {
-                notifyUser("Alert stream connection lost with the server", "danger", DANGER_TIMEOUT, "top-center");
-            };
-            wsAlert.onerror = function (err) {
-                notifyUser(err, "danger", DANGER_TIMEOUT, "top-center");
-            };
-            webSockets.push(wsAlert);
-        }
+            }
+        };
+        wsAlert.onclose = function () {
+            notifyUser("Alert stream connection lost with the server", "danger", DANGER_TIMEOUT, "top-center");
+        };
+        wsAlert.onerror = function (err) {
+            notifyUser(err, "danger", DANGER_TIMEOUT, "top-center");
+        };
+        webSockets.push(wsAlert);
     };
 
 
@@ -149,4 +208,33 @@
             wsAlert.close();
         }
     };
-}(window));
+
+    $(document).ready(function(){
+        intializeWebsockets();
+        createHeatMap();
+        floorId = $("#image").attr("floorId");
+        buildingId = $("#image").attr("buildingId");
+        console.log(floorId);
+        console.log(buildingId);
+        buildingId = "WSO2";
+        floorId = "5th floor";
+    });
+
+    $("form input:radio").change(function () {
+        switch (currentSelection) {
+            case "Temperature" :  temperatureMapInstance.setData({data:[]}); break;
+            case "Motion" : motionMapInstance.setData({data:[]});break;
+            case "Humidity" : humidityMapInstance.setData({data:[]});break;
+            case "Light" : lightMapInstance.setData({data:[]}); break;
+        }
+        currentSelection = $(this).val();
+        switch (currentSelection) {
+            case "Temperature" :  temperatureMapInstance.setData(currentTemperatureMap.getData()); break;
+            case "Motion" : motionMapInstance.setData(currentMotionMap.getData());break;
+            case "Humidity" : humidityMapInstance.setData(currentHumidityMap.getData());break;
+            case "Light" : lightMapInstance.setData(currentLightMap.getData()); break;
+        }
+
+    });
+
+}(window, document));
