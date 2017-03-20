@@ -18,6 +18,20 @@
 {{#zone "topCss"}}
     {{~css "css/floorcreate.css"}}
 {{/zone}}
+
+{{#zone "navbarActions"}}
+    <li>
+        <!--suppress HtmlUnknownTarget -->
+        <a href="{{@app.context}}/buildings?buildingId={{buildingId}}" class="cu-btn">
+        <span class="icon fw-stack">
+            <i class="fw fw-left fw-stack-1x"></i>
+            <i class="fw fw-circle-outline fw-stack-2x"></i>
+        </span>
+            Goto Building View
+        </a>
+    </li>
+{{/zone}}
+
 <div class="row">
     <div class="col-lg-5 col-md-6 col-centered">
         {{#if errorMessage}}
@@ -28,10 +42,10 @@
             <i class="icon fw fw-error"></i><strong>Error!</strong>
             <span id = "error-message">{{errorMessage}}</span>
         </div>
-        <form id = "floor-plan-upload" class="form-horizontal" method="post" action="/buildingmonitor/api/floor/{{buildingId}}/{{floorId}}" enctype="multipart/form-data">
+        <form id = "floor-plan-upload" class="form-horizontal" method="post" action="{{@app.context}}/api/floor/{{buildingId}}/{{floorId}}" enctype="multipart/form-data">
             <div class="form-group">
                 <div class="col-sm-12">
-                    <label class="control-label">File Upload [Supports Multi Select]</label>
+                    <label class="control-label">Please select a floor plan</label>
                     <div class="input-group input-wrap file-upload-control">
                         <input type="text" class="form-control" readonly="">
                         <input type="file" class="form-control"  id = "files" name="files">
