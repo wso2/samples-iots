@@ -15,13 +15,38 @@
   specific language governing permissions and limitations
   under the License.
 }}
-{{#zone "topCss"}}
+{{unit "locationview.unit.lib.heatmap"}}
+{{unit "locationview.unit.lib.uikit"}}
+
+{{#zone "navbarActions"}}
+    <li>
+        <!--suppress HtmlUnknownTarget -->
+        <a href="{{@app.context}}/buildings?buildingId={{buildingId}}" class="cu-btn">
+        <span class="icon fw-stack">
+            <i class="fw fw-left fw-stack-1x"></i>
+            <i class="fw fw-circle-outline fw-stack-2x"></i>
+        </span>
+            Goto Building View
+        </a>
+    </li>
+    <li>
+        <a href="#" id = "show-analytics" class="show-analytics">
+            <span class="icon fw-stack">
+                <i class="fw fw-analytics-extensions fw-stack-1x"></i>
+                <i class="fw fw-circle-outline fw-stack-2x"></i>
+            </span>
+            Show analytics
+        </a>
+    </li>
 {{/zone}}
+
 <!--end of image drag drop-->
 <div id="image">
     <img src="data:image/png;base64,{{imageObj}}" alt="#" id="img"/>
     <svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" id="svg"></svg>
     <!--<canvas id="heatmap"> </canvas>-->
 </div>
+<div id="heat-map-hidden" class="hidden"></div>
 {{~#zone "bottomJs"}}
+    {{js "js/floorview.js"}}
 {{/zone}}

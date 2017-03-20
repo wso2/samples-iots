@@ -98,6 +98,11 @@
                                         <include name="*.car"/>
                                     </fileset>
                                 </copy>
+                                <copy todir="wso2iot-3.1.0-SNAPSHOT/analytics/repository/conf/datasources">
+                                    <fileset dir="wso2iot-3.1.0-SNAPSHOT/core/repository/conf/datasources">
+                                        <include name="senseme-datasources.xml"/>
+                                    </fileset>
+                                </copy>
                             </tasks>
                         </configuration>
                         <goals>
