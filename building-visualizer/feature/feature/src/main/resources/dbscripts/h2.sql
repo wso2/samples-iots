@@ -7,6 +7,7 @@ CREATE  TABLE IF NOT EXISTS `device` (
   `floorId` VARCHAR(100) NULL DEFAULT NULL,
   `xCoordinate` VARCHAR(100) NULL DEFAULT NULL,
   `yCoordinate` VARCHAR(100) NULL DEFAULT NULL,
+  `lastKnown` BIGINT,
   PRIMARY KEY (`deviceId`) );
 
 CREATE  TABLE IF NOT EXISTS `building` (

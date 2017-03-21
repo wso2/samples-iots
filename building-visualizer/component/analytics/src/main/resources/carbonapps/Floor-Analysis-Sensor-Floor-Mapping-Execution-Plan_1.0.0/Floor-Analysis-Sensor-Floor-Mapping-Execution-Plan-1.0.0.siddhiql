@@ -19,7 +19,7 @@ define stream summarizedDataOut (deviceId string, temperature double, motion dou
 double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
 
 @from(eventtable = 'rdbms' , datasource.name = 'WSO2_FLOOR_ANALYTICS' , table.name = 'device')
-define table deviceLocationTable (deviceId string, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+define table deviceLocationTable (deviceId string, buildingId string, floorId string, xCoordinate int, yCoordinate int, lastKnown long);
 
 from dataIn as d join deviceLocationTable as l on d.deviceId == l.deviceId
 select d.deviceId as deviceId, d.avgTemperature as temperature, d.avgMotion as motion, d.avgHumidity as humidity, d
@@ -30,3 +30,8 @@ from dataIn as d join deviceLocationTable as l on d.deviceId == l.deviceId
 select d.deviceId as deviceId, d.avgTemperature as temperature, d.avgMotion as motion, d.avgHumidity as humidity, d
 .avgAirQuality as  airQuality, d.avgLight as light, d.timeStamp as timeStamp, l.buildingId as buildingId,
 l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into summarizedDataOut;
+
+from dataIn
+select deviceId, timeStamp as lastKnown
+update deviceLocationTable
+    on deviceId == deviceLocationTable.deviceId;

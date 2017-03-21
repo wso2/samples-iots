@@ -49,6 +49,7 @@
 					<Attribute>floorId</Attribute>
 					<Attribute>xCoordinate</Attribute>
 					<Attribute>yCoordinate</Attribute>
+					<Attribute>lastKnown</Attribute>
 				</Attributes>
 			</Table>
 		</TableConfig>

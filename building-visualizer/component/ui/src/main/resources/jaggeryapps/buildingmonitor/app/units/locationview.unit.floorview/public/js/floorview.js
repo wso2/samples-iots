@@ -16,8 +16,9 @@
     var floorId;
     var buildingId;
     var rangeSlider;
+    var historicalSlider;
     var isSliderChanged = false;
-    var currentSliderValue = 10;
+    var currentSliderValue = 0;
     var currentSelection = "Temperature";
     var isHistoricalView = false;
     var temperatureMapData = [];
@@ -25,7 +26,6 @@
     var lightMapData = [];
     var humidityMapData = [];
     var timeouts = [];
-    var historicalData = [];
     var heatMapConfig = {
         container: document.getElementById('image'),
         radius: 200,
@@ -33,6 +33,7 @@
         minOpacity: 0,
         blur: .75
     };
+    var selectedDate;
 
 
     $("#show-analytics").on('click', function () {
@@ -42,6 +43,8 @@
             $("#show-analytics").addClass("hide-analytics").removeClass("show-analytics");
             $("#analytics").html("Hide Analytics");
             $('.slider-wrapper').show(1000);
+            $(".slider-wrapper").click();
+            //rangeSlider.bootstrapSlider('setValue', -1, true, true);
         } else {
             $("#radio-selections").addClass("hidden");
             $('#image canvas').addClass('hidden');
@@ -136,7 +139,7 @@
         currentMotionMap.addData(motionDataPoint);
 
         if (!isHistoricalView) {
-            if (!isSliderChanged || currentSliderValue == 10) {
+            if (!isSliderChanged || currentSliderValue == 0) {
                 switch (currentSelection) {
                     case "Temperature" :
                         temperatureMapInstance.addData(temperatureDataPoint);
@@ -259,11 +262,36 @@
         buildingId = "WSO2";
         floorId = "5th floor";
 
-        rangeSlider = $("#range-slider").bootstrapSlider();
-        rangeSlider.bootstrapSlider('setAttribute', 'min', 1);
-        rangeSlider.bootstrapSlider('setValue', 10);
+        rangeSlider = $("#range-slider").bootstrapSlider({
+            ticks: [-3, -2, -1, 0],
+            ticks_labels: ['-3h', '-2h', '-1h', 'current'],
+            formatter: function(value) {
+                return value + "h";
+            }
+        });
+        rangeSlider.bootstrapSlider('setAttribute', 'min', -3);
+        rangeSlider.bootstrapSlider('setAttribute', 'max', 0);
+        rangeSlider.bootstrapSlider('setValue', 0);
+
+        historicalSlider = $("#historical-slider").bootstrapSlider({
+            ticks: [0, 4, 8, 12, 16, 20, 24],
+            ticks_labels: ['0h', '4h', '8h', '12h', '16h', '20h', '24h'],
+            formatter: function(value) {
+                return value + "h";
+            }
+        });
+        historicalSlider.bootstrapSlider('setAttribute', 'min', 0);
+        historicalSlider.bootstrapSlider('setAttribute', 'max', 24);
+        historicalSlider.bootstrapSlider('setValue', 0);
 
         $('#range-slider').on("slide", function () {
+            updateHeatMapOnSlideChange();
+
+        }).on("change", function () {
+            updateHeatMapOnSlideChange();
+        });
+
+        $('#historical-slider').on("slide", function () {
             updateHeatMapOnSlideChange();
 
         }).on("change", function () {
@@ -275,11 +303,16 @@
             endDate: "+0d",
             autoclose: true
         }).on("changeDate", function(e) {
+            // var endDate = new Date(e.date);
+            // endDate.setHours(endDate.getHours() + 24);
+            selectedDate = e.date;
             var endDate = new Date(e.date);
             endDate.setHours(endDate.getHours() + 24);
-            var fromDate = e.date;
-            historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
-            updateHistoricData();
+
+            var fromDate = new Date(e.date);
+            fromDate.setHours(fromDate.getHours() + 23);
+            var historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
+            updateHistoricData(historicalData);
         });
 
         $('#image canvas').addClass('hidden');
@@ -289,7 +322,7 @@
      * To update the heat map
      * @param data
      */
-    var updateHistoricData = function() {
+    var updateHistoricData = function(historicalData) {
 
         switch (currentSelection) {
             case "Temperature" :
@@ -350,10 +383,6 @@
      */
     var updateHeatMapOnSlideChange = function () {
         isSliderChanged = true;
-        var max = rangeSlider.bootstrapSlider("getAttribute", 'max');
-        var min = rangeSlider.bootstrapSlider("getAttribute", 'min');
-        currentSliderValue = rangeSlider.bootstrapSlider("getValue");
-
         switch (currentSelection) {
             case "Temperature" :  temperatureMapInstance.setData({data:[]}); break;
             case "Motion" : motionMapInstance.setData({data:[]});break;
@@ -362,7 +391,10 @@
         }
 
         if (!isHistoricalView) {
-            if (currentSliderValue == 10) {
+            var max = rangeSlider.bootstrapSlider("getAttribute", 'max');
+            var min = rangeSlider.bootstrapSlider("getAttribute", 'min');
+            currentSliderValue = rangeSlider.bootstrapSlider("getValue");
+            if (currentSliderValue == 0) {
                 switch (currentSelection) {
                     case "Temperature" :
                         temperatureMapInstance.setData(currentTemperatureMap.getData());
@@ -378,23 +410,69 @@
                         break;
                 }
             } else {
+                var endDate = new Date();
+                endDate.setHours(endDate.getHours() + currentSliderValue);
+                var fromDate = new Date();
+                fromDate.setHours(fromDate.getHours() + currentSliderValue -1);
+                var recentPastData = getProviderData("ORG_WSO2_FLOOR_DEVICE_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
+                var length = recentPastData.length;
                 switch (currentSelection) {
                     case "Temperature" :
-                        temperatureMapInstance.setData(temperatureMapData[currentSliderValue - 1]);
+                        for (var i = 0; i < length; i++) {
+                            var dataPoint = {
+                                x: recentPastData[i].xCoordinate,
+                                y: recentPastData[i].yCoordinate,
+                                value: recentPastData[i].temperature
+                            };
+                            temperatureMapInstance.addData(dataPoint);
+                        }
+                        temperatureMapInstance.repaint();
                         break;
                     case "Motion" :
-                        motionMapInstance.setData(motionMapData[currentSliderValue - 1]);
+                        for (var i = 0; i < length; i++) {
+                            var dataPoint = {
+                                x: recentPastData[i].xCoordinate,
+                                y: recentPastData[i].yCoordinate,
+                                value: recentPastData[i].motion
+                            };
+                            motionMapInstance.addData(dataPoint);
+                        }
+                        motionMapInstance.repaint();
                         break;
                     case "Humidity" :
-                        humidityMapInstance.setData(humidityMapData[currentSliderValue - 1]);
+                        for (var i = 0; i < length; i++) {
+                            var dataPoint = {
+                                x: recentPastData[i].xCoordinate,
+                                y: recentPastData[i].yCoordinate,
+                                value: recentPastData[i].humidity
+                            };
+                            humidityMapInstance.addData(dataPoint);
+                        }
+                        humidityMapInstance.repaint();
                         break;
                     case "Light" :
-                        lightMapInstance.setData(lightMapData[currentSliderValue - 1]);
+                        for (var i = 0; i < length; i++) {
+                            var dataPoint = {
+                                x: recentPastData[i].xCoordinate,
+                                y: recentPastData[i].yCoordinate,
+                                value: recentPastData[i].light
+                            };
+                            lightMapInstance.addData(dataPoint);
+                        }
+                        lightMapInstance.repaint();
                         break;
                 }
             }
         } else {
-            var length = historicalData.length * ((currentSliderValue-min) / (max-min));
+            var max =  historicalSlider.bootstrapSlider("getAttribute", 'max');
+            var min = historicalSlider.bootstrapSlider("getAttribute", 'min');
+            currentSliderValue = historicalSlider.bootstrapSlider("getValue");
+            var endDate = new Date(selectedDate);
+            endDate.setHours(endDate.getHours() + currentSliderValue);
+            var fromDate = new Date(selectedDate);
+            fromDate.setHours(fromDate.getHours() + currentSliderValue -1);
+            var historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
+            var length = historicalData.length;
             switch (currentSelection) {
                 case "Temperature" :
                     temperatureMapInstance.setData({data: []});
@@ -470,39 +548,41 @@
      */
     $( "#play" ).click(function(e) {
         e.preventDefault();
-        if ($("#play").hasClass('play')) {
-            $(this).addClass('pause').removeClass('play');
-            $("#pau").removeClass("hidden");
-            $("#pla").addClass("hidden");
-            var currentSliderValue = rangeSlider.bootstrapSlider("getValue");
+        if (!isHistoricalView) {
+            if ($("#play").hasClass('play')) {
+                $(this).addClass('pause').removeClass('play');
+                $("#pau").removeClass("hidden");
+                $("#pla").addClass("hidden");
+                var currentSliderValue = rangeSlider.bootstrapSlider("getValue");
 
-            if (currentSliderValue == 10) {
-                rangeSlider.bootstrapSlider("setValue", 0);
-                currentSliderValue = 0;
-                updateHeatMapOnSlideChange();
-            }
-
-            for (var i = 0, len = rangeSlider.bootstrapSlider("getAttribute", "max"); currentSliderValue <= len; currentSliderValue++, i++) {
-                timeouts.push(setTimeout(function(y) {
-                    rangeSlider.bootstrapSlider("setValue", y);
+                if (currentSliderValue == 0) {
+                    rangeSlider.bootstrapSlider("setValue", -3);
+                    currentSliderValue = -3;
                     updateHeatMapOnSlideChange();
-
-                    if (y == 10) {
-                        $("#pla").removeClass("hidden");
-                        $("#pau").addClass("hidden");
-                        $("#play").addClass('play').removeClass('pause');
-                    }
-                }, i * 500, currentSliderValue));
-            }
-        } else {
-            $("#pla").removeClass("hidden");
-            $("#pau").addClass("hidden");
-            if (timeouts) {
-                for (var i = 0;i < timeouts.length; i++) {
-                    clearTimeout(timeouts[i]);
                 }
+
+                for (var i = 0, len = rangeSlider.bootstrapSlider("getAttribute", "max"); currentSliderValue <= len; currentSliderValue++, i++) {
+                    timeouts.push(setTimeout(function (y) {
+                        rangeSlider.bootstrapSlider("setValue", y);
+                        updateHeatMapOnSlideChange();
+
+                        if (y == 0) {
+                            $("#pla").removeClass("hidden");
+                            $("#pau").addClass("hidden");
+                            $("#play").addClass('play').removeClass('pause');
+                        }
+                    }, i * 500 * 2, currentSliderValue));
+                }
+            } else {
+                $("#pla").removeClass("hidden");
+                $("#pau").addClass("hidden");
+                if (timeouts) {
+                    for (var i = 0; i < timeouts.length; i++) {
+                        clearTimeout(timeouts[i]);
+                    }
+                }
+                $(this).addClass('play').removeClass('pause');
             }
-            $(this).addClass('play').removeClass('pause');
         }
     });
 
@@ -532,7 +612,13 @@
                     break;
             }
         } else {
-            updateHistoricData();
+            var endDate = new Date(selectedDate);
+            endDate.setHours(endDate.getHours() + 24);
+
+            var fromDate = new Date(selectedDate);
+            fromDate.setHours(fromDate.getHours() + 23);
+            var historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
+            updateHistoricData(historicalData);
         }
 
     });
@@ -542,8 +628,17 @@
         $('.date-picker').slideToggle("slow");
 
         if (isHistoricalView) {
-            updateHistoricData();
+            $("#live-view").addClass("hidden");
+            $("#historical-view").removeClass("hidden");
+            switch (currentSelection) {
+                case "Temperature" :  temperatureMapInstance.setData({data:[]}); break;
+                case "Motion" : motionMapInstance.setData({data:[]});break;
+                case "Humidity" : humidityMapInstance.setData({data:[]});break;
+                case "Light" : lightMapInstance.setData({data:[]}); break;
+            }
         } else {
+            $("#live-view").removeClass("hidden");
+            $("#historical-view").addClass("hidden");
             updateHeatMap();
         }
     });
@@ -602,7 +697,7 @@
                 providerData = data;
             },
             error : function (err) {
-                notifyUser(err, "danger", constants.DANGER_TIMEOUT, "top-center");
+                notifyUser(err, "danger", DANGER_TIMEOUT, "top-center");
             }
         });
         return providerData;
