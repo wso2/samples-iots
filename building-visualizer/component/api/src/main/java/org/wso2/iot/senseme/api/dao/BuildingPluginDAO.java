@@ -226,6 +226,38 @@ public class BuildingPluginDAO {
         return buildingId;
     }
 
+
+    public BuildingInfo getBuildingData(int buildingId){
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        BuildingInfo building = new BuildingInfo();
+
+        try {
+            conn = BuildingDAOHandler.getConnection();
+            String selectDBQuery = "SELECT * FROM building WHERE buildingId=?" ;
+            stmt = conn.prepareStatement(selectDBQuery);
+            stmt.setInt(1, buildingId);
+
+            ResultSet rows = stmt.executeQuery();
+
+            while (rows.next()) {
+                building.setBuildingId(rows.getInt("BUILDINGID"));
+                building.setOwner(rows.getString("OWNER"));
+                building.setBuildingName(rows.getString("BUILDINGNAME"));
+                building.setLatitude(rows.getString("LNG"));
+                building.setLongitude(rows.getString("LAT"));
+                building.setNumFloors(rows.getInt("NUMOFFLOORS"));
+            }
+        } catch (SQLException e) {
+            String msg = "SQL Exception";
+            log.error(msg, e);
+        } finally {
+            DeviceTypeUtils.cleanupResources(stmt, null,conn);
+        }
+        return building;
+    }
+
     public boolean updateFloorPlan(int buildingId, int floorId, byte[] imageBytes){
 
         boolean status = false;
