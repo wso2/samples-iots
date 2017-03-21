@@ -15,6 +15,8 @@
     var currentHumidityMap;
     var floorId;
     var buildingId;
+    var rangeSlider;
+    var isSliderChanged = false;
     var currentSelection = "Temperature";
     var heatMapConfig = {
         container: document.getElementById('image'),
@@ -31,11 +33,13 @@
             $('#image canvas').removeClass('hidden');
             $("#show-analytics").addClass("hide-analytics").removeClass("show-analytics");
             $("#analytics").html("Hide Analytics");
+            $('.slider-wrapper').show(1000);
         } else {
             $("#radio-selections").addClass("hidden");
             $('#image canvas').addClass('hidden');
             $("#show-analytics").removeClass("hide-analytics").addClass("show-analytics");
             $("#analytics").html("Show Analytics");
+            $('.slider-wrapper').hide(1000);
         }
     });
 
@@ -44,21 +48,25 @@
      */
     var createHeatMap = function () {
         if (!temperatureMapInstance) {
-            heatMapConfig.gradient = {
-                '0': 'rgb(212, 210, 218)',
-                '.1': 'rgb(190, 189, 196)',
-                '.2': 'rgb(169, 168, 174)',
-                '.3': 'rgb(151, 148, 152)',
-                '.4': 'rgb(130, 127, 130)',
-                '.5': 'rgb(109, 107, 108)',
-                '.6': 'rgb(87, 85, 86)',
-                '.7': 'rgb(65, 64, 65))',
-                '.8': 'rgb(43, 43, 43)',
-                '.9': 'rgb(0, 0, 0)'
-            };
+            // heatMapConfig.gradient = {
+            //     '0': 'rgb(255, 255, 255)',
+            //     '1': 'rgb(0, 0, 0)'
+            // };
             temperatureMapInstance = h337.create(heatMapConfig);
+            // heatMapConfig.gradient = {
+            //     '0': 'rgb(255, 255, 255)',
+            //     '1': 'rgb(255, 0, 0)'
+            // };
             motionMapInstance = h337.create(heatMapConfig);
+            // heatMapConfig.gradient = {
+            //     '0': 'rgb(255, 255, 255)',
+            //     '1': 'rgb(0, 255, 0)'
+            // };
             lightMapInstance = h337.create(heatMapConfig);
+            // heatMapConfig.gradient = {
+            //     '0': 'rgb(255, 255, 255)',
+            //     '1': 'rgb(0, 0, 255)'
+            // };
             humidityMapInstance = h337.create(heatMapConfig);
             motionMapInstance.setDataMin(0);
             motionMapInstance.setDataMax(1);
@@ -218,7 +226,65 @@
         console.log(buildingId);
         buildingId = "WSO2";
         floorId = "5th floor";
+
+        rangeSlider = $("#range-slider").bootstrapSlider();
+        rangeSlider.bootstrapSlider('setValue', 10);
+
+        $('#range-slider').on("slide", function () {
+            updateHeatMapOnSlideChange();
+
+        }).on("change", function () {
+            updateHeatMapOnSlideChange();
+        });
+
+        $('input[name="daterange"]').datepicker({
+            orientation: "auto",
+            endDate: "+0d"
+        }).on("changeDate", function(e) {
+
+        });
     });
+
+    /**
+     * To update the heat map on changing the slider.
+     */
+    var updateHeatMapOnSlideChange = function () {
+        isSliderChanged = true;
+        var max = rangeSlider.bootstrapSlider("getAttribute", 'max');
+        var min = rangeSlider.bootstrapSlider("getAttribute", 'min');
+        currentSliderValue = rangeSlider.bootstrapSlider("getValue");
+
+        var data = {data: []};
+        heatmapInstance.setData(data);
+        heatmapInstance = h337.create(heatMapConfig);
+
+        if (!isHistoricalView) {
+            if (currentSliderValue == 10) {
+                heatmapInstance.setData(data);
+                heatmapInstance = h337.create(heatMapConfig);
+                heatmapInstance.setData(currentHeatMap.getData());
+            } else {
+                heatmapInstance.setData(heatMapData[currentSliderValue - 1]);
+            }
+        } else {
+            if (historicalData) {
+                data = {data: []};
+                heatmapInstance.setData(data);
+                heatmapInstance = h337.create(heatMapConfig);
+                var length = historicalData.length * ((currentSliderValue-min) / (max-min));
+                for (var i = 0; i < length; i++) {
+                    var dataPoint = {
+                        x: historicalData[i].xCoordinate,
+                        y: historicalData[i].yCoordinate,
+                        value: historicalData[i].temperature
+                    };
+                    heatmapInstance.addData(dataPoint);
+                }
+            } else {
+
+            }
+        }
+    };
 
     $("form input:radio").change(function () {
         switch (currentSelection) {
