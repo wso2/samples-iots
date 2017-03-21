@@ -17,7 +17,14 @@
     var buildingId;
     var rangeSlider;
     var isSliderChanged = false;
+    var currentSliderValue = 10;
     var currentSelection = "Temperature";
+    var isHistoricalView = false;
+    var temperatureMapData = [];
+    var motionMapData = [];
+    var lightMapData = [];
+    var humidityMapData = [];
+    var timeouts = []
     var heatMapConfig = {
         container: document.getElementById('image'),
         radius: 200,
@@ -105,15 +112,6 @@
             value: dataValues.temperature
         };
         currentTemperatureMap.addData(temperatureDataPoint);
-        /* if (!isSliderChanged) {
-         heatmapInstance.addData(dataPoint);
-         } else if (!isHistoricalView && currentSliderValue == 10) {*/
-
-        /*  }
-         if (heatMapData.length == 10) {
-         heatMapData.shift();
-         }
-         heatMapData.push(currentHeatMap.getData());*/
 
         var humidityDataPoint = {
             x: dataValues.location.coordinates[0],
@@ -136,12 +134,41 @@
         };
         currentMotionMap.addData(motionDataPoint);
 
-        switch (currentSelection) {
-            case "Temperature" : temperatureMapInstance.addData(temperatureDataPoint); break;
-            case "Motion" : motionMapInstance.addData(motionDataPoint); break;
-            case "Humidity" : humidityMapInstance.addData(humidityDataPoint); break;
-            case "Light" : lightMapInstance.addData(lightDataPoint); break;
+        if (!isHistoricalView) {
+            if (!isSliderChanged || currentSliderValue == 10) {
+                switch (currentSelection) {
+                    case "Temperature" :
+                        temperatureMapInstance.addData(temperatureDataPoint);
+                        break;
+                    case "Motion" :
+                        motionMapInstance.addData(motionDataPoint);
+                        break;
+                    case "Humidity" :
+                        humidityMapInstance.addData(humidityDataPoint);
+                        break;
+                    case "Light" :
+                        lightMapInstance.addData(lightDataPoint);
+                        break;
+                }
+            }
         }
+
+        if (temperatureMapData.length == 10) {
+            temperatureMapData.shift();
+        }
+        if (motionMapData.length == 10) {
+            motionMapData.shift();
+        }
+        if (humidityMapData.length == 10) {
+            humidityMapData.shift();
+        }
+        if (lightMapData.length == 10) {
+            lightMapData.shift();
+        }
+        temperatureMapData.push(currentTemperatureMap.getData());
+        motionMapData.push(currentMotionMap.getData());
+        humidityMapData.push(currentHumidityMap.getData());
+        lightMapData.push(currentLightMap.getData());
     };
 
     /**
@@ -228,6 +255,7 @@
         floorId = "5th floor";
 
         rangeSlider = $("#range-slider").bootstrapSlider();
+        rangeSlider.bootstrapSlider('setAttribute', 'min', 1);
         rangeSlider.bootstrapSlider('setValue', 10);
 
         $('#range-slider').on("slide", function () {
@@ -254,37 +282,106 @@
         var min = rangeSlider.bootstrapSlider("getAttribute", 'min');
         currentSliderValue = rangeSlider.bootstrapSlider("getValue");
 
-        var data = {data: []};
-        heatmapInstance.setData(data);
-        heatmapInstance = h337.create(heatMapConfig);
+        switch (currentSelection) {
+            case "Temperature" :  temperatureMapInstance.setData({data:[]}); break;
+            case "Motion" : motionMapInstance.setData({data:[]});break;
+            case "Humidity" : humidityMapInstance.setData({data:[]});break;
+            case "Light" : lightMapInstance.setData({data:[]}); break;
+        }
 
         if (!isHistoricalView) {
             if (currentSliderValue == 10) {
-                heatmapInstance.setData(data);
-                heatmapInstance = h337.create(heatMapConfig);
-                heatmapInstance.setData(currentHeatMap.getData());
-            } else {
-                heatmapInstance.setData(heatMapData[currentSliderValue - 1]);
-            }
-        } else {
-            if (historicalData) {
-                data = {data: []};
-                heatmapInstance.setData(data);
-                heatmapInstance = h337.create(heatMapConfig);
-                var length = historicalData.length * ((currentSliderValue-min) / (max-min));
-                for (var i = 0; i < length; i++) {
-                    var dataPoint = {
-                        x: historicalData[i].xCoordinate,
-                        y: historicalData[i].yCoordinate,
-                        value: historicalData[i].temperature
-                    };
-                    heatmapInstance.addData(dataPoint);
+                switch (currentSelection) {
+                    case "Temperature" :
+                        temperatureMapInstance.setData(currentTemperatureMap.getData());
+                        break;
+                    case "Motion" :
+                        motionMapInstance.setData(currentMotionMap.getData());
+                        break;
+                    case "Humidity" :
+                        humidityMapInstance.setData(currentHumidityMap.getData());
+                        break;
+                    case "Light" :
+                        lightMapInstance.setData(currentLightMap.getData());
+                        break;
                 }
             } else {
-
+                switch (currentSelection) {
+                    case "Temperature" :
+                        temperatureMapInstance.setData(temperatureMapData[currentSliderValue - 1]);
+                        break;
+                    case "Motion" :
+                        motionMapInstance.setData(motionMapData[currentSliderValue - 1]);
+                        break;
+                    case "Humidity" :
+                        humidityMapInstance.setData(humidityMapData[currentSliderValue - 1]);
+                        break;
+                    case "Light" :
+                        lightMapInstance.setData(lightMapData[currentSliderValue - 1]);
+                        break;
+                }
             }
+        } else {
+            // if (historicalData) {
+            //     data = {data: []};
+            //     heatmapInstance.setData(data);
+            //     heatmapInstance = h337.create(heatMapConfig);
+            //     var length = historicalData.length * ((currentSliderValue-min) / (max-min));
+            //     for (var i = 0; i < length; i++) {
+            //         var dataPoint = {
+            //             x: historicalData[i].xCoordinate,
+            //             y: historicalData[i].yCoordinate,
+            //             value: historicalData[i].temperature
+            //         };
+            //         heatmapInstance.addData(dataPoint);
+            //     }
+            // } else {
+            //
+            // }
         }
     };
+
+
+    /**
+     * To make animation out of the heat-map for the real-time data.
+     */
+    $( "#play" ).click(function(e) {
+        e.preventDefault();
+        if ($("#play").hasClass('play')) {
+            $(this).addClass('pause').removeClass('play');
+            $("#pau").removeClass("hidden");
+            $("#pla").addClass("hidden");
+            var currentSliderValue = rangeSlider.bootstrapSlider("getValue");
+
+            if (currentSliderValue == 10) {
+                rangeSlider.bootstrapSlider("setValue", 0);
+                currentSliderValue = 0;
+                updateHeatMapOnSlideChange();
+            }
+
+            for (var i = 0, len = rangeSlider.bootstrapSlider("getAttribute", "max"); currentSliderValue <= len; currentSliderValue++, i++) {
+                timeouts.push(setTimeout(function(y) {
+                    rangeSlider.bootstrapSlider("setValue", y);
+                    updateHeatMapOnSlideChange();
+
+                    if (y == 10) {
+                        $("#pla").removeClass("hidden");
+                        $("#pau").addClass("hidden");
+                        $("#play").addClass('play').removeClass('pause');
+                    }
+                }, i * 500, currentSliderValue));
+            }
+        } else {
+            $("#pla").removeClass("hidden");
+            $("#pau").addClass("hidden");
+            if (timeouts) {
+                for (var i = 0;i < timeouts.length; i++) {
+                    clearTimeout(timeouts[i]);
+                }
+            }
+            $(this).addClass('play').removeClass('pause');
+        }
+    });
 
     $("form input:radio").change(function () {
         switch (currentSelection) {
@@ -301,6 +398,10 @@
             case "Light" : lightMapInstance.setData(currentLightMap.getData()); break;
         }
 
+    });
+
+    $("#historic-toggle").click(function(){
+        $('.date-picker').slideToggle("slow");
     });
 
 }(window, document));

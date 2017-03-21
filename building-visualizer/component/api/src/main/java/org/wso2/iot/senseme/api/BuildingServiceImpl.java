@@ -178,7 +178,9 @@ public class BuildingServiceImpl implements BuildingService {
 
             byte[] imageBytes = IOUtils.toByteArray(fileInputStream);
             buildingDAOManager.getBuildingDAOHandler().openConnection();
+            buildingDAOManager.getBuildingDAOHandler().beginTransaction();
             status = buildingDAO.insertFloorDetails(buildingId,floorId, imageBytes);
+            buildingDAOManager.getBuildingDAOHandler().commitTransaction();
 
             if (status){
                 return Response.status(Response.Status.OK.getStatusCode()).build();
