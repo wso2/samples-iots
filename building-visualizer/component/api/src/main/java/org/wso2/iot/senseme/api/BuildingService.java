@@ -192,6 +192,7 @@ public interface BuildingService {
 
     Response getRegisteredBuildings();
 
+
     @POST
     @Path("/update")
     @Produces("application/json")
@@ -213,5 +214,27 @@ public interface BuildingService {
 
 
     Response updateBuilding(BuildingInfo buildingInfo);
+
+    @GET
+    @Path("/{bildingId}")
+    @Produces("application/json")
+    @Consumes("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Get existing floor Ids which have an image uploaded.",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+
+
+    Response getAvailableFloors(@PathParam("buildingId") int buildingId);
 
 }

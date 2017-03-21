@@ -22,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.http.protocol.ResponseServer;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAO;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAOManager;
@@ -107,6 +108,23 @@ public class BuildingServiceImpl implements BuildingService {
         } catch (SQLException e) {
             e.printStackTrace();
             buildingDAOManager.getBuildingDAOHandler().rollbackTransaction();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
+        }
+    }
+
+    @GET
+    @Path("/{buildingId}")
+    @Produces("application/json")
+    @Override
+    public Response getAvailableFloors(@PathParam("buildingId") int buildingId) {
+        try {
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
+            return Response.status(Response.Status.OK).entity(floorNums).build();
+        } catch (SQLException e) {
+            log.error(e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();

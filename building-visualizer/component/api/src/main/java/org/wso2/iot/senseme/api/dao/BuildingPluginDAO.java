@@ -366,4 +366,30 @@ public class BuildingPluginDAO {
         }
         return file;
     }
+
+    public List<Integer> getAvailableFloors(int buildingId) {
+        List<Integer> floorIds = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet resultSet = null;
+
+        try {
+            conn = BuildingDAOHandler.getConnection();
+            String query = "SELECT FLOORNUM, image FROM floor WHERE buildingId = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, buildingId);
+            resultSet = stmt.executeQuery();
+
+            while (resultSet.next()) {
+                if (resultSet.getBinaryStream("image") != null) {
+                    floorIds.add(resultSet.getInt("FLOORNUM"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DeviceTypeUtils.cleanupResources(stmt, resultSet);
+        }
+        return floorIds;
+    }
 }
