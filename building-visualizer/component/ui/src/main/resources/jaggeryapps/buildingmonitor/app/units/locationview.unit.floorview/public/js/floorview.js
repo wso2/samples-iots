@@ -1,4 +1,4 @@
-(function (window, document) {
+(function (window, document, context) {
     var webSockets = [];
     var DANGER_TIMEOUT = 20000;
     var WARNING_TIMEOUT = 15000;
@@ -24,7 +24,8 @@
     var motionMapData = [];
     var lightMapData = [];
     var humidityMapData = [];
-    var timeouts = []
+    var timeouts = [];
+    var historicalData = [];
     var heatMapConfig = {
         container: document.getElementById('image'),
         radius: 200,
@@ -139,15 +140,19 @@
                 switch (currentSelection) {
                     case "Temperature" :
                         temperatureMapInstance.addData(temperatureDataPoint);
+                        temperatureMapInstance.repaint();
                         break;
                     case "Motion" :
                         motionMapInstance.addData(motionDataPoint);
+                        motionMapInstance.repaint();
                         break;
                     case "Humidity" :
                         humidityMapInstance.addData(humidityDataPoint);
+                        humidityMapInstance.repaint();
                         break;
                     case "Light" :
                         lightMapInstance.addData(lightDataPoint);
+                        lightMapInstance.repaint();
                         break;
                 }
             }
@@ -267,11 +272,78 @@
 
         $('input[name="daterange"]').datepicker({
             orientation: "auto",
-            endDate: "+0d"
+            endDate: "+0d",
+            autoclose: true
         }).on("changeDate", function(e) {
-
+            var endDate = new Date(e.date);
+            endDate.setHours(endDate.getHours() + 24);
+            var fromDate = e.date;
+            historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
+            updateHistoricData();
         });
+
+        $('#image canvas').addClass('hidden');
     });
+
+    /**
+     * To update the heat map
+     * @param data
+     */
+    var updateHistoricData = function() {
+
+        switch (currentSelection) {
+            case "Temperature" :
+                temperatureMapInstance.setData({data: []});
+                for (var data in historicalData) {
+                    var dataPoint = {
+                        x: historicalData[data].xCoordinate,
+                        y: historicalData[data].yCoordinate,
+                        value: historicalData[data].temperature
+                    };
+                    temperatureMapInstance.addData(dataPoint);
+                }
+                temperatureMapInstance.repaint();
+                break;
+
+            case "Motion" :
+                motionMapInstance.setData({data: []});
+                for (var data in historicalData) {
+                    var dataPoint = {
+                        x: historicalData[data].xCoordinate,
+                        y: historicalData[data].yCoordinate,
+                        value: historicalData[data].motion
+                    };
+                    motionMapInstance.addData(dataPoint);
+                }
+                motionMapInstance.repaint();
+                break;
+            case "Humidity" :
+                humidityMapInstance.setData({data: []});
+                for (var data in historicalData) {
+                    var dataPoint = {
+                        x: historicalData[data].xCoordinate,
+                        y: historicalData[data].yCoordinate,
+                        value: historicalData[data].humidity
+                    };
+                    humidityMapInstance.addData(dataPoint);
+                }
+                humidityMapInstance.repaint();
+                break;
+            case "Light" :
+                lightMapInstance.setData({data: []});
+                for (var data in historicalData) {
+                    var dataPoint = {
+                        x: historicalData[data].xCoordinate,
+                        y: historicalData[data].yCoordinate,
+                        value: historicalData[data].light
+                    };
+                    lightMapInstance.addData(dataPoint);
+                }
+                lightMapInstance.repaint();
+                break;
+        }
+
+    };
 
     /**
      * To update the heat map on changing the slider.
@@ -322,6 +394,57 @@
                 }
             }
         } else {
+            var length = historicalData.length * ((currentSliderValue-min) / (max-min));
+            switch (currentSelection) {
+                case "Temperature" :
+                    temperatureMapInstance.setData({data: []});
+                    for (var i = 0; i < length; i++) {
+                        var dataPoint = {
+                            x: historicalData[i].xCoordinate,
+                            y: historicalData[i].yCoordinate,
+                            value: historicalData[i].temperature
+                        };
+                        temperatureMapInstance.addData(dataPoint);
+                    }
+                    temperatureMapInstance.repaint();
+                    break;
+                case "Motion" :
+                    motionMapInstance.setData({data: []});
+                    for (var i = 0; i < length; i++) {
+                        var dataPoint = {
+                            x: historicalData[i].xCoordinate,
+                            y: historicalData[i].yCoordinate,
+                            value: historicalData[i].motion
+                        };
+                        motionMapInstance.addData(dataPoint);
+                    }
+                    motionMapInstance.repaint();
+                    break;
+                case "Humidity" :
+                    humidityMapInstance.setData({data: []});
+                    for (var i = 0; i < length; i++) {
+                        var dataPoint = {
+                            x: historicalData[i].xCoordinate,
+                            y: historicalData[i].yCoordinate,
+                            value: historicalData[i].humidity
+                        };
+                        humidityMapInstance.addData(dataPoint);
+                    }
+                    humidityMapInstance.repaint();
+                    break;
+                case "Light" :
+                    lightMapInstance.setData({data: []});
+                    for (var i = 0; i < length; i++) {
+                        var dataPoint = {
+                            x: historicalData[i].xCoordinate,
+                            y: historicalData[i].yCoordinate,
+                            value: historicalData[i].light
+                        };
+                        lightMapInstance.addData(dataPoint);
+                    }
+                    lightMapInstance.repaint();
+                    break;
+            }
             // if (historicalData) {
             //     data = {data: []};
             //     heatmapInstance.setData(data);
@@ -390,18 +513,98 @@
             case "Humidity" : humidityMapInstance.setData({data:[]});break;
             case "Light" : lightMapInstance.setData({data:[]}); break;
         }
+
         currentSelection = $(this).val();
-        switch (currentSelection) {
-            case "Temperature" :  temperatureMapInstance.setData(currentTemperatureMap.getData()); break;
-            case "Motion" : motionMapInstance.setData(currentMotionMap.getData());break;
-            case "Humidity" : humidityMapInstance.setData(currentHumidityMap.getData());break;
-            case "Light" : lightMapInstance.setData(currentLightMap.getData()); break;
+
+        if (!isHistoricalView) {
+            switch (currentSelection) {
+                case "Temperature" :
+                    temperatureMapInstance.setData(currentTemperatureMap.getData());
+                    break;
+                case "Motion" :
+                    motionMapInstance.setData(currentMotionMap.getData());
+                    break;
+                case "Humidity" :
+                    humidityMapInstance.setData(currentHumidityMap.getData());
+                    break;
+                case "Light" :
+                    lightMapInstance.setData(currentLightMap.getData());
+                    break;
+            }
+        } else {
+            updateHistoricData();
         }
 
     });
 
     $("#historic-toggle").click(function(){
+        isHistoricalView = !isHistoricalView;
         $('.date-picker').slideToggle("slow");
+
+        if (isHistoricalView) {
+            updateHistoricData();
+        } else {
+            updateHeatMap();
+        }
     });
 
-}(window, document));
+    var updateHeatMap = function () {
+        switch (currentSelection) {
+            case "Temperature" :
+                temperatureMapInstance.setData({data: []});
+                temperatureMapInstance.setData(currentTemperatureMap.getData());
+                break;
+            case "Motion" :
+                motionMapInstance.setData({data: []});
+                motionMapInstance.setData(currentMotionMap.getData());
+                break;
+            case "Humidity" :
+                humidityMapInstance.setData({data: []});
+                humidityMapInstance.setData(currentHumidityMap.getData());
+                break;
+            case "Light" :
+                lightMapInstance.setData({data: []});
+                lightMapInstance.setData(currentLightMap.getData());
+                break;
+        }
+
+    };
+
+    /**
+     * To get the historical data for a certain period of time.
+     * @param tableName Name of the table to fetch the data from
+     * @param timeFrom Start time
+     * @param timeTo End time
+     *
+     */
+    var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortBy) {
+        var providerData = null;
+        var providerUrl = context + '/api/batch-provider?action=getData&tableName=' + tableName;
+
+        if (timeFrom && timeTo) {
+            providerUrl += '&timeFrom=' + timeFrom + '&timeTo=' + timeTo;
+        }
+        if (start) {
+            providerUrl += "&start=" + start;
+        }
+        if (limit) {
+            providerUrl += "&limit=" + limit;
+        }
+        if (sortBy) {
+            providerUrl += "&sortBy="  +sortBy
+        }
+        $.ajax({
+            url:providerUrl,
+            method: "GET",
+            contentType: "application/json",
+            async: false,
+            success: function (data) {
+                providerData = data;
+            },
+            error : function (err) {
+                notifyUser(err, "danger", constants.DANGER_TIMEOUT, "top-center");
+            }
+        });
+        return providerData;
+    };
+}(window, document, context));
