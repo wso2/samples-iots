@@ -192,12 +192,15 @@ public interface BuildingService {
 
     Response getRegisteredBuildings();
 
-    @GET
+    @POST
+    @Path("/update")
     @Produces("application/json")
+    @Consumes("application/json")
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
-            httpMethod = "GET",
-            value = "get building data",
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Update existing building",
             notes = "",
             response = Response.class,
             tags = "senseme",
@@ -208,6 +211,7 @@ public interface BuildingService {
             }
     )
 
-    Response getBuildingData(int buildingId);
+
+    Response updateBuilding(BuildingInfo buildingInfo);
 
 }

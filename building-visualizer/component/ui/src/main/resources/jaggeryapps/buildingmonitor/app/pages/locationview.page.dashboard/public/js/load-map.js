@@ -19,6 +19,7 @@
 var map;
 //Array to store marker latlng and ID
 var markers = [];
+var buildingsMap = [];
 
 var modalPopup = ".modal";
 var modalPopupContainer = modalPopup + " .modal-content";
@@ -68,20 +69,30 @@ function loadLeafletMap() {
 }
 
 function preLoadBuildings() {
-	var getBuildingApi = "/senseme/building";
-	invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
-		if (jqXHR.status == 200) {
-			//[{"buildingId":1,"buildingName":"ayyoobs1","owner":"admin","longitude":"79.97607422294095","latitude":"6.995539474716988","numFloors":4}
-			var buildings = JSON.parse(data);
-			for(var i = 0; i < buildings.length; i++) {
-				var obj = buildings[i];
-				var cord = {"lat" : obj.latitude, "lng" : obj.longitude}
-				addingMarker(cord, obj.buildingName, obj.buildingId);
-			}
-		}
-	}, function (jqXHR) {
+    var getBuildingApi = "/senseme/building";
+    invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
+        if (jqXHR.status == 200) {
+            //[{"buildingId":1,"buildingName":"ayyoobs1","owner":"admin","longitude":"79.97607422294095","latitude":"6.995539474716988","numFloors":4}
+            var buildings = JSON.parse(data);
+            for(var i = 0; i < buildings.length; i++) {
+                var obj = buildings[i];
+                console.log(obj);
+                var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
+                console.log(cord);
+                addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i]);
+                //printBuildingData(obj);
+            }
+        }
+    }, function (jqXHR) {
 	}, "application/json");
 
+}
+
+function printBuildingData(buildingInfo) {
+    var buildingContent = $("#cont")
+    var data = "<div><p>Building Name: "+ buildingInfo.buildingName +
+        "Owner:" + buildingInfo.owner +" </p></div>";
+    buildingContent.find("#buildingContent").append(data);
 }
 
 $(document).ready(function () {
@@ -151,8 +162,39 @@ function addBuilding (e) {
 	addingMarker(cord, null, null);
 }
 
+function onMarkerDragged(event) {
+    var marker = event.target;
+    console.log("Marker ");
+    var latitude = event.target._latlng.lat;
+    var longitude = event.target._latlng.lng;
+
+    var tmp_building = buildingsMap[marker._leaflet_id];
+    tmp_building.longitude = latitude;
+    tmp_building.latitude = longitude;
+
+    var updateBuildingApi = "/senseme/building/update";
+
+    //TODO : Update the building data base.
+    invokerUtil.post(updateBuildingApi, tmp_building, function(data, textStatus, jqXHR){
+        if (jqXHR.status == 200 && data) {
+            console.log(jqXHR);
+        }
+    }, function(jqXHR){
+        if (jqXHR.status == 400) {
+            console.log("error")
+        } else {
+            var response = JSON.parse(jqXHR.responseText).message;
+
+        }
+    },"application/json","application/json");
+
+    //apiInvokerUTIL.post
+    //marker.setLatLng(event.latlng, {id:marker.title, draggable:'true'}).bindPopup(popup).update();
+
+}
+
 // Script for adding marker
-function addingMarker(cord, locationName, buildingId) {
+function addingMarker(cord, locationName, buildingId, building) {
 
 	var markerId,
 		popup;
@@ -183,15 +225,22 @@ function addingMarker(cord, locationName, buildingId) {
 
 	marker._leaflet_id = markerId;
 
-	marker.on('click', onMarkerClick);
-	//marker.on("popupopen", onPopupOpen);
-	marker.addTo(map);
-	markerId = marker._leaflet_id;
-	console.log(marker._leaflet_id);
+    marker.on('click', onMarkerClick);
 
-	markers[markerId] = marker;
-	console.log(markerId);
-	console.log(markers[markerId]);
+    marker.on('dragend', onMarkerDragged);
+
+    //marker.on("popupopen", onPopupOpen);
+    marker.addTo(map);
+    markerId = marker._leaflet_id;
+    console.log(marker._leaflet_id);
+
+    if (building != null) {
+        buildingsMap[markerId] = building;
+    }
+
+    markers[markerId] = marker;
+    console.log(markerId);
+    console.log(markers[markerId]);
 
 	//Adding panel heading on load only
 	//if(e == null){
