@@ -2,43 +2,7 @@ var webSocket;
 var floorData = [];
 var rangeSlider;
 
-$(document).ready(function () {
-
-    $(".slider-wrapper").show(1000);
-    rangeSlider = $("#range-slider").bootstrapSlider();
-    rangeSlider.bootstrapSlider('setAttribute', 'min', 1);
-    rangeSlider.bootstrapSlider('setValue', 10);
-    var url = "ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
-    createWebSocket(url);
-    var numOfFloors = $("#buildingView").data("num_of_floors");
-    createDataArrays(numOfFloors);
-
-    $('#range-slider').on("slide", function () {}).on("change", function () {
-        var time = rangeSlider.bootstrapSlider("getValue");
-        showReacentPastData(time);
-    });
-
-    $('input[name="daterange"]').datepicker({
-        orientation: "auto",
-        endDate: "+0d"
-    }).on("changeDate", function (e) {
-
-    });
-
-
-    $("#historic-toggle").click(function () {
-        $(".date-picker").slideToggle("slow");
-    });
-
-});
-
-window.onbeforeunload = function () {
-    if (webSocket) {
-        webSocket.close();
-    }
-};
-
-function showReacentPastData(time){
+function showRecentPastData(time){
     var numOfFloors = floorData.length;
     var tmp = 11-time;
     for (var i = 0; i < numOfFloors; i++) {
@@ -151,3 +115,86 @@ function clearCanvas(cnv) {
 
     ctx.restore();        // restore the transform
 }
+
+var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortBy) {
+    var providerData = null;
+    var providerUrl = context + '/api/batch-provider?action=getLatestUpdate&tableName=' + tableName;
+
+    if (timeFrom && timeTo) {
+        providerUrl += '&timeFrom=' + timeFrom + '&timeTo=' + timeTo;
+    }
+    if (start) {
+        providerUrl += "&start=" + start;
+    }
+    if (limit) {
+        providerUrl += "&limit=" + limit;
+    }
+    if (sortBy) {
+        providerUrl += "&sortBy="  +sortBy
+    }
+    $.ajax({
+        url:providerUrl,
+        method: "GET",
+        contentType: "application/json",
+        async: false,
+        success: function (data) {
+            providerData = data;
+        },
+        error : function (err) {
+            console.log(err);
+        }
+    });
+    return providerData;
+};
+
+function getRecentPastdata(numOfFloors){
+    var currentTime = new Date();
+    var oldTime = currentTime.getTime();
+    currentTime.setMinutes(currentTime.getMinutes() - 30);
+
+    for (var x=0; x<numOfFloors;x++){
+        floorData[x]= getProviderData("ORG_WSO2_FLOOR_PERFLOOR_SENSORSTREAM", currentTime.getTime(), oldTime, 0, 10, "DESC").reverse();
+
+    }
+    showRecentPastData(10);
+
+}
+
+$(document).ready(function () {
+
+    $(".slider-wrapper").show(1000);
+
+    rangeSlider = $("#range-slider").bootstrapSlider();
+    rangeSlider.bootstrapSlider('setAttribute', 'min', 1);
+    rangeSlider.bootstrapSlider('setValue', 10);
+    var url = "ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
+    var numOfFloors = $("#buildingView").data("num_of_floors");
+
+    createWebSocket(url);
+    createDataArrays(numOfFloors);
+    getRecentPastdata(numOfFloors);
+
+    $('#range-slider').on("slide", function () {}).on("change", function () {
+        var time = rangeSlider.bootstrapSlider("getValue");
+        showRecentPastData(time);
+    });
+
+    $('input[name="daterange"]').datepicker({
+        orientation: "auto",
+        endDate: "+0d"
+    }).on("changeDate", function (e) {
+
+    });
+
+
+    $("#historic-toggle").click(function () {
+        $(".date-picker").slideToggle("slow");
+    });
+
+});
+
+window.onbeforeunload = function () {
+    if (webSocket) {
+        webSocket.close();
+    }
+};
