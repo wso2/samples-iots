@@ -19,6 +19,7 @@
  */
 (function () {
 
+
     response.contentType = 'application/json';
     var tableName = request.getParameter("tableName");
     var action = request.getParameter("action");
@@ -59,8 +60,14 @@
                 "DESC");
         }
         print(data);
+    }else if (action === 'getLatestUpdate') {
+
+        var data;
+        data = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, sortBy);
+        var log = new Log();
+        log.info(data);
+        print(data);
     }
 }());
-
 
 %>
