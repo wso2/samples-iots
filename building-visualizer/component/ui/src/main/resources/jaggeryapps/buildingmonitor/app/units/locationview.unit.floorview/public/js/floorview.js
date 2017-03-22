@@ -95,7 +95,7 @@ function hidePopup() {
 			$('#image').css('cursor', 'default');
 		} else {
 			isAddDeviceMode = true;
-			$('#image').css('cursor', 'url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/9632/happy.png"),auto');
+			$('#image').css('cursor', 'crosshair');
 			$("#device").text("Cancel");
 		}
 	});

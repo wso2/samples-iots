@@ -395,7 +395,7 @@ var summerHtmlImageMapCreator = (function() {
 				domElements.container.style.height = height + 'px';
 				return this;
 			},
-			loadImage : function(url) {
+			loadImage : function() {
 				state.image.src = domElements.img.src;
 				domElements.img.onload = function() {
 					app.show()
