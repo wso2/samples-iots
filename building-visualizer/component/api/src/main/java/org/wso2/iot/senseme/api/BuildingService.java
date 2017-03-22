@@ -104,7 +104,7 @@ public interface BuildingService {
                     })
             }
     )
-    Response getRegisteredBuildings(@PathParam("buildingId") int buildingId);
+    Response getRegisteredBuilding(@PathParam("buildingId") int buildingId);
 
     /**
      * To update building image into db

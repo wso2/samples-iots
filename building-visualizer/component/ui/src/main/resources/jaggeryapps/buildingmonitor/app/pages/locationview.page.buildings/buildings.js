@@ -44,9 +44,20 @@ function onRequest(context) {
 		url, function (responsePayload) {
 			var building = JSON.parse(responsePayload.responseText);
 			viewModel["floorCount"] = building.numFloors;
+
 		},
 		function (responsePayload) {
 			viewModel["floorCount"] = "0";
+		}
+	);
+
+	serviceInvokers.XMLHttp.get(
+		url+"/floors", function (responsePayload) {
+			viewModel["floorsWithImages"] = JSON.parse(responsePayload.responseText);
+			console.log(responsePayload.responseText);
+		},
+		function (responsePayload) {
+			viewModel["floorsWithImages"] = "0";
 		}
 	);
 	new Log().error(viewModel);
