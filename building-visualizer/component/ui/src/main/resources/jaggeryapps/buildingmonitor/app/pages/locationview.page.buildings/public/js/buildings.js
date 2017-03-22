@@ -1,10 +1,11 @@
 var webSocket;
 var floorData = [];
+var rangeSlider;
 
 $(document).ready(function () {
 
     $(".slider-wrapper").show(1000);
-    var rangeSlider = $("#range-slider").bootstrapSlider();
+    rangeSlider = $("#range-slider").bootstrapSlider();
     rangeSlider.bootstrapSlider('setAttribute', 'min', 1);
     rangeSlider.bootstrapSlider('setValue', 10);
     var url = "ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
@@ -12,11 +13,9 @@ $(document).ready(function () {
     var numOfFloors = $("#buildingView").data("num_of_floors");
     createDataArrays(numOfFloors);
 
-    $('#range-slider').on("slide", function () {
-        console.log(rangeSlider.bootstrapSlider("getValue"));
-
-    }).on("change", function () {
-        console.log("slider changing")
+    $('#range-slider').on("slide", function () {}).on("change", function () {
+        var time = rangeSlider.bootstrapSlider("getValue");
+        showReacentPastData(time);
     });
 
     $('input[name="daterange"]').datepicker({
@@ -38,6 +37,16 @@ window.onbeforeunload = function () {
         webSocket.close();
     }
 };
+
+function showReacentPastData(time){
+    var numOfFloors = floorData.length;
+    var tmp = 11-time;
+    for (var i = 0; i < numOfFloors; i++) {
+        var index = floorData[i].length-tmp;
+        displyaData(i+1,floorData[i][index]);
+    }
+
+}
 
 function createDataArrays(val){
     for (var i = 0; i < val; i++) {
@@ -89,6 +98,7 @@ function createWebSocket(host) {
 }
 
 function reatTimeDataHandler(data){
+    rangeSlider.bootstrapSlider('setValue', 10);
     var buildingId = getUrlVar("buildingId");
     if(data.building === "WSO2"){
         var floorId = data.floor;
@@ -96,26 +106,48 @@ function reatTimeDataHandler(data){
             floorId="1";
         }
         var fId = parseInt(floorId)-1;
-        if (floorData[fId].length>=10){
+        if (floorData[fId].length==10){
             floorData[fId].shift();
             floorData[fId].push(data);
         }else{
             floorData[fId].push(data);
         }
-
-        var canvas = document.getElementById(floorId);
-        var ctx = canvas.getContext("2d");
-        ctx.font = "14px Arial";
-        ctx.fillText("Temperature: " + data.temperature,10,10);
-        ctx.fillText("Air Quality: " + data.airQuality,10,30);
-        ctx.fillText("Humidity: " + data.humidity,10,50);
-        ctx.fillText("Light: " + data.light,10,70);
-        ctx.fillText("Motion: " + data.motion,10,90);
-
+        displyaData(floorId,data);
     }
 }
 
 function getUrlVar(key){
     var result = new RegExp(key + "=([^&]*)", "i").exec(window.location.search);
     return result && unescape(result[1]) || "";
+}
+
+function displyaData(floorId,data){
+
+    var canvas = document.getElementById(floorId);
+    clearCanvas(canvas);
+    var ctx = canvas.getContext("2d");
+    if (data!=null){
+        ctx.font = "14px Arial";
+        ctx.fillText("Temperature: " + data.temperature,10,10);
+        ctx.fillText("Air Quality: " + data.airQuality,10,30);
+        ctx.fillText("Humidity: " + data.humidity,10,50);
+        ctx.fillText("Light: " + data.light,10,70);
+        ctx.fillText("Motion: " + data.motion,10,90);
+    }else{
+        ctx.font = "14px Arial";
+        ctx.fillText("No value",10,10);
+    }
+
+}
+
+function clearCanvas(cnv) {
+    var ctx = cnv.getContext('2d');     // gets reference to canvas context
+    ctx.beginPath();    // clear existing drawing paths
+    ctx.save();         // store the current transformation matrix
+
+    // Use the identity matrix while clearing the canvas
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, cnv.width, cnv.height);
+
+    ctx.restore();        // restore the transform
 }
