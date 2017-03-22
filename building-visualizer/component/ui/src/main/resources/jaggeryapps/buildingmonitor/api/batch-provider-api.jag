@@ -45,6 +45,8 @@
                 data = data.concat(newData);
                 start += 100;
             }
+        } else {
+            data = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, sortBy);
         }
         print(data);
     }
