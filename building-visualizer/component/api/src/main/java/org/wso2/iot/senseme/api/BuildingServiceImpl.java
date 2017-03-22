@@ -124,7 +124,7 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @GET
-    @Path("/{buildingId}")
+    @Path("/{buildingId}/floors")
     @Produces("application/json")
     @Override
     public Response getAvailableFloors(@PathParam("buildingId") int buildingId) {
@@ -144,7 +144,7 @@ public class BuildingServiceImpl implements BuildingService {
     @Path("/{buildingId}")
     @Produces("application/json")
     @Override
-    public Response getRegisteredBuildings(@PathParam("buildingId") int buildingId){
+    public Response getRegisteredBuilding(@PathParam("buildingId") int buildingId){
         try {
             buildingDAOManager.getBuildingDAOHandler().openConnection();
             BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);

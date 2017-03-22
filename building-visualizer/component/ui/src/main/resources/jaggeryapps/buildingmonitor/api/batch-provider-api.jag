@@ -19,6 +19,7 @@
  */
 (function () {
 
+
     response.contentType = 'application/json';
     var tableName = request.getParameter("tableName");
     var action = request.getParameter("action");
@@ -45,10 +46,28 @@
                 data = data.concat(newData);
                 start += 100;
             }
+        } else {
+            data = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, sortBy);
         }
+        print(data);
+    } else if (action == 'getHistoricalData') {
+        var hourToMilliSeconds = 3600000;
+        var data = [];
+        for (var i = 0; i < 25; i++) {
+            var startTime = parseFloat(timeFrom) + hourToMilliSeconds * i;
+            var endTime = parseFloat(timeFrom) + hourToMilliSeconds * (i + 1);
+            data[i] = providerAPI.getData(tableName, buildingId, floorId, String(startTime), String(endTime), 0, 20,
+                "DESC");
+        }
+        print(data);
+    }else if (action === 'getLatestUpdate') {
+
+        var data;
+        data = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, sortBy);
+        var log = new Log();
+        log.info(data);
         print(data);
     }
 }());
-
 
 %>
