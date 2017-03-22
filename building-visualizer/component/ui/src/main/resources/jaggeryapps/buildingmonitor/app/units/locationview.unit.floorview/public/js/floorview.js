@@ -33,6 +33,8 @@
         minOpacity: 0,
         blur: .75
     };
+    var historicalData = [];
+    var recentPastData = [];
     var selectedDate;
 
 
@@ -312,16 +314,16 @@
             endDate: "+0d",
             autoclose: true
         }).on("changeDate", function(e) {
-            // var endDate = new Date(e.date);
-            // endDate.setHours(endDate.getHours() + 24);
             selectedDate = e.date;
-            var endDate = new Date(e.date);
-            endDate.setHours(endDate.getHours() + 24);
+            var date = new Date(e.date);
+            date.setHours(date.getHours()-1);
+            console.log(date.getTime());
 
-            var fromDate = new Date(e.date);
-            fromDate.setHours(fromDate.getHours() + 23);
-            var historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", fromDate.getTime(), endDate.getTime());
-            updateHistoricData(historicalData);
+            var date = new Date(e.date);
+            console.log("xxx" + date.getTime());
+
+            historicalData = getHistoricalData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+            updateHistoricData(historicalData[currentSliderValue]);
         });
 
         $('#image canvas').addClass('hidden');
@@ -464,15 +466,8 @@
                 }
             }
         } else {
-            var max =  historicalSlider.bootstrapSlider("getAttribute", 'max');
-            var min = historicalSlider.bootstrapSlider("getAttribute", 'min');
             currentSliderValue = historicalSlider.bootstrapSlider("getValue");
-            var endDate = new Date(selectedDate);
-            endDate.setHours(endDate.getHours() + currentSliderValue);
-            var fromDate = new Date(selectedDate);
-            fromDate.setHours(fromDate.getHours() + currentSliderValue -1);
-            var historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", fromDate.getTime(), endDate.getTime(), 0, 20, "DESC");
-            updateHistoricData(historicalData);
+            updateHistoricData(historicalData[currentSliderValue]);
         }
     };
 
@@ -597,9 +592,13 @@
                 case "Humidity" : humidityMapInstance.setData({data:[]});break;
                 case "Light" : lightMapInstance.setData({data:[]}); break;
             }
+            historicalSlider.bootstrapSlider("setValue", historicalSlider.bootstrapSlider("getAttribute", "max"));
+            currentSliderValue = historicalSlider.bootstrapSlider("getValue");
         } else {
             $("#live-view").removeClass("hidden");
             $("#historical-view").addClass("hidden");
+            rangeSlider.bootstrapSlider("setValue", rangeSlider.bootstrapSlider("getAttribute", "max"));
+            currentSliderValue = rangeSlider.bootstrapSlider("getValue");
             updateHeatMap();
         }
     });
@@ -648,6 +647,35 @@
         }
         if (sortBy) {
             providerUrl += "&sortBy="  +sortBy
+        }
+        $.ajax({
+            url:providerUrl,
+            method: "GET",
+            contentType: "application/json",
+            async: false,
+            success: function (data) {
+                providerData = data;
+            },
+            error : function (err) {
+                notifyUser(err, "danger", DANGER_TIMEOUT, "top-center");
+            }
+        });
+        return providerData;
+    };
+
+    /**
+     * To get the historical data for a certain period of time.
+     * @param tableName Name of the table to fetch the data from
+     * @param timeFrom Start time
+     * @param timeTo End time
+     *
+     */
+    var getHistoricalData = function (tableName, timeFrom) {
+        var providerData = null;
+        var providerUrl = context + '/api/batch-provider?action=getHistoricalData&tableName=' + tableName;
+
+        if (timeFrom) {
+            providerUrl += '&timeFrom=' + timeFrom;
         }
         $.ajax({
             url:providerUrl,

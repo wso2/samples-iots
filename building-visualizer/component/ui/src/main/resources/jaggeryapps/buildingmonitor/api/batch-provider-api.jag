@@ -49,6 +49,16 @@
             data = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, sortBy);
         }
         print(data);
+    } else if (action == 'getHistoricalData') {
+        var hourToMilliSeconds = 3600000;
+        var data = [];
+        for (var i = 0; i < 25; i++) {
+            var startTime = parseFloat(timeFrom) + hourToMilliSeconds * i;
+            var endTime = parseFloat(timeFrom) + hourToMilliSeconds * (i + 1);
+            data[i] = providerAPI.getData(tableName, buildingId, floorId, String(startTime), String(endTime), 0, 20,
+                "DESC");
+        }
+        print(data);
     }
 }());
 
