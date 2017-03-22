@@ -10,6 +10,10 @@
 define stream dataIn (deviceId string, avgTemperature double, avgMotion double, avgHumidity double, avgAirQuality
 double, avgLight double, timeStamp long);
 
+@Import('org.wso2.floor.summarized.SensorStream:1.0.0')
+define stream summarizedDataIn (deviceId string, temperature double, motion double, humidity double, airQuality double,
+light double, timeStamp long);
+
 @Export('org.wso2.floor.device.SensorStream:1.0.0')
 define stream dataOut (deviceId string, temperature double, motion double, humidity double, airQuality
 double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
@@ -26,9 +30,9 @@ select d.deviceId as deviceId, d.avgTemperature as temperature, d.avgMotion as m
 .avgAirQuality as  airQuality, d.avgLight as light, d.timeStamp as timeStamp, l.buildingId as buildingId,
 l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into dataOut;
 
-from dataIn as d join deviceLocationTable as l on d.deviceId == l.deviceId
-select d.deviceId as deviceId, d.avgTemperature as temperature, d.avgMotion as motion, d.avgHumidity as humidity, d
-.avgAirQuality as  airQuality, d.avgLight as light, d.timeStamp as timeStamp, l.buildingId as buildingId,
+from summarizedDataIn as d join deviceLocationTable as l on d.deviceId == l.deviceId
+select d.deviceId as deviceId, d.temperature as temperature, d.motion as motion, d.humidity as humidity, d
+.airQuality as  airQuality, d.light as light, d.timeStamp as timeStamp, l.buildingId as buildingId,
 l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into summarizedDataOut;
 
 from dataIn
