@@ -375,7 +375,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             properties.add(yCoordinate);
 
             device.setProperties(properties);
-            device.setName(senseMe.getDeviceName());
+            device.setName(senseMe.getDeviceId());
             device.setType(DeviceTypeConstants.DEVICE_TYPE);
             enrolmentInfo.setOwner(APIUtil.getAuthenticatedUser());
             device.setEnrolmentInfo(enrolmentInfo);

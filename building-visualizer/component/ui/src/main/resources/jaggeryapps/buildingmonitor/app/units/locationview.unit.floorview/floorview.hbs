@@ -44,6 +44,17 @@
             </span>
         </a>
     </li>
+    <li>
+        <a href="#" id = "add-device" class="show-device">
+            <span class="icon fw-stack">
+                <i class="fw  fw-stack-1x"></i>
+                <i class="fw fw-circle-outline fw-stack-2x"></i>
+            </span>
+            <span id ="device">
+            Add a device
+            </span>
+        </a>
+    </li>
 {{/zone}}
 
 <form class="form-horizontal hidden" id = "radio-selections">
@@ -68,14 +79,39 @@
         </div>
     </div>
 </form>
-<!--end of image drag drop-->
-<div id="image" buildingId ="{{buildingId}}" floorId="{{floorId}}">
-    <img id = "floor-image" src="data:image/png;base64,{{imageObj}}" alt="#" id="img"/>
-    <!--<canvas id="heatmap"> </canvas>-->
+<div id="device-response-template" style="display: none">
+    <div class="row">
+        <div class="col-lg-5 col-md-6 col-centered">
+            <form action="" method="post" id="register-form-'+ markerId +'" novalidate="novalidate">
+                <div class="form-group">
+                    <label for="deviceId">Device Claim Id *</label>
+                    <input type="text" class="form-control" id="deviceId" name="deviceId" >
+                </div>
+                <div id="device-button" class="form-group">
+                    <button id="enrolldevice" type="button" class="btn btn-primary" onclick="addDevice()" data-toggle="update-data">Enroll Device</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-<div id="heat-map-hidden" class="hidden"></div>
+
+<div class="row">
+    <div class="col-lg-5 col-md-6 col-centered">
+        <div id="coords" style="display:none"></div>
+        <!--end of image drag drop-->
+        <div id="image" buildingId ="{{buildingId}}" floorId="{{floorId}}" url="{{@unit.publicUri}}">
+            <img src="data:image/png;base64,{{imageObj}}" alt="#" id="img"/>
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny" id="svg">
+            </svg>
+            <!--<canvas id="heatmap"> </canvas>-->
+        </div>
+        <div id="heat-map-hidden" class="hidden"></div>
+    </div>
+</div>
+
 
 {{unit "locationview.unit.ui.analytics.rangeSelector"}}
 {{~#zone "bottomJs"}}
     {{js "js/floorview.js"}}
+    {{js "js/summerHTMLImageMapCreator.js"}}
 {{/zone}}

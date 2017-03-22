@@ -24,10 +24,18 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.http.protocol.ResponseServer;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.device.mgt.common.Device;
+import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
+import org.wso2.carbon.device.mgt.common.DeviceManagementException;
+import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroup;
+import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
+import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAO;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAOManager;
 import org.wso2.iot.senseme.api.dto.BuildingInfo;
 import org.wso2.iot.senseme.api.dto.FloorInfo;
+import org.wso2.iot.senseme.api.dto.SenseMe;
+import org.wso2.iot.senseme.api.util.APIUtil;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -35,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -228,5 +237,34 @@ public class BuildingServiceImpl implements BuildingService {
         }catch (Exception e){
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();        }
+    }
+
+    @Override
+    @Path("/{buildingId}/{floorId}/devices")
+    @GET
+    @Produces("application/json")
+    public Response getDevices(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId) {
+        try {
+            String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+            DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
+            List<SenseMe> senseMes = new ArrayList<>();
+            if (floorDeviceGroup != null) {
+                List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
+                        floorDeviceGroup.getGroupId(),
+                        0, 1000);
+                for (Device device : devices) {
+                    device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
+                            device.getDeviceIdentifier(), device.getType()));
+                    senseMes.add(new SenseMe(device));
+                }
+            }
+            return Response.status(Response.Status.OK).entity(senseMes).build();
+        } catch (GroupManagementException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } catch (DeviceManagementException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        }
     }
 }

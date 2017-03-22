@@ -1,3 +1,37 @@
+var modalPopup = ".modal";
+var modalPopupContainer = modalPopup + " .modal-content";
+var modalPopupContent = modalPopup + " .modal-content";
+var isAddDeviceMode =false;
+
+/*
+ * set popup maximum height function.
+ */
+function setPopupMaxHeight() {
+	var maxHeight = "max-height";
+	var marginTop = "margin-top";
+	var body = "body";
+	$(modalPopupContent).css(maxHeight, ($(body).height() - ($(body).height() / 100 * 30)));
+	$(modalPopupContainer).css(marginTop, (-($(modalPopupContainer).height() / 2)));
+}
+
+/*
+ * show popup function.
+ */
+function showPopup() {
+	$(modalPopup).modal('show');
+}
+
+/*
+ * hide popup function.
+ */
+function hidePopup() {
+	$(modalPopupContent).html("");
+	$(modalPopupContent).removeClass("operation-data");
+	$(modalPopup).modal('hide');
+	$('body').removeClass('modal-open').css('padding-right','0px');
+	$('.modal-backdrop').remove();
+}
+
 (function (window, document, context) {
     var webSockets = [];
     var DANGER_TIMEOUT = 20000;
@@ -35,7 +69,6 @@
     };
     var selectedDate;
 
-
     $("#show-analytics").on('click', function () {
         if ($("#show-analytics").hasClass("show-analytics")) {
             $("#radio-selections").removeClass("hidden");
@@ -53,6 +86,18 @@
             $('.slider-wrapper').hide(1000);
         }
     });
+
+	$("#add-device").on('click', function () {
+		if (isAddDeviceMode) {
+			isAddDeviceMode = false;
+			$("#device").text("Add a device");
+			$('#image').css('cursor', 'default');
+		} else {
+			isAddDeviceMode = true;
+			$('#image').css('cursor', 'url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/9632/happy.png"),auto');
+			$("#device").text("Cancel");
+		}
+	});
 
     /**
      * Creates the heatMap.
@@ -257,8 +302,6 @@
         createHeatMap();
         floorId = $("#image").attr("floorId");
         buildingId = $("#image").attr("buildingId");
-        console.log(floorId);
-        console.log(buildingId);
         buildingId = "WSO2";
         floorId = "5th floor";
 
@@ -643,6 +686,10 @@
         }
     });
 
+	//$('#image').bind('click', function (ev) {
+	//
+	//});
+
     var updateHeatMap = function () {
         switch (currentSelection) {
             case "Temperature" :
@@ -664,6 +711,7 @@
         }
 
     };
+
 
     /**
      * To get the historical data for a certain period of time.
@@ -702,4 +750,70 @@
         });
         return providerData;
     };
+
+	loadDevices();
 }(window, document, context));
+
+function addDevice () {
+	var deviceIdValue = document.getElementsByName('deviceId')[0].value;;
+	var xCordValue = document.getElementsByName('xCord')[0].value;;
+	var yCordValue = document.getElementsByName('yCord')[0].value;;
+	var floorIdValue = $("#image").attr("floorId");
+	var buildingIdValue = $("#image").attr("buildingId");
+	var deviceData = {deviceId:deviceIdValue, buildingId:buildingIdValue, floorNumber:floorIdValue, xCord:xCordValue, yCord:yCordValue };
+	var addDeviceApi = "/senseme/device/enroll";
+	invokerUtil.post(addDeviceApi, deviceData, function(data, textStatus, jqXHR){
+		if (jqXHR.status == 200) {
+			placeDevice(deviceId, xCordValue, yCordValue)
+		}
+	}, function(jqXHR){
+		if (jqXHR.status == 400) {
+			console.log("error")
+		} else {
+			var response = JSON.parse(jqXHR.responseText).message;
+
+		}
+	},"application/json","application/json");
+	hidePopup();
+}
+
+
+function placeDevice(deviceId, x, y, status) {
+
+	var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+	rect.setAttributeNS(null,"id", "myrect-" + deviceId);
+	rect.setAttributeNS(null,"fill", "grey");
+	if (status) {
+		if (status == "ACTIVE") {
+			rect.setAttributeNS(null,"fill", "blue");
+		} else if (status == "FAULT") {
+			rect.setAttributeNS(null,"fill", "red");
+		}
+	}
+	rect.setAttributeNS(null,"stroke", "black");
+	rect.setAttributeNS(null,"stroke-width", "5");
+	rect.setAttributeNS(null,"x", x);
+	rect.setAttributeNS(null,"y", y);
+	rect.setAttributeNS(null,"width", "30");
+	rect.setAttributeNS(null,"height", "30");
+	var svg = document.getElementById("svg");
+	svg.appendChild(rect);
+}
+
+function loadDevices() {
+	var floorIdValue = $("#image").attr("floorId");
+	var buildingIdValue = $("#image").attr("buildingId");
+	var deviceApi = "/senseme/building/" + buildingIdValue + "/" + floorIdValue + "/devices";
+	invokerUtil.get(deviceApi, function (data, textStatus, jqXHR) {
+		if (jqXHR.status == 200) {
+			var devices = JSON.parse(data);
+			for(var i = 0; i < devices.length; i++) {
+				var device = devices[i];
+				console.log(device);
+				placeDevice(device.deviceId, device.xCord, device.yCord, device.status);
+			}
+		}
+	}, function (jqXHR) {
+	}, "application/json");
+}
+

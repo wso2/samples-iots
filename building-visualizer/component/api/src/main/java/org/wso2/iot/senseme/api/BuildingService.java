@@ -237,4 +237,22 @@ public interface BuildingService {
 
     Response getAvailableFloors(@PathParam("buildingId") int buildingId);
 
+    @Path("/{buildingId}/{floorId}/devices")
+    @GET
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Get devices for the floor",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+    Response getDevices(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId);
+
 }
