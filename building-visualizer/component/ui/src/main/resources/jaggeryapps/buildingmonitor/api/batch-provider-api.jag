@@ -30,6 +30,7 @@
     var sortBy = request.getParameter("sortBy");
     var buildingId = request.getParameter("buildingId");
     var floorId = request.getParameter("floorId");
+    var floorCount = request.getParameter("floorCount");
 
     var providerAPI = require('/app/modules/batch-provider-api.js');
     if (action === 'getData') {
@@ -75,17 +76,24 @@
         }
         print(data);
     } else if (action === 'getCount') {
-        var newData = [];
         var data = [];
-        start = 0;
-        limit = 100;
+        var newData = [];
 
-        while (newData.length == 100 || start == 0) {
-            newData = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, "DESC");
-            data = data.concat(newData);
-            start += 100;
+        for (var i = 0; i < parseInt(floorCount); i++) {
+            start = 0;
+            data[i] = 0;
+            while (newData.length == 100 || start == 0) {
+                var timeFrom = new Date();
+                timeFrom.setHours(timeFrom.getHours - 24);
+
+                var timeTo = new Date();
+                newData = providerAPI.getData(tableName, buildingId, String(i + 1), timeFrom.getTime(), timeTo
+                    .getTime(), start, limit, "DESC");
+                data[i] += newData.length;
+                start += 100;
+            }
         }
-        print(data.length);
+        print(data);
     }
 }());
 

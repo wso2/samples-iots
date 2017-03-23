@@ -183,7 +183,7 @@ function getRecentPastdata(numOfFloors) {
     showRecentPastData(sliderPointMax);
 }
 
-function setRealViewSlider(){
+function setRealViewSlider() {
     rangeSlider = $("#range-slider").bootstrapSlider();
     rangeSlider.bootstrapSlider('setAttribute', 'min', sliderPointMin);
     rangeSlider.bootstrapSlider('setValue', sliderPointMax);
@@ -201,14 +201,14 @@ $(document).ready(function () {
     setRealViewSlider();
     var analyticsUrl = "wss://localhost:9445";
     $.ajax({
-        url:context + '/api/analytics/',
+        url: context + '/api/analytics/',
         method: "GET",
         contentType: "application/json",
         async: false,
         success: function (data) {
             analyticsUrl = data;
         },
-        error : function (err) {
+        error: function (err) {
         }
     });
     var url = analyticsUrl + "/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
@@ -234,7 +234,34 @@ $(document).ready(function () {
     $("#historic-toggle").click(function () {
         $(".date-picker").slideToggle("slow");
     });
+
+    updateAlertCount();
 });
+
+var updateAlertCount = function () {
+    var providerData = null;
+    var providerUrl = context + '/api/batch-provider?action=getCount&tableName=ORG_WSO2_FLOOR_ALERTNOTIFICATIONS&buildingId=' + getUrlVar("buildingId") + "&floorCount=" + floorData.length;
+
+    $.ajax({
+        url: providerUrl,
+        method: "GET",
+        contentType: "application/json",
+        async: false,
+        success: function (data) {
+            providerData = data;
+
+            for (var i = 0; i < floorData.length; i++) {
+                if (providerData[i] > 0) {
+                    $("#alerts_" + (i + 1)).html("You have " + providerData[i] + " new alerts in this floor.");
+                    $("#div_" + (i + 1)).removeClass("message-success").addClass("message-danger");
+                }
+            }
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+};
 
 window.onbeforeunload = function () {
     if (webSocket) {
