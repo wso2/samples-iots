@@ -538,7 +538,7 @@ function hidePopup() {
 
             if (currentTime - lastFetchedTime > minuteToMilliseconds) {  var date = new Date();
                 date.setMinutes(date.getMinutes() - 210);
-                recentPastData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+                recentPastData = getHistoricalData("getRecentPastData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
                 lastFetchedTime = new Date().getTime();
             }
             var max = rangeSlider.bootstrapSlider("getAttribute", 'max');
@@ -659,21 +659,7 @@ function hidePopup() {
                         break;
                 }
             } else {
-                var min  = rangeSlider.bootstrapSlider("getAttribute", "min");
-                switch (currentSelection) {
-                    case "Temperature" :
-                        temperatureMapInstance.setData(temperatureMapData[min * -1 + currentSliderValue]);
-                        break;
-                    case "Motion" :
-                        motionMapInstance.setData(motionMapData[min * -1 + currentSliderValue]);
-                        break;
-                    case "Humidity" :
-                        humidityMapInstance.setData(humidityMapData[min * -1 + currentSliderValue]);
-                        break;
-                    case "Light" :
-                        lightMapInstance.setData(lightMapData[min * -1 +  currentSliderValue]);
-                        break;
-                }
+                updateHeatMapOnSlideChange();
             }
         } else {
             updateHeatMapOnSlideChange();
