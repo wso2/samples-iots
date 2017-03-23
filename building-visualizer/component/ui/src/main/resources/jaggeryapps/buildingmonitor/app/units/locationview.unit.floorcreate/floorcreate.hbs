@@ -19,36 +19,23 @@
     {{~css "css/floorcreate.css"}}
 {{/zone}}
 
-{{#zone "navbarActions"}}
-    <li>
-        <!--suppress HtmlUnknownTarget -->
-        <a href="{{@app.context}}/buildings?buildingId={{buildingId}}" class="cu-btn">
-        <span class="icon fw-stack">
-            <i class="fw fw-left fw-stack-1x"></i>
-            <i class="fw fw-circle-outline fw-stack-2x"></i>
-        </span>
-            Goto Building View
-        </a>
-    </li>
-{{/zone}}
-
 <div class="row">
     <div class="col-lg-5 col-md-6 col-centered">
         {{#if errorMessage}}
-            <div class="alert alert-danger" role="alert" id="error-div">
+            <div class="alert alert-danger" role="alert" id="error-div-plan-{{floorId}}">
         {{else}}
-            <div class="alert alert-danger hide" role="alert" id="error-div">
+            <div class="alert alert-danger hide" role="alert" id="error-div-plan-{{floorId}}">
         {{/if}}
             <i class="icon fw fw-error"></i><strong>Error!</strong>
-            <span id = "error-message">{{errorMessage}}</span>
+            <span id = "error-message-plan-{{floorId}}">{{errorMessage}}</span>
         </div>
-        <form id = "floor-plan-upload" class="form-horizontal" method="post" action="{{@app.context}}/api/floor/{{buildingId}}/{{floorId}}" enctype="multipart/form-data">
+        <form id = "plan-{{floorId}}" class="form-horizontal" method="post" action="{{@app.context}}/api/floor/{{buildingId}}/{{floorId}}" enctype="multipart/form-data">
             <div class="form-group">
                 <div class="col-sm-12">
                     <label class="control-label">Please select a floor plan</label>
                     <div class="input-group input-wrap file-upload-control">
                         <input type="text" class="form-control" readonly="">
-                        <input type="file" class="form-control"  id = "files" name="files">
+                        <input type="file" class="form-control files"  id = "plan-{{floorId}}" name="files">
                         <div class="input-group-btn">
                             <button class="btn browse" type="button" title="Browse File">
                                 <i class="fw fw-file-browse" aria-hidden="true"></i>
@@ -57,7 +44,7 @@
                         </div>
                         <div class="input-group-btn"></div>
                         <div class="input-group-btn">
-                            <button class="btn btn-default btn-primary" type="button" title="Upload" id = "file-upload">
+                            <button class="btn btn-default btn-primary file-upload" type="button" title="Upload" id = "plan-{{floorId}}">
                                 <i class="fw fw-upload" aria-hidden="true"></i>
                                 <span class="hidden-xs">Upload</span>
                             </button>
@@ -66,7 +53,7 @@
                 </div>
 
                 <div class="form-group col-sm-12">
-                    <img id="floor-plan-preview" src="#" class="hidden" title = "Floor plan preview"/>
+                    <img id="floor-plan-preview-plan-{{floorId}}" src="#" class="hidden" title = "Floor plan preview"/>
                 </div>
             </div>
         </form>

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-function onRequest() {
+function onRequest(context) {
     var constants = require("/app/modules/constants.js");
     var userModule = require("/app/modules/business-controllers/user.js")["userModule"];
     var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
@@ -29,8 +29,8 @@ function onRequest() {
         response.sendRedirect(devicemgtProps["appContext"] + "devices");
         return;
     }
-	var buildingId = request.getParameter("buildingId");
-	var floorId = request.getParameter("floorId");
+	var buildingId = context.unit.params.buildingId;
+	var floorId = context.unit.params.floorId;
 
 	var viewModel = {};
 	viewModel["buildingId"] = buildingId;
