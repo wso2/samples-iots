@@ -32,8 +32,6 @@
     var floorId = request.getParameter("floorId");
     var floorCount = request.getParameter("floorCount");
 
-    var buildingSet = request.getParameter("buildingSet");
-
     var providerAPI = require('/app/modules/batch-provider-api.js');
     if (action === 'getData') {
         if (!limit) {
@@ -62,10 +60,13 @@
         }
         print(data);
     } else if (action === 'getLatestUpdate') {
-        var data;
-        data = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, sortBy);
-        var log = new Log();
-        log.info(data);
+        var fd = parseInt(floorCount);
+        var data =[];
+        for (var i = 1; i < fd+1; i++) {
+            data[i-1] = providerAPI.getData(tableName, buildingId, i, timeFrom, timeTo, start, limit, sortBy);
+
+        }
+
         print(data);
     } else if (action === 'getRecentPastData') {
         var minutesToMilliSeconds = 1800000;
@@ -94,28 +95,6 @@
                 data[i] += newData.length;
                 start += 100;
             }
-        }
-        print(data);
-    } else if (action === 'getMapAlertCount') {
-        var data = [];
-        var newData = [];
-        var buildingSet = buildingSet.split(",");
-
-        for (var i in buildingSet) {
-
-            new Log().info("here");
-            start = 0;
-            data[i] = 0;
-            while (newData.length == 100 || start == 0) {
-                var timeFrom = new Date();
-                timeFrom.setHours(timeFrom.getHours - 24);
-                var timeTo = new Date();
-                newData = providerAPI.getData(tableName, buildingSet[i], null, timeFrom.getTime(), timeTo
-                    .getTime(), start, limit, "DESC");
-                data[i] += newData.length;
-                start += 100;
-            }
-
         }
         print(data);
     }
