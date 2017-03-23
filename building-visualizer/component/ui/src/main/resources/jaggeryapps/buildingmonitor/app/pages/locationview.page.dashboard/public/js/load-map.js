@@ -24,48 +24,51 @@ var buildingsMap = [];
 var modalPopup = ".modal";
 var modalPopupContainer = modalPopup + " .modal-content";
 var modalPopupContent = modalPopup + " .modal-content";
+var buildingAlertCount = [];
 
 /*
  * set popup maximum height function.
  */
 function setPopupMaxHeight() {
-	var maxHeight = "max-height";
-	var marginTop = "margin-top";
-	var body = "body";
-	$(modalPopupContent).css(maxHeight, ($(body).height() - ($(body).height() / 100 * 30)));
-	$(modalPopupContainer).css(marginTop, (-($(modalPopupContainer).height() / 2)));
+    var maxHeight = "max-height";
+    var marginTop = "margin-top";
+    var body = "body";
+    $(modalPopupContent).css(maxHeight, ($(body).height() - ($(body).height() / 100 * 30)));
+    $(modalPopupContainer).css(marginTop, (-($(modalPopupContainer).height() / 2)));
 }
 
 /*
  * show popup function.
  */
 function showPopup() {
-	$(modalPopup).modal('show');
+    $(modalPopup).modal('show');
 }
 
 /*
  * hide popup function.
  */
 function hidePopup() {
-	$(modalPopupContent).html("");
-	$(modalPopupContent).removeClass("operation-data");
-	$(modalPopup).modal('hide');
-	$('body').removeClass('modal-open').css('padding-right','0px');
-	$('.modal-backdrop').remove();
+    $(modalPopupContent).html("");
+    $(modalPopupContent).removeClass("operation-data");
+    $(modalPopup).modal('hide');
+    $('body').removeClass('modal-open').css('padding-right', '0px');
+    $('.modal-backdrop').remove();
 }
 
 function loadLeafletMap() {
-	var deviceLocationID = "#device-location"
-	container = "device-location",
-		zoomLevel = 13,
-		tileSet = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-		attribution = "&copy; <a href='https://openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
-	map = L.map(container).locate({setView: true, maxZoom: 17, animate: true, duration: 3});
-	L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
-	setTimeout(function(){ map.invalidateSize()}, 400);
+    var deviceLocationID = "#device-location"
+    container = "device-location",
+        zoomLevel = 13,
+        tileSet = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attribution = "&copy; <a href='https://openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
+    map = L.map(container).locate({setView: true, maxZoom: 17, animate: true, duration: 3});
+    L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
+    setTimeout(function () {
+        map.invalidateSize()
+    }, 400);
 
-	//TODo : When loading the map, call to backend and get all the buildings available and show them on the map.
-	preLoadBuildings();
+    //TODo : When loading the map, call to backend and get all the buildings available and show them on the map.
+    preLoadBuildings();
 }
 
 function preLoadBuildings() {
@@ -81,9 +84,10 @@ function preLoadBuildings() {
     var getBuildingApi = "/senseme/building";
     invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
         if (jqXHR.status == 200) {
+            var buildingIds;
             //[{"buildingId":1,"buildingName":"ayyoobs1","owner":"admin","longitude":"79.97607422294095","latitude":"6.995539474716988","numFloors":4}
             var buildings = JSON.parse(data);
-            for(var i = 0; i < buildings.length; i++) {
+            for (var i = 0; i < buildings.length; i++) {
                 var obj = buildings[i];
                 var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
 
@@ -100,81 +104,123 @@ function preLoadBuildings() {
 				}
                 addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i], buildingdevice);
                 //printBuildingData(obj);
+                if (i == 0) {
+                    buildingIds = obj.buildingId;
+                } else {
+                    buildingIds = buildingIds + "," + obj.buildingId;
+                }
+
+            }
+            if (buildings.length > 0) {
+                loadNotifications(buildingIds);
             }
         }
     }, function (jqXHR) {
-	}, "application/json");
+    }, "application/json");
 
 }
 
+function loadNotifications(buildingIds) {
+    var providerUrl = context + '/api/batch-provider?action=getMapAlertCount&tableName=ORG_WSO2_FLOOR_ALERTNOTIFICATIONS&buildingSet=' + buildingIds;
+
+    $.ajax({
+        url: providerUrl,
+        method: "GET",
+        contentType: "application/json",
+        async: false,
+        success: function (data) {
+            buildingAlertCount = data;
+
+            for (var index in buildingsMap) {
+                var building =  buildingsMap[index];
+                var buildingId = buildingIds.split(",");
+                addBuildingMenu(building.buildingId, building.buildingName, index, data[buildingId.indexOf(building.buildingId.toString())]);
+
+            }
+
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+
+}
+
+
 function printBuildingData(buildingInfo) {
     var buildingContent = $("#cont")
-    var data = "<div><p>Building Name: "+ buildingInfo.buildingName +
-        "Owner:" + buildingInfo.owner +" </p></div>";
+    var data = "<div><p>Building Name: " + buildingInfo.buildingName +
+        "Owner:" + buildingInfo.owner + " </p></div>";
     buildingContent.find("#buildingContent").append(data);
 }
 
 $(document).ready(function () {
-	loadLeafletMap();
+    loadLeafletMap();
 
 });
 
 function onAddMarker() {
 
-	map.once('click', addBuilding);
+    map.once('click', addBuilding);
 //        if(click !== null){
-	$('body.fixed ').addClass('marker-cursor');
-	$('#device-location').addClass('marker-cursor');
+    $('body.fixed ').addClass('marker-cursor');
+    $('#device-location').addClass('marker-cursor');
 //        }
 }
 
 function onMarkerClick(e) {
-	$('div').removeClass('active-marker');
-	$('div #' + e.target._leaflet_id).addClass('active-marker');
-	for (var mark in markers) {
-		markers[mark].setIcon(smallIcon);
-	}
-	var offset = map.panTo(markers[mark].getLatLng());
-	map.panBy(offset);
+    $('div').removeClass('active-marker');
+    $('div #' + e.target._leaflet_id).addClass('active-marker');
+    for (var mark in markers) {
+        markers[mark].setIcon(smallIcon);
+    }
+    var offset = map.panTo(markers[mark].getLatLng());
+    map.panBy(offset);
 }
 
 var tmpEventStore;
 
-function saveBuilding () {
-	var buildingName = document.getElementsByName('locationName')[0].value;
-	var noOffloors = document.getElementsByName('floors')[0].value;
-	var lat = document.getElementsByName('lat')[0].value;
-	var long = document.getElementsByName('long')[0].value;
-	var addBuildingApi = "/senseme/building";
-	var buildingdata = {buildingName:buildingName, longitude:lat, latitude:long, numFloors:noOffloors};
+function saveBuilding() {
+    var buildingName = document.getElementsByName('locationName')[0].value;
+    var noOffloors = document.getElementsByName('floors')[0].value;
+    var lat = document.getElementsByName('lat')[0].value;
+    var long = document.getElementsByName('long')[0].value;
+    var addBuildingApi = "/senseme/building";
+    var buildingdata = {buildingName: buildingName, longitude: lat, latitude: long, numFloors: noOffloors};
 
-	invokerUtil.post(addBuildingApi, buildingdata, function(data, textStatus, jqXHR){
-		if (jqXHR.status == 200 && data) {
-			var cord = {"lat" : lat, "lng" : long};
-			var building = {buildingName:buildingName, longitude:lat, latitude:long, numFloors:noOffloors, buildingId:data};
-			addingMarker(cord, buildingName, data, building);
-		}
-	}, function(jqXHR){
-		if (jqXHR.status == 400) {
-			console.log("error")
-		} else {
-			var response = JSON.parse(jqXHR.responseText).message;
+    invokerUtil.post(addBuildingApi, buildingdata, function (data, textStatus, jqXHR) {
+        if (jqXHR.status == 200 && data) {
+            var cord = {"lat": lat, "lng": long};
+            var building = {
+                buildingName: buildingName,
+                longitude: lat,
+                latitude: long,
+                numFloors: noOffloors,
+                buildingId: data
+            };
+            addingMarker(cord, buildingName, data, building);
+        }
+    }, function (jqXHR) {
+        if (jqXHR.status == 400) {
+            console.log("error")
+        } else {
+            var response = JSON.parse(jqXHR.responseText).message;
 
-		}
-	},"application/json","application/json");
+        }
+    }, "application/json", "application/json");
 
-	hidePopup();
+    hidePopup();
 }
 
-function addBuilding (e) {
-	//save building here.
-	tmpEventStore = e;
-	var cord = e.latlng;
-	var content = $("#building-response-template");
-	content.find("#lat").attr('value', cord.lat);
-	content.find("#long").attr('value', cord.lng);
-	$(modalPopupContent).html(content.html());
-	showPopup();
+function addBuilding(e) {
+    //save building here.
+    tmpEventStore = e;
+    var cord = e.latlng;
+    var content = $("#building-response-template");
+    content.find("#lat").attr('value', cord.lat);
+    content.find("#long").attr('value', cord.lng);
+    $(modalPopupContent).html(content.html());
+    showPopup();
 }
 
 function onMarkerDragged(event) {
@@ -189,54 +235,54 @@ function onMarkerDragged(event) {
     var updateBuildingApi = "/senseme/building/update";
 
     //TODO : Update the building data base.
-    invokerUtil.post(updateBuildingApi, tmp_building, function(data, textStatus, jqXHR){
+    invokerUtil.post(updateBuildingApi, tmp_building, function (data, textStatus, jqXHR) {
         if (jqXHR.status == 200 && data) {
             console.log(jqXHR);
         }
-    }, function(jqXHR){
+    }, function (jqXHR) {
         if (jqXHR.status == 400) {
             console.log("error")
         } else {
             var response = JSON.parse(jqXHR.responseText).message;
 
         }
-    },"application/json","application/json");
+    }, "application/json", "application/json");
 
     //apiInvokerUTIL.post
     //marker.setLatLng(event.latlng, {id:marker.title, draggable:'true'}).bindPopup(popup).update();
 
 }
 
-// Script for adding marker
+
 function addingMarker(cord, locationName, buildingId, building, buildingdevice) {
 	var markerId,
 		popup;
 	$('body.fixed ').removeClass('marker-cursor');
 	$('#device-location').removeClass('marker-cursor');
 
-	popup = L.popup({
-		autoPan: true,
-		keepInView: true
-	})
-		.setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId=' + buildingId + '" class="btn btn-primary">' +
-		"Get into " + locationName + '</a></p>');
+    popup = L.popup({
+        autoPan: true,
+        keepInView: true
+    })
+        .setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId=' + buildingId + '" class="btn btn-primary">' +
+            "Get into " + locationName + '</a></p>');
 
-	//variable for marker
-	var marker;
+    //variable for marker
+    var marker;
 
-	//markers info JSON array
-	var markerInfo = {
-		info: []
-	};
+    //markers info JSON array
+    var markerInfo = {
+        info: []
+    };
 
-	marker = new L.marker(cord, {
-		title: locationName,
-		alt: locationName,
-		riseOnHover: true,
-		draggable: true
-	}).bindPopup(popup);
+    marker = new L.marker(cord, {
+        title: locationName,
+        alt: locationName,
+        riseOnHover: true,
+        draggable: true
+    }).bindPopup(popup);
 
-	marker._leaflet_id = markerId;
+    marker._leaflet_id = markerId;
 
     marker.on('click', onMarkerClick);
 
@@ -278,19 +324,19 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
 	/*
 	 Pan to Marker on item panel hover
 	 */
-	$('.item').on("mouseover", function (e) {
-		$('div').removeClass('active-marker');
-		$('#'+$(this).attr('id')+' .panel-default > .panel-heading').addClass('active-marker');
-		for (var mark in markers) {
-			markers[mark].setIcon(smallIcon);
-		}
-		markerFunction($(this).attr('id'));
-		markers[$(this).attr('id')].setIcon(bigIcon);
-		var mid = $(this).attr('id');
-		var LatLng = markers[mid].getLatLng();
-		var offset = baseMap.panTo(LatLng);
-		baseMap.panBy(offset);
-	});
+    $('.item').on("mouseover", function (e) {
+        $('div').removeClass('active-marker');
+        $('#' + $(this).attr('id') + ' .panel-default > .panel-heading').addClass('active-marker');
+        for (var mark in markers) {
+            markers[mark].setIcon(smallIcon);
+        }
+        markerFunction($(this).attr('id'));
+        markers[$(this).attr('id')].setIcon(bigIcon);
+        var mid = $(this).attr('id');
+        var LatLng = markers[mid].getLatLng();
+        var offset = baseMap.panTo(LatLng);
+        baseMap.panBy(offset);
+    });
 }
 
 function addBuildingMenu(buildingId, buildingName, markerId, buildingdevice) {

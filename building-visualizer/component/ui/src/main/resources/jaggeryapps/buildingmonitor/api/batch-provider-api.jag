@@ -32,6 +32,8 @@
     var floorId = request.getParameter("floorId");
     var floorCount = request.getParameter("floorCount");
 
+    var buildingSet = request.getParameter("buildingSet");
+
     var providerAPI = require('/app/modules/batch-provider-api.js');
     if (action === 'getData') {
         if (!limit) {
@@ -92,6 +94,28 @@
                 data[i] += newData.length;
                 start += 100;
             }
+        }
+        print(data);
+    } else if (action === 'getMapAlertCount') {
+        var data = [];
+        var newData = [];
+        var buildingSet = buildingSet.split(",");
+
+        for (var i in buildingSet) {
+
+            new Log().info("here");
+            start = 0;
+            data[i] = 0;
+            while (newData.length == 100 || start == 0) {
+                var timeFrom = new Date();
+                timeFrom.setHours(timeFrom.getHours - 24);
+                var timeTo = new Date();
+                newData = providerAPI.getData(tableName, buildingSet[i], null, timeFrom.getTime(), timeTo
+                    .getTime(), start, limit, "DESC");
+                data[i] += newData.length;
+                start += 100;
+            }
+
         }
         print(data);
     }

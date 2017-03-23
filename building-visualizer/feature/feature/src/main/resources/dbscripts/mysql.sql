@@ -21,7 +21,7 @@ CREATE  TABLE IF NOT EXISTS `building` (
 CREATE  TABLE IF NOT EXISTS `floor` (
   `floorNum` INTEGER NOT NULL ,
   `buildingId` INTEGER NOT NULL ,
-  `image` BLOB NULL DEFAULT NULL,
+  `image` LONGBLOB NULL DEFAULT NULL,
   PRIMARY KEY (`buildingId`,`floorNum`),
   FOREIGN KEY (`buildingId`) REFERENCES building(`buildingId`))
   ENGINE = InnoDB;

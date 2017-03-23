@@ -65,8 +65,8 @@ long startDelay = millis();
 const char* ssid = "WSO2-Restricted";
 const char* password = "LKvene8xIOT";
 
-const char* gateway = "http://192.168.57.99:8280";
-const char* mqtt_server = "192.168.57.99";
+const char* gateway = "http://192.168.57.100:8280";
+const char* mqtt_server = "192.168.57.100";
 const int mqtt_port = 1886;
 const char* tenant_domain = "carbon.super";
 char device_id[100] ;
