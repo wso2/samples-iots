@@ -30,8 +30,6 @@
     var sortBy = request.getParameter("sortBy");
     var buildingId = request.getParameter("buildingId");
     var floorId = request.getParameter("floorId");
-    buildingId = "WSO2";
-    floorId = "5th floor";
 
     var providerAPI = require('/app/modules/batch-provider-api.js');
     if (action === 'getData') {
@@ -70,8 +68,8 @@
         var minutesToMilliSeconds = 1800000;
         var data = [];
         for (var i = 0; i < 6; i++) {
-            var startTime = parseFloat(timeFrom) + hourToMilliSeconds * i;
-            var endTime = parseFloat(timeFrom) + hourToMilliSeconds * (i + 1);
+            var startTime = parseFloat(timeFrom) + minutesToMilliSeconds * i;
+            var endTime = parseFloat(timeFrom) + minutesToMilliSeconds * (i + 1);
             data[i] = providerAPI.getData(tableName, buildingId, floorId, String(startTime), String(endTime), 0, 20,
                 "DESC");
         }
