@@ -1,6 +1,9 @@
 var webSocket;
 var floorData = [];
 var rangeSlider;
+var timer;
+var sliderPoint = 1;
+var sliderPointMax = 10;
 
 function showRecentPastData(time){
     var numOfFloors = floorData.length;
@@ -9,7 +12,6 @@ function showRecentPastData(time){
         var index = floorData[i].length-tmp;
         displyaData(i+1,floorData[i][index]);
     }
-
 }
 
 function createDataArrays(val){
@@ -37,17 +39,14 @@ function createWebSocket(host) {
                 webSocket.onopen = function () {
                     console.log("on open");
                 };
-
                 webSocket.onmessage = function (msg) {
                     console.log("on message");
                     reatTimeDataHandler(JSON.parse(msg.data));
 
                 };
-
                 webSocket.onclose = function () {
                     console.log("on close");
                 };
-
                 webSocket.error= function (err) {
                     console.log(err);
                 }
@@ -62,7 +61,7 @@ function createWebSocket(host) {
 }
 
 function reatTimeDataHandler(data){
-    rangeSlider.bootstrapSlider('setValue', 10);
+    rangeSlider.bootstrapSlider('setValue', sliderPointMax);
     var buildingId = getUrlVar("buildingId");
     if(data.building === "WSO2"){
         var floorId = data.floor;
@@ -101,7 +100,6 @@ function displyaData(floorId,data){
         ctx.font = "14px Arial";
         ctx.fillText("No value",10,10);
     }
-
 }
 
 function clearCanvas(cnv) {
@@ -147,6 +145,31 @@ var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortB
     return providerData;
 };
 
+function slide() {
+    if (sliderPoint<=sliderPointMax){
+        rangeSlider.bootstrapSlider('setValue', sliderPoint);
+        showRecentPastData(sliderPoint);
+        sliderPoint++;
+    }else{
+        sliderPoint=sliderPointMax;
+        setTimer();
+    }
+}
+
+function setTimer(){
+    if (timer) {
+        // stop
+        showRecentPastData(sliderPoint);
+        rangeSlider.bootstrapSlider('setValue', sliderPoint);
+        clearInterval( timer );
+        timer=null;
+        sliderPoint=1;
+    }
+    else {
+        timer = setInterval("slide()",1000);
+    }
+}
+
 function getRecentPastdata(numOfFloors){
     var currentTime = new Date();
     var oldTime = currentTime.getTime();
@@ -154,11 +177,14 @@ function getRecentPastdata(numOfFloors){
 
     for (var x=0; x<numOfFloors;x++){
         floorData[x]= getProviderData("ORG_WSO2_FLOOR_PERFLOOR_SENSORSTREAM", currentTime.getTime(), oldTime, 0, 10, "DESC").reverse();
-
     }
     showRecentPastData(10);
 
 }
+
+$("#pla").on("click", "i", function (event) {
+    setTimer();
+});
 
 $(document).ready(function () {
 
@@ -186,11 +212,9 @@ $(document).ready(function () {
 
     });
 
-
     $("#historic-toggle").click(function () {
         $(".date-picker").slideToggle("slow");
     });
-
 });
 
 window.onbeforeunload = function () {
