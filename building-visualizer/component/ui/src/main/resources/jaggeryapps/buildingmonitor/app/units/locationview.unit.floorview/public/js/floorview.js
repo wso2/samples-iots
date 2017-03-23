@@ -247,7 +247,20 @@ function hidePopup() {
      * To initialize the web-sockets to get the real-time data.
      */
     var intializeWebsockets = function () {
-        var webSocketURL = 'wss://localhost:9445/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceFloorEvent';
+        var analyticsUrl = "wss://localhost:9445";
+        $.ajax({
+            url:context + '/api/analytics/',
+            method: "GET",
+            contentType: "application/json",
+            async: false,
+            success: function (data) {
+                analyticsUrl = data;
+            },
+            error : function (err) {
+            }
+        });
+
+        var webSocketURL = analyticsUrl + '/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceFloorEvent';
 
         ws = new WebSocket(webSocketURL);
         ws.onopen = function () {
@@ -264,7 +277,7 @@ function hidePopup() {
         };
         webSockets.push(ws);
 
-        webSocketURL = 'wss://localhost:9445/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertEvent';
+        webSocketURL = analyticsUrl + '/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertEvent';
         wsAlert = new WebSocket(webSocketURL);
         wsAlert.onopen = function () {
             notifyUser("You are now connected to Alert stream!", "success", SUCCESS_TIMEOUT, "top-center");

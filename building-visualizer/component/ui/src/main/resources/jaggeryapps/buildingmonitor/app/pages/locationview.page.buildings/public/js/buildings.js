@@ -167,7 +167,19 @@ $(document).ready(function () {
     rangeSlider = $("#range-slider").bootstrapSlider();
     rangeSlider.bootstrapSlider('setAttribute', 'min', 1);
     rangeSlider.bootstrapSlider('setValue', 10);
-    var url = "ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
+    var analyticsUrl = "wss://localhost:9445";
+    $.ajax({
+        url:context + '/api/analytics/',
+        method: "GET",
+        contentType: "application/json",
+        async: false,
+        success: function (data) {
+            analyticsUrl = data;
+        },
+        error : function (err) {
+        }
+    });
+    var url = analyticsUrl + "/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
     var numOfFloors = $("#buildingView").data("num_of_floors");
 
     createWebSocket(url);
