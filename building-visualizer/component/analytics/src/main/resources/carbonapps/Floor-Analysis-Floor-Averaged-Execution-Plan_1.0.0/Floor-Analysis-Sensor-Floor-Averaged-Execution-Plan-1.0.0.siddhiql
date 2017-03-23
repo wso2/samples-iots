@@ -31,19 +31,15 @@ select buildingId, floorId, avg(temperature) as temperature, avg(motion) as moti
 (airQuality) as airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
 group by floorId insert all events into summarizedDataOut;
 
-from dataOut[temperature < 22]
+from dataOut[temperature < 23]
 select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very cool. Please increase the temperature" as information,
 timeStamp insert into alertOut ;
 
-from dataOut[temperature > 25]
+from dataOut[temperature > 28]
 select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very hot. Please decrease the temperature" as information,
 timeStamp insert into alertOut ;
 
-from dataOut[temperature > 25]
-select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very hot. Please decrease the temperature" as information,
-timeStamp insert into alertOut ;
-
-from dataOut[motion == 0 and light > 0]
+from dataOut[motion == 0 and light < 500]
 select buildingId, floorId, "Light" as type, light as value,
 "Floor seem to be empty. Human motion seem to be nil. But lights are switched on. Please switch off the lights." as
 information, timeStamp insert into alertOut ;
