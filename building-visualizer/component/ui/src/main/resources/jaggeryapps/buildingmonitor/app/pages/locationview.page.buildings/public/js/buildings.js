@@ -8,6 +8,8 @@ var sliderPointMax = 10;
 var sliderPointMin = 1;
 var historicalData = [];
 var isDatePick = false;
+var buildingId;
+var numOfFloors;
 
 /**
  * To show received recent past data
@@ -15,9 +17,12 @@ var isDatePick = false;
  */
 function showRecentPastData(time) {
     var numOfFloors = floorData.length;
-    var tmp = sliderPointMax + 1 - time;
+    var index = sliderPointMax - time;
     for (var i = 0; i < numOfFloors; i++) {
-        var index = floorData[i].length - tmp;
+        if (floorData[i].length == 0) {
+            displayError(i+1);
+            continue;
+        }
         displyaData(i + 1, floorData[i][index]);
     }
 }
@@ -78,14 +83,10 @@ function createWebSocket(host) {
  */
 function realTimeDataHandler(data) {
     rangeSlider.bootstrapSlider('setValue', sliderPointMax);
-    var buildingId = getUrlVar("buildingId");
     if (data.building === buildingId) {
         var floorId = data.floor;
-        // if (data.floor === "5th floor") {
-        //     floorId = "1";
-        // }
         var fId = parseInt(floorId) - 1;
-        if (floorData[fId].length == 10) {
+        if (floorData[fId].length == sliderPointMax) {
             floorData[fId].shift();
             floorData[fId].push(data);
         } else {
@@ -114,19 +115,22 @@ function displyaData(floorId, data) {
     var canvas = document.getElementById(floorId);
     clearCanvas(canvas);
     var ctx = canvas.getContext("2d");
-    if (data != null) {
-        ctx.font = "14px Arial";
-        ctx.fillText("Temperature: " + data.temperature, 10, 10);
-        ctx.fillText("Air Quality: " + data.airQuality, 10, 30);
-        ctx.fillText("Humidity: " + data.humidity, 10, 50);
-        ctx.fillText("Light: " + data.light, 10, 70);
-        ctx.fillText("Motion: " + data.motion, 10, 90);
-    } else {
-        ctx.font = "14px Arial";
-        ctx.fillText("No value", 10, 10);
-    }
+    ctx.font = "14px Arial";
+    ctx.fillText("Temperature: " + data.temperature, 10, 10);
+    ctx.fillText("Air Quality: " + data.airQuality, 10, 30);
+    ctx.fillText("Humidity: " + data.humidity, 10, 50);
+    ctx.fillText("Light: " + data.light, 10, 70);
+    ctx.fillText("Motion: " + data.motion, 10, 90);
+
 }
 
+function displayError(floorId) {
+    var canvas = document.getElementById(floorId);
+    clearCanvas(canvas);
+    var ctx = canvas.getContext("2d");
+    ctx.font = "14px Arial";
+    ctx.fillText("No value", 10, 10);
+}
 /**
  * To clear data on canvas.
  * @param cnv canvas
@@ -151,10 +155,13 @@ function clearCanvas(cnv) {
  * @param start starting point
  * @param limit limit
  * @param sortBy sorting method
+ * @param buildingId id of the building
+ * @param floorCount number of vloors
  */
-var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortBy) {
+var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortBy, buildingId, floorCount,action) {
     var providerData = null;
-    var providerUrl = context + '/api/batch-provider?action=getLatestUpdate&tableName=' + tableName;
+
+    var providerUrl = context + '/api/batch-provider?action='+action+'&tableName=' + tableName;
 
     if (timeFrom && timeTo) {
         providerUrl += '&timeFrom=' + timeFrom + '&timeTo=' + timeTo;
@@ -167,6 +174,12 @@ var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortB
     }
     if (sortBy) {
         providerUrl += "&sortBy=" + sortBy
+    }
+    if (buildingId) {
+        providerUrl += "&buildingId=" + buildingId
+    }
+    if (floorCount) {
+        providerUrl += "&floorCount=" + floorCount
     }
     $.ajax({
         url: providerUrl,
@@ -224,13 +237,25 @@ function setTimer() {
 function getRecentPastdata(numOfFloors) {
     var currentTime = new Date();
     var oldTime = currentTime.getTime();
-    currentTime.setMinutes(currentTime.getMinutes() - 30);
-
-    for (var x = 0; x < numOfFloors; x++) {
-        // should add floor ids as params
-        floorData[x] = getProviderData("ORG_WSO2_FLOOR_PERFLOOR_SENSORSTREAM", currentTime.getTime(), oldTime, 0, 10, "DESC").reverse();
-    }
+    currentTime.setHours(currentTime.getHours() - 3);
+    floorData = getProviderData("ORG_WSO2_FLOOR_PERFLOOR_SENSORSTREAM", currentTime.getTime(), oldTime, 0, 10, "DESC",
+        buildingId, numOfFloors,"getLatestUpdate");
     showRecentPastData(sliderPointMax);
+}
+
+/**
+ * To get recent past data when load the page.
+ * @param numOfFloors number of floors
+ * @param date selected date
+ */
+function getHistoricaldata(numOfFloors,date) {
+
+    date.setHours(0,0,0,0);
+    var end = new Date();
+    end.setHours(23,59,59,999);
+    historicalData = getProviderData("ORG_WSO2_SUMMARIZED_PERFLOOR_SENSORSTREAM", date.getTime(),end.getTime(),0,25,
+        "DESC",buildingId,numOfFloors);
+
 }
 
 /**
@@ -258,7 +283,7 @@ function setHistoricalViewSlider(sliderPointMin, sliderPointMax) {
 /**
  * Toggle switch to live view.
  */
-function switchToLive(){
+function switchToLive() {
     $(".date-picker").slideToggle("slow");
     $('#historic-toggle').removeClass("history");
     $('#historic-toggle').addClass("live");
@@ -272,7 +297,7 @@ function switchToLive(){
 /**
  * Toggle switch to history view.
  */
-function switchToHistory(){
+function switchToHistory() {
     $(".date-picker").slideToggle("slow");
     $('#live-view').addClass("hidden");
     $('#historical-view').removeClass("hidden");
@@ -298,26 +323,12 @@ $('#range-slider').on("slide", function () {
 
 $('#historical-slider').on("slide", function () {
 }).on("change", function () {
-    if (isDatePick){
+    if (isDatePick) {
         //show historical data
-    }else{
+    } else {
         // alert("Please pick a date");
         //display message to pick date
     }
-});
-
-$('input[name="daterange"]').datepicker({
-    orientation: "auto",
-    endDate: "+0d"
-}).on("changeDate", function (e) {
-    var selectedDate = e.date;
-    var date = new Date(e.date);
-    date.setHours(date.getHours()-1);
-    console.log(date.getTime());
-
-    var date = new Date(e.date);
-    console.log("xxx" + date.getTime());
-
 });
 
 $("#historic-toggle").click(function () {
@@ -328,53 +339,6 @@ $("#historic-toggle").click(function () {
     else if ($("#historic-toggle").hasClass('history')) {
         switchToLive();
     }
-});
-
-$(document).ready(function () {
-
-    $(".slider-wrapper").show(1000);
-    $('#historic-toggle').addClass("live");
-
-    rangeSlider = $("#range-slider").bootstrapSlider();
-    historicalSlider = $("#historical-slider").bootstrapSlider();
-
-    setRealViewSlider(sliderPointMin,sliderPointMax);
-
-    var analyticsUrl = "wss://localhost:9445";
-    $.ajax({
-        url: context + '/api/analytics/',
-        method: "GET",
-        contentType: "application/json",
-        async: false,
-        success: function (data) {
-            analyticsUrl = data;
-        },
-        error: function (err) {
-        }
-    });
-    var url = analyticsUrl + "/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
-    var numOfFloors = $("#buildingView").data("num_of_floors");
-    console.log(numOfFloors);
-
-    createWebSocket(url);
-    createDataArrays(numOfFloors);
-    getRecentPastdata(numOfFloors);
-
-    $('input[name="daterange"]').datepicker({
-        orientation: "auto",
-        endDate: "+0d",
-        autoclose: true
-    }).on("changeDate", function(e) {
-        var date = new Date(e.date);
-        date.setHours(date.getHours()-1);
-        console.log(date.getTime());
-
-        var date = new Date(e.date);
-        console.log("xxx" + date.getTime());
-
-    });
-
-    updateAlertCount();
 });
 
 var updateAlertCount = function () {
@@ -401,6 +365,49 @@ var updateAlertCount = function () {
         }
     });
 };
+
+$(document).ready(function () {
+
+    $(".slider-wrapper").show(1000);
+    $('#historic-toggle').addClass("live");
+    buildingId = getUrlVar("buildingId");
+    numOfFloors = $("#buildingView").data("num_of_floors");
+
+    rangeSlider = $("#range-slider").bootstrapSlider();
+    historicalSlider = $("#historical-slider").bootstrapSlider();
+
+    setRealViewSlider(sliderPointMin, sliderPointMax);
+
+    var analyticsUrl = "wss://localhost:9445";
+    $.ajax({
+        url: context + '/api/analytics/',
+        method: "GET",
+        contentType: "application/json",
+        async: false,
+        success: function (data) {
+            analyticsUrl = data;
+        },
+        error: function (err) {
+        }
+    });
+    var url = analyticsUrl + "/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
+    console.log(numOfFloors);
+
+    createWebSocket(url);
+    createDataArrays(numOfFloors);
+    getRecentPastdata(numOfFloors);
+    updateAlertCount();
+
+    $('input[name="daterange"]').datepicker({
+        orientation: "auto",
+        endDate: "+0d",
+        autoclose: true
+    }).on("changeDate", function (e) {
+        var date = new Date(e.date);
+        historicalData = getHistoricaldata(numOfFloors, date);
+
+    });
+});
 
 window.onbeforeunload = function () {
     if (webSocket) {
