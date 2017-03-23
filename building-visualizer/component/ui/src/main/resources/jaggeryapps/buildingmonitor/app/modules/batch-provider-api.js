@@ -99,7 +99,11 @@ var getData;
         var result;
         //if there's a filter present, we should perform a Lucene search instead of reading the table
 
-        luceneQuery = 'buildingId:"' + buildingId + '" AND floorId:"' + floorId + '" AND ' + luceneQuery;
+        if (buildingId && floorId) {
+            luceneQuery = 'buildingId:"' + buildingId + '" AND floorId:"' + floorId + '" AND ' + luceneQuery;
+        } else {
+            luceneQuery = 'buildingId:"' + buildingId + '" AND ' + luceneQuery;
+        }
         var filter = {
             "query": luceneQuery,
             "start": startCount,

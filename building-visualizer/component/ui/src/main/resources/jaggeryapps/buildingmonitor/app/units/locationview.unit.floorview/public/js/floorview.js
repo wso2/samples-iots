@@ -422,7 +422,6 @@ function hidePopup() {
                         notifications.push(notification);
                     }
 
-                    console.log(notifications);
                     viewModel.notifications = notifications;
                     $(messageSideBar).html(template(viewModel));
                 } else {
