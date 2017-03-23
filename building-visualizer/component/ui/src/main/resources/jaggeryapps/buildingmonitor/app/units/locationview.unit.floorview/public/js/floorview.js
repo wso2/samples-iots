@@ -7,29 +7,29 @@ var isAddDeviceMode =false;
  * set popup maximum height function.
  */
 function setPopupMaxHeight() {
-	var maxHeight = "max-height";
-	var marginTop = "margin-top";
-	var body = "body";
-	$(modalPopupContent).css(maxHeight, ($(body).height() - ($(body).height() / 100 * 30)));
-	$(modalPopupContainer).css(marginTop, (-($(modalPopupContainer).height() / 2)));
+    var maxHeight = "max-height";
+    var marginTop = "margin-top";
+    var body = "body";
+    $(modalPopupContent).css(maxHeight, ($(body).height() - ($(body).height() / 100 * 30)));
+    $(modalPopupContainer).css(marginTop, (-($(modalPopupContainer).height() / 2)));
 }
 
 /*
  * show popup function.
  */
 function showPopup() {
-	$(modalPopup).modal('show');
+    $(modalPopup).modal('show');
 }
 
 /*
  * hide popup function.
  */
 function hidePopup() {
-	$(modalPopupContent).html("");
-	$(modalPopupContent).removeClass("operation-data");
-	$(modalPopup).modal('hide');
-	$('body').removeClass('modal-open').css('padding-right','0px');
-	$('.modal-backdrop').remove();
+    $(modalPopupContent).html("");
+    $(modalPopupContent).removeClass("operation-data");
+    $(modalPopup).modal('hide');
+    $('body').removeClass('modal-open').css('padding-right','0px');
+    $('.modal-backdrop').remove();
 }
 
 (function (window, document, context) {
@@ -88,17 +88,17 @@ function hidePopup() {
         }
     });
 
-	$("#add-device").on('click', function () {
-		if (isAddDeviceMode) {
-			isAddDeviceMode = false;
-			$("#device").text("Add a device");
-			$('#image').css('cursor', 'default');
-		} else {
-			isAddDeviceMode = true;
-			$('#image').css('cursor', 'crosshair');
-			$("#device").text("Cancel");
-		}
-	});
+    $("#add-device").on('click', function () {
+        if (isAddDeviceMode) {
+            isAddDeviceMode = false;
+            $("#device").text("Add a device");
+            $('#image').css('cursor', 'default');
+        } else {
+            isAddDeviceMode = true;
+            $('#image').css('cursor', 'crosshair');
+            $("#device").text("Cancel");
+        }
+    });
 
     /**
      * Creates the heatMap.
@@ -246,7 +246,7 @@ function hidePopup() {
      * To initialize the web-sockets to get the real-time data.
      */
     var intializeWebsockets = function () {
-        var webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceFloorEvent';
+        var webSocketURL = 'wss://localhost:9445/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceFloorEvent';
 
         ws = new WebSocket(webSocketURL);
         ws.onopen = function () {
@@ -263,7 +263,7 @@ function hidePopup() {
         };
         webSockets.push(ws);
 
-        webSocketURL = 'ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertEvent';
+        webSocketURL = 'wss://localhost:9445/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertEvent';
         wsAlert = new WebSocket(webSocketURL);
         wsAlert.onopen = function () {
             notifyUser("You are now connected to Alert stream!", "success", SUCCESS_TIMEOUT, "top-center");
@@ -319,8 +319,6 @@ function hidePopup() {
         createHeatMap();
         floorId = $("#image").attr("floorId");
         buildingId = $("#image").attr("buildingId");
-        buildingId = "WSO2";
-        floorId = "5th floor";
 
         rangeSlider = $("#range-slider").bootstrapSlider({
             ticks: [-15, -10, -5, 0],
@@ -370,6 +368,7 @@ function hidePopup() {
         });
 
         $('#image canvas').addClass('hidden');
+        loadNotifications();
     });
 
     var isDataExist = function(dataArray, dataPoint) {
@@ -379,6 +378,50 @@ function hidePopup() {
             }
         }
     };
+
+
+    var loadNotifications = function() {
+        var messageSideBar = ".sidebar-messages";
+        if ($("#right-sidebar").attr("is-authorized") == "true") {
+            var notifications = $("#notifications");
+            var currentUser = notifications.data("currentUser");
+
+            var serviceURL = backendEndBasePath + "/notifications?status=NEW";
+
+            $.template("notification-listing", notifications.attr("src"), function (template) {
+                var currentDate = new Date();
+                currentDate.setHours(currentDate.getHours() - 24);
+                var endDate = new Date();
+                var data = getProviderData("ORG_WSO2_FLOOR_ALERTNOTIFICATIONS", currentDate.getTime(), endDate.getTime(), 0, 20, "DESC");
+
+                if (data) {
+                    var viewModel = {};
+                    var notifications = [];
+
+                    for (var index in data) {
+                        var notification = {};
+                        notification.heading = data[index].type + " Alert";
+                        notification.description = data[index].type + " value is " + data[index].value.toFixed(2) + ". " + data[index].information;
+                        notification.timeStamp =  new Date(data[index].timeStamp)
+                        notifications.push(notification);
+                    }
+
+                    console.log(notifications);
+                    viewModel.notifications = notifications;
+                    $(messageSideBar).html(template(viewModel));
+                } else {
+                    $(messageSideBar).html("<h4 class ='message-danger text-center'>No new notifications found</h4>");
+                }
+            });
+        } else {
+            $(messageSideBar).html("<h4 class ='message-danger text-center'>You are not authorized to view notifications</h4>");
+        }
+    };
+
+    $("#notification-bubble-wrapper").click(function() {
+        loadNotifications();
+
+    });
 
     /**
      * To update the heat map
@@ -646,9 +689,9 @@ function hidePopup() {
         }
     });
 
-	//$('#image').bind('click', function (ev) {
-	//
-	//});
+    //$('#image').bind('click', function (ev) {
+    //
+    //});
 
     var updateHeatMap = function () {
         switch (currentSelection) {
@@ -682,7 +725,7 @@ function hidePopup() {
      */
     var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortBy) {
         var providerData = null;
-        var providerUrl = context + '/api/batch-provider?action=getData&tableName=' + tableName;
+        var providerUrl = context + '/api/batch-provider?action=getData&tableName=' + tableName + "&buildingId=" + buildingId + "&floorId=" + floorId;;
 
         if (timeFrom && timeTo) {
             providerUrl += '&timeFrom=' + timeFrom + '&timeTo=' + timeTo;
@@ -710,64 +753,64 @@ function hidePopup() {
         });
         return providerData;
     };
-	/**
-	 * To get the historical data for a certain period of time.
-	 * @param tableName Name of the table to fetch the data from
-	 * @param timeFrom Start time
-	 * @param timeTo End time
-	 *
-	 */
-	var getHistoricalData = function (tableName, timeFrom) {
-		var providerData = null;
-		var providerUrl = context + '/api/batch-provider?action=getHistoricalData&tableName=' + tableName;
+    /**
+     * To get the historical data for a certain period of time.
+     * @param tableName Name of the table to fetch the data from
+     * @param timeFrom Start time
+     * @param timeTo End time
+     *
+     */
+    var getHistoricalData = function (tableName, timeFrom) {
+        var providerData = null;
+        var providerUrl = context + '/api/batch-provider?action=getHistoricalData&tableName=' + tableName + "&buildingId=" + buildingId + "&floorId=" + floorId;;
 
-		if (timeFrom) {
-			providerUrl += '&timeFrom=' + timeFrom;
-		}
-		$.ajax({
-			url:providerUrl,
-			method: "GET",
-			contentType: "application/json",
-			async: false,
-			success: function (data) {
-				providerData = data;
-			},
-			error : function (err) {
-				notifyUser(err, "danger", DANGER_TIMEOUT, "top-center");
-			}
-		});
-		return providerData;
-	};
-	/**
-	 * Load devices;
-	 */
-	loadDevices();
+        if (timeFrom) {
+            providerUrl += '&timeFrom=' + timeFrom;
+        }
+        $.ajax({
+            url:providerUrl,
+            method: "GET",
+            contentType: "application/json",
+            async: false,
+            success: function (data) {
+                providerData = data;
+            },
+            error : function (err) {
+                notifyUser(err, "danger", DANGER_TIMEOUT, "top-center");
+            }
+        });
+        return providerData;
+    };
+    /**
+     * Load devices;
+     */
+    loadDevices();
 }(window, document, context));
 
 /**
  * Add a new device;
  */
 function addDevice () {
-	var deviceIdValue = document.getElementsByName('deviceId')[0].value;;
-	var xCordValue = document.getElementsByName('xCord')[0].value;;
-	var yCordValue = document.getElementsByName('yCord')[0].value;;
-	var floorIdValue = $("#image").attr("floorId");
-	var buildingIdValue = $("#image").attr("buildingId");
-	var deviceData = {deviceId:deviceIdValue, buildingId:buildingIdValue, floorNumber:floorIdValue, xCord:xCordValue, yCord:yCordValue };
-	var addDeviceApi = "/senseme/device/enroll";
-	invokerUtil.post(addDeviceApi, deviceData, function(data, textStatus, jqXHR){
-		if (jqXHR.status == 200) {
-			placeDevice(deviceId, xCordValue, yCordValue)
-		}
-	}, function(jqXHR){
-		if (jqXHR.status == 400) {
-			console.log("error")
-		} else {
-			var response = JSON.parse(jqXHR.responseText).message;
+    var deviceIdValue = document.getElementsByName('deviceId')[0].value;;
+    var xCordValue = document.getElementsByName('xCord')[0].value;;
+    var yCordValue = document.getElementsByName('yCord')[0].value;;
+    var floorIdValue = $("#image").attr("floorId");
+    var buildingIdValue = $("#image").attr("buildingId");
+    var deviceData = {deviceId:deviceIdValue, buildingId:buildingIdValue, floorNumber:floorIdValue, xCord:xCordValue, yCord:yCordValue };
+    var addDeviceApi = "/senseme/device/enroll";
+    invokerUtil.post(addDeviceApi, deviceData, function(data, textStatus, jqXHR){
+        if (jqXHR.status == 200) {
+            placeDevice(deviceId, xCordValue, yCordValue)
+        }
+    }, function(jqXHR){
+        if (jqXHR.status == 400) {
+            console.log("error")
+        } else {
+            var response = JSON.parse(jqXHR.responseText).message;
 
-		}
-	},"application/json","application/json");
-	hidePopup();
+        }
+    },"application/json","application/json");
+    hidePopup();
 }
 
 
@@ -780,40 +823,40 @@ function addDevice () {
  */
 function placeDevice(deviceId, x, y, status) {
 
-	var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-	rect.setAttributeNS(null,"id", "myrect-" + deviceId);
-	rect.setAttributeNS(null,"fill", "grey");
-	if (status) {
-		if (status == "ACTIVE") {
-			rect.setAttributeNS(null,"fill", "blue");
-		} else if (status == "FAULT") {
-			rect.setAttributeNS(null,"fill", "red");
-		}
-	}
-	rect.setAttributeNS(null,"stroke", "black");
-	rect.setAttributeNS(null,"stroke-width", "5");
-	rect.setAttributeNS(null,"x", x);
-	rect.setAttributeNS(null,"y", y);
-	rect.setAttributeNS(null,"width", "30");
-	rect.setAttributeNS(null,"height", "30");
-	var svg = document.getElementById("svg");
-	svg.appendChild(rect);
+    var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttributeNS(null,"id", "myrect-" + deviceId);
+    rect.setAttributeNS(null,"fill", "grey");
+    if (status) {
+        if (status == "ACTIVE") {
+            rect.setAttributeNS(null,"fill", "blue");
+        } else if (status == "FAULT") {
+            rect.setAttributeNS(null,"fill", "red");
+        }
+    }
+    rect.setAttributeNS(null,"stroke", "black");
+    rect.setAttributeNS(null,"stroke-width", "5");
+    rect.setAttributeNS(null,"x", x);
+    rect.setAttributeNS(null,"y", y);
+    rect.setAttributeNS(null,"width", "30");
+    rect.setAttributeNS(null,"height", "30");
+    var svg = document.getElementById("svg");
+    svg.appendChild(rect);
 }
 
 function loadDevices() {
-	var floorIdValue = $("#image").attr("floorId");
-	var buildingIdValue = $("#image").attr("buildingId");
-	var deviceApi = "/senseme/building/" + buildingIdValue + "/" + floorIdValue + "/devices";
-	invokerUtil.get(deviceApi, function (data, textStatus, jqXHR) {
-		if (jqXHR.status == 200) {
-			var devices = JSON.parse(data);
-			for(var i = 0; i < devices.length; i++) {
-				var device = devices[i];
-				console.log(device);
-				placeDevice(device.deviceId, device.xCord, device.yCord, device.status);
-			}
-		}
-	}, function (jqXHR) {
-	}, "application/json");
+    var floorIdValue = $("#image").attr("floorId");
+    var buildingIdValue = $("#image").attr("buildingId");
+    var deviceApi = "/senseme/building/" + buildingIdValue + "/" + floorIdValue + "/devices";
+    invokerUtil.get(deviceApi, function (data, textStatus, jqXHR) {
+        if (jqXHR.status == 200) {
+            var devices = JSON.parse(data);
+            for(var i = 0; i < devices.length; i++) {
+                var device = devices[i];
+                console.log(device);
+                placeDevice(device.deviceId, device.xCord, device.yCord, device.status);
+            }
+        }
+    }, function (jqXHR) {
+    }, "application/json");
 }
 
