@@ -1,11 +1,18 @@
 var webSocket;
 var floorData = [];
 var rangeSlider;
+var historicalSlider;
 var timer;
 var sliderPoint = 1;
 var sliderPointMax = 10;
 var sliderPointMin = 1;
+var historicalData = [];
+var isDatePick = false;
 
+/**
+ * To show received recent past data
+ * @param time slider value.
+ */
 function showRecentPastData(time) {
     var numOfFloors = floorData.length;
     var tmp = sliderPointMax + 1 - time;
@@ -15,12 +22,20 @@ function showRecentPastData(time) {
     }
 }
 
+/**
+ * Initialize floor data arrays
+ * @param val number of floors.
+ */
 function createDataArrays(val) {
     for (var i = 0; i < val; i++) {
         floorData[i] = [];
+        historicalData[i] = [];
     }
 }
 
+/**
+ * Initialize the web-sockets to get the real-time data.
+ */
 function createWebSocket(host) {
 
     if (!("WebSocket" in window)) {
@@ -34,7 +49,6 @@ function createWebSocket(host) {
 
         function connect() {
             try {
-
                 webSocket = new WebSocket(host);
 
                 webSocket.onopen = function () {
@@ -54,12 +68,14 @@ function createWebSocket(host) {
             } catch (exception) {
                 console.log(exception);
             }
-
         }
-
     }
 }
 
+/**
+ * To manage receiving real time data .
+ * @param data received data
+ */
 function realTimeDataHandler(data) {
     rangeSlider.bootstrapSlider('setValue', sliderPointMax);
     var buildingId = getUrlVar("buildingId");
@@ -79,11 +95,20 @@ function realTimeDataHandler(data) {
     }
 }
 
+/**
+ * To get query param .
+ * @param key key value
+ */
 function getUrlVar(key) {
     var result = new RegExp(key + "=([^&]*)", "i").exec(window.location.search);
     return result && unescape(result[1]) || "";
 }
 
+/**
+ * To display received data.
+ * @param floorId floor number
+ * @param data relative data for floor number
+ */
 function displyaData(floorId, data) {
 
     var canvas = document.getElementById(floorId);
@@ -102,6 +127,10 @@ function displyaData(floorId, data) {
     }
 }
 
+/**
+ * To clear data on canvas.
+ * @param cnv canvas
+ */
 function clearCanvas(cnv) {
     var ctx = cnv.getContext('2d');     // gets reference to canvas context
     ctx.beginPath();    // clear existing drawing paths
@@ -114,6 +143,15 @@ function clearCanvas(cnv) {
     ctx.restore();        // restore the transform
 }
 
+/**
+ * Calling batch provider api.
+ * @param tableName table name
+ * @param timeFrom starting time
+ * @param timeTo end time
+ * @param start starting point
+ * @param limit limit
+ * @param sortBy sorting method
+ */
 var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortBy) {
     var providerData = null;
     var providerUrl = context + '/api/batch-provider?action=getLatestUpdate&tableName=' + tableName;
@@ -145,6 +183,10 @@ var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortB
     return providerData;
 };
 
+
+/**
+ * To play slider.
+ */
 function slide() {
     if (sliderPoint <= sliderPointMax) {
         rangeSlider.bootstrapSlider('setValue', sliderPoint);
@@ -156,6 +198,9 @@ function slide() {
     }
 }
 
+/**
+ * To set timer.
+ */
 function setTimer() {
     if (timer) {
         // stop
@@ -172,21 +217,71 @@ function setTimer() {
     }
 }
 
+/**
+ * To get recent past data when load the page.
+ * @param numOfFloors number of floors
+ */
 function getRecentPastdata(numOfFloors) {
     var currentTime = new Date();
     var oldTime = currentTime.getTime();
     currentTime.setMinutes(currentTime.getMinutes() - 30);
 
     for (var x = 0; x < numOfFloors; x++) {
+        // should add floor ids as params
         floorData[x] = getProviderData("ORG_WSO2_FLOOR_PERFLOOR_SENSORSTREAM", currentTime.getTime(), oldTime, 0, 10, "DESC").reverse();
     }
     showRecentPastData(sliderPointMax);
 }
 
-function setRealViewSlider(){
-    rangeSlider = $("#range-slider").bootstrapSlider();
+/**
+ * To configure slider to display real time data.
+ * @param sliderPointMin minimum value of slider
+ * @param sliderPointMax maximum value of slider
+ */
+function setRealViewSlider(sliderPointMin, sliderPointMax) {
     rangeSlider.bootstrapSlider('setAttribute', 'min', sliderPointMin);
+    historicalSlider.bootstrapSlider('setAttribute', 'max', sliderPointMax);
     rangeSlider.bootstrapSlider('setValue', sliderPointMax);
+}
+
+/**
+ * To configure slider to display historical data.
+ * @param sliderPointMin minimum value of slider
+ * @param sliderPointMax maximum value of slider
+ */
+function setHistoricalViewSlider(sliderPointMin, sliderPointMax) {
+    historicalSlider.bootstrapSlider('setAttribute', 'min', sliderPointMin);
+    historicalSlider.bootstrapSlider('setAttribute', 'max', sliderPointMax);
+    historicalSlider.bootstrapSlider('setValue', sliderPointMax);
+}
+
+/**
+ * Toggle switch to live view.
+ */
+function switchToLive(){
+    $(".date-picker").slideToggle("slow");
+    $('#historic-toggle').removeClass("history");
+    $('#historic-toggle').addClass("live");
+    $('#live-view').removeClass("hidden");
+    $('#historical-view').addClass("hidden");
+    $('#pla').removeClass("hidden");
+    $('#pau').addClass("hidden");
+    console.log("live view");
+}
+
+/**
+ * Toggle switch to history view.
+ */
+function switchToHistory(){
+    $(".date-picker").slideToggle("slow");
+    $('#live-view').addClass("hidden");
+    $('#historical-view').removeClass("hidden");
+    $('#pla').addClass("hidden");
+    $('#pau').removeClass("hidden");
+    setHistoricalViewSlider(0, 24);
+    $('#historic-toggle').removeClass("live");
+    $('#historic-toggle').addClass("history");
+    console.log("history view");
 
 }
 
@@ -194,11 +289,57 @@ $("#pla").on("click", "i", function (event) {
     setTimer();
 });
 
+$('#range-slider').on("slide", function () {
+}).on("change", function () {
+    var time = rangeSlider.bootstrapSlider("getValue");
+    showRecentPastData(time);
+});
+
+
+$('#historical-slider').on("slide", function () {
+}).on("change", function () {
+    if (isDatePick){
+        //show historical data
+    }else{
+        // alert("Please pick a date");
+        //display message to pick date
+    }
+});
+
+$('input[name="daterange"]').datepicker({
+    orientation: "auto",
+    endDate: "+0d"
+}).on("changeDate", function (e) {
+    var selectedDate = e.date;
+    var date = new Date(e.date);
+    date.setHours(date.getHours()-1);
+    console.log(date.getTime());
+
+    var date = new Date(e.date);
+    console.log("xxx" + date.getTime());
+
+});
+
+$("#historic-toggle").click(function () {
+    if ($("#historic-toggle").hasClass('live')) {
+        switchToHistory();
+
+    }
+    else if ($("#historic-toggle").hasClass('history')) {
+        switchToLive();
+    }
+});
+
 $(document).ready(function () {
 
     $(".slider-wrapper").show(1000);
+    $('#historic-toggle').addClass("live");
 
-    setRealViewSlider();
+    rangeSlider = $("#range-slider").bootstrapSlider();
+    historicalSlider = $("#historical-slider").bootstrapSlider();
+
+    setRealViewSlider(sliderPointMin,sliderPointMax);
+
     var analyticsUrl = "wss://localhost:9445";
     $.ajax({
         url:context + '/api/analytics/',
@@ -213,26 +354,24 @@ $(document).ready(function () {
     });
     var url = analyticsUrl + "/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
     var numOfFloors = $("#buildingView").data("num_of_floors");
+    console.log(numOfFloors);
 
     createWebSocket(url);
     createDataArrays(numOfFloors);
     getRecentPastdata(numOfFloors);
 
-    $('#range-slider').on("slide", function () {
-    }).on("change", function () {
-        var time = rangeSlider.bootstrapSlider("getValue");
-        showRecentPastData(time);
-    });
-
     $('input[name="daterange"]').datepicker({
         orientation: "auto",
-        endDate: "+0d"
-    }).on("changeDate", function (e) {
+        endDate: "+0d",
+        autoclose: true
+    }).on("changeDate", function(e) {
+        var date = new Date(e.date);
+        date.setHours(date.getHours()-1);
+        console.log(date.getTime());
 
-    });
+        var date = new Date(e.date);
+        console.log("xxx" + date.getTime());
 
-    $("#historic-toggle").click(function () {
-        $(".date-picker").slideToggle("slow");
     });
 });
 
