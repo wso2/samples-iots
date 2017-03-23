@@ -70,6 +70,7 @@ function hidePopup() {
     var historicalData = [];
     var recentPastData = [];
     var selectedDate;
+    var lastFetchedTime;
 
     $("#show-analytics").on('click', function () {
         if ($("#show-analytics").hasClass("show-analytics")) {
@@ -246,7 +247,20 @@ function hidePopup() {
      * To initialize the web-sockets to get the real-time data.
      */
     var intializeWebsockets = function () {
-        var webSocketURL = 'wss://localhost:9445/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceFloorEvent';
+        var analyticsUrl = "wss://localhost:9445";
+        $.ajax({
+            url:context + '/api/analytics/',
+            method: "GET",
+            contentType: "application/json",
+            async: false,
+            success: function (data) {
+                analyticsUrl = data;
+            },
+            error : function (err) {
+            }
+        });
+
+        var webSocketURL = analyticsUrl + '/outputwebsocket/Floor-Analysis-WebSocketLocal-DeviceFloorEvent';
 
         ws = new WebSocket(webSocketURL);
         ws.onopen = function () {
@@ -263,7 +277,7 @@ function hidePopup() {
         };
         webSockets.push(ws);
 
-        webSocketURL = 'wss://localhost:9445/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertEvent';
+        webSocketURL = analyticsUrl + '/outputwebsocket/Floor-Analysis-WebSocketLocal-AlertEvent';
         wsAlert = new WebSocket(webSocketURL);
         wsAlert.onopen = function () {
             notifyUser("You are now connected to Alert stream!", "success", SUCCESS_TIMEOUT, "top-center");
@@ -321,13 +335,15 @@ function hidePopup() {
         buildingId = $("#image").attr("buildingId");
 
         rangeSlider = $("#range-slider").bootstrapSlider({
-            ticks: [-15, -10, -5, 0],
-            ticks_labels: ['-15s', '-10s', '-5s', 'current'],
+            ticks: [-30, -25, -20, -15,-10, -5, 0],
+            ticks_labels: ['-3h', '-2.5h', '-2h', '-1.5h', '-1h', '0.5h', 'current'],
+            step : 5,
             formatter: function(value) {
-                return value + "s";
+                var full = value / 10;
+                return full + "h";
             }
         });
-        rangeSlider.bootstrapSlider('setAttribute', 'min', -15);
+        rangeSlider.bootstrapSlider('setAttribute', 'min', -30);
         rangeSlider.bootstrapSlider('setAttribute', 'max', 0);
         rangeSlider.bootstrapSlider('setValue', 0);
 
@@ -358,15 +374,15 @@ function hidePopup() {
             selectedDate = e.date;
             var date = new Date(e.date);
             date.setHours(date.getHours()-1);
-            console.log(date.getTime());
 
-            var date = new Date(e.date);
-            console.log("xxx" + date.getTime());
-
-            historicalData = getHistoricalData("ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+            historicalData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
             updateHistoricData(historicalData[currentSliderValue]);
         });
 
+        var date = new Date();
+        date.setMinutes(date.getMinutes() - 210);
+        recentPastData = getHistoricalData("getRecentPastData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+        lastFetchedTime = new Date().getTime();
         $('#image canvas').addClass('hidden');
         loadNotifications();
     });
@@ -508,6 +524,7 @@ function hidePopup() {
      * To update the heat map on changing the slider.
      */
     var updateHeatMapOnSlideChange = function () {
+        var minuteToMilliseconds = 1800000;
         isSliderChanged = true;
         switch (currentSelection) {
             case "Temperature" :  temperatureMapInstance.setData({data:[]}); break;
@@ -517,6 +534,13 @@ function hidePopup() {
         }
 
         if (!isHistoricalView) {
+            var currentTime = new Date().getTime();
+
+            if (currentTime - lastFetchedTime > minuteToMilliseconds) {  var date = new Date();
+                date.setMinutes(date.getMinutes() - 210);
+                recentPastData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+                lastFetchedTime = new Date().getTime();
+            }
             var max = rangeSlider.bootstrapSlider("getAttribute", 'max');
             var min = rangeSlider.bootstrapSlider("getAttribute", 'min');
             currentSliderValue = rangeSlider.bootstrapSlider("getValue");
@@ -536,20 +560,8 @@ function hidePopup() {
                         break;
                 }
             } else {
-                switch (currentSelection) {
-                    case "Temperature" :
-                        temperatureMapInstance.setData(temperatureMapData[min * -1 + currentSliderValue]);
-                        break;
-                    case "Motion" :
-                        motionMapInstance.setData(motionMapData[min * -1 + currentSliderValue]);
-                        break;
-                    case "Humidity" :
-                        humidityMapInstance.setData(humidityMapData[min * -1 + currentSliderValue]);
-                        break;
-                    case "Light" :
-                        lightMapInstance.setData(lightMapData[min * -1 +  currentSliderValue]);
-                        break;
-                }
+                var effective_value = (currentSliderValue * -1)/5;
+                updateHistoricData(recentPastData[6-effective_value]);
             }
         } else {
             currentSliderValue = historicalSlider.bootstrapSlider("getValue");
@@ -586,7 +598,11 @@ function hidePopup() {
                 updateHeatMapOnSlideChange();
             }
 
-            for (var i = 0, len = max; currentSliderValue <= len; currentSliderValue++, i++) {
+            var increment = 5;
+            if (isHistoricalView) {
+                increment = 1;
+            }
+            for (var i = 0, len = max; currentSliderValue <= len; currentSliderValue += increment, i++) {
                 timeouts.push(setTimeout(function (y) {
                     if (!isHistoricalView) {
                         rangeSlider.bootstrapSlider("setValue", y);
@@ -760,9 +776,10 @@ function hidePopup() {
      * @param timeTo End time
      *
      */
-    var getHistoricalData = function (tableName, timeFrom) {
+    var getHistoricalData = function (action,tableName, timeFrom) {
         var providerData = null;
-        var providerUrl = context + '/api/batch-provider?action=getHistoricalData&tableName=' + tableName + "&buildingId=" + buildingId + "&floorId=" + floorId;;
+        var providerUrl = context + '/api/batch-provider?action=' + action + '&tableName=' + tableName +
+            '&buildingId=' +  buildingId + "&floorId=" + floorId;
 
         if (timeFrom) {
             providerUrl += '&timeFrom=' + timeFrom;
