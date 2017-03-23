@@ -35,7 +35,6 @@
     });
 
     $(".file-upload").on('click', function () {
-		alert("dsf");
 		console.log(this.id);
         if (validateFileUpload(this)) {
             $('#' + this.id).submit();

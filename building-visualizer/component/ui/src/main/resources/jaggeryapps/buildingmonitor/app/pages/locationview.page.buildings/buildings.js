@@ -35,6 +35,16 @@ function onRequest(context) {
 			accum += block.fn(i);
 		return accum;
 	});
+
+	//need to fix this
+	context.handlebars.registerHelper('ifCond', function(floornum, floors, options) {
+		//fls = JSON.parse(floors);
+		if(floors === floornum) {
+			return options.inverse(this);
+		}
+		return options.fn(this);
+	});
+
 	var viewModel = {};
 	viewModel["buildingId"] = request.getParameter("buildingId");;
 	var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
@@ -53,10 +63,19 @@ function onRequest(context) {
 
 	serviceInvokers.XMLHttp.get(
 		url+"/floors", function (responsePayload) {
-			viewModel["floorsWithImages"] = JSON.parse(responsePayload.responseText);
+			viewModel["floorsWithImages"] = responsePayload.responseText;
 		},
 		function (responsePayload) {
 			viewModel["floorsWithImages"] = "0";
+		}
+	);
+
+	serviceInvokers.XMLHttp.get(
+		url+"/devices", function (responsePayload) {
+			new Log().error(responsePayload.responseText);
+		},
+		function (responsePayload) {
+
 		}
 	);
 	new Log().error(viewModel);

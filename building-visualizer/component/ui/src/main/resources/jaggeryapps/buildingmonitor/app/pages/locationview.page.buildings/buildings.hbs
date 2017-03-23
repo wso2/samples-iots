@@ -44,14 +44,17 @@
 
         {{#times floorCount}}
             <div class="col-lg-5 col-md-6 col-centered message message-success" id = "div_{{this}}">
+            {{#ifCond this floorsWithImages}}
                 <a href="/buildingmonitor/floor?buildingId={{../buildingId}}&floorId={{this}}">
                     Floor - {{this}}
                     <canvas id="{{this}}" width="300%" height="100" style="border:1px solid #000000;"/>
                 </a>
+            {{else}}
                 <p id = "alerts_{{this}}"></p>
                 <div id="upload-view">
                     {{unit "locationview.unit.floorcreate" buildingId=../buildingId floorId=this}}
                 </div>
+            {{/ifCond}}
             </div>
             <br>
         {{/times}}
