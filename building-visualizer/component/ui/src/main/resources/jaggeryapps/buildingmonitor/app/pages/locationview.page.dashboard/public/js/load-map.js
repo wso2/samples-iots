@@ -76,9 +76,7 @@ function preLoadBuildings() {
             var buildings = JSON.parse(data);
             for(var i = 0; i < buildings.length; i++) {
                 var obj = buildings[i];
-                console.log(obj);
                 var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
-                console.log(cord);
                 addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i]);
                 //printBuildingData(obj);
             }
@@ -124,14 +122,16 @@ var tmpEventStore;
 function saveBuilding () {
 	var buildingName = document.getElementsByName('locationName')[0].value;
 	var noOffloors = document.getElementsByName('floors')[0].value;
-	var cords = tmpEventStore.latlng;
+	var lat = document.getElementsByName('lat')[0].value;
+	var long = document.getElementsByName('long')[0].value;
 	var addBuildingApi = "/senseme/building";
-	var buildingdata = {buildingName:buildingName, longitude:cords.lat, latitude:cords.lng, numFloors:noOffloors};
+	var buildingdata = {buildingName:buildingName, longitude:lat, latitude:long, numFloors:noOffloors};
 
-   console.log(buildingdata);
 	invokerUtil.post(addBuildingApi, buildingdata, function(data, textStatus, jqXHR){
 		if (jqXHR.status == 200 && data) {
-			console.log(jqXHR);
+			var cord = {"lat" : lat, "lng" : long};
+			var building = {buildingName:buildingName, longitude:lat, latitude:long, numFloors:noOffloors, buildingId:data};
+			addingMarker(cord, buildingName, data, building);
 		}
 	}, function(jqXHR){
 		if (jqXHR.status == 400) {
@@ -143,7 +143,6 @@ function saveBuilding () {
 	},"application/json","application/json");
 
 	hidePopup();
-	location.reload();
 }
 
 function addBuilding (e) {
@@ -151,20 +150,14 @@ function addBuilding (e) {
 	tmpEventStore = e;
 	var cord = e.latlng;
 	var content = $("#building-response-template");
-
+	content.find("#lat").attr('value', cord.lat);
+	content.find("#long").attr('value', cord.lng);
 	$(modalPopupContent).html(content.html());
 	showPopup();
-	setTimeout(function () {
-		hidePopup();
-		// location.reload(true);
-
-	}, 20000);
-	addingMarker(cord, null, null);
 }
 
 function onMarkerDragged(event) {
     var marker = event.target;
-    console.log("Marker ");
     var latitude = event.target._latlng.lat;
     var longitude = event.target._latlng.lng;
 
@@ -195,7 +188,7 @@ function onMarkerDragged(event) {
 
 // Script for adding marker
 function addingMarker(cord, locationName, buildingId, building) {
-	addBuildingMenu();
+
 	var markerId,
 		popup;
 	$('body.fixed ').removeClass('marker-cursor');
@@ -232,21 +225,13 @@ function addingMarker(cord, locationName, buildingId, building) {
     //marker.on("popupopen", onPopupOpen);
     marker.addTo(map);
     markerId = marker._leaflet_id;
-    console.log(marker._leaflet_id);
 
     if (building != null) {
         buildingsMap[markerId] = building;
     }
 
     markers[markerId] = marker;
-    console.log(markerId);
-    console.log(markers[markerId]);
-
-	//Adding panel heading on load only
-	//if(e == null){
-	//	$('#heading'+markerId).find('.panel-title').text(locationName);
-	//}
-
+	addBuildingMenu(buildingId,locationName, markerId);
 
 	// Remove Marker
 	$('.remove').on("click", function () {
@@ -258,15 +243,11 @@ function addingMarker(cord, locationName, buildingId, building) {
 		$(this).parent('div').remove();
 
 		$('#home').find('#' + idNo).remove();
-		console.log(typeof objectJSON.metaData);
 
 		if(window.localStorage.getItem(KEY_NAME) !== null){
 			$.each(objectJSON.metaData, function(i, values){
-				// console.log(values[i]);
 				if(values.id == idNo){
 					objectJSON.metaData.splice(i, 1);
-					console.log("accessed");
-					console.log(objectJSON);
 					var result = JSON.stringify(objectJSON);
 					window.localStorage.setItem(KEY_NAME, result);
 				}
@@ -292,9 +273,24 @@ function addingMarker(cord, locationName, buildingId, building) {
 	});
 }
 
-function addBuildingMenu() {
-	var content = $("#device-building-template");
+function addBuildingMenu(buildingId, buildingName, markerId) {
+	console.log(buildingId)
+	var content = $("#device-building-template").clone();
 	var sidebar = $("#right-sidebar");
-	content.find("#building-content").text("Hello world!");;
+	content.attr("id","device-building-" + buildingId);
+	content.find("#building-content").text(buildingName);
+	content.find("#building-content-div").attr("data-buildingid", buildingId);
+	content.find("#building-content-div").attr("data-markerid", markerId);
+	content.find("#building-content-div").attr("id","building-content-" + buildingId);
 	sidebar.append(content);
+}
+
+function focusBuilding(id) {
+	var buildingId = $("#" + id).attr('data-buildingid');
+	var markerId = $("#" + id).attr('data-markerid');
+	console.log(buildingId);
+	console.log(markerId);
+	var mark = markers[markerId];
+	var offset = map.panTo(mark.getLatLng());
+	map.panBy(offset);
 }

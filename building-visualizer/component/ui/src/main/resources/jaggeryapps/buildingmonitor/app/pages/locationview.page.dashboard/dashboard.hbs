@@ -74,6 +74,10 @@
                         <label for="floors">No. of Floors *</label>
                         <input type="number" class="form-control required" id="floors" name="floors" placeholder="e.g.: Number of floors">
                     </div>
+                    <div class="form-group">
+                        <input type="hidden" class="form-control required" name="lat" id="lat" name="floors">
+                        <input type="hidden" class="form-control required" name="long" id="long" name="floors">
+                    </div>
                     <div id="building-button" class="form-group">
                         <button id="buttonme" type="button" class="btn btn-primary" data-toggle="update-data" onclick="saveBuilding()">Save</button>
                     </div>
@@ -143,8 +147,8 @@
     </div>
 
     <div style="display:none">
-        <div id="device-building-template" >
-            <div class="text-center"><a class="btn btn-primary" id="building-content"></a></div>
+        <div id="device-building-template"  >
+            <div class="text-center" onclick="focusBuilding(this.id)" id="building-content-div"><a class="btn btn-primary" id="building-content"></a></div>
         </div>
     </div>
 {{/zone}}
