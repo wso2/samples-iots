@@ -19,6 +19,5 @@
 
 var deviceMgtProps = require("/app/modules/conf-reader/main.js")["conf"];
 
-n
 print(deviceMgtProps["wssURL"]);
 %>
