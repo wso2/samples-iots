@@ -6359,7 +6359,7 @@ ul.tiles .icon {
 }
 
 #device-location{
-  height:450px;
+  height: calc(100vh - 90px);
   margin-bottom:0px;
 }
 #device-location .leaflet-popup-content-wrapper{

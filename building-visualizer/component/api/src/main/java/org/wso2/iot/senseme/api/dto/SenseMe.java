@@ -32,6 +32,13 @@ public class SenseMe {
                     break;
                 case "buildingId":  buildingId = property.getValue();
                     break;
+                case "lastKnown":
+                    if (property.getValue() != null) {
+                        long timestamp = Long.parseLong(property.getValue());
+                        if ((System.currentTimeMillis() - timestamp)/1000 > 3600) {
+                            status = "FAULT";
+                        }
+                    }
 
             }
         }

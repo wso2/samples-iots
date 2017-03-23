@@ -36,6 +36,8 @@
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="Floor-Analysis-EventSink-SummarizedDeviceSensorStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
+        <dependency artifact="Floor-Analysis-EventSink-SummarizedFloorSensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
         <dependency artifact="Floor-Analysis-WebSocketLocal-DeviceFloorEvent" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="Floor-Analysis-WebSocketLocal-FloorEvent" version="1.0.0" include="true"
@@ -57,6 +59,8 @@
         <dependency artifact="org.wso2.floor.summarized.SensorStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
         <dependency artifact="org.wso2.floor.summarized.device.floor.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized.perFloor.SensorStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
     </artifact>
 </artifacts>

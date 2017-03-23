@@ -62,11 +62,11 @@ long startDelay = millis();
 //const char* gateway = "http://192.168.1.103:8280";
 //const char* mqtt_server = "192.168.1.103";
 
-const char* ssid = "TP-LINK_EB7F32";
-const char* password = "80246008";
+const char* ssid = "WSO2-Restricted";
+const char* password = "LKvene8xIOT";
 
-const char* gateway = "http://192.168.0.102:8280";
-const char* mqtt_server = "192.168.0.102";
+const char* gateway = "http://192.168.57.99:8280";
+const char* mqtt_server = "192.168.57.99";
 const int mqtt_port = 1886;
 const char* tenant_domain = "carbon.super";
 char device_id[100] ;

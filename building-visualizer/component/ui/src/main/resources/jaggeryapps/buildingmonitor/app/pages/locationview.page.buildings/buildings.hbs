@@ -42,15 +42,19 @@
     <!--</header>-->
     <div class="row" data-num_of_floors="{{floorCount}}" id="buildingView">
 
-            {{#times floorCount}}
-            <div class="col-lg-5 col-md-6 col-centered" >
+        {{#times floorCount}}
+            <div class="col-lg-5 col-md-6 col-centered message message-success" id = "div_{{this}}">
                 <a href="/buildingmonitor/floor?buildingId={{../buildingId}}&floorId={{this}}">
                     Floor - {{this}}
                     <canvas id="{{this}}" width="300%" height="100" style="border:1px solid #000000;"/>
                 </a>
-                <br>
+                <p id = "alerts_{{this}}"></p>
+                <div id="upload-view">
+                    {{unit "locationview.unit.floorcreate" buildingId=../buildingId floorId=this}}
+                </div>
             </div>
-            {{/times}}
+            <br>
+        {{/times}}
 
     </div>
     {{unit "locationview.unit.ui.analytics.rangeSelector"}}

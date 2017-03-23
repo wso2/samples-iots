@@ -111,13 +111,13 @@ function hidePopup() {
             lightMapInstance = h337.create(heatMapConfig);
             humidityMapInstance = h337.create(heatMapConfig);
             temperatureMapInstance.setDataMin(1500);
-            temperatureMapInstance.setDataMax(2800);
+            temperatureMapInstance.setDataMax(3500);
             motionMapInstance.setDataMin(0);
             motionMapInstance.setDataMax(10000);
             lightMapInstance.setDataMin(0);
-            lightMapInstance.setDataMax(10000);
+            lightMapInstance.setDataMax(1024);
             humidityMapInstance.setDataMin(0);
-            humidityMapInstance.setDataMax(10000);
+            humidityMapInstance.setDataMax(100);
         }
         if (!currentTemperatureMap) {
             var config = {
@@ -132,11 +132,11 @@ function hidePopup() {
             currentLightMap = window.h337.create(config);
             currentMotionMap = window.h337.create(config);
             currentTemperatureMap.setDataMin(1500);
-            currentTemperatureMap.setDataMax(2800);
+            currentTemperatureMap.setDataMax(3500);
             currentHumidityMap.setDataMin(0);
-            currentHumidityMap.setDataMax(10000);
+            currentHumidityMap.setDataMax(100);
             currentLightMap.setDataMin(0);
-            currentLightMap.setDataMax(10000);
+            currentLightMap.setDataMax(1024);
             currentMotionMap.setDataMin(0);
             currentMotionMap.setDataMax(10000);
         }
@@ -173,7 +173,7 @@ function hidePopup() {
         var humidityDataPoint = {
             x: dataValues.location.coordinates[0],
             y: dataValues.location.coordinates[1],
-            value: dataValues.humidity * 10000
+            value: dataValues.humidity
         };
 
         var currentHumidityData = currentHumidityMap.getData();
@@ -185,7 +185,7 @@ function hidePopup() {
         var lightDataPoint = {
             x: dataValues.location.coordinates[0],
             y: dataValues.location.coordinates[1],
-            value: dataValues.light * 10000
+            value: 1024 - dataValues.light
         };
         var currentLightData = currentLightMap.getData();
         currentLightData.data = processHeatMapDataPoints(currentLightData.data, lightDataPoint);
@@ -422,7 +422,6 @@ function hidePopup() {
                         notifications.push(notification);
                     }
 
-                    console.log(notifications);
                     viewModel.notifications = notifications;
                     $(messageSideBar).html(template(viewModel));
                 } else {
@@ -488,7 +487,7 @@ function hidePopup() {
                     var dataPoint = {
                         x: historicalData[data].xCoordinate,
                         y: historicalData[data].yCoordinate,
-                        value: historicalData[data].humidity * 10000
+                        value: historicalData[data].humidity
                     };
                     if (!isDataExist(humidityMapInstance.getData().data, dataPoint)) {
                         if (dataPoint.value > max) {
@@ -505,7 +504,7 @@ function hidePopup() {
                     var dataPoint = {
                         x: historicalData[data].xCoordinate,
                         y: historicalData[data].yCoordinate,
-                        value: historicalData[data].light * 10000
+                        value: 1024 - historicalData[data].light
                     };
                     if (!isDataExist(lightMapInstance.getData().data, dataPoint)) {
                         if (dataPoint.value > max) {
@@ -538,7 +537,7 @@ function hidePopup() {
 
             if (currentTime - lastFetchedTime > minuteToMilliseconds) {  var date = new Date();
                 date.setMinutes(date.getMinutes() - 210);
-                recentPastData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+                recentPastData = getHistoricalData("getRecentPastData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
                 lastFetchedTime = new Date().getTime();
             }
             var max = rangeSlider.bootstrapSlider("getAttribute", 'max');
@@ -659,21 +658,7 @@ function hidePopup() {
                         break;
                 }
             } else {
-                var min  = rangeSlider.bootstrapSlider("getAttribute", "min");
-                switch (currentSelection) {
-                    case "Temperature" :
-                        temperatureMapInstance.setData(temperatureMapData[min * -1 + currentSliderValue]);
-                        break;
-                    case "Motion" :
-                        motionMapInstance.setData(motionMapData[min * -1 + currentSliderValue]);
-                        break;
-                    case "Humidity" :
-                        humidityMapInstance.setData(humidityMapData[min * -1 + currentSliderValue]);
-                        break;
-                    case "Light" :
-                        lightMapInstance.setData(lightMapData[min * -1 +  currentSliderValue]);
-                        break;
-                }
+                updateHeatMapOnSlideChange();
             }
         } else {
             updateHeatMapOnSlideChange();
