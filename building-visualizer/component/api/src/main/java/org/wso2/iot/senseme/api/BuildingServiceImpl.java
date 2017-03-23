@@ -22,17 +22,18 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.http.protocol.ResponseServer;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.device.mgt.common.Device;
 import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
+import org.wso2.carbon.device.mgt.common.EnrolmentInfo;
 import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroup;
 import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
 import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAO;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAOManager;
 import org.wso2.iot.senseme.api.dto.BuildingInfo;
+import org.wso2.iot.senseme.api.dto.DeviceInfo;
 import org.wso2.iot.senseme.api.dto.FloorInfo;
 import org.wso2.iot.senseme.api.dto.SenseMe;
 import org.wso2.iot.senseme.api.util.APIUtil;
@@ -265,6 +266,133 @@ public class BuildingServiceImpl implements BuildingService {
         } catch (DeviceManagementException e) {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        }
+    }
+
+    @Override
+    @Path("/{buildingId}/devices")
+    @GET
+    @Produces("application/json")
+    public Response getDevicesForFloor(@PathParam("buildingId") int buildingId) {
+        try {
+            List<DeviceInfo> deviceInfos = new ArrayList<>();
+
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
+            for (int floorId : floorNums) {
+                String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+                DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
+                if (floorDeviceGroup != null) {
+                    DeviceInfo deviceInfo = new DeviceInfo("" +floorId);
+                    List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
+                            floorDeviceGroup.getGroupId(),
+                            0, 1000);
+                    for (Device device : devices) {
+                        device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
+                                device.getDeviceIdentifier(), device.getType()));
+                        String status = device.getEnrolmentInfo().getStatus().toString();
+                        List<Device.Property> propertyList = device.getProperties();
+                        if (device.getEnrolmentInfo().getStatus() == EnrolmentInfo.Status.ACTIVE) {
+                            deviceInfo.increaseActive();
+                            for (Device.Property property : propertyList) {
+                                switch (property.getName()) {
+                                    case "lastKnown":
+                                        if (property.getValue() != null) {
+                                            long timestamp = Long.parseLong(property.getValue());
+                                            if ((System.currentTimeMillis() - timestamp)/1000 > 3600) {
+                                                deviceInfo.increaseFault();
+                                                deviceInfo.decreaseActive();
+                                            }
+                                        }
+
+                                }
+                            }
+                        } else {
+                            deviceInfo.increaseInactive();
+                        }
+                    }
+                    deviceInfos.add(deviceInfo);
+                }
+            }
+            if (deviceInfos.size() > 0) {
+                return Response.status(Response.Status.OK).entity(deviceInfos).build();
+            } else {
+                return Response.status(Response.Status.NO_CONTENT).entity(deviceInfos).build();
+            }
+        } catch (GroupManagementException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } catch (DeviceManagementException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } finally {
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
+        }
+    }
+
+    @Override
+    @Path("/devices")
+    @GET
+    @Produces("application/json")
+    public Response getDevicesForUser() {
+        try {
+            List<DeviceInfo> deviceInfos = new ArrayList<>();
+
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            List<BuildingInfo> buildingList = this.buildingDAO.getAllBuildings();
+            for (BuildingInfo buildingId : buildingList) {
+                String groupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId.getBuildingId());
+                DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
+                if (floorDeviceGroup != null) {
+                    DeviceInfo deviceInfo = new DeviceInfo("" +buildingId.getBuildingId());
+                    List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
+                            floorDeviceGroup.getGroupId(),
+                            0, 1000);
+                    for (Device device : devices) {
+                        device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
+                                device.getDeviceIdentifier(), device.getType()));
+                        List<Device.Property> propertyList = device.getProperties();
+                        if (device.getEnrolmentInfo().getStatus() == EnrolmentInfo.Status.ACTIVE) {
+                            deviceInfo.increaseActive();
+                            for (Device.Property property : propertyList) {
+                                switch (property.getName()) {
+                                    case "lastKnown":
+                                        if (property.getValue() != null) {
+                                            long timestamp = Long.parseLong(property.getValue());
+                                            if ((System.currentTimeMillis() - timestamp)/1000 > 3600) {
+                                                deviceInfo.increaseFault();
+                                                deviceInfo.decreaseActive();
+                                            }
+                                        }
+
+                                }
+                            }
+                        } else {
+                            deviceInfo.increaseInactive();
+                        }
+                    }
+                    deviceInfos.add(deviceInfo);
+                }
+            }
+            if (deviceInfos.size() > 0) {
+                return Response.status(Response.Status.OK).entity(deviceInfos).build();
+            } else {
+                return Response.status(Response.Status.NO_CONTENT).entity(deviceInfos).build();
+            }
+        } catch (GroupManagementException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } catch (DeviceManagementException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } finally {
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
     }
 }

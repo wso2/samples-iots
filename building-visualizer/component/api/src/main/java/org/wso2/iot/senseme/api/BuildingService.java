@@ -255,4 +255,40 @@ public interface BuildingService {
     )
     Response getDevices(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId);
 
+    @Path("/{buildingId}/devices")
+    @GET
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Get devices for the building",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+    Response getDevicesForFloor(@PathParam("buildingId") int buildingId);
+
+    @Path("/devices")
+    @GET
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Get devices for the user",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+    Response getDevicesForUser();
+
 }

@@ -69,6 +69,21 @@ function loadLeafletMap() {
 }
 
 function preLoadBuildings() {
+	var getBuildingDevicesApi = "/senseme/building/devices";
+	var dict = {};
+	invokerUtil.get(getBuildingDevicesApi, function (data, textStatus, jqXHR) {
+		if (jqXHR.status == 200) {
+			var devices = JSON.parse(data);
+			for(var i = 0; i < devices.length; i++) {
+				var obj = devices[i];
+				//[{"id":"9","activeDevices":0,"faultDevices":0,"inactiveDevices":4,"totalDevices":4}]
+				dict[obj.id] = {"active" : obj.activeDevices, "inactive" : obj.inactiveDevices, "fault":obj.faultDevices, "total":obj.totalDevices};
+
+			}
+		}
+	}, function (jqXHR) {
+	}, "application/json");
+
     var getBuildingApi = "/senseme/building";
     invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
         if (jqXHR.status == 200) {
@@ -77,7 +92,9 @@ function preLoadBuildings() {
             for(var i = 0; i < buildings.length; i++) {
                 var obj = buildings[i];
                 var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
-                addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i]);
+				var buildingdevice = dict[obj.buildingId];
+				console.log("buildingadd" + JSON.stringify(buildingdevice));
+                addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i], buildingdevice);
                 //printBuildingData(obj);
             }
         }
@@ -187,8 +204,7 @@ function onMarkerDragged(event) {
 }
 
 // Script for adding marker
-function addingMarker(cord, locationName, buildingId, building) {
-
+function addingMarker(cord, locationName, buildingId, building, buildingdevice) {
 	var markerId,
 		popup;
 	$('body.fixed ').removeClass('marker-cursor');
@@ -231,7 +247,7 @@ function addingMarker(cord, locationName, buildingId, building) {
     }
 
     markers[markerId] = marker;
-	addBuildingMenu(buildingId,locationName, markerId);
+	addBuildingMenu(buildingId,locationName, markerId, buildingdevice);
 
 	// Remove Marker
 	$('.remove').on("click", function () {
@@ -273,11 +289,23 @@ function addingMarker(cord, locationName, buildingId, building) {
 	});
 }
 
-function addBuildingMenu(buildingId, buildingName, markerId) {
-	console.log(buildingId)
+function addBuildingMenu(buildingId, buildingName, markerId, buildingdevice) {
 	var content = $("#device-building-template").clone();
 	var sidebar = $("#right-sidebar");
 	content.attr("id","device-building-" + buildingId);
+	console.log("buildingmenu" + JSON.stringify(buildingdevice));
+	console.log(buildingdevice);
+	if (buildingdevice && buildingdevice != undefined) {
+		content.find("#building-active").text(buildingdevice.active);
+		content.find("#building-inactive").text(buildingdevice.inactive);
+		content.find("#building-fault").text(buildingdevice.fault);
+		content.find("#building-alerts").text("0");
+	} else {
+		content.find("#building-active").text("0");
+		content.find("#building-inactive").text("0");
+		content.find("#building-fault").text("0");
+		content.find("#building-alerts").text("0");
+	}
 	content.find("#building-content").text(buildingName);
 	content.find("#building-content-div").attr("data-buildingid", buildingId);
 	content.find("#building-content-div").attr("data-markerid", markerId);
@@ -288,8 +316,6 @@ function addBuildingMenu(buildingId, buildingName, markerId) {
 function focusBuilding(id) {
 	var buildingId = $("#" + id).attr('data-buildingid');
 	var markerId = $("#" + id).attr('data-markerid');
-	console.log(buildingId);
-	console.log(markerId);
 	var mark = markers[markerId];
 	var offset = map.panTo(mark.getLatLng());
 	map.panBy(offset);
