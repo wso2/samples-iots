@@ -70,16 +70,10 @@ function loadLeafletMap() {
 
 function preLoadBuildings() {
 	var getBuildingDevicesApi = "/senseme/building/devices";
-	var dict = {};
+	var devices = {};
 	invokerUtil.get(getBuildingDevicesApi, function (data, textStatus, jqXHR) {
 		if (jqXHR.status == 200) {
-			var devices = JSON.parse(data);
-			for(var i = 0; i < devices.length; i++) {
-				var obj = devices[i];
-				//[{"id":"9","activeDevices":0,"faultDevices":0,"inactiveDevices":4,"totalDevices":4}]
-				dict[obj.id] = {"active" : obj.activeDevices, "inactive" : obj.inactiveDevices, "fault":obj.faultDevices, "total":obj.totalDevices};
-
-			}
+			devices = JSON.parse(data);
 		}
 	}, function (jqXHR) {
 	}, "application/json");
@@ -92,8 +86,18 @@ function preLoadBuildings() {
             for(var i = 0; i < buildings.length; i++) {
                 var obj = buildings[i];
                 var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
-				var buildingdevice = dict[obj.buildingId];
-				console.log("buildingadd" + JSON.stringify(buildingdevice));
+
+				for(var j = 0; i < devices.length; j++) {
+					var buildingdevice;
+
+					if (devices[j].id == obj.buildingId) {
+						var deviceobj = devices[j];
+						//[{"id":"9","activeDevices":0,"faultDevices":0,"inactiveDevices":4,"totalDevices":4}]
+						buildingdevice = {"active" : deviceobj.activeDevices, "inactive" : deviceobj.inactiveDevices, "fault":deviceobj.faultDevices, "total":deviceobj.totalDevices};
+
+					}
+
+				}
                 addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i], buildingdevice);
                 //printBuildingData(obj);
             }
@@ -293,8 +297,6 @@ function addBuildingMenu(buildingId, buildingName, markerId, buildingdevice) {
 	var content = $("#device-building-template").clone();
 	var sidebar = $("#right-sidebar");
 	content.attr("id","device-building-" + buildingId);
-	console.log("buildingmenu" + JSON.stringify(buildingdevice));
-	console.log(buildingdevice);
 	if (buildingdevice && buildingdevice != undefined) {
 		content.find("#building-active").text(buildingdevice.active);
 		content.find("#building-inactive").text(buildingdevice.inactive);
