@@ -195,7 +195,7 @@ function onMarkerDragged(event) {
 
 // Script for adding marker
 function addingMarker(cord, locationName, buildingId, building) {
-
+	addBuildingMenu();
 	var markerId,
 		popup;
 	$('body.fixed ').removeClass('marker-cursor');
@@ -290,4 +290,11 @@ function addingMarker(cord, locationName, buildingId, building) {
 		var offset = baseMap.panTo(LatLng);
 		baseMap.panBy(offset);
 	});
+}
+
+function addBuildingMenu() {
+	var content = $("#device-building-template");
+	var sidebar = $("#right-sidebar");
+	content.find("#building-content").text("Hello world!");;
+	sidebar.append(content);
 }

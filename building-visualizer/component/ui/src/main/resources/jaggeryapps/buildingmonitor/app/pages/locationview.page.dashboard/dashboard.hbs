@@ -18,6 +18,7 @@
 {{unit "cdmf.unit.lib.leaflet"}}
 {{unit "cdmf.unit.ui.title" pageTitle="Home"}}
 {{unit "uuf.unit.lib.form-validation"}}
+
 {{#zone "breadcrumbs"}}
     <li>
         <a href="{{@app.context}}/">
@@ -108,6 +109,44 @@
         </div>
     </div>
         <!--<div id="openStreetMapId" style="height:100%"></div>-->
+{{/zone}}
+
+
+{{#zone "navMenu-icon"}}
+    <span class="icon fw-stack">
+        <i class="fw fw-menu fw-stack-1x toggle-icon-down"></i>
+    </span>
+{{/zone}}
+
+{{#zone "navbarCollapsableRightItems"}}
+    <ul id="notification-bubble-wrapper" class="nav navbar-nav navbar-right">
+        <li class="visible-inline-block">
+            <!--<a href="{{@app.context}}notification-listing" title="Failures of operations on the device side will be listed here">-->
+            <a data-toggle="sidebar" data-target="#right-sidebar" data-container=".page-content"
+               aria-expanded="false" rel="notifications-sidebar">
+                <span class="icon fw-stack">
+                    <i class="fw fw-notification fw-stack-1x"></i>
+                </span>
+                <span class="hidden-xs">Buildings</span>
+                <span class="badge notifications" id="notification-bubble"></span>
+            </a>
+        </li>
+    </ul>
+{{/zone}}
+
+{{#zone "sidePanes"}}
+
+    <div class="sidebar-wrapper sidebar-wrapper-animation-fix" id="right-sidebar"
+         data-side="right" data-width="320" data-sidebar-fixed="true" data-top="90" data-fixed-offset="90" data-offset-top="50" data-spy="affix">
+        <ul class="sidebar-messages">
+        </ul>
+    </div>
+
+    <div style="display:none">
+        <div id="device-building-template" >
+            <div class="text-center"><a class="btn btn-primary" id="building-content"></a></div>
+        </div>
+    </div>
 {{/zone}}
 
 {{#zone "bottomJs"}}
