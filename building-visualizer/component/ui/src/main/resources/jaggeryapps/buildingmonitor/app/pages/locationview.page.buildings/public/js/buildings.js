@@ -199,21 +199,7 @@ $(document).ready(function () {
     $(".slider-wrapper").show(1000);
 
     setRealViewSlider();
-
-    var analyticsUrl = "wss://localhost:9445";
-    $.ajax({
-        url:context + '/api/analytics/',
-        method: "GET",
-        contentType: "application/json",
-        async: false,
-        success: function (data) {
-            analyticsUrl = data;
-        },
-        error : function (err) {
-        }
-    });
-
-    var url = analyticsUrl + '/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent';
+    var url = "ws://localhost:9765/outputwebsocket/Floor-Analysis-WebSocketLocal-FloorEvent";
     var numOfFloors = $("#buildingView").data("num_of_floors");
 
     createWebSocket(url);
