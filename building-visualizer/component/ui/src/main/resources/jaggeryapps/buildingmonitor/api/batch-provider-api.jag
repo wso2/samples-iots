@@ -74,6 +74,18 @@
                 "DESC");
         }
         print(data);
+    } else if (action === 'getCount') {
+        var newData = [];
+        var data = [];
+        start = 0;
+        limit = 100;
+
+        while (newData.length == 100 || start == 0) {
+            newData = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, "DESC");
+            data = data.concat(newData);
+            start += 100;
+        }
+        print(data.length);
     }
 }());
 
