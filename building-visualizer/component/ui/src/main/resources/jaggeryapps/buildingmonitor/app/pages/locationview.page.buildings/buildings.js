@@ -29,41 +29,46 @@ function onRequest(context) {
         return;
     }
 
-	context.handlebars.registerHelper('times', function(n, block) {
-		var accum = '';
-		for(var i = n; i >= 1; --i)
-			accum += block.fn(i);
-		return accum;
-	});
-
-	//need to fix this
-	context.handlebars.registerHelper('ifCond', function(floornum, floors, options) {
-		//fls = JSON.parse(floors);
-		if(floors === floornum) {
-			return options.inverse(this);
-		}
-		return options.fn(this);
-	});
-
 	var viewModel = {};
 	viewModel["buildingId"] = request.getParameter("buildingId");;
 	var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
 	var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
 	var url = devicemgtProps["httpsURL"] + "/senseme/building/" + viewModel["buildingId"];
+	var floorsCount = 0;
 	serviceInvokers.XMLHttp.get(
 		url, function (responsePayload) {
 			var building = JSON.parse(responsePayload.responseText);
-			viewModel["floorCount"] = building.numFloors;
+			floorsCount = building.numFloors;
+			viewModel["floorCount"] = floorsCount;
 
 		},
 		function (responsePayload) {
 			viewModel["floorCount"] = "0";
 		}
 	);
+	var floors = {};
+	for (var i = floorsCount; i >= 1; i--) {
+		var floor = {};
+		floor.active = 0;
+		floor.inactive = 0;
+		floor.fault = 0;
+		floor.total = 0;
+		floor.num = i;
+		floors[i] = floor;
+	}
 
 	serviceInvokers.XMLHttp.get(
 		url+"/floors", function (responsePayload) {
-			viewModel["floorsWithImages"] = responsePayload.responseText;
+			var floorsImages = JSON.parse(responsePayload.responseText);
+			viewModel["floorsWithImages"] = floorsImages;
+			for (var i = 0; i < floorsImages.length; i++) {
+				for (var j = 1; j <= floorsCount; j++) {
+					if (floorsImages.indexOf(j) > -1) {
+
+						floors["" + j].image = "exist";
+					}
+				}
+			}
 		},
 		function (responsePayload) {
 			viewModel["floorsWithImages"] = "0";
@@ -72,12 +77,21 @@ function onRequest(context) {
 
 	serviceInvokers.XMLHttp.get(
 		url+"/devices", function (responsePayload) {
-			new Log().error(responsePayload.responseText);
+			var devices = JSON.parse(responsePayload.responseText);
+			if (devices) {
+
+				for (var i = 0; i < devices.length; i++) {
+					floors["" + devices[i].id].active = devices[i].activeDevices;
+					floors["" + devices[i].id].inactive = devices[i].inactiveDevices;
+					floors["" + devices[i].id].fault = devices[i].faultDevices;
+					floors["" + devices[i].id].total = devices[i].totalDevices;
+				}
+			}
 		},
 		function (responsePayload) {
 
 		}
 	);
-	new Log().error(viewModel);
+	viewModel["floors"] = floors;
 	return viewModel;
 }

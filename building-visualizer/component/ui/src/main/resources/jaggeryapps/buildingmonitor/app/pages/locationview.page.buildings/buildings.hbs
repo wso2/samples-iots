@@ -41,25 +41,34 @@
 {{#zone "content"}}
     <!--</header>-->
     <div class="row" data-num_of_floors="{{floorCount}}" id="buildingView">
+        {{#each floors}}
+        <div class="col-lg-5 col-md-6 col-centered message message-success" id = "div_{{this.num}}">
+            Floor - {{this.num}}
+            {{#if this.image}}
 
-        {{#times floorCount}}
-            <div class="col-lg-5 col-md-6 col-centered message message-success" id = "div_{{this}}">
-            {{#ifCond this floorsWithImages}}
-                <a href="/buildingmonitor/floor?buildingId={{../buildingId}}&floorId={{this}}">
-                    Floor - {{this}}
-                    <canvas id="{{this}}" width="300%" height="100" style="border:1px solid #000000;"/>
-                </a>
+                    <a href="/buildingmonitor/floor?buildingId={{../../buildingId}}&floorId={{../this.num}}">
+                        <canvas id="{{num}}" width="300%" height="100" style="border:1px solid #000000;"/>
+                    </a>
+                    <p id = "alerts_{{../this.num}}">alerts : 0</p>
+                    <p id = "active_{{../this.num}}">active : {{../this.active}}</p>
+                    <p id = "inactive_{{../this.num}}">inactive : {{../this.inactive}}</p>
+                    <p id = "fault_{{../this.num}}">fault : {{../this.fault}}</p>
+
+
             {{else}}
-                <p id = "alerts_{{this}}"></p>
                 <div id="upload-view">
-                    {{unit "locationview.unit.floorcreate" buildingId=../buildingId floorId=this}}
+                    {{unit "locationview.unit.floorcreate" buildingId=../../buildingId floorId=../this.num}}
                 </div>
-            {{/ifCond}}
-            </div>
+            {{/if}}
+        </div>
             <br>
-        {{/times}}
+        {{/each}}
+
+
 
     </div>
+
+
     {{unit "locationview.unit.ui.analytics.rangeSelector"}}
 {{/zone}}
 
