@@ -24,7 +24,6 @@ var buildingsMap = [];
 var modalPopup = ".modal";
 var modalPopupContainer = modalPopup + " .modal-content";
 var modalPopupContent = modalPopup + " .modal-content";
-var buildingAlertCount = [];
 
 /*
  * set popup maximum height function.
@@ -77,73 +76,65 @@ function preLoadBuildings() {
 	invokerUtil.get(getBuildingDevicesApi, function (data, textStatus, jqXHR) {
 		if (jqXHR.status == 200) {
 			devices = JSON.parse(data);
+			var getBuildingApi = "/senseme/building";
+			invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
+				if (jqXHR.status == 200) {
+					//[{"buildingId":1,"buildingName":"ayyoobs1","owner":"admin","longitude":"79.97607422294095","latitude":"6.995539474716988","numFloors":4}
+					var buildings = JSON.parse(data);
+					var buildingIds;
+					if (buildings.length > 0) {
+						for (var i = 0; i < buildings.length; i++) {
+							if (i == 0) {
+								buildingIds = buildings[i].buildingId;
+							} else {
+								buildingIds = buildingIds + "," + buildings[i].buildingId;
+							}
+						}
+						var providerUrl = context + '/api/batch-provider?action=getMapAlertCount&tableName=ORG_WSO2_FLOOR_ALERTNOTIFICATIONS&buildingSet=' + buildingIds;
+
+						$.ajax({
+							url: providerUrl,
+							method: "GET",
+							contentType: "application/json",
+							async: false,
+							success: function (buildingAlertCount) {
+								for (var i = 0; i < buildings.length; i++) {
+									var obj = buildings[i];
+									var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
+
+									for(var j = 0; j < devices.length; j++) {
+										var buildingdevice;
+
+										if (devices[j].id == obj.buildingId) {
+											var deviceobj = devices[j];
+											//[{"id":"9","activeDevices":0,"faultDevices":0,"inactiveDevices":4,"totalDevices":4}]
+											var alert = buildingAlertCount[obj.buildingId];
+											buildingdevice = {"active" : deviceobj.activeDevices,
+												"inactive" : deviceobj.inactiveDevices,
+												"fault":deviceobj.faultDevices, "total":deviceobj.totalDevices, "alerts" : alert};
+											break;
+										}
+
+									}
+									addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i], buildingdevice);
+									//printBuildingData(obj);
+
+
+								}
+
+							},
+							error: function (err) {
+								console.log(err);
+							}
+						});
+					}
+				}
+			}, function (jqXHR) {
+			}, "application/json");
 		}
+
 	}, function (jqXHR) {
 	}, "application/json");
-
-    var getBuildingApi = "/senseme/building";
-    invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
-        if (jqXHR.status == 200) {
-            var buildingIds;
-            //[{"buildingId":1,"buildingName":"ayyoobs1","owner":"admin","longitude":"79.97607422294095","latitude":"6.995539474716988","numFloors":4}
-            var buildings = JSON.parse(data);
-            for (var i = 0; i < buildings.length; i++) {
-                var obj = buildings[i];
-                var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
-
-				for(var j = 0; i < devices.length; j++) {
-					var buildingdevice;
-
-					if (devices[j].id == obj.buildingId) {
-						var deviceobj = devices[j];
-						//[{"id":"9","activeDevices":0,"faultDevices":0,"inactiveDevices":4,"totalDevices":4}]
-						buildingdevice = {"active" : deviceobj.activeDevices, "inactive" : deviceobj.inactiveDevices, "fault":deviceobj.faultDevices, "total":deviceobj.totalDevices};
-
-					}
-
-				}
-                addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i], buildingdevice);
-                //printBuildingData(obj);
-                if (i == 0) {
-                    buildingIds = obj.buildingId;
-                } else {
-                    buildingIds = buildingIds + "," + obj.buildingId;
-                }
-
-            }
-            if (buildings.length > 0) {
-                loadNotifications(buildingIds);
-            }
-        }
-    }, function (jqXHR) {
-    }, "application/json");
-
-}
-
-function loadNotifications(buildingIds) {
-    var providerUrl = context + '/api/batch-provider?action=getMapAlertCount&tableName=ORG_WSO2_FLOOR_ALERTNOTIFICATIONS&buildingSet=' + buildingIds;
-
-    $.ajax({
-        url: providerUrl,
-        method: "GET",
-        contentType: "application/json",
-        async: false,
-        success: function (data) {
-            buildingAlertCount = data;
-
-            for (var index in buildingsMap) {
-                var building =  buildingsMap[index];
-                var buildingId = buildingIds.split(",");
-                addBuildingMenu(building.buildingId, building.buildingName, index, data[buildingId.indexOf(building.buildingId.toString())]);
-
-            }
-
-        },
-        error: function (err) {
-            console.log(err);
-        }
-    });
-
 }
 
 
@@ -347,7 +338,7 @@ function addBuildingMenu(buildingId, buildingName, markerId, buildingdevice) {
 		content.find("#building-active").text(buildingdevice.active);
 		content.find("#building-inactive").text(buildingdevice.inactive);
 		content.find("#building-fault").text(buildingdevice.fault);
-		content.find("#building-alerts").text("0");
+		content.find("#building-alerts").text(buildingdevice.alerts);
 	} else {
 		content.find("#building-active").text("0");
 		content.find("#building-inactive").text("0");

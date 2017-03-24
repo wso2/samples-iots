@@ -57,6 +57,7 @@ public class SenseMe {
                             status = "FAULT";
                         }
                     }
+                    break;
 
             }
         }
