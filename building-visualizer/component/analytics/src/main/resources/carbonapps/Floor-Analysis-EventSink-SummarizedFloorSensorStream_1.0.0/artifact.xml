@@ -18,5 +18,5 @@
   -->
 <artifact name="Floor-Analysis-EventSink-SummarizedFloorSensorStream" version="1.0.0" type="analytics/eventstore"
           serverRole="DataAnalyticsServer">
-    <file>org_wso2_summarized_perFloor_SensorStream.xml</file>
+    <file>org_wso2_floor_summarized_perFloor_SensorStream.xml</file>
 </artifact>
