@@ -35,7 +35,7 @@ from dataOut[temperature < 23]
 select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very cool. Please increase the temperature" as information,
 timeStamp insert into alertOut ;
 
-from dataOut[temperature > 28]
+from dataOut[temperature > 2]
 select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very hot. Please decrease the temperature" as information,
 timeStamp insert into alertOut ;
 
