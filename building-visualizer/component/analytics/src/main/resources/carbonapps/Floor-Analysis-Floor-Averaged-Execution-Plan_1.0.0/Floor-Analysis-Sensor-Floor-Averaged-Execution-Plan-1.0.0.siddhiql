@@ -14,7 +14,7 @@ double, light double, timeStamp long, buildingId string, floorId string, xCoordi
 define stream dataOut (buildingId string, floorId string, temperature double, motion double, humidity double, airQuality
 double, light double, timeStamp long);
 
-@Export('org.wso2.floor.summarized.perFloor.SensorStream:1.0.0')
+@Export('org.wso2.summarized.perFloor.SensorStream:1.0.0')
 define stream summarizedDataOut (buildingId string, floorId string, temperature double, motion double, humidity double,
 airQuality double, light double, timeStamp long);
 
@@ -35,7 +35,7 @@ from dataOut[temperature < 23]
 select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very cool. Please increase the temperature" as information,
 timeStamp insert into alertOut ;
 
-from dataOut[temperature > 28]
+from dataOut[temperature > 2]
 select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very hot. Please decrease the temperature" as information,
 timeStamp insert into alertOut ;
 

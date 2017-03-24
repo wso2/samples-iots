@@ -62,7 +62,7 @@ function hidePopup() {
     var timeouts = [];
     var heatMapConfig = {
         container: document.getElementById('image'),
-        radius: 200,
+        radius: 100,
         maxOpacity: .5,
         minOpacity: 0,
         blur: .75
@@ -122,7 +122,7 @@ function hidePopup() {
         if (!currentTemperatureMap) {
             var config = {
                 container: document.getElementById('heat-map-hidden'),
-                radius: 200,
+                radius: 100,
                 maxOpacity: .5,
                 minOpacity: 0,
                 blur: .75
@@ -131,7 +131,7 @@ function hidePopup() {
             currentHumidityMap = window.h337.create(config);
             currentLightMap = window.h337.create(config);
             currentMotionMap = window.h337.create(config);
-            currentTemperatureMap.setDataMin(1500);
+            currentTemperatureMap.setDataMin(1800);
             currentTemperatureMap.setDataMax(3500);
             currentHumidityMap.setDataMin(0);
             currentHumidityMap.setDataMax(100);
@@ -456,13 +456,11 @@ function hidePopup() {
                     };
 
                     if (!isDataExist(temperatureMapInstance.getData().data, dataPoint)) {
-                        if (dataPoint.value > max) {
-                            max = dataPoint.value;
-                        }
                         temperatureMapInstance.addData(dataPoint);
                     }
                 }
-                temperatureMapInstance.setDataMax(max);
+                temperatureMapInstance.setDataMax(3500);
+                temperatureMapInstance.setDataMin(1800);
                 break;
             case "Motion" :
                 motionMapInstance.setData({data: []});
@@ -473,13 +471,11 @@ function hidePopup() {
                         value: historicalData[data].motion * 10000
                     };
                     if (!isDataExist(motionMapInstance.getData().data, dataPoint)) {
-                        if (dataPoint.value > max) {
-                            max = dataPoint.value;
-                        }
                         motionMapInstance.addData(dataPoint);
                     }
                 }
-                motionMapInstance.setDataMax(max);
+                motionMapInstance.setDataMin(0);
+                motionMapInstance.setDataMax(10000);
                 break;
             case "Humidity" :
                 humidityMapInstance.setData({data: []});
@@ -496,7 +492,8 @@ function hidePopup() {
                         humidityMapInstance.addData(dataPoint);
                     }
                 }
-                humidityMapInstance.setDataMax(max);
+                humidityMapInstance.setDataMin(0);
+                humidityMapInstance.setDataMax(100);
                 break;
             case "Light" :
                 lightMapInstance.setData({data: []});
@@ -513,7 +510,8 @@ function hidePopup() {
                         lightMapInstance.addData(dataPoint)
                     }
                 }
-                lightMapInstance.setDataMax(max);
+                lightMapInstance.setDataMin(0);
+                lightMapInstance.setDataMax(1024);
                 break;
         }
 

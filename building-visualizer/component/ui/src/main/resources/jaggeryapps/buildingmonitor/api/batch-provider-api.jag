@@ -71,6 +71,9 @@
     } else if (action === 'getRecentPastData') {
         var minutesToMilliSeconds = 1800000;
         var data = [];
+        var start = new Date();
+        start.setMinutes(start.getMinutes() - 210);
+        timeFrom = start.getTime();
         for (var i = 0; i < 6; i++) {
             var startTime = parseFloat(timeFrom) + minutesToMilliSeconds * i;
             var endTime = parseFloat(timeFrom) + minutesToMilliSeconds * (i + 1);
