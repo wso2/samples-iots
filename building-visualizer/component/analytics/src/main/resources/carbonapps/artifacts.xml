@@ -48,6 +48,7 @@
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="Floor-Analysis-WebSocketLocal-AlertEvent" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
+		<dependency artifact="android_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="temperature_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="light_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="humidity_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>

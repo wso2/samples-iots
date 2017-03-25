@@ -22,6 +22,7 @@ import io.swagger.annotations.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.apimgt.annotations.api.Scope;
 import org.wso2.carbon.apimgt.annotations.api.Scopes;
+import org.wso2.iot.senseme.api.dto.AlertMessage;
 import org.wso2.iot.senseme.api.dto.BuildingInfo;
 import org.wso2.iot.senseme.api.dto.FloorInfo;
 
@@ -290,5 +291,23 @@ public interface BuildingService {
             }
     )
     Response getDevicesForUser();
+
+    @Path("/notification")
+    @POST
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "POST notifications to android devices in the group",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+    Response sendNotifications(AlertMessage alertMessage);
 
 }

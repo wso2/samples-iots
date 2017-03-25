@@ -27,14 +27,20 @@ import org.wso2.carbon.device.mgt.common.Device;
 import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
 import org.wso2.carbon.device.mgt.common.EnrolmentInfo;
+import org.wso2.carbon.device.mgt.common.InvalidDeviceException;
 import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroup;
 import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
+import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
+import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
+import org.wso2.carbon.device.mgt.core.operation.mgt.ProfileOperation;
 import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAO;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAOManager;
+import org.wso2.iot.senseme.api.dto.AlertMessage;
 import org.wso2.iot.senseme.api.dto.BuildingInfo;
 import org.wso2.iot.senseme.api.dto.DeviceInfo;
 import org.wso2.iot.senseme.api.dto.FloorInfo;
+import org.wso2.iot.senseme.api.dto.Notification;
 import org.wso2.iot.senseme.api.dto.SenseMe;
 import org.wso2.iot.senseme.api.util.APIUtil;
 
@@ -57,6 +63,9 @@ public class BuildingServiceImpl implements BuildingService {
     private static Log log = LogFactory.getLog(BuildingServiceImpl.class);
     BuildingPluginDAOManager buildingDAOManager = new BuildingPluginDAOManager();
     BuildingPluginDAO buildingDAO = buildingDAOManager.getDeviceDAO();
+    private static final String ANDROID_DEVICE_TYPE = "android";
+    public static final String NOTIFICATION = "NOTIFICATION";
+
 
     @POST
     @Produces("application/json")
@@ -270,27 +279,69 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    @Path("/{buildingId}/devices")
+    @Path("/notification")
+    @POST
+    @Produces("application/json")
+    public Response sendNotifications(AlertMessage alertMessage) {
+        try {
+            int buildingId = Integer.parseInt(alertMessage.getBuildingId());
+            int floorId = Integer.parseInt(alertMessage.getFloorId());
+            String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+            DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
+            if (floorDeviceGroup != null) {
+                List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
+                        floorDeviceGroup.getGroupId(),
+                        0, 1000);
+                List<DeviceIdentifier> androidDevices = new ArrayList<>();
+                for (Device device : devices) {
+                    if (device.getType().equals(ANDROID_DEVICE_TYPE)) {
+                        androidDevices.add(new DeviceIdentifier(device.getDeviceIdentifier(), device.getType()));
+                    }
+                }
+
+                if (androidDevices.size() > 0) {
+                    Notification notification = new Notification(alertMessage);
+                    ProfileOperation operation = new ProfileOperation();
+                    operation.setCode(NOTIFICATION);
+                    operation.setType(Operation.Type.PROFILE);
+                    operation.setPayLoad(notification.toJSON());
+                    APIUtil.getDeviceManagementService().addOperation(ANDROID_DEVICE_TYPE, operation, androidDevices);
+                }
+            }
+            return Response.status(Response.Status.OK).build();
+        } catch (GroupManagementException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } catch (OperationManagementException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } catch (InvalidDeviceException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        }
+    }
+
+    @Override
+    @Path("/devices")
     @GET
     @Produces("application/json")
-    public Response getDevicesForFloor(@PathParam("buildingId") int buildingId) {
+    public Response getDevicesForUser() {
         try {
             List<DeviceInfo> deviceInfos = new ArrayList<>();
 
             buildingDAOManager.getBuildingDAOHandler().openConnection();
-            List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
-            for (int floorId : floorNums) {
-                String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+            List<BuildingInfo> buildingList = this.buildingDAO.getAllBuildings();
+            for (BuildingInfo buildingId : buildingList) {
+                String groupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId.getBuildingId());
                 DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
                 if (floorDeviceGroup != null) {
-                    DeviceInfo deviceInfo = new DeviceInfo("" +floorId);
+                    DeviceInfo deviceInfo = new DeviceInfo("" +buildingId.getBuildingId());
                     List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
                             floorDeviceGroup.getGroupId(),
                             0, 1000);
                     for (Device device : devices) {
                         device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
                                 device.getDeviceIdentifier(), device.getType()));
-                        String status = device.getEnrolmentInfo().getStatus().toString();
                         List<Device.Property> propertyList = device.getProperties();
                         if (device.getEnrolmentInfo().getStatus() == EnrolmentInfo.Status.ACTIVE) {
                             deviceInfo.increaseActive();
@@ -333,27 +384,29 @@ public class BuildingServiceImpl implements BuildingService {
         }
     }
 
+
     @Override
-    @Path("/devices")
+    @Path("/{buildingId}/devices")
     @GET
     @Produces("application/json")
-    public Response getDevicesForUser() {
+    public Response getDevicesForFloor(@PathParam("buildingId") int buildingId) {
         try {
             List<DeviceInfo> deviceInfos = new ArrayList<>();
 
             buildingDAOManager.getBuildingDAOHandler().openConnection();
-            List<BuildingInfo> buildingList = this.buildingDAO.getAllBuildings();
-            for (BuildingInfo buildingId : buildingList) {
-                String groupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId.getBuildingId());
+            List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
+            for (int floorId : floorNums) {
+                String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
                 DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
                 if (floorDeviceGroup != null) {
-                    DeviceInfo deviceInfo = new DeviceInfo("" +buildingId.getBuildingId());
+                    DeviceInfo deviceInfo = new DeviceInfo("" +floorId);
                     List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
                             floorDeviceGroup.getGroupId(),
                             0, 1000);
                     for (Device device : devices) {
                         device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
                                 device.getDeviceIdentifier(), device.getType()));
+                        String status = device.getEnrolmentInfo().getStatus().toString();
                         List<Device.Property> propertyList = device.getProperties();
                         if (device.getEnrolmentInfo().getStatus() == EnrolmentInfo.Status.ACTIVE) {
                             deviceInfo.increaseActive();
