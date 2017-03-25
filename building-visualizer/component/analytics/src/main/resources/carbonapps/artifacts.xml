@@ -48,6 +48,10 @@
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="Floor-Analysis-WebSocketLocal-AlertEvent" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
+        <dependency artifact="temperature_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="light_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="humidity_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="motion_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="org.wso2.floor.SensorStream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="org.wso2.floor.average.SensorStream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="org.wso2.floor.device.SensorStream" version="1.0.0" include="true"
@@ -62,5 +66,27 @@
                     serverRole="DataAnalyticsServer" />
         <dependency artifact="org.wso2.floor.summarized.perFloor.SensorStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
+        <dependency artifact="motion_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer" />
+        <dependency artifact="temperature_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer" />
+        <dependency artifact="light_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer" />
+        <dependency artifact="humidity_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer" />
+        <dependency artifact="temperature_spark_script" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="humidity_spark_script" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="light_spark_script" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="motion_spark_script" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="temperature_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="motion_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="humidity_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="light_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+
+
     </artifact>
 </artifacts>

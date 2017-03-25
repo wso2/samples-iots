@@ -385,6 +385,14 @@ function hidePopup() {
         lastFetchedTime = new Date().getTime();
         $('#image canvas').addClass('hidden');
         loadNotifications();
+/*
+        $("#svg rect").click(function (e) {
+            e.preventDefault;
+            var id = $(this).attr("id");
+            console.log(id.substring(7));
+
+        });*/
+
     });
 
     var isDataExist = function(dataArray, dataPoint) {
@@ -565,7 +573,6 @@ function hidePopup() {
             updateHistoricData(historicalData[currentSliderValue]);
         }
     };
-
 
     /**
      * To make animation out of the heat-map for the real-time data.
@@ -822,7 +829,8 @@ function addDevice () {
  * @param status
  */
 function placeDevice(deviceId, x, y, status) {
-
+    var link = document.createElementNS(null, "a");
+    link.setAttributeNS(null, "href", context + "/device?deviceId=" + deviceId + "&deviceType=senseme");
     var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     rect.setAttributeNS(null,"id", "myrect-" + deviceId);
     rect.setAttributeNS(null,"fill", "grey");
@@ -839,8 +847,11 @@ function placeDevice(deviceId, x, y, status) {
     rect.setAttributeNS(null,"y", y);
     rect.setAttributeNS(null,"width", "30");
     rect.setAttributeNS(null,"height", "30");
+
+    //rect.setAttributeNS(null, "href", context + "/device?deviceId=" + deviceId + "&deviceType=senseme");
+    link.appendChild(rect)
     var svg = document.getElementById("svg");
-    svg.appendChild(rect);
+    svg.appendChild(link);
 }
 
 function loadDevices() {

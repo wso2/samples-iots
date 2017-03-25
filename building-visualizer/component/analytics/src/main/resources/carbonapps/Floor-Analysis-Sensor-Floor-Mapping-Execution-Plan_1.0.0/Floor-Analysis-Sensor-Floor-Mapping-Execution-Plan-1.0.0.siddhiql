@@ -18,6 +18,19 @@ light double, timeStamp long);
 define stream dataOut (deviceId string, temperature double, motion double, humidity double, airQuality
 double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
 
+@Export('org.wso2.iot.devices.motion:1.0.0')
+define stream motionOut (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, motion double);
+
+@Export('org.wso2.iot.devices.humidity:1.0.0')
+define stream humidityOut (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, humidity double);
+
+@Export('org.wso2.iot.devices.light:1.0.0')
+define stream lightOut (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, light double);
+
+@Export('org.wso2.iot.devices.temperature:1.0.0')
+define stream temperatureOut (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long,
+temperature double);
+
 @Export('org.wso2.floor.summarized.device.floor.SensorStream:1.0.0')
 define stream summarizedDataOut (deviceId string, temperature double, motion double, humidity double, airQuality
 double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
@@ -34,6 +47,22 @@ from summarizedDataIn as d join deviceLocationTable as l on d.deviceId == l.devi
 select d.deviceId as deviceId, d.temperature as temperature, d.motion as motion, d.humidity as humidity, d
 .airQuality as  airQuality, d.light as light, d.timeStamp as timeStamp, l.buildingId as buildingId,
 l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into summarizedDataOut;
+
+from dataIn
+select "owner" as meta_owner, "senseme" as meta_deviceType, deviceId as meta_deviceId, time:timestampInMilliseconds() as meta_time,
+avgMotion as motion insert into motionOut ;
+
+from dataIn
+select "owner" as meta_owner, "senseme" as meta_deviceType, deviceId as meta_deviceId, time:timestampInMilliseconds() as meta_time,
+avgTemperature as temperature insert into temperatureOut ;
+
+from dataIn
+select "owner" as meta_owner, "senseme" as meta_deviceType, deviceId as meta_deviceId, time:timestampInMilliseconds() as meta_time,
+avgLight as light insert into lightOut ;
+
+from dataIn
+select "owner" as meta_owner, "senseme" as meta_deviceType, deviceId as meta_deviceId, time:timestampInMilliseconds() as meta_time,
+avgHumidity as humidity insert into humidityOut ;
 
 from dataIn
 select deviceId, timeStamp as lastKnown
