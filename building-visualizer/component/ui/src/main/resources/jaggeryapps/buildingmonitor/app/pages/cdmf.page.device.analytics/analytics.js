@@ -16,21 +16,13 @@
  * under the License.
  */
 
-function onRequest(context){
-    var utility = require("/app/modules/utility.js").utility;
-    context.handlebars.registerHelper('equal', function (lvalue, rvalue, options) {
-        if (arguments.length < 3)
-            throw new Error("Handlebars Helper equal needs 2 parameters");
-        if( lvalue!=rvalue ) {
-            return options.inverse(this);
-        } else {
-            return options.fn(this);
-        }
-    });
-
-    var buildingId = request.getParameter("buildingId");
-    var floorId = request.getParameter("floorId");
+function onRequest(context) {
     var deviceType = context.uriParams.deviceType;
-    return {"buildingId": buildingId,
-            "floorId" : floorId};
+    var deviceName = request.getParameter("deviceName");
+    var deviceId = request.getParameter("deviceId");
+    return {
+        "deviceType": deviceType,
+        "deviceName": deviceName,
+        "deviceId": deviceId
+    };
 }

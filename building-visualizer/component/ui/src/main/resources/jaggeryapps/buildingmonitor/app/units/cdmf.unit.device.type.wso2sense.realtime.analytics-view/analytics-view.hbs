@@ -13,7 +13,7 @@
 </div>
 <div id="div-chart-sensorType2" data-websocketurlStream="{{websocketEndpointForStream2}}">
     <div class="chartWrapper" id="chartWrapper">
-        <div id="yAxisSensorType2" class="custom_y_axis">humidy</div>
+        <div id="yAxisSensorType2" class="custom_y_axis">humidity</div>
         <div class="legend_container">
             <div id="smootherSensorType2" title="Smoothing"></div>
             <div id="legendSensorType2"></div>
@@ -22,9 +22,30 @@
         <div class="custom_x_axis">Time</div>
     </div>
 </div>
+<div id="div-chart-sensorType3" data-websocketurlStream="{{websocketEndpointForStream3}}">
+    <div class="chartWrapper" id="chartWrapper">
+        <div id="yAxisSensorType3" class="custom_y_axis">motion</div>
+        <div class="legend_container">
+            <div id="smootherSensorType3" title="Smoothing"></div>
+            <div id="legendSensorType3"></div>
+        </div>
+        <div id="chartSensorType3" class="custom_rickshaw_graph"></div>
+        <div class="custom_x_axis">Time</div>
+    </div>
+</div>
+<div id="div-chart-sensorType4" data-websocketurlStream="{{websocketEndpointForStream4}}">
+    <div class="chartWrapper" id="chartWrapper">
+        <div id="yAxisSensorType4" class="custom_y_axis">temperature</div>
+        <div class="legend_container">
+            <div id="smootherSensorType4" title="Smoothing"></div>
+            <div id="legendSensorType4"></div>
+        </div>
+        <div id="chartSensorType4" class="custom_rickshaw_graph"></div>
+        <div class="custom_x_axis">Time</div>
+    </div>
+</div>
 <a class="padding-left"
-   href="{{@app.context}}/device/{{device.type}}/analytics?deviceId={{device.deviceIdentifier}}
-   &deviceName={{device.name}}">
+   href="{{@app.context}}/device/{{device.type}}/analytics?deviceId={{device.deviceIdentifier}}&deviceName={{device.name}}">
     <span class="fw-stack">
         <i class="fw fw-ring fw-stack-2x"></i>
         <i class="fw fw-statistics fw-stack-1x"></i>

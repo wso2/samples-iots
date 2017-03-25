@@ -385,15 +385,18 @@ function hidePopup() {
         lastFetchedTime = new Date().getTime();
         $('#image canvas').addClass('hidden');
         loadNotifications();
-/*
-        $("#svg rect").click(function (e) {
-            e.preventDefault;
-            var id = $(this).attr("id");
-            console.log(id.substring(7));
 
-        });*/
+        $("#svg rect").click(function (e) {
+            e.preventDefault();
+            var id = $(this).attr("id");
+            var deviceId = id.substring(7);
+            window.open(context + "/device/senseme?id="+deviceId + "&buildingId=" + buildingId + "&floorId=" + floorId);
+
+        });
 
     });
+
+
 
     var isDataExist = function(dataArray, dataPoint) {
         for (var data in dataArray) {
@@ -731,7 +734,7 @@ function hidePopup() {
      */
     var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortBy) {
         var providerData = null;
-        var providerUrl = context + '/api/batch-provider?action=getData&tableName=' + tableName + "&buildingId=" + buildingId + "&floorId=" + floorId;;
+        var providerUrl = context + '/api/batch-provider?action=getData&tableName=' + tableName + "&buildingId=" + buildingId + "&floorId=" + floorId;
 
         if (timeFrom && timeTo) {
             providerUrl += '&timeFrom=' + timeFrom + '&timeTo=' + timeTo;
@@ -829,8 +832,6 @@ function addDevice () {
  * @param status
  */
 function placeDevice(deviceId, x, y, status) {
-    var link = document.createElementNS(null, "a");
-    link.setAttributeNS(null, "href", context + "/device?deviceId=" + deviceId + "&deviceType=senseme");
     var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     rect.setAttributeNS(null,"id", "myrect-" + deviceId);
     rect.setAttributeNS(null,"fill", "grey");
@@ -847,11 +848,8 @@ function placeDevice(deviceId, x, y, status) {
     rect.setAttributeNS(null,"y", y);
     rect.setAttributeNS(null,"width", "30");
     rect.setAttributeNS(null,"height", "30");
-
-    //rect.setAttributeNS(null, "href", context + "/device?deviceId=" + deviceId + "&deviceType=senseme");
-    link.appendChild(rect)
     var svg = document.getElementById("svg");
-    svg.appendChild(link);
+    svg.appendChild(rect);
 }
 
 function loadDevices() {
@@ -863,7 +861,6 @@ function loadDevices() {
             var devices = JSON.parse(data);
             for(var i = 0; i < devices.length; i++) {
                 var device = devices[i];
-                console.log(device);
                 placeDevice(device.deviceId, device.xCord, device.yCord, device.status);
             }
         }

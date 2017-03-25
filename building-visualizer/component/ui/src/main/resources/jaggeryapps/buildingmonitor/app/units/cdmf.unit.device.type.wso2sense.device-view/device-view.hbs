@@ -15,6 +15,8 @@
   specific language governing permissions and limitations
   under the License.
 }}
+
+{{unit "cdmf.unit.lib.leaflet"}}
 {{#zone "topCss"}}
     <style>
         .thumbnail.icon:before {
@@ -32,10 +34,15 @@
                           data-toggle="tab" aria-controls="device_statistics">Device
                                                                               Statistics</a>
     </li>
-    <li><a class="list-group-item" href="#event_log" role="tab" data-toggle="tab"
-           aria-controls="event_log">Operations Log</a></li>
-    <li><a class="list-group-item" href="#geo_dashboard" role="tab" data-toggle="tab"
-           aria-controls="geo_dashboard">Map</a></li>
+    <li role="presentation" class="list-group-item location_tab">
+        <a href="#device_location_tab" role="tab" data-toggle="tab"
+           data-lat="{{device.location.latitude}}"
+           data-long="{{device.location.longitude}}"
+           aria-controls="device_location_tab">
+            <i class="icon fw fw-map-location"></i><span
+                class="hidden-sm">Device Location</span>
+        </a>
+    </li>
 {{/zone}}
 
 {{#zone "device-view-tab-contents"}}
@@ -44,43 +51,45 @@
         <div class="panel-heading">Device Statistics</div>
         {{unit "cdmf.unit.device.type.wso2sense.realtime.analytics-view" device=device}}
     </div>
-    <div class="panel panel-default tab-pane" id="event_log" role="tabpanel"
-         aria-labelledby="event_log">
-        <div class="panel-heading">Operations Log <span><a href="#"
-                                                           id="refresh-operations"><i
-                class="fw fw-refresh"></i></a></span></div>
-        <div class="panel-body">
-            <div id="operations-spinner" class="wr-advance-operations-init hidden">
-                <br>
-
-                <i class="fw fw-settings fw-spin fw-2x"></i>
-
-                Loading Operations Log . . .
-                <br>
-                <br>
-            </div>
-            <div id="operations-log-container">
-                <div class="panel-body">
-                    Not available yet
-                </div>
-                <br class="c-both"/>
+    <div class="panel panel-default visible-xs-block" role="tabpanel"
+         id="device_location_tab">
+        <div class="panel-heading visible-xs collapsed" id="device_location">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#tabs"
+                   href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                    <i class="fw fw-map-location fw-2x"></i>
+                    Device Location
+                    <i class="caret-updown fw fw-down"></i>
+                </a>
+            </h4>
+        </div>
+        <div class="panel-heading display-none-xs">Device Location</div>
+        <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel"
+             aria-labelledby="device_location">
+            <div class="panel-body">
+                {{#if device.location}}
+                    <div id="device-location"
+                         data-lat="{{device.location.latitude}}"
+                         data-long="{{device.location.longitude}}"
+                         data-locations="{{device.locationHistory}}">
+                    </div>
+                    <br/>
+                {{else}}
+                    <div id="map-error" class="message message-warning">
+                        <h4 class="remove-margin">
+                            <i class="icon fw fw-warning"></i>
+                            Device location information is not available.
+                        </h4>
+                    </div>
+                    <p class="add-padding-5x"></p>
+                    <p class="add-padding-5x"></p>
+                    <p class="add-padding-5x"></p>
+                {{/if}}
             </div>
         </div>
     </div>
-    <div class="panel panel-default tab-pane"
-         id="geo_dashboard" role="tabpanel" aria-labelledby="geo_dashboard">
-        <div class="panel-heading">Map</div>
+{{/zone}}
 
-        <div id="chartWrapper">
-        </div>
-
-        <a class="padding-left"
-           href="{{portalUrl}}/portal/dashboards/geo-dashboard/?GLOBAL-STATE={{anchor}}">
-
-            <span class="fw-stack">
-                <i class="fw fw-circle-outline fw-stack-2x"></i>
-                <i class="fw fw-statistics fw-stack-1x"></i>
-            </span> View Device Location
-        </a>
-    </div>
+{{#zone "bottomJs"}}
+    {{js "js/load-map.js"}}
 {{/zone}}

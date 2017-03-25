@@ -21,15 +21,17 @@ function onRequest(context) {
     var deviceType = context["uriParams"]["deviceType"];
     var deviceId = request.getParameter("id");
     var deviceViewData = {};
+    var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
     if (deviceType && deviceId) {
         var deviceModule = require("/app/modules/business-controllers/device.js")["deviceModule"];
         var response = deviceModule.viewDevice(deviceType, deviceId);
+
         if (response["status"] == "success") {
+
             deviceViewData["deviceFound"] = true;
             deviceViewData["isAuthorized"] = true;
 
             var filteredDeviceData = response["content"];
-
             // creating deviceView information model from filtered device data
             var viewModel = {};
             if (filteredDeviceData["type"]) {
@@ -84,51 +86,11 @@ function onRequest(context) {
                         viewModel["vendor"] = filteredDeviceData["initialDeviceInfo"]["VENDOR"];
                         viewModel["model"] = filteredDeviceData["initialDeviceInfo"]["DEVICE_MODEL"];
                     }
-                    if (filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]) {
-                        if (deviceType == "android") {
-                            viewModel["BatteryLevel"] = {};
-                            viewModel["BatteryLevel"]["value"] = filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["BATTERY_LEVEL"];
 
-                            viewModel["internalMemory"] = {};
-                            viewModel["internalMemory"]["total"] = Math.
-                                round(filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["INTERNAL_TOTAL_MEMORY"] * 100) / 100;
-                            if (filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["INTERNAL_TOTAL_MEMORY"] != 0) {
-                                viewModel["internalMemory"]["usage"] = Math.
-                                    round((filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["INTERNAL_TOTAL_MEMORY"] -
-                                        filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["INTERNAL_AVAILABLE_MEMORY"])
-                                        / filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["INTERNAL_TOTAL_MEMORY"] * 10000) / 100;
-                            } else {
-                                viewModel["internalMemory"]["usage"] = 0;
-                            }
+                    viewModel["buildingId"] = filteredDeviceData["initialDeviceInfo"]["buildingId"];
+                    viewModel["floorId"] = filteredDeviceData["initialDeviceInfo"]["floorId"];
+                    viewModel["coordinates"] = "(" + filteredDeviceData["initialDeviceInfo"]["xCoordinate"] + ", " + filteredDeviceData["initialDeviceInfo"]["yCoordinate"] + ")";
 
-                            viewModel["externalMemory"] = {};
-                            viewModel["externalMemory"]["total"] = Math.
-                                round(filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["EXTERNAL_TOTAL_MEMORY"] * 100) / 100;
-                            if (filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["EXTERNAL_TOTAL_MEMORY"] != 0) {
-                                viewModel["externalMemory"]["usage"] = Math.
-                                    round((filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["EXTERNAL_TOTAL_MEMORY"] -
-                                        filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["EXTERNAL_AVAILABLE_MEMORY"])
-                                        / filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["EXTERNAL_TOTAL_MEMORY"] * 10000) / 100;
-                            } else {
-                                viewModel["externalMemory"]["usage"] = 0;
-                            }
-                        } else if (deviceType == "ios") {
-                            viewModel["BatteryLevel"] = {};
-                            viewModel["BatteryLevel"]["value"] = filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["BatteryLevel"];
-
-                            viewModel["internalMemory"] = {};
-                            viewModel["internalMemory"]["total"] = Math.
-                                round(filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["DeviceCapacity"] * 100) / 100;
-                            if (filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["DeviceCapacity"] != 0) {
-                                viewModel["internalMemory"]["usage"] = Math.
-                                    round((filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["DeviceCapacity"] -
-                                        filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["AvailableDeviceCapacity"])
-                                        / filteredDeviceData["initialDeviceInfo"]["DEVICE_INFO"]["DeviceCapacity"] * 10000) / 100;
-                            } else {
-                                viewModel["internalMemory"]["usage"] = 0;
-                            }
-                        }
-                    }
                 }
             }
             if (filteredDeviceData["latestDeviceInfo"]) {
@@ -195,7 +157,6 @@ function onRequest(context) {
             if (!filteredDeviceData["initialDeviceInfo"] && !filteredDeviceData["latestDeviceInfo"]) {
                 viewModel["deviceInfoAvailable"] = false;
             }
-
             deviceViewData["device"] = viewModel;
         } else if (response["status"] == "unauthorized") {
             deviceViewData["deviceFound"] = true;

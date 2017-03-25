@@ -18,10 +18,16 @@
 
 var wsConnection1;
 var wsConnection2;
+var wsConnection3;
+var wsConnection4;
 var graphForSensorType1;
 var graphForSensorType2;
+var graphForSensorType3;
+var graphForSensorType4;
 var chartDataSensorType1 = [];
 var chartDataSensorType2 = [];
+var chartDataSensorType3 = [];
+var chartDataSensorType4 = [];
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
     var tNow = new Date().getTime() / 1000;
@@ -67,7 +73,7 @@ function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
         formatter: function (series, x, y) {
             var date = '<span class="date">' + moment.unix(x * 1000).format('Do MMM YYYY h:mm:ss a') + '</span>';
             var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-            return swatch + series.name + ": " + parseInt(y) + '<br>' + date;
+            return swatch + series.name + ": " + parseFloat(y).toFixed(2) + '<br>' + date;
         }
     });
     var websocketurlStream = $(placeHolder).attr("data-websocketurlStream");
@@ -79,11 +85,17 @@ $(window).load(function () {
         , graphForSensorType1);
     drawGraph(wsConnection2, "#div-chart-sensorType2", "yAxisSensorType2", "chartSensorType2", chartDataSensorType2
         , graphForSensorType2);
+    drawGraph(wsConnection3, "#div-chart-sensorType3", "yAxisSensorType3", "chartSensorType3", chartDataSensorType3
+        , graphForSensorType3);
+    drawGraph(wsConnection4, "#div-chart-sensorType4", "yAxisSensorType4", "chartSensorType4", chartDataSensorType4
+        , graphForSensorType4);
 });
 
 $(window).unload(function () {
     disconnect(wsConnection1);
     disconnect(wsConnection2);
+    disconnect(wsConnection3);
+    disconnect(wsConnection4);
 });
 
 //websocket connection
@@ -97,7 +109,6 @@ function connect(wsConnection, target, chartData, graph) {
     }
     if (wsConnection) {
         wsConnection.onmessage = function (event) {
-            alert("hello");
             var dataPoint = JSON.parse(event.data);
             chartData.push({
                 x: parseInt(dataPoint[4]) / 1000,
@@ -106,7 +117,17 @@ function connect(wsConnection, target, chartData, graph) {
             chartData.shift();
             graph.update();
         };
+        wsConnection.onopen = function (event) {
+            console.log("opened");
+        };
+        wsConnection.onclose = function (event) {
+            console.log("closed");
+        };
+        wsConnection.onerror = function (event) {
+            console.log("error");
+        };
     }
+
 }
 
 function disconnect(wsConnection) {

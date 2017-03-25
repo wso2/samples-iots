@@ -16,21 +16,41 @@
  * under the License.
  */
 
-function onRequest(context){
-    var utility = require("/app/modules/utility.js").utility;
-    context.handlebars.registerHelper('equal', function (lvalue, rvalue, options) {
-        if (arguments.length < 3)
-            throw new Error("Handlebars Helper equal needs 2 parameters");
-        if( lvalue!=rvalue ) {
-            return options.inverse(this);
-        } else {
-            return options.fn(this);
-        }
-    });
+#rangeSliderWrapper {
+    margin-top: 25px;
+}
 
-    var buildingId = request.getParameter("buildingId");
-    var floorId = request.getParameter("floorId");
-    var deviceType = context.uriParams.deviceType;
-    return {"buildingId": buildingId,
-            "floorId" : floorId};
+#chart {
+    display: inline-block;
+}
+
+#legend {
+    display: inline-block;
+    position: relative;
+    left: 8px;
+}
+
+#legend_container {
+    position: absolute;
+    right: 0;
+    bottom: 26px;
+    width: 0;
+}
+
+#chart_container {
+    float: left;
+    position: relative;
+}
+
+.ast-container {
+    padding-bottom: 30px;
+}
+
+.container {
+    width: auto;
+}
+
+.shrink {
+    margin-right: 20px;
+    margin-left: 20px;
 }

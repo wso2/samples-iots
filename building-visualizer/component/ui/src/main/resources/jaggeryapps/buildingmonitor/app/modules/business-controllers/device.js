@@ -100,7 +100,6 @@ deviceModule = function () {
         }
         var utility = require('/app/modules/utility.js')["utility"];
         try {
-            utility.startTenantFlow(carbonUser);
             var url = devicemgtProps["httpsURL"] + "/api/device-mgt/v1.0/devices/" + deviceType + "/" + deviceId;
             return serviceInvokers.XMLHttp.get(
                 url,
@@ -196,8 +195,6 @@ deviceModule = function () {
             );
         } catch (e) {
             throw e;
-        } finally {
-            utility.endTenantFlow();
         }
     };
 

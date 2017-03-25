@@ -26,17 +26,21 @@
             <i class="icon fw fw-home"></i>
         </a>
     </li>
+{{/zone}}
+
+{{#zone "navbarActions"}}
     <li>
-        <a href="{{@app.context}}/devices">
-            Devices
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            Device Details
+        <!--suppress HtmlUnknownTarget -->
+        <a href="{{@app.context}}/floor/?buildingId={{buildingId}}&floorId={{floorId}}">
+        <span class="icon fw-stack">
+            <i class="fw fw-left fw-stack-1x"></i>
+            <i class="fw fw-circle-outline fw-stack-2x"></i>
+        </span>
+            Go back to floor view
         </a>
     </li>
 {{/zone}}
+
 
 {{#zone "content"}}
     {{unit "cdmf.unit.device.type.wso2sense.device-view"}}

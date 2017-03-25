@@ -22,7 +22,7 @@ var sensorType2 = "humidy";
 var sensorType1Graph;
 var sensorType2Graph;
 
-function drawGraph_wso2sense(from, to)
+function drawGraph_senseme(from, to)
 {
     var devices = $("#details").data("devices");
     var tzOffset = new Date().getTimezoneOffset() * 60;

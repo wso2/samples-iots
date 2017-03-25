@@ -28,8 +28,25 @@ function onRequest(context) {
 		var deviceModule = require("/app/modules/business-controllers/device.js")["deviceModule"];
 		var device = deviceModule.viewDevice(deviceType, deviceId);
 
-		new Log().info("here");
-		if (device && device.status != "error") {
+        var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
+        var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
+
+        if (device && device.status != "error") {
+			var buildingId = device.content["initialDeviceInfo"]["buildingId"];
+            if (buildingId) {
+                var url = devicemgtProps["httpsURL"] + "/senseme/building/" + buildingId;
+
+                serviceInvokers.XMLHttp.get(
+                    url,
+                    // response callback
+                    function (backendResponse) {
+                        var details = JSON.parse(backendResponse["responseText"]);
+                        device.content["location"] = {};
+                        device.content["location"]["latitude"] = details.latitude;
+                        device.content["location"]["longitude"] = details.longitude;
+                    }
+                );
+            }
 			return {"device": device.content, "autoCompleteParams" : autoCompleteParams, "encodedFeaturePayloads": ""};
 		} else {
 			response.sendError(404, "Device Id " + deviceId + " of type " + deviceType + " cannot be found!");
