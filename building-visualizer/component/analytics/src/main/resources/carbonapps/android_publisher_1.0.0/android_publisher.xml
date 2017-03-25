@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<eventPublisher name="Android-PushNotification-Publisher"
+<eventPublisher name="android_publisher"
 				processing="enable" statistics="disable" trace="disable" xmlns="http://wso2.org/carbon/eventpublisher">
 	<from streamName="org.wso2.floor.AlertNotifications" version="1.0.0"/>
 	<mapping customMapping="enable" type="json">

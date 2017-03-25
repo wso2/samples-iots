@@ -291,7 +291,7 @@ public interface BuildingService {
             }
     )
     Response getDevicesForUser();
-    
+
     @Path("/notification")
     @POST
     @Produces("application/json")

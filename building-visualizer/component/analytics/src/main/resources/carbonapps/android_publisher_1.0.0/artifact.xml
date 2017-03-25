@@ -16,7 +16,6 @@
   ~ under the License.
   -->
 
-<artifact name="Floor-Analysis-WebSocketLocal-AlertEvent" version="1.0.0" type="event/publisher"
-          serverRole="DataAnalyticsServer">
-    <file>Android-PushNotification-Publisher-1.0.0.xml</file>
+<artifact name="android_publisher" version="1.0.0" type="event/publisher" serverRole="DataAnalyticsServer">
+    <file>android_publisher.xml</file>
 </artifact>
