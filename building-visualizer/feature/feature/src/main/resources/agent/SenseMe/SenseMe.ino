@@ -132,6 +132,8 @@ boolean registerme() {
         String at = response.substring(13, commaIndex);
         Serial.print("accessToken: ");
         Serial.println(at);
+        char __at[at.length() + 1];
+        at.toCharArray(__at, sizeof(__at));
         String response2 = response.substring(commaIndex + 1, response.length());
         commaIndex = response2.indexOf(',');
         String rt = response2.substring(14, commaIndex);
@@ -148,17 +150,13 @@ boolean registerme() {
         Serial.print("\nUpdated refresh token and app key: ");
         Serial.println(__rt);
         Serial.println(__appKey);
-        File configFile = SPIFFS.open("/config", "w");
-        if (!configFile) {
-          Serial.println("Failed to open config file for writing");
-        }else{
-          configFile.print(__rt);
-          configFile.print(",");
-          configFile.print(__appKey);
-          configFile.print(";");
-          configFile.close();
-          Serial.println("Config updated");
-        }
+        memcpy(refreshToken,__rt, 36);
+        memcpy(apiKey,__appKey, appKey.length() + 1);
+        memcpy(accessToken,__at, at.length() + 1);
+        Serial.println("test");
+        Serial.println(apiKey);
+        Serial.println(accessToken);
+        Serial.println(refreshToken);
       
         return true;
       }else{
@@ -171,41 +169,12 @@ boolean registerme() {
   }
 }
 
-String getAccessToken() {
-  File configFile = SPIFFS.open("/config", "r");
-  char __refreshToken[36];
-  char __appKey[100];
-  if (!configFile) {
-    memcpy(__refreshToken, refreshToken, 36);
-    Serial.println("Config file not available. Using defalt coonfigs");
-  }else{
-    boolean refreshToken = false;
-    int index = 0;
-    while (configFile.available()) {
-      char readCharacater = (char) configFile.read();
-      
-      if (readCharacater == ',') {
-        refreshToken = true;
-        index = 0;
-        continue;
-      }else if (readCharacater == ';') {
-        break;
-      } 
-      if (refreshToken) {
-        __appKey[index++] = readCharacater;
-      } else {
-        __refreshToken[index++] = readCharacater;
-      }
-    }
-    configFile.close();
-  }
-  
-
+void loadAccessTokenFromRefreshToken() {
   Serial.print("\nLoaded refreshToken: ");
-  Serial.println(__refreshToken);
+  Serial.println(refreshToken);
 
   Serial.print("\nLoaded appKey: ");
-  Serial.println(__appKey);
+  Serial.println(apiKey);
 
   HTTPClient http;    //Declare object of class HTTPClient
   char tokenEP[100];
@@ -213,41 +182,39 @@ String getAccessToken() {
   Serial.println(tokenEP);
   http.begin(tokenEP);      //Specify request destination
   http.addHeader("content-type", "application/x-www-form-urlencoded");  //Specify content-type header
-  http.addHeader("Authorization", __appKey);
+  http.addHeader("Authorization", apiKey);
 
   char payload[200];
-  snprintf (payload, 200, "grant_type=refresh_token&refresh_token=%s", __refreshToken);
+  snprintf (payload, 200, "grant_type=refresh_token&refresh_token=%s", refreshToken);
   Serial.println(payload);
   int httpCode = http.POST(payload);   //Send the request
   String response = http.getString();  //Get the response payload
   http.end();  //Close connection
-
+  Serial.println("Refresh Request");
   Serial.println(response);
-
-  int commaIndex = response.indexOf(',');
-  if (commaIndex > 0 && response.length() > 30) {
-    String at = response.substring(13, commaIndex);
-    String response2 = response.substring(commaIndex + 1, response.length());
-    commaIndex = response2.indexOf(',');
-    String rt = response2.substring(14, commaIndex);
-    char __rt[rt.length() + 1];
-    rt.toCharArray(__rt, sizeof(__rt));
-    Serial.print("\nUpdated refresh token: ");
-    Serial.println(__rt);
-    File configFile = SPIFFS.open("/config", "w");
-    if (!configFile) {
-      Serial.println("Failed to open config file for writing");
-    }else{
-      configFile.println(__rt);
-      configFile.close();
-      Serial.println("Config updated");
+  Serial.println(httpCode);
+  if (httpCode > 0) {
+    if (httpCode == 200) {
+      int commaIndex = response.indexOf(',');
+      String at = response.substring(13, commaIndex);
+      char __at[at.length() + 1];
+      at.toCharArray(__at, sizeof(__at));
+      String response2 = response.substring(commaIndex + 1, response.length());
+      commaIndex = response2.indexOf(',');
+      String rt = response2.substring(14, commaIndex);
+      char __rt[rt.length() + 1];
+      rt.toCharArray(__rt, sizeof(__rt));
+      Serial.print("\nUpdated refresh token: ");
+      Serial.println(__rt);
+      memcpy(refreshToken,__rt, rt.length() + 1);
+      memcpy(accessToken,__at, at.length() + 1);
+      Serial.println("test from refreshToken");
+      Serial.println(apiKey);
+      Serial.println(accessToken);
+      Serial.println(refreshToken);
+    } else {
+      registerme();
     }
-    String _timeStampString = response2.substring(commaIndex + 12, response2.length());
-    syncTime(_timeStampString);
-    return at;
-  }else{
-    Serial.println("\nUsing hardcoded access token");
-    return accessToken;
   }
 }
 
@@ -275,8 +242,7 @@ void setup() {
   pinMode(PIR_OUT, INPUT);
 
   Serial.begin(115200);
-  
-  
+
   Serial.print("device id :");
   Serial.println(device_id);
   if (!SPIFFS.begin()) {
@@ -291,13 +257,10 @@ void reconnect() {
   // Loop until we're reconnected
   Serial.print("Attempting MQTT connection...");
   // Attempt to connect
-  String __at = getAccessToken();
-  char __accessToken[__at.length() + 1];
-  __at.toCharArray(__accessToken, sizeof(__accessToken));
+  loadAccessTokenFromRefreshToken();
   Serial.print("\nConnecting MQTT client using access token: ");
-  Serial.println(__accessToken);
-  if (client.connect(device_id, __accessToken, "")) {
-    client.subscribe(subscribedTopic);
+  Serial.println(accessToken);
+  if (client.connect(device_id, accessToken, "")) {
     Serial.println("MQTT Client Connected again");
   } else {
     Serial.print("failed, rc=");
@@ -316,13 +279,10 @@ void loop() {
       Serial.println("device not registered.. retrying");
        return;
      } else {
-        String __at = getAccessToken();
-        char __accessToken[__at.length() + 1];
-        __at.toCharArray(__accessToken, sizeof(__accessToken));
         Serial.print("\nConnecting MQTT client using access token: ");
-        Serial.println(__accessToken);
+        Serial.println(accessToken);
         if (!mqttConnected) {
-          if (client.connect(device_id, __accessToken, "")) {
+          if (client.connect(device_id, accessToken, "")) {
             Serial.println("MQTT Client Connected");
             mqttConnected = true;
           } else {
