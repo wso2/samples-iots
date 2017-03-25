@@ -24,12 +24,12 @@ define stream alertOut (buildingId string, floorId string, type string, value do
 from dataIn#window.timeBatch(1 min)
 select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
 (airQuality) as airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
-group by floorId insert all events into dataOut ;
+group by floorId insert into dataOut ;
 
 from dataIn#window.timeBatch(60 min)
 select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
 (airQuality) as airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
-group by floorId insert all events into summarizedDataOut;
+group by floorId insert into summarizedDataOut;
 
 from dataOut[temperature < 23]
 select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very cool. Please increase the temperature" as information,
