@@ -34,6 +34,8 @@
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="Floor-Analysis-EventSink-AlertNotifications" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
+		<dependency artifact="Android-PushNotification-Publisher" version="1.0.0" include="true"
+					serverRole="DataAnalyticsServer"/>
         <dependency artifact="Floor-Analysis-EventSink-SummarizedDeviceSensorStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="Floor-Analysis-EventSink-SummarizedFloorSensorStream" version="1.0.0" include="true"
