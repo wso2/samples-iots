@@ -11,7 +11,8 @@ var historicalData = [];
 var isDatePick = false;
 var buildingId;
 var numOfFloors;
-
+var isLive = true;
+var isPause = false;
 
 /**
  * To show received data
@@ -28,8 +29,42 @@ function handleData(sliderVal, sliderMax, buildingData) {
         } else {
             if (buildingData[i][index] != null) {
                 displyaData(i + 1, buildingData[i][index]);
+            } else {
+                displyaError(i + 1);
             }
         }
+    }
+}
+
+/**
+ * To display received data.
+ * @param floorId floor number
+ * @param data relative data for floor number
+ */
+function displyaData(floorId, data) {
+    var canvas = document.getElementById(floorId);
+    clearCanvas(canvas);
+    var ctx = canvas.getContext("2d");
+    ctx.font = "14px Arial";
+    ctx.fillText("Temperature: " + data.temperature, 10, 10);
+    ctx.fillText("Air Quality: " + data.airQuality, 10, 30);
+    ctx.fillText("Humidity: " + data.humidity, 10, 50);
+    ctx.fillText("Light: " + data.light, 10, 70);
+    ctx.fillText("Motion: " + data.motion, 10, 90);
+
+}
+
+/**
+ * To display error message.
+ * @param floorId floor number
+ */
+function displyaError(floorId) {
+    var canvas = document.getElementById(floorId);
+    clearCanvas(canvas);
+    if (canvas != null) {
+        var ctx = canvas.getContext("2d");
+        ctx.font = "14px Arial";
+        ctx.fillText("No data", 10, 10);
     }
 }
 
@@ -112,25 +147,6 @@ function getUrlVar(key) {
 }
 
 /**
- * To display received data.
- * @param floorId floor number
- * @param data relative data for floor number
- */
-function displyaData(floorId, data) {
-
-    var canvas = document.getElementById(floorId);
-    clearCanvas(canvas);
-    var ctx = canvas.getContext("2d");
-    ctx.font = "14px Arial";
-    ctx.fillText("Temperature: " + data.temperature, 10, 10);
-    ctx.fillText("Air Quality: " + data.airQuality, 10, 30);
-    ctx.fillText("Humidity: " + data.humidity, 10, 50);
-    ctx.fillText("Light: " + data.light, 10, 70);
-    ctx.fillText("Motion: " + data.motion, 10, 90);
-
-}
-
-/**
  * To clear data on canvas.
  * @param cnv canvas
  */
@@ -155,7 +171,8 @@ function clearCanvas(cnv) {
  * @param limit limit
  * @param sortBy sorting method
  * @param buildingId id of the building
- * @param floorCount number of vloors
+ * @param floorCount number of floors
+ * @param action action to perform
  */
 var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortBy, buildingId, floorCount, action) {
     var providerData = null;
@@ -197,73 +214,88 @@ var getProviderData = function (tableName, timeFrom, timeTo, start, limit, sortB
 
 
 /**
- * To play slider.
+ * To play slider. (live view)
  */
 function slide() {
-    if (sliderPoint <= sliderPointMax) {
-        rangeSlider.bootstrapSlider('setValue', sliderPoint);
-        handleData(sliderPoint, sliderPointMax, floorData);
-        sliderPoint++;
-    } else {
-        sliderPoint = sliderPointMax;
-        setTimer();
+    if (isLive) {
+        if (sliderPoint <= sliderPointMax) {
+            rangeSlider.bootstrapSlider('setValue', sliderPoint);
+            handleData(sliderPoint, sliderPointMax, floorData);
+            sliderPoint++;
+        } else {
+            sliderPoint = sliderPointMax;
+            setTimer();
+        }
+    }else{
+        if (sliderPoint <= historySliderPointMax) {
+            historicalSlider.bootstrapSlider('setValue', sliderPoint);
+            handleData(sliderPoint, historySliderPointMax, historicalData);
+            sliderPoint++;
+        } else {
+            sliderPoint = historySliderPointMax;
+            setTimer();
+        }
     }
+
 }
 
+function handleTimer(slider,point,maxPoint,data){
+    // stop
+    $("#pla i").removeClass("fw-right");
+    $("#pla i").addClass("fw-circle");
+    handleData(point, maxPoint, data);
+    slider.bootstrapSlider('setValue', point);
+    if (point == maxPoint) {
+        sliderPoint = sliderPointMin;
+        $("#pla i").removeClass("fw-circle");
+        $("#pla i").addClass("fw-right");
+    }else{
+        isPause=true;
+    }
+
+}
 /**
- * To set timer.
+ * To set timer. (live view)
  */
 function setTimer() {
-    if (timer) {
-        // stop
-        handleData(sliderPoint, sliderPointMax, floorData);
-        rangeSlider.bootstrapSlider('setValue', sliderPoint);
-        clearInterval(timer);
-        timer = null;
-        if (sliderPoint == sliderPointMax) {
-            sliderPoint = sliderPointMin;
+    if (isLive) {
+        if (timer) {
+            // stop
+            clearInterval(timer);
+            timer = null;
+            handleTimer(rangeSlider,sliderPoint,sliderPointMax,floorData);
         }
-    }
-    else {
-        timer = setInterval(function () {
-            slide();
-        }, 1000);
-    }
-}
+        else {
+            if(isPause){
+                $("#pla i").removeClass("fw-circle");
+                $("#pla i").addClass("fw-right");
+                isPause=false;
+            }
+            timer = setInterval(function () {
+                slide();
+            }, 2000);
+        }
 
-/**
- * To play slider.
- */
-function slidePau() {
-    if (sliderPoint <= historySliderPointMax) {
-        historicalSlider.bootstrapSlider('setValue', sliderPoint);
-        handleData(sliderPoint, historySliderPointMax, historicalData);
-        sliderPoint++;
     } else {
-        sliderPoint = historySliderPointMax;
-        setTimerPau();
-    }
-}
+        if (timer) {
+            // stop
+            clearInterval(timer);
+            timer = null;
+            handleTimer(historicalSlider,sliderPoint,historySliderPointMax,historicalData);
 
-/**
- * To set timer.
- */
-function setTimerPau() {
-    if (timer) {
-        // stop
-        handleData(sliderPoint, historySliderPointMax, historicalData);
-        historicalSlider.bootstrapSlider('setValue', sliderPoint);
-        clearInterval(timer);
-        timer = null;
-        if (sliderPoint == historySliderPointMax) {
-            sliderPoint = sliderPointMin;
+        }
+        else {
+            if(isPause){
+                $("#pla i").removeClass("fw-circle");
+                $("#pla i").addClass("fw-right");
+                isPause=false;
+            }
+            timer = setInterval(function () {
+                slide();
+            }, 1000);
         }
     }
-    else {
-        timer = setInterval(function () {
-            slidePau();
-        }, 1000);
-    }
+
 }
 
 /**
@@ -298,74 +330,71 @@ function getHistoricaldata(numOfFloors, date) {
 }
 
 /**
- * To configure slider to display real time data.
+ * To configure slider to display data.
+ * @param slider slider type
  * @param sliderPointMin minimum value of slider
  * @param sliderPointMax maximum value of slider
  */
-function setRealViewSlider(sliderPointMin, sliderPointMax) {
-    rangeSlider.bootstrapSlider('setAttribute', 'min', sliderPointMin);
-    historicalSlider.bootstrapSlider('setAttribute', 'max', sliderPointMax);
-    rangeSlider.bootstrapSlider('setValue', sliderPointMax);
-}
-
-/**
- * To configure slider to display historical data.
- * @param sliderPointMin minimum value of slider
- * @param sliderPointMax maximum value of slider
- */
-function setHistoricalViewSlider(sliderPointMin, sliderPointMax) {
-    historicalSlider.bootstrapSlider('setAttribute', 'min', sliderPointMin);
-    historicalSlider.bootstrapSlider('setAttribute', 'max', sliderPointMax);
-    historicalSlider.bootstrapSlider('setValue', sliderPointMax);
+function setSlider(slider,sliderPointMin, sliderPointMax) {
+    slider.bootstrapSlider('setAttribute', 'min', sliderPointMin);
+    slider.bootstrapSlider('setAttribute', 'max', sliderPointMax);
+    slider.bootstrapSlider('setValue', sliderPointMax);
 }
 
 /**
  * Toggle switch to live view.
  */
 function switchToLive() {
-    isDatePick = false;
+
+    isLive = true;
     $(".date-picker").slideToggle("slow");
+    $('input[name="daterange"]').val('');
+
+    if (isDatePick) {
+        isDatePick = false;
+        $('#historical-view').addClass("hidden");
+    }
+
     $('#historic-toggle').removeClass("history");
     $('#historic-toggle').addClass("live");
     $('#live-view').removeClass("hidden");
-    $('#historical-view').addClass("hidden");
-    $('#pla').removeClass("hidden");
-    $('#pau').addClass("hidden");
+
+    setSlider(rangeSlider, sliderPointMin, sliderPointMax);
+    handleData(sliderPointMax, sliderPointMax, floorData);
 }
 
 /**
  * Toggle switch to history view.
  */
 function switchToHistory() {
+
+    isLive = false;
     $(".date-picker").slideToggle("slow");
     $('#live-view').addClass("hidden");
     $('#pla').addClass("hidden");
-    if (isDatePick) {
-        displayHistorySlider()
-    }
-
-}
-
-function displayHistorySlider() {
-    $('#historical-view').removeClass("hidden");
-    $('#pau').removeClass("hidden");
-    setHistoricalViewSlider(0, 24);
     $('#historic-toggle').removeClass("live");
     $('#historic-toggle').addClass("history");
+}
+
+/**
+ * To show historical view slider.
+ */
+function displayHistorySlider() {
+    $('#historical-view').removeClass("hidden");
+    $('#pla').removeClass("hidden");
+    setSlider(historicalSlider, sliderPointMin, historySliderPointMax);
+    handleData(historySliderPointMax, historySliderPointMax, historicalData);
 }
 
 $("#pla").on("click", "i", function (event) {
     setTimer();
 });
 
-$("#pau").on("click", "i", function (event) {
-    setTimerPau();
-
-});
 
 $('#range-slider').on("slide", function () {
 }).on("change", function () {
     var time = rangeSlider.bootstrapSlider("getValue");
+    sliderPoint = time;
     handleData(time, sliderPointMax, floorData);
 });
 
@@ -373,6 +402,7 @@ $('#range-slider').on("slide", function () {
 $('#historical-slider').on("slide", function () {
 }).on("change", function () {
     var time = historicalSlider.bootstrapSlider("getValue");
+    sliderPoint = time;
     handleData(time, historySliderPointMax, historicalData);
 });
 
@@ -421,7 +451,7 @@ $(document).ready(function () {
     rangeSlider = $("#range-slider").bootstrapSlider();
     historicalSlider = $("#historical-slider").bootstrapSlider();
 
-    setRealViewSlider(sliderPointMin, sliderPointMax);
+    setSlider(rangeSlider, sliderPointMin, sliderPointMax);
 
     var analyticsUrl = "wss://localhost:9445";
     $.ajax({
@@ -448,9 +478,9 @@ $(document).ready(function () {
         autoclose: true
     }).on("changeDate", function (e) {
         isDatePick = true;
-        displayHistorySlider();
         var date = new Date(e.date);
         historicalData = getHistoricaldata(numOfFloors, date);
+        displayHistorySlider();
     });
 });
 
