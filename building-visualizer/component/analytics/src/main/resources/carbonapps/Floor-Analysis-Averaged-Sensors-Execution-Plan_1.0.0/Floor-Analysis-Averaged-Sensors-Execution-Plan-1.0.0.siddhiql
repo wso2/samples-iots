@@ -21,10 +21,10 @@ from dataIn#window.timeBatch(30 sec)
 select deviceId, avg(temperature) as avgTemperature, avg(motion) as avgMotion, avg(humidity) as avgHumidity, avg
 (airQuality) as avgAirQuality, avg(light) as avgLight, time:timestampInMilliseconds() as timeStamp
 group by deviceId
-insert all events into dataOut;
+insert into dataOut;
 
 from dataIn#window.timeBatch(15 min)
 select deviceId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg(airQuality) as
 airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
 group by deviceId
-insert all events into summarizedDataOut;
+insert into summarizedDataOut;
