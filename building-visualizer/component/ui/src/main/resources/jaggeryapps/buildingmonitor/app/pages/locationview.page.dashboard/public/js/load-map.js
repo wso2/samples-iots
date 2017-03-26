@@ -162,9 +162,9 @@ function onAddMarker() {
 function onMarkerClick(e) {
     $('div').removeClass('active-marker');
     $('div #' + e.target._leaflet_id).addClass('active-marker');
-    for (var mark in markers) {
-        markers[mark].setIcon(smallIcon);
-    }
+    //for (var mark in markers) {
+    //    markers[mark].setIcon(smallIcon);
+    //}
     var offset = map.panTo(markers[mark].getLatLng());
     map.panBy(offset);
 }
@@ -251,12 +251,31 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
 	$('body.fixed ').removeClass('marker-cursor');
 	$('#device-location').removeClass('marker-cursor');
 
+	var content = $("#device-popup-template").clone();
+	var sidebar = $("#sidebar-messages");
+	content.attr("id","device-building-" + buildingId);
+	if (buildingdevice && buildingdevice != undefined) {
+		content.find("#building-active").text(buildingdevice.active);
+		content.find("#building-inactive").text(buildingdevice.inactive);
+		content.find("#building-fault").text(buildingdevice.fault);
+		content.find("#building-alerts").text(buildingdevice.alerts);
+	} else {
+		content.find("#building-active").text("0");
+		content.find("#building-inactive").text("0");
+		content.find("#building-fault").text("0");
+		content.find("#building-alerts").text("0");
+	}
+	content.find("#building-content").text(locationName);
+	content.find("#building-content-div").attr("data-buildingid", buildingId);
+	content.find("#building-content-div").attr("data-markerid", markerId);
+	content.find("#building-content-div").attr("id","building-content-" + buildingId);
+	content.find("#building-location").attr("href","/buildingmonitor/buildings?buildingId=" + buildingId);
+
     popup = L.popup({
         autoPan: true,
         keepInView: true
     })
-        .setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId=' + buildingId + '" class="btn btn-primary">' +
-            "Get into " + locationName + '</a></p>');
+        .setContent(content.html());
 
     //variable for marker
     var marker;
@@ -318,9 +337,9 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
     $('.item').on("mouseover", function (e) {
         $('div').removeClass('active-marker');
         $('#' + $(this).attr('id') + ' .panel-default > .panel-heading').addClass('active-marker');
-        for (var mark in markers) {
-            markers[mark].setIcon(smallIcon);
-        }
+        //for (var mark in markers) {
+        //    markers[mark].setIcon(smallIcon);
+        //}
         markerFunction($(this).attr('id'));
         markers[$(this).attr('id')].setIcon(bigIcon);
         var mid = $(this).attr('id');
@@ -332,7 +351,7 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
 
 function addBuildingMenu(buildingId, buildingName, markerId, buildingdevice) {
 	var content = $("#device-building-template").clone();
-	var sidebar = $("#right-sidebar");
+	var sidebar = $("#sidebar-messages");
 	content.attr("id","device-building-" + buildingId);
 	if (buildingdevice && buildingdevice != undefined) {
 		content.find("#building-active").text(buildingdevice.active);
