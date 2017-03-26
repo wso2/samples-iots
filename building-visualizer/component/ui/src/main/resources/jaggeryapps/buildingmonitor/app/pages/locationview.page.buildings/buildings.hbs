@@ -46,7 +46,7 @@
     <!--</header>-->
     <div class="row" data-num_of_floors="{{floorCount}}" id="buildingView">
         {{#each floors}}
-        <div class="col-lg-5 col-md-6 col-centered message message-success" id = "div_{{this.num}}">
+        <div class="col-lg-12 col-md-12 message message-success" id = "div_{{this.num}}">
 
             {{#if this.image}}
                 <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-active">
@@ -123,7 +123,7 @@
                         </div>
                     </div>
                 </div>
-                <br/>
+                <div class="">
                 <a href="/buildingmonitor/floor?buildingId={{../../buildingId}}&floorId={{../this.num}}">
                     <span class="fw-stack">
                         <i class="fw fw-circle-outline fw-stack-2x"></i>
@@ -131,16 +131,16 @@
                     </span>
                     View
                 </a>
-                <br/>
-                <h4>{{this.suffix}} Floor</h4>
 
+                <h4>{{this.suffix}} Floor</h4>
+                </div>
             {{else}}
                 <div id="upload-view">
                     {{unit "locationview.unit.floorcreate" buildingId=../../buildingId floorId=../this.num}}
                 </div>
             {{/if}}
         </div>
-            <br>
+
         {{/each}}
 
 
