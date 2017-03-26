@@ -291,8 +291,8 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
         autoPan: true,
         keepInView: true
     })
-        .setContent('<p>Hello there!<br /><a href="/buildingmonitor/buildings?buildingId=' + buildingId + '" class="btn btn-primary">' +
-            "Get into " + locationName + '</a></p>');
+        .setContent('<p><a href="/buildingmonitor/buildings?buildingId=' + buildingId + '" class="btn btn-default">' +
+            "Go to building " + locationName + '</a></p>');
 
     //variable for marker
     var marker;
