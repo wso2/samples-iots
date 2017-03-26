@@ -19,6 +19,7 @@
 {{unit "cdmf.unit.ui.title" pageTitle="Home"}}
 {{#zone "topCss"}}
     {{css "css/buildings.css"}}
+    {{css "css/custom.css"}}
 {{/zone}}
 {{#zone "breadcrumbs"}}
     <li>
@@ -26,9 +27,6 @@
             <i class="icon fw fw-home"></i>
         </a>
     </li>
-{{/zone}}
-{{#zone "topCss" override=false}}
-    {{css "css/custom.css"}}
 {{/zone}}
 
 {{#zone "navbarActions"}}
@@ -77,7 +75,7 @@
                 </div>
                 <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-alerts">
                     <div>
-                        <span id="alerts_{{../this.num}}"></span>
+                        <span id="alerts_{{../this.num}}">0</span>
                     </div>
                     <div>
                         <span class="wr-stats-board-sidebar-text">TRIGGERED ALERTS</span>
