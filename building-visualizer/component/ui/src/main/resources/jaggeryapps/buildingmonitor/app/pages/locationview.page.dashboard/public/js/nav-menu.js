@@ -89,7 +89,7 @@ $.sidebar_toggle = function(action, target, container) {
             $(target).trigger('show.sidebar');
 
             if(targetWidth !== undefined) {
-                $(target).css('width', targetWidth);
+               // $(target).css('width', targetWidth);
             }
 
             $(target).addClass('toggled');

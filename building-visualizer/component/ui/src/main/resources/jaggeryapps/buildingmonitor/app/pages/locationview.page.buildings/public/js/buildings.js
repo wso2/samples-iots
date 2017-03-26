@@ -48,11 +48,11 @@ function displyaData(floorId,data) {
     }else if (data.light>500){
         light=0;
     }
-    $( "#"+floorId ).children( "#temperature").text("Temperature: "+data.temperature);
-    $( "#"+floorId ).children( "#humidity").text("Humidity: "+data.humidity);
-    $( "#"+floorId ).children( "#light").text("Light: "+light);
-    $( "#"+floorId ).children( "#motion").text("Motion: "+data.motion);
-    $( "#"+floorId ).children( "#airquality").text("Air Quality: "+data.airQuality);
+    $( "#"+floorId ).find( "#temperature").text(parseInt(data.temperature));
+    $( "#"+floorId ).find( "#humidity").text(parseInt(data.humidity));
+    $( "#"+floorId ).find( "#light").text(light);
+    $( "#"+floorId ).find( "#motion").text(data.motion);
+    $( "#"+floorId ).find( "#airquality").text(data.airQuality);
 }
 
 /**
@@ -60,11 +60,11 @@ function displyaData(floorId,data) {
  * @param floorId floor number
  */
 function displyaError(floorId) {
-    $( "#"+floorId ).children( "#temperature").text("Temperature: No Value");
-    $( "#"+floorId ).children( "#humidity").text("Humidity: No Value");
-    $( "#"+floorId ).children( "#light").text("Light: No Value");
-    $( "#"+floorId ).children( "#motion").text("Motion: No Value");
-    $( "#"+floorId ).children( "#airquality").text("Air Quality: No Value");
+    $( "#"+floorId ).find( "#temperature").text("-");
+    $( "#"+floorId ).find( "#humidity").text("-");
+    $( "#"+floorId ).find( "#light").text("-");
+    $( "#"+floorId ).find( "#motion").text("-");
+    $( "#"+floorId ).find( "#airquality").text("-");
 }
 
 // /**
@@ -476,7 +476,7 @@ var updateAlertCount = function () {
 
             for (var i = 0; i < floorData.length; i++) {
                 if (providerData[i] > 0) {
-                    $("#alerts_" + (i + 1)).html("You have " + providerData[i] + " new alerts in this floor.");
+                    $("#alerts_" + (i + 1)).html(providerData[i]);
                     $("#div_" + (i + 1)).removeClass("message-success").addClass("message-danger");
                 }
             }
