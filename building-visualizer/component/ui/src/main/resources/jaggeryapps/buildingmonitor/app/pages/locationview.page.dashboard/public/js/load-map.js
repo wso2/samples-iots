@@ -17,6 +17,7 @@
  */
 
 var map;
+var locateMe; //locate me position
 //Array to store marker latlng and ID
 var markers = [];
 var buildingsMap = [];
@@ -54,8 +55,8 @@ function hidePopup() {
     $('.modal-backdrop').remove();
 }
 
-function centerMap (e) {
-    map.panTo(e.latlng);
+function locateMe (e) {
+    locateMe.start()
 }
 
 function zoomIn (e) {
@@ -79,8 +80,8 @@ function loadLeafletMap() {
             text: 'Add Building',
             callback: addBuilding
         }, {
-            text: 'Center map here',
-            callback: centerMap
+            text: 'Locate me',
+            callback: locateMe
         }, '-', {
             text: 'Zoom in',
             callback: zoomIn
@@ -92,9 +93,9 @@ function loadLeafletMap() {
     L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
 
     //locate me button
-    var locateMe = L.control.locate({
+    locateMe = L.control.locate({
         strings: {
-            title: "Show me where I am..!"
+            title: "Locate me"
         }
     }).addTo(map);
 
