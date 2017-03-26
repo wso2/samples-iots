@@ -1,3 +1,13 @@
 .sidebar-wrapper{
     margin-top: 40px;
 }
+.building-status{
+    padding: 6px 10px;
+    border-left: 3px solid red;
+    margin: 5px 3px;
+    height: 30px;
+    border-bottom: 1px solid rgba(51, 51, 51, 0.67);
+}
+.building-status span{
+    width: 30px;
+}

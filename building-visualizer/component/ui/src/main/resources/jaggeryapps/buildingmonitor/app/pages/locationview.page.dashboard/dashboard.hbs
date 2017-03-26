@@ -153,13 +153,13 @@
     </div>
 
     <div style="display:none">
-        <div id="device-building-template"  >
-            <div class="text-center" onclick="focusBuilding(this.id)" id="building-content-div">
-                <a class="btn btn-primary" id="building-content"></a>
-                <a class="btn btn-primary" id="building-active"></a>
-                <a class="btn btn-primary" id="building-inactive"></a>
-                <a class="btn btn-primary" id="building-fault"></a>
-                <a class="btn btn-primary" id="building-alerts"></a>
+        <div id="device-building-template" >
+            <div class="building-status" onclick="focusBuilding(this.id)" id="building-content-div">
+                <span class="pull-left" id="building-content"></span>
+                <span class="pull-right text-right" id="building-active"></span>
+                <span class="pull-right text-right" id="building-inactive"></span>
+                <span class="pull-right text-right" id="building-fault"></span>
+                <span class="pull-right text-right" id="building-alerts"></span>
             </div>
         </div>
     </div>
