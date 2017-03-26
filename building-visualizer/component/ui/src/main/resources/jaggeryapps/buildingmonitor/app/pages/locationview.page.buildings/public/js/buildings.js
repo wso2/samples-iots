@@ -42,9 +42,15 @@ function handleData(sliderVal, sliderMax, buildingData) {
  * @param data relative data for floor number
  */
 function displyaData(floorId,data) {
+    var light;
+    if(data.light<500){
+        light = 1;
+    }else if (data.light>500){
+        light=0;
+    }
     $( "#"+floorId ).children( "#temperature").text("Temperature: "+data.temperature);
     $( "#"+floorId ).children( "#humidity").text("Humidity: "+data.humidity);
-    $( "#"+floorId ).children( "#light").text("Light: "+data.light);
+    $( "#"+floorId ).children( "#light").text("Light: "+light);
     $( "#"+floorId ).children( "#motion").text("Motion: "+data.motion);
     $( "#"+floorId ).children( "#airquality").text("Air Quality: "+data.airQuality);
 }
