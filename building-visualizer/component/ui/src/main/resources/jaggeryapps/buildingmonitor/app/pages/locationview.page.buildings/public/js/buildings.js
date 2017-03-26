@@ -158,8 +158,7 @@ function handleRealTimeData(data) {
         } else {
             floorData[fId].push(data);
         }
-        a(floorId, data);
-        // displyaData(floorId, data);
+        displyaData(floorId, data);
     }
 }
 
