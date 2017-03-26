@@ -159,3 +159,8 @@
 	width: 100%;
 	padding-top: 20px;
 }
+
+.upload-preview img{
+	max-width: 200px;
+	max-height: 200px;
+}
