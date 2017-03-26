@@ -47,7 +47,14 @@
             {{#if this.image}}
 
                     <a href="/buildingmonitor/floor?buildingId={{../../buildingId}}&floorId={{../this.num}}">
-                        <canvas id="{{num}}" width="300%" height="100" style="border:1px solid #000000;"/>
+                        <!--<canvas id="{{num}}" width="300%" height="100" style="border:1px solid #000000;"/>-->
+                        <div id="{{num}}">
+                            <span id="temperature">Temperature: No Value</span><br>
+                            <span id="humidity">Humidity: No Value</span><br>
+                            <span id="light">Light: No Value</span><br>
+                            <span id="motion">Motion: No Value</span><br>
+                            <span id="airquality">Air Quality: No Value</span>
+                        </div>
                     </a>
                     <p id = "alerts_{{../this.num}}">alerts : 0</p>
                     <p id = "active_{{../this.num}}">active : {{../this.active}}</p>
