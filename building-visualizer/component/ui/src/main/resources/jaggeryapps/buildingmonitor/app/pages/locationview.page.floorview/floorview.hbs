@@ -25,19 +25,6 @@
     </li>
 {{/zone}}
 
-{{#zone "navbarActions"}}
-    <li>
-        <!--suppress HtmlUnknownTarget -->
-        <a href="{{@app.context}}/buildings?buildingId={{buildingId}}" class="cu-btn">
-        <span class="icon fw-stack">
-            <i class="fw fw-left fw-stack-1x"></i>
-            <i class="fw fw-circle-outline fw-stack-2x"></i>
-        </span>
-            Go Back to Building View
-        </a>
-    </li>
-{{/zone}}
-
 {{#zone "content"}}
     {{#if imageObj}}
         {{unit "locationview.unit.floorview" imageObj=imageObj }}

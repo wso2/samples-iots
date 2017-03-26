@@ -539,6 +539,7 @@ $(document).ready(function () {
         historicalData = getHistoricaldata(numOfFloors, date);
         displayHistorySlider();
     });
+	loadLeafletMap();
 });
 
 window.onbeforeunload = function () {
@@ -546,3 +547,32 @@ window.onbeforeunload = function () {
         webSocket.close();
     }
 };
+
+function loadLeafletMap() {
+	var buildingLocationId = "#building-location",
+		location_lat = $(buildingLocationId).data("lat"),
+		location_long = $(buildingLocationId).data("long"),
+		container = "building-location",
+		zoomLevel = 13,
+		tileSet = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+		attribution = "&copy; <a href='https://openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
+
+	if (location_long && location_lat) {
+		map = L.map(container).setView([location_lat, location_long], zoomLevel);
+		L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
+
+		var m = L.marker([location_lat, location_long], {"opacity": 0.70}).addTo(map).bindPopup("Your Building is here");
+		m.on('mouseover', function (e) {
+			this.openPopup();
+		});
+		m.on('mouseout', function (e) {
+			this.closePopup();
+		});
+		$("#map-error").hide();
+		$("#device-location").show();
+		setTimeout(function(){ map.invalidateSize()}, 400);
+	} else {
+		$("#device-location").hide();
+		$("#map-error").show();
+	}
+}

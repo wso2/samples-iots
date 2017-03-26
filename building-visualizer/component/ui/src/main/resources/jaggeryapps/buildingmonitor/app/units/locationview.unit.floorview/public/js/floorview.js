@@ -834,18 +834,18 @@ function addDevice () {
 function placeDevice(deviceId, x, y, status) {
     var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     rect.setAttributeNS(null,"id", "myrect-" + deviceId);
-    rect.setAttributeNS(null,"fill", "grey");
+    rect.setAttributeNS(null,"fill", "#6C7A89");
     if (status) {
         if (status == "ACTIVE") {
-            rect.setAttributeNS(null,"fill", "blue");
+            rect.setAttributeNS(null,"fill", "#2574A9");
         } else if (status == "FAULT") {
-            rect.setAttributeNS(null,"fill", "red");
+            rect.setAttributeNS(null,"fill", "#E74C3C");
         }
     }
     rect.setAttributeNS(null,"stroke", "black");
-    rect.setAttributeNS(null,"stroke-width", "5");
-    rect.setAttributeNS(null,"x", x);
-    rect.setAttributeNS(null,"y", y);
+    rect.setAttributeNS(null,"stroke-width", "1");
+    rect.setAttributeNS(null,"x", x-15);
+    rect.setAttributeNS(null,"y", y-15);
     rect.setAttributeNS(null,"width", "30");
     rect.setAttributeNS(null,"height", "30");
     var svg = document.getElementById("svg");

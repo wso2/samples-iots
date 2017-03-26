@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+var map;
 function onRequest(context) {
     var constants = require("/app/modules/constants.js");
     var userModule = require("/app/modules/business-controllers/user.js")["userModule"];

@@ -15,7 +15,7 @@
   specific language governing permissions and limitations
   under the License.
 }}
-
+{{unit "cdmf.unit.lib.leaflet"}}
 {{unit "cdmf.unit.ui.title" pageTitle="Home"}}
 {{#zone "topCss"}}
     {{css "css/buildings.css"}}
@@ -45,6 +45,14 @@
 {{#zone "content"}}
     <div>
         <h1>{{buildingName}}</h1>
+    </div>
+    <div >
+        <div class="panel-body">
+            <div id="building-location"
+                 data-lat="{{latitude}}"
+                 data-long="{{longitude}}">
+            </div>
+        </div>
     </div>
     <!--</header>-->
     <div class="row" data-num_of_floors="{{floorCount}}" id="buildingView">
@@ -114,7 +122,7 @@
                             <span id="light">-</span>
                         </div>
                         <div>
-                            <span class="wr-stats-board-sidebar-text">light</span>
+                            <span class="wr-stats-board-sidebar-text">LIGHT</span>
                         </div>
                     </div>
                     <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-air" style="display:none">
@@ -145,9 +153,6 @@
         </div>
 
         {{/each}}
-
-
-
     </div>
 
     {{unit "locationview.unit.ui.analytics.rangeSelector"}}

@@ -17,9 +17,10 @@
 }}
 {{unit "locationview.unit.lib.heatmap"}}
 {{unit "locationview.unit.lib.uikit"}}
-
+{{unit "cdmf.unit.ui.navbar.nav-menu"}}
 {{#zone "topCss"}}
     {{css "css/floorview.css"}}
+    {{css "css/custom.css"}}
 {{/zone}}
 
 {{#zone "navbarActions"}}
@@ -47,8 +48,8 @@
     <li>
         <a href="#" id = "add-device" class="show-device">
             <span class="icon fw-stack">
-                <i class="fw  fw-stack-1x"></i>
-                <i class="fw fw-circle-outline fw-stack-2x"></i>
+                <i class="fw fw-add fw-stack-1x"></i>
+            <i class="fw fw-circle-outline fw-stack-2x"></i>
             </span>
             <span id ="device">
             Add a device
@@ -89,7 +90,7 @@
                     <input type="text" class="form-control" id="deviceId" name="deviceId" >
                 </div>
                 <div id="device-button" class="form-group">
-                    <button id="enrolldevice" type="button" class="btn btn-primary" onclick="addDevice()" data-toggle="update-data">Enroll Device</button>
+                    <button id="enrolldevice" type="button" class="btn btn-primary" onclick="addDevice()" data-toggle="update-data">Add Device</button>
                 </div>
             </form>
         </div>
@@ -109,6 +110,23 @@
     </div>
 </div>
 
+<div class="col-centered">
+    <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-active">
+        <div>
+            <span class="wr-stats-board-sidebar-text">ACTIVE DEVICES</span>
+        </div>
+    </div>
+    <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-inactive">
+        <div>
+            <span class="wr-stats-board-sidebar-text">INACTIVE DEVICES</span>
+        </div>
+    </div>
+    <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-fault">
+        <div>
+            <span class="wr-stats-board-sidebar-text">FAULT DEVICES</span>
+        </div>
+    </div>
+</div>
 
 {{unit "locationview.unit.ui.analytics.rangeSelector"}}
 {{~#zone "bottomJs"}}
