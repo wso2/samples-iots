@@ -16,11 +16,16 @@
   under the License.
 }}
 {{unit "cdmf.unit.lib.leaflet"}}
+{{unit "cdmf.unit.lib.leaflet-contextmenu"}}
+{{unit "cdmf.unit.lib.leaflet-locatecontrol"}}
 {{unit "cdmf.unit.ui.title" pageTitle="Home"}}
 {{unit "uuf.unit.lib.form-validation"}}
+
 {{#zone "topCss" override=false}}
     {{css "css/custom-devices.css"}}
+    {{css "css/custom.css"}}
 {{/zone}}
+
 {{#zone "breadcrumbs"}}
     <li>
         <a href="{{@app.context}}/">
@@ -237,5 +242,4 @@
 
 {{#zone "bottomJs"}}
     {{js "js/load-map.js"}}
-    {{js "js/nav-menu.js"}}
 {{/zone}}

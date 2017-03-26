@@ -17,6 +17,7 @@
  */
 
 var map;
+var locateMe; //locate me position
 //Array to store marker latlng and ID
 var markers = [];
 var buildingsMap = [];
@@ -54,14 +55,50 @@ function hidePopup() {
     $('.modal-backdrop').remove();
 }
 
+function locateMe (e) {
+    locateMe.start()
+}
+
+function zoomIn (e) {
+    map.zoomIn();
+}
+
+function zoomOut (e) {
+    map.zoomOut();
+}
+
 function loadLeafletMap() {
     var deviceLocationID = "#device-location"
     container = "device-location",
         zoomLevel = 13,
         tileSet = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         attribution = "&copy; <a href='https://openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
-    map = L.map(container).locate({setView: true, maxZoom: 17, animate: true, duration: 3});
+    map = L.map(container, {
+        contextmenu: true,
+        contextmenuWidth: 140,
+        contextmenuItems: [{
+            text: 'Add Building',
+            callback: addBuilding
+        }, {
+            text: 'Locate me',
+            callback: locateMe
+        }, '-', {
+            text: 'Zoom in',
+            callback: zoomIn
+        }, {
+            text: 'Zoom out',
+            callback: zoomOut
+        }]
+    }).locate({setView: true, maxZoom: 17, animate: true, duration: 3});
     L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
+
+    //locate me button
+    locateMe = L.control.locate({
+        strings: {
+            title: "Locate me"
+        }
+    }).addTo(map);
+
     setTimeout(function () {
         map.invalidateSize()
     }, 400);
@@ -162,9 +199,9 @@ function onAddMarker() {
 function onMarkerClick(e) {
     $('div').removeClass('active-marker');
     $('div #' + e.target._leaflet_id).addClass('active-marker');
-    //for (var mark in markers) {
-    //    markers[mark].setIcon(smallIcon);
-    //}
+    for (var mark in markers) {
+        markers[mark].setIcon(smallIcon);
+    }
     var offset = map.panTo(markers[mark].getLatLng());
     map.panBy(offset);
 }
@@ -337,9 +374,9 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
     $('.item').on("mouseover", function (e) {
         $('div').removeClass('active-marker');
         $('#' + $(this).attr('id') + ' .panel-default > .panel-heading').addClass('active-marker');
-        //for (var mark in markers) {
-        //    markers[mark].setIcon(smallIcon);
-        //}
+        for (var mark in markers) {
+            markers[mark].setIcon(smallIcon);
+        }
         markerFunction($(this).attr('id'));
         markers[$(this).attr('id')].setIcon(bigIcon);
         var mid = $(this).attr('id');
