@@ -288,12 +288,31 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
 	$('body.fixed ').removeClass('marker-cursor');
 	$('#device-location').removeClass('marker-cursor');
 
+	var content = $("#device-popup-template").clone();
+	var sidebar = $("#sidebar-messages");
+	content.attr("id","device-building-" + buildingId);
+	if (buildingdevice && buildingdevice != undefined) {
+		content.find("#building-active").text(buildingdevice.active);
+		content.find("#building-inactive").text(buildingdevice.inactive);
+		content.find("#building-fault").text(buildingdevice.fault);
+		content.find("#building-alerts").text(buildingdevice.alerts);
+	} else {
+		content.find("#building-active").text("0");
+		content.find("#building-inactive").text("0");
+		content.find("#building-fault").text("0");
+		content.find("#building-alerts").text("0");
+	}
+	content.find("#building-content").text(locationName);
+	content.find("#building-content-div").attr("data-buildingid", buildingId);
+	content.find("#building-content-div").attr("data-markerid", markerId);
+	content.find("#building-content-div").attr("id","building-content-" + buildingId);
+	content.find("#building-location").attr("href","/buildingmonitor/buildings?buildingId=" + buildingId);
+
     popup = L.popup({
         autoPan: true,
         keepInView: true
     })
-        .setContent('<p><a href="/buildingmonitor/buildings?buildingId=' + buildingId + '" class="btn btn-default">' +
-            "Go to building " + locationName + '</a></p>');
+        .setContent(content.html());
 
     //variable for marker
     var marker;
@@ -369,7 +388,7 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
 
 function addBuildingMenu(buildingId, buildingName, markerId, buildingdevice) {
 	var content = $("#device-building-template").clone();
-	var sidebar = $("#right-sidebar");
+	var sidebar = $("#sidebar-messages");
 	content.attr("id","device-building-" + buildingId);
 	if (buildingdevice && buildingdevice != undefined) {
 		content.find("#building-active").text(buildingdevice.active);
