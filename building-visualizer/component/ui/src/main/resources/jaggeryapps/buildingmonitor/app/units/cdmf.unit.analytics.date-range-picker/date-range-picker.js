@@ -18,7 +18,7 @@
 
 function onRequest(context) {
     var deviceTypes = context.unit.params.deviceTypes;
-    var deviceType = context.uriParams.deviceType;
+    var deviceType = "senseme";
 
     var deviceTypesList = [];
     if (deviceTypes) {

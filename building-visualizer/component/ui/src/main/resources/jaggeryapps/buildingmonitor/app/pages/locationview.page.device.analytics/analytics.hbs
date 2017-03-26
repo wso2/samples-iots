@@ -31,19 +31,17 @@
             <i class="icon fw fw-home"></i>
         </a>
     </li>
+{{/zone}}
+
+{{#zone "navbarActions"}}
     <li>
-        <a href="{{@app.context}}/devices">
-            Devices
-        </a>
-    </li>
-    <li>
-        <a href="{{@app.context}}/device/{{deviceType}}?id={{deviceId}}">
-            {{deviceName}}
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            Analytics
+        <!--suppress HtmlUnknownTarget -->
+        <a href="{{@app.context}}/senseme?id={{deviceId}}" class="cu-btn">
+        <span class="icon fw-stack">
+            <i class="fw fw-back fw-stack-1x"></i>
+            <i class="fw fw-circle-outline fw-stack-2x"></i>
+        </span>
+            Go Back to Device View
         </a>
     </li>
 {{/zone}}
@@ -53,7 +51,7 @@
         <div class=" margin-top-double">
             <div class="row padding-top-double padding-bottom-double margin-bottom-double">
                 <div class="col-lg-3  margin-top-double">
-                    <h1 class="grey ">{{deviceName}} Analytics</h1>
+                    <h1 class="grey ">{{deviceId}} Analytics</h1>
                 </div>
                 {{unit "cdmf.unit.analytics.date-range-picker"}}
             </div>

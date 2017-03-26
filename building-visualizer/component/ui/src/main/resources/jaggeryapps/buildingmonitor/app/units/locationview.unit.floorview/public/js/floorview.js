@@ -390,7 +390,7 @@ function hidePopup() {
             e.preventDefault();
             var id = $(this).attr("id");
             var deviceId = id.substring(7);
-            window.open(context + "/device/senseme?id="+deviceId + "&buildingId=" + buildingId + "&floorId=" + floorId);
+            window.open(context + "/senseme?id="+deviceId,"_self");
 
         });
 

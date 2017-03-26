@@ -21,6 +21,7 @@ package org.wso2.iot.senseme.api.dto;
 
 import org.wso2.carbon.device.mgt.common.Device;
 import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
+import org.wso2.carbon.device.mgt.common.EnrolmentInfo;
 import org.wso2.iot.senseme.api.util.APIUtil;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class SenseMe {
     public SenseMe(Device device) {
         deviceId = device.getDeviceIdentifier();
         status = device.getEnrolmentInfo().getStatus().toString();
+
         List<Device.Property> propertyList = device.getProperties();
         for (Device.Property property : propertyList) {
             switch (property.getName()) {
@@ -51,10 +53,12 @@ public class SenseMe {
                 case "buildingId":  buildingId = property.getValue();
                     break;
                 case "lastKnown":
-                    if (property.getValue() != null) {
-                        long timestamp = Long.parseLong(property.getValue());
-                        if ((System.currentTimeMillis() - timestamp)/1000 > 3600) {
-                            status = "FAULT";
+                    if (device.getEnrolmentInfo().getStatus() == EnrolmentInfo.Status.ACTIVE) {
+                        if (property.getValue() != null) {
+                            long timestamp = Long.parseLong(property.getValue());
+                            if ((System.currentTimeMillis() - timestamp) / 1000 > 3600) {
+                                status = "FAULT";
+                            }
                         }
                     }
                     break;

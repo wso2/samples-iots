@@ -35,9 +35,6 @@ import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorization
 import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroup;
 import org.wso2.carbon.device.mgt.common.group.mgt.GroupAlreadyExistException;
 import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
-import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
-import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
-import org.wso2.carbon.device.mgt.core.operation.mgt.CommandOperation;
 import org.wso2.carbon.device.mgt.core.service.GroupManagementProviderService;
 import org.wso2.carbon.identity.jwt.client.extension.JWTClient;
 import org.wso2.carbon.identity.jwt.client.extension.dto.AccessTokenInfo;
@@ -52,13 +49,9 @@ import org.wso2.iot.senseme.api.dto.SensorRecord;
 import org.wso2.iot.senseme.api.dto.TokenInfo;
 import org.wso2.iot.senseme.api.util.APIUtil;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -93,22 +86,26 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
      * @param to       ending time
      * @return response with List<SensorRecord> object which includes sensor data which is requested
      */
-    @Path("device/stats/{deviceId}")
+    @Path("/stats/{deviceId}")
     @GET
     @Consumes("application/json")
     @Produces("application/json")
     public Response getSensorStats(@PathParam("deviceId") String deviceId, @QueryParam("from") long from,
                                    @QueryParam("to") long to, @QueryParam("sensorType") String sensorType) {
-        String fromDate = String.valueOf(from);
-        String toDate = String.valueOf(to);
-        String query = "meta_deviceId:" + deviceId + " AND meta_deviceType:" +
-                       DeviceTypeConstants.DEVICE_TYPE + " AND meta_time : [" + fromDate + " TO" +
+        String fromDate = String.valueOf(from * 1000);
+        String toDate = String.valueOf(to * 1000);
+        String query = "deviceId:" + deviceId + " AND deviceType:" +
+                       DeviceTypeConstants.DEVICE_TYPE + " AND time : [" + fromDate + " TO" +
                 " " + toDate + "]";
         String sensorTableName = null;
-        if (sensorType.equals(DeviceTypeConstants.SENSOR_TYPE1)) {
-            sensorTableName = DeviceTypeConstants.SENSOR_TYPE1_EVENT_TABLE;
-        } else if (sensorType.equals(DeviceTypeConstants.SENSOR_TYPE2)) {
-            sensorTableName = DeviceTypeConstants.SENSOR_TYPE2_EVENT_TABLE;
+        if (sensorType.equals(DeviceTypeConstants.SENSOR_TYPE_MOTION)) {
+            sensorTableName = DeviceTypeConstants.MOTION_EVENT_TABLE;
+        } else if (sensorType.equals(DeviceTypeConstants.SENSOR_TYPE_LIGHT)) {
+            sensorTableName = DeviceTypeConstants.LIGHT_EVENT_TABLE;
+        } else if (sensorType.equals(DeviceTypeConstants.SENSOR_TYPE_TEMPERATURE)) {
+            sensorTableName = DeviceTypeConstants.TEMPERATURE_EVENT_TABLE;
+        } else if (sensorType.equals(DeviceTypeConstants.SENSOR_TYPE_HUMIDITY)) {
+            sensorTableName = DeviceTypeConstants.HUMIDITY_EVENT_TABLE;
         }
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
@@ -117,7 +114,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             }
             if (sensorTableName != null) {
                 List<SortByField> sortByFields = new ArrayList<>();
-                SortByField sortByField = new SortByField("meta_time", SortType.ASC);
+                SortByField sortByField = new SortByField("time", SortType.ASC);
                 sortByFields.add(sortByField);
                 List<SensorRecord> sensorRecords = APIUtil.getAllEventsForDevice(sensorTableName, query, sortByFields);
                 return Response.status(Response.Status.OK.getStatusCode()).entity(sensorRecords).build();

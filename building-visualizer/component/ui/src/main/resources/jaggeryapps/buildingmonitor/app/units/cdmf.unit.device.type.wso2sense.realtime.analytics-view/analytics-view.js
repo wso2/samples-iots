@@ -34,42 +34,14 @@ function onRequest(context) {
     var token = "";
     var tokenPair = session.get("websocket_token_pair");
 
-    if (tokenPair) {
-        tokenPair = parse(tokenPair);
-        token = tokenPair["accessToken"];
+	var tokenUtil = require("/app/modules/oauth/token-handler-utils.js")["utils"];
+	var resp = tokenUtil.decode(encodedClientKeys).split(":");
+	var tokenPair = jwtClient.getAccessToken(resp[0], resp[1], context.user.username, "default", {});
+	if (tokenPair) {
+		token = tokenPair.accessToken;
 
-        var currentTime = new Date().getTime();
-        if (currentTime > parse(tokenPair)["expiresIn"]) {
-            var tokenUtil = require("/app/modules/oauth/token-handler-utils.js")["utils"];
-            var resp = tokenUtil.decode(encodedClientKeys).split(":");
-            var tokenPair = jwtClient.getAccessTokenFromRefreshToken(token, context.user.username, "default", resp[0], resp[1]);
+	}
 
-            if (tokenPair) {
-                token = tokenPair.accessToken;
-                var tokenData = {};
-                tokenData["accessToken"] = tokenPair["accessToken"];
-                tokenData["refreshToken"] = tokenPair["refreshToken"];
-                tokenData["expiresIn"] = tokenPair["expiresIn"];
-                // setting up access token pair into session context as a string
-                session.put("websocket_token_pair", stringify(tokenPair));
-            }
-        }
-    }
-
-    if (!token && encodedClientKeys) {
-        var tokenUtil = require("/app/modules/oauth/token-handler-utils.js")["utils"];
-        var resp = tokenUtil.decode(encodedClientKeys).split(":");
-        var tokenPair = jwtClient.getAccessToken(resp[0], resp[1], context.user.username, "default", {});
-        if (tokenPair) {
-            token = tokenPair.accessToken;
-            var tokenData = {};
-            tokenData["accessToken"] = tokenPair["accessToken"];
-            tokenData["refreshToken"] = tokenPair["refreshToken"];
-            tokenData["expiresIn"] = tokenPair["expiresIn"];
-            // setting up access token pair into session context as a string
-            session.put("websocket_token_pair", stringify(tokenPair));
-        }
-    }
     websocketEndpointForStream1 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.light/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;
     websocketEndpointForStream2 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.humidity/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;
     websocketEndpointForStream3 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.motion/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;
