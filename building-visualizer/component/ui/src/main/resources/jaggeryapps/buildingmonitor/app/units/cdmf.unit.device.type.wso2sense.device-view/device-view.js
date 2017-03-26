@@ -18,7 +18,7 @@
 
 function onRequest(context) {
 	var log = new Log("device-view.js");
-	var deviceType = context.uriParams.deviceType;
+	var deviceType = "senseme";
 	var deviceId = request.getParameter("id");
 	var autoCompleteParams = [
 		{"name" : "deviceId", "value" : deviceId}
@@ -33,6 +33,7 @@ function onRequest(context) {
 
         if (device && device.status != "error") {
 			var buildingId = device.content["initialDeviceInfo"]["buildingId"];
+			var floorId = device.content["initialDeviceInfo"]["floorId"];
             if (buildingId) {
                 var url = devicemgtProps["httpsURL"] + "/senseme/building/" + buildingId;
 
@@ -44,6 +45,8 @@ function onRequest(context) {
                         device.content["location"] = {};
                         device.content["location"]["latitude"] = details.latitude;
                         device.content["location"]["longitude"] = details.longitude;
+						device.content["buildingId"] = buildingId;
+						device.content["floorId"] = floorId;
                     }
                 );
             }

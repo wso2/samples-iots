@@ -18,18 +18,37 @@
 
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 var sensorType1 = "light";
-var sensorType2 = "humidy";
+var sensorType2 = "humidity";
+var sensorType3 = "temperature";
+var sensorType4 = "motion";
 var sensorType1Graph;
 var sensorType2Graph;
+var sensorType3Graph;
+var sensorType4Graph;
 
 function drawGraph_senseme(from, to)
 {
+	clearGraph(1);
+	clearGraph(2);
+	clearGraph(3);
+	clearGraph(4);
     var devices = $("#details").data("devices");
-    var tzOffset = new Date().getTimezoneOffset() * 60;
+    var tzOffset = 0;//new Date().getTimezoneOffset() * 60;
     var chartWrapperElmId = "#chartDivSensorType1";
     var graphWidth = $(chartWrapperElmId).width() - 50;
     var graphConfigSensorType1 = getGraphConfig("chartSensorType1");
     var graphConfigSensorType2 = getGraphConfig("chartSensorType2");
+	var graphConfigSensorType3 = getGraphConfig("chartSensorType3");
+	var graphConfigSensorType4 = getGraphConfig("chartSensorType4");
+
+	function clearGraph(id) {
+		$("#sensorType" + id + "yAxis").html("");
+		$("#smoother-sensorType" + id).html("");
+		$("#sensorType" + id + "Legend").html("");
+		$("#chartSensorType" + id).html("");
+		$("#sensorType" + id + "xAxis").html("");
+		$("#sensorType" + id + "Slider").html("");
+	}
 
     function getGraphConfig(placeHolder) {
         return {
@@ -68,6 +87,24 @@ function drawGraph_senseme(from, to)
                     }],
                     'name': devices[i].name
                 });
+			graphConfigSensorType3['series'].push(
+				{
+					'color': palette.color(),
+					'data': [{
+						x: parseInt(new Date().getTime() / 1000),
+						y: 0
+					}],
+					'name': devices[i].name
+				});
+			graphConfigSensorType4['series'].push(
+				{
+					'color': palette.color(),
+					'data': [{
+						x: parseInt(new Date().getTime() / 1000),
+						y: 0
+					}],
+					'name': devices[i].name
+				});
         }
     } else {
         graphConfigSensorType1['series'].push(
@@ -88,17 +125,40 @@ function drawGraph_senseme(from, to)
                 }],
                 'name': $("#details").data("devicename")
             });
+		graphConfigSensorType3['series'].push(
+			{
+				'color': palette.color(),
+				'data': [{
+					x: parseInt(new Date().getTime() / 1000),
+					y: 0
+				}],
+				'name': $("#details").data("devicename")
+			});
+		graphConfigSensorType4['series'].push(
+			{
+				'color': palette.color(),
+				'data': [{
+					x: parseInt(new Date().getTime() / 1000),
+					y: 0
+				}],
+				'name': $("#details").data("devicename")
+			});
     }
 
     sensorType1Graph = new Rickshaw.Graph(graphConfigSensorType1);
     sensorType2Graph = new Rickshaw.Graph(graphConfigSensorType2);
+	sensorType3Graph = new Rickshaw.Graph(graphConfigSensorType3);
+	sensorType4Graph = new Rickshaw.Graph(graphConfigSensorType4);
     drawGraph(sensorType1Graph, "sensorType1yAxis", "sensorType1Slider", "sensorType1Legend", sensorType1
         , graphConfigSensorType1, "chartSensorType1");
     drawGraph(sensorType2Graph, "sensorType2yAxis", "sensorType2Slider", "sensorType2Legend", sensorType2
         , graphConfigSensorType2, "chartSensorType2");
+	drawGraph(sensorType2Graph, "sensorType3yAxis", "sensorType3Slider", "sensorType3Legend", sensorType3
+		, graphConfigSensorType3, "chartSensorType3");
+	drawGraph(sensorType2Graph, "sensorType4yAxis", "sensorType4Slider", "sensorType4Legend", sensorType4
+		, graphConfigSensorType4, "chartSensorType4");
 
     function drawGraph(graph, yAxis, slider, legend, sensorType, graphConfig, chart) {
-        console.log("1");
         graph.render();
         var xAxis = new Rickshaw.Graph.Axis.Time({
             graph: graph
@@ -143,7 +203,6 @@ function drawGraph_senseme(from, to)
             legend: legend
         });
         var deviceIndex = 0;
-        console.log("1");
         if (devices) {
             getData(chat, deviceIndex, sensorType);
         } else {
@@ -189,7 +248,7 @@ function drawGraph_senseme(from, to)
         for (var i = 0; i < data.length; i++) {
             chartData.push(
                 {
-                    x: parseInt(data[i].values.meta_time) - tzOffset,
+                    x: parseInt(data[i].values.time/1000) - tzOffset,
                     y: parseInt(data[i].values[sensorType])
                 }
             );

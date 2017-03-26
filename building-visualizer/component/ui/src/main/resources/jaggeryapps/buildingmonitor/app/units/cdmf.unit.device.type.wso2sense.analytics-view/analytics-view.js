@@ -20,9 +20,8 @@ function onRequest(context) {
 	var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
 
 	var devices = context.unit.params.devices;
-	var deviceType = context.uriParams.deviceType;
+	var deviceType = "senseme";
 	var deviceId = request.getParameter("deviceId");
-
 	if (devices) {
 		return {
 			"devices": stringify(devices),
@@ -34,7 +33,7 @@ function onRequest(context) {
 		if (device && device.status != "error") {
 			return {
 				"device": device.content,
-				"backendApiUri":  "/" + deviceType +"/device/stats/" + deviceId
+				"backendApiUri":  "/senseme/device/stats/" + deviceId
 			};
 		} else {
 			response.sendError(404, "Device Id " + deviceId + " of type " + deviceType + " cannot be found!");

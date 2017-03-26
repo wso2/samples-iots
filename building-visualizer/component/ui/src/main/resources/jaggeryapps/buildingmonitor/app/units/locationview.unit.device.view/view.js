@@ -18,7 +18,7 @@
 
 function onRequest(context) {
     var log = new Log("cdmf.unit.device.view/view.js");
-    var deviceType = context["uriParams"]["deviceType"];
+    var deviceType = "senseme";
     var deviceId = request.getParameter("id");
     var deviceViewData = {};
     var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];

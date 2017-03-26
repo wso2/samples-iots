@@ -27,10 +27,6 @@ function onRequest(context){
             return options.fn(this);
         }
     });
-
-    var buildingId = request.getParameter("buildingId");
-    var floorId = request.getParameter("floorId");
     var deviceType = context.uriParams.deviceType;
-    return {"buildingId": buildingId,
-            "floorId" : floorId};
+    return {};
 }

@@ -59,11 +59,11 @@ import java.util.List;
 @Path("building")
 public class BuildingServiceImpl implements BuildingService {
 
-    private static final String KEY_TYPE = "PRODUCTION";
     private static Log log = LogFactory.getLog(BuildingServiceImpl.class);
     BuildingPluginDAOManager buildingDAOManager = new BuildingPluginDAOManager();
     BuildingPluginDAO buildingDAO = buildingDAOManager.getDeviceDAO();
     private static final String ANDROID_DEVICE_TYPE = "android";
+    private static final String SENSEME_DEVICE_TYPE = "senseme";
     public static final String NOTIFICATION = "NOTIFICATION";
 
 
@@ -263,6 +263,9 @@ public class BuildingServiceImpl implements BuildingService {
                         floorDeviceGroup.getGroupId(),
                         0, 1000);
                 for (Device device : devices) {
+                    if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
+                        continue;
+                    }
                     device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
                             device.getDeviceIdentifier(), device.getType()));
                     senseMes.add(new SenseMe(device));
@@ -340,6 +343,9 @@ public class BuildingServiceImpl implements BuildingService {
                             floorDeviceGroup.getGroupId(),
                             0, 1000);
                     for (Device device : devices) {
+                        if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
+                            continue;
+                        }
                         device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
                                 device.getDeviceIdentifier(), device.getType()));
                         List<Device.Property> propertyList = device.getProperties();
@@ -404,9 +410,11 @@ public class BuildingServiceImpl implements BuildingService {
                             floorDeviceGroup.getGroupId(),
                             0, 1000);
                     for (Device device : devices) {
+                        if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
+                            continue;
+                        }
                         device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
                                 device.getDeviceIdentifier(), device.getType()));
-                        String status = device.getEnrolmentInfo().getStatus().toString();
                         List<Device.Property> propertyList = device.getProperties();
                         if (device.getEnrolmentInfo().getStatus() == EnrolmentInfo.Status.ACTIVE) {
                             deviceInfo.increaseActive();
