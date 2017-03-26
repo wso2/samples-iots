@@ -40,6 +40,9 @@ function onRequest(context) {
 			var building = JSON.parse(responsePayload.responseText);
 			floorsCount = building.numFloors;
 			viewModel["floorCount"] = floorsCount;
+			viewModel["buildingName"] = building.buildingName;
+			viewModel["longitude"] = building.longitude;
+			viewModel["latitude"] = building.latitude;
 
 		},
 		function (responsePayload) {

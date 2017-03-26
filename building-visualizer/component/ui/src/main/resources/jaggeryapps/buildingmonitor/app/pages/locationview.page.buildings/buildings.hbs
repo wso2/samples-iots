@@ -43,6 +43,9 @@
 {{/zone}}
 
 {{#zone "content"}}
+    <div>
+        <h1>{{buildingName}}</h1>
+    </div>
     <!--</header>-->
     <div class="row" data-num_of_floors="{{floorCount}}" id="buildingView">
         {{#each floors}}
@@ -146,7 +149,6 @@
 
 
     </div>
-
 
     {{unit "locationview.unit.ui.analytics.rangeSelector"}}
 {{/zone}}
