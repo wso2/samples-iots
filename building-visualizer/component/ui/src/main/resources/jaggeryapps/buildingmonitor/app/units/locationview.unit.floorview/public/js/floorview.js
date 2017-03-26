@@ -374,9 +374,9 @@ function hidePopup() {
             selectedDate = e.date;
             var date = new Date(e.date);
             date.setHours(date.getHours()-1);
-
             historicalData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
             updateHistoricData(historicalData[currentSliderValue]);
+            historicalSlider.bootstrapSlider('refresh');
         });
 
         var date = new Date();
