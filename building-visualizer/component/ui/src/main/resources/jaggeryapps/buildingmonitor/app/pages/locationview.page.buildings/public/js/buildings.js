@@ -41,17 +41,12 @@ function handleData(sliderVal, sliderMax, buildingData) {
  * @param floorId floor number
  * @param data relative data for floor number
  */
-function displyaData(floorId, data) {
-    var canvas = document.getElementById(floorId);
-    clearCanvas(canvas);
-    var ctx = canvas.getContext("2d");
-    ctx.font = "14px Arial";
-    ctx.fillText("Temperature: " + data.temperature, 10, 10);
-    ctx.fillText("Air Quality: " + data.airQuality, 10, 30);
-    ctx.fillText("Humidity: " + data.humidity, 10, 50);
-    ctx.fillText("Light: " + data.light, 10, 70);
-    ctx.fillText("Motion: " + data.motion, 10, 90);
-
+function displyaData(floorId,data) {
+    $( "#"+floorId ).children( "#temperature").text("Temperature: "+data.temperature);
+    $( "#"+floorId ).children( "#humidity").text("Humidity: "+data.humidity);
+    $( "#"+floorId ).children( "#light").text("Light: "+data.light);
+    $( "#"+floorId ).children( "#motion").text("Motion: "+data.motion);
+    $( "#"+floorId ).children( "#airquality").text("Air Quality: "+data.airQuality);
 }
 
 /**
@@ -59,14 +54,44 @@ function displyaData(floorId, data) {
  * @param floorId floor number
  */
 function displyaError(floorId) {
-    var canvas = document.getElementById(floorId);
-    clearCanvas(canvas);
-    if (canvas != null) {
-        var ctx = canvas.getContext("2d");
-        ctx.font = "14px Arial";
-        ctx.fillText("No data", 10, 10);
-    }
+    $( "#"+floorId ).children( "#temperature").text("Temperature: No Value");
+    $( "#"+floorId ).children( "#humidity").text("Humidity: No Value");
+    $( "#"+floorId ).children( "#light").text("Light: No Value");
+    $( "#"+floorId ).children( "#motion").text("Motion: No Value");
+    $( "#"+floorId ).children( "#airquality").text("Air Quality: No Value");
 }
+
+// /**
+//  * To display received data.
+//  * @param floorId floor number
+//  * @param data relative data for floor number
+//  */
+// function displyaData(floorId, data) {
+//     var canvas = document.getElementById(floorId);
+//     clearCanvas(canvas);
+//     var ctx = canvas.getContext("2d");
+//     ctx.font = "14px Arial";
+//     ctx.fillText("Temperature: " + data.temperature, 10, 10);
+//     ctx.fillText("Air Quality: " + data.airQuality, 10, 30);
+//     ctx.fillText("Humidity: " + data.humidity, 10, 50);
+//     ctx.fillText("Light: " + data.light, 10, 70);
+//     ctx.fillText("Motion: " + data.motion, 10, 90);
+//
+// }
+//
+// /**
+//  * To display error message.
+//  * @param floorId floor number
+//  */
+// function displyaError(floorId) {
+//     var canvas = document.getElementById(floorId);
+//     clearCanvas(canvas);
+//     if (canvas != null) {
+//         var ctx = canvas.getContext("2d");
+//         ctx.font = "14px Arial";
+//         ctx.fillText("No data", 10, 10);
+//     }
+// }
 
 /**
  * Initialize floor data arrays
@@ -133,7 +158,8 @@ function handleRealTimeData(data) {
         } else {
             floorData[fId].push(data);
         }
-        displyaData(floorId, data);
+        a(floorId, data);
+        // displyaData(floorId, data);
     }
 }
 
@@ -146,21 +172,21 @@ function getUrlVar(key) {
     return result && unescape(result[1]) || "";
 }
 
-/**
- * To clear data on canvas.
- * @param cnv canvas
- */
-function clearCanvas(cnv) {
-    var ctx = cnv.getContext('2d');     // gets reference to canvas context
-    ctx.beginPath();    // clear existing drawing paths
-    ctx.save();         // store the current transformation matrix
-
-    // Use the identity matrix while clearing the canvas
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, cnv.width, cnv.height);
-
-    ctx.restore();        // restore the transform
-}
+// /**
+//  * To clear data on canvas.
+//  * @param cnv canvas
+//  */
+// function clearCanvas(cnv) {
+//     var ctx = cnv.getContext('2d');     // gets reference to canvas context
+//     ctx.beginPath();    // clear existing drawing paths
+//     ctx.save();         // store the current transformation matrix
+//
+//     // Use the identity matrix while clearing the canvas
+//     ctx.setTransform(1, 0, 0, 1, 0, 0);
+//     ctx.clearRect(0, 0, cnv.width, cnv.height);
+//
+//     ctx.restore();        // restore the transform
+// }
 
 /**
  * Calling batch provider api.
