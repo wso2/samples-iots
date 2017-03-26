@@ -11,3 +11,9 @@
 .building-status span{
     width: 30px;
 }
+.modal-content{
+    padding: 20px;
+}
+form .form-group label{
+    color:#fff;
+}
