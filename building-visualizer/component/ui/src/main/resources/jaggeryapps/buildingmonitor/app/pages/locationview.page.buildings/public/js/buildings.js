@@ -239,6 +239,7 @@ function slide() {
 
 }
 
+
 function handleTimer(slider,point,maxPoint,data){
     // stop
     $("#pla i").removeClass("fw-right");
@@ -346,6 +347,13 @@ function setSlider(slider,sliderPointMin, sliderPointMax) {
  */
 function switchToLive() {
 
+    if(isPause){
+        $("#pla i").removeClass("fw-circle");
+        $("#pla i").addClass("fw-right");
+        isPause=false;
+        sliderPoint=sliderPointMin;
+    }
+
     isLive = true;
     $(".date-picker").slideToggle("slow");
     $('input[name="daterange"]').val('');
@@ -367,6 +375,13 @@ function switchToLive() {
  * Toggle switch to history view.
  */
 function switchToHistory() {
+
+    if(isPause){
+        $("#pla i").removeClass("fw-circle");
+        $("#pla i").addClass("fw-right");
+        isPause=false;
+        sliderPoint=sliderPointMin;
+    }
 
     isLive = false;
     $(".date-picker").slideToggle("slow");
@@ -448,8 +463,19 @@ $(document).ready(function () {
     buildingId = getUrlVar("buildingId");
     numOfFloors = $("#buildingView").data("num_of_floors");
 
-    rangeSlider = $("#range-slider").bootstrapSlider();
-    historicalSlider = $("#historical-slider").bootstrapSlider();
+    rangeSlider = $("#range-slider").bootstrapSlider(
+        {
+            ticks: [1,2,4,6,8,10],
+            ticks_labels: ['-9m','-8m','-6m','-4m', '-2m',  'latest']
+
+        }
+    );
+    historicalSlider = $("#historical-slider").bootstrapSlider(
+        {
+            ticks: [1, 4, 8, 12, 16, 20, 24],
+            ticks_labels: ['0h','4h', '8h', '12h', '16h', '20h', '24h']
+        }
+    );
 
     setSlider(rangeSlider, sliderPointMin, sliderPointMax);
 
