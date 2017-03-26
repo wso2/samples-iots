@@ -138,14 +138,19 @@ function preLoadBuildings() {
 								for (var i = 0; i < buildings.length; i++) {
 									var obj = buildings[i];
 									var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
-
+									var buildingdevice = {"active" : 0,
+										"inactive" : 0,
+										"fault":0, "total":0, "alerts" : 0};
 									for(var j = 0; j < devices.length; j++) {
-										var buildingdevice;
+
 
 										if (devices[j].id == obj.buildingId) {
 											var deviceobj = devices[j];
 											//[{"id":"9","activeDevices":0,"faultDevices":0,"inactiveDevices":4,"totalDevices":4}]
 											var alert = buildingAlertCount[obj.buildingId];
+											if (!alert && alert== undefined) {
+												alert = 0;
+											}
 											buildingdevice = {"active" : deviceobj.activeDevices,
 												"inactive" : deviceobj.inactiveDevices,
 												"fault":deviceobj.faultDevices, "total":deviceobj.totalDevices, "alerts" : alert};
@@ -285,6 +290,7 @@ function onMarkerDragged(event) {
 function addingMarker(cord, locationName, buildingId, building, buildingdevice) {
 	var markerId,
 		popup;
+
 	$('body.fixed ').removeClass('marker-cursor');
 	$('#device-location').removeClass('marker-cursor');
 
