@@ -90,6 +90,14 @@ function loadLeafletMap() {
         }]
     }).locate({setView: true, maxZoom: 17, animate: true, duration: 3});
     L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
+
+    //locate me button
+    var locateMe = L.control.locate({
+        strings: {
+            title: "Show me where I am..!"
+        }
+    }).addTo(map);
+
     setTimeout(function () {
         map.invalidateSize()
     }, 400);
