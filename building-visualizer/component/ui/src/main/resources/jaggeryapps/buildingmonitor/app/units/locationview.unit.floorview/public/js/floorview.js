@@ -346,6 +346,7 @@ function hidePopup() {
         rangeSlider.bootstrapSlider('setAttribute', 'min', -30);
         rangeSlider.bootstrapSlider('setAttribute', 'max', 0);
         rangeSlider.bootstrapSlider('setValue', 0);
+        rangeSlider.bootstrapSlider('refresh');
 
         historicalSlider = $("#historical-slider").bootstrapSlider({
             ticks: [0, 4, 8, 12, 16, 20, 24],

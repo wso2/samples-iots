@@ -371,6 +371,8 @@ function setSlider(slider,sliderPointMin, sliderPointMax) {
     slider.bootstrapSlider('setAttribute', 'min', sliderPointMin);
     slider.bootstrapSlider('setAttribute', 'max', sliderPointMax);
     slider.bootstrapSlider('setValue', sliderPointMax);
+    slider.bootstrapSlider('refresh');
+
 }
 
 /**
