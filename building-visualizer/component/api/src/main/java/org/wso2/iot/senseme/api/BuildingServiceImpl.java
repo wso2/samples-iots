@@ -266,6 +266,10 @@ public class BuildingServiceImpl implements BuildingService {
                     if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
                         continue;
                     }
+                    if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE ||
+                            device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
+                        continue;
+                    }
                     device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
                             device.getDeviceIdentifier(), device.getType()));
                     senseMes.add(new SenseMe(device));
@@ -346,6 +350,10 @@ public class BuildingServiceImpl implements BuildingService {
                         if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
                             continue;
                         }
+                        if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE ||
+                                device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
+                            continue;
+                        }
                         device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
                                 device.getDeviceIdentifier(), device.getType()));
                         List<Device.Property> propertyList = device.getProperties();
@@ -411,6 +419,10 @@ public class BuildingServiceImpl implements BuildingService {
                             0, 1000);
                     for (Device device : devices) {
                         if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
+                            continue;
+                        }
+                        if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE ||
+                                device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
                             continue;
                         }
                         device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
