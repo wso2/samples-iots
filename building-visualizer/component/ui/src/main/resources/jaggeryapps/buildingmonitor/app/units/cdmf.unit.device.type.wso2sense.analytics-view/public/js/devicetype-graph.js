@@ -153,9 +153,9 @@ function drawGraph_senseme(from, to)
         , graphConfigSensorType1, "chartSensorType1");
     drawGraph(sensorType2Graph, "sensorType2yAxis", "sensorType2Slider", "sensorType2Legend", sensorType2
         , graphConfigSensorType2, "chartSensorType2");
-	drawGraph(sensorType2Graph, "sensorType3yAxis", "sensorType3Slider", "sensorType3Legend", sensorType3
+	drawGraph(sensorType3Graph, "sensorType3yAxis", "sensorType3Slider", "sensorType3Legend", sensorType3
 		, graphConfigSensorType3, "chartSensorType3");
-	drawGraph(sensorType2Graph, "sensorType4yAxis", "sensorType4Slider", "sensorType4Legend", sensorType4
+	drawGraph(sensorType4Graph, "sensorType4yAxis", "sensorType4Slider", "sensorType4Legend", sensorType4
 		, graphConfigSensorType4, "chartSensorType4");
 
     function drawGraph(graph, yAxis, slider, legend, sensorType, graphConfig, chart) {
