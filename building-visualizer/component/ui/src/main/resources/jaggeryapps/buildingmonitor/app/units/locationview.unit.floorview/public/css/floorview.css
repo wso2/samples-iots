@@ -27,3 +27,12 @@
 	width: 100%;
 	padding: 12px;
 }
+
+.keys {
+	margin-top: 1em;
+}
+.keys .wr-stats-board-sidebar{
+	width: 17%;
+	height: 30px;
+	padding: 2px 0px;
+}
