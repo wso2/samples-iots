@@ -375,6 +375,7 @@ function getHistoricaldata(numOfFloors, date) {
  * @param sliderPointMax maximum value of slider
  */
 function setSlider(slider,sliderPointMin, sliderPointMax) {
+    slider.bootstrapSlider('refresh');
     slider.bootstrapSlider('setAttribute', 'min', sliderPointMin);
     slider.bootstrapSlider('setAttribute', 'max', sliderPointMax);
     slider.bootstrapSlider('setValue', sliderPointMax);
