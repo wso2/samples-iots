@@ -500,7 +500,7 @@ $(document).ready(function () {
     $(".slider-wrapper").show(1000);
     $('#historic-toggle').addClass("live");
     buildingId = getUrlVar("buildingId");
-    numOfFloors = $("#group-2").data("group-2");
+    numOfFloors = $("#group-2").data("num_of_floors");
 
     rangeSlider = $("#range-slider").bootstrapSlider(
         {
