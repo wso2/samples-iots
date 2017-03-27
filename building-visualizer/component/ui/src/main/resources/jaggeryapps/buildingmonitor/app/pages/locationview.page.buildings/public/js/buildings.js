@@ -43,16 +43,23 @@ function handleData(sliderVal, sliderMax, buildingData) {
  */
 function displyaData(floorId,data) {
     var light;
+    var motion;
     if(data.light<500){
-        light = 1;
+        light = "ON";
     }else if (data.light>500){
-        light=0;
+        light="OFF";
     }
-    $( "#"+floorId ).find( "#temperature").text(parseInt(data.temperature));
-    $( "#"+floorId ).find( "#humidity").text(parseInt(data.humidity));
+
+    if (data.motion>0.5){
+        motion = "TRUE";
+    }else{
+        motion = "FALSE";
+    }
+    $( "#"+floorId ).find( "#temperature").text(parseInt(data.temperature)+"°C");
+    $( "#"+floorId ).find( "#humidity").text(parseInt(data.humidity).toFixed(2));
     $( "#"+floorId ).find( "#light").text(light);
-    $( "#"+floorId ).find( "#motion").text(data.motion);
-    $( "#"+floorId ).find( "#airquality").text(data.airQuality);
+    $( "#"+floorId ).find( "#motion").text(motion);
+    $( "#"+floorId ).find( "#airquality").text(parseInt(data.airQuality).toFixed(2));
 }
 
 /**
