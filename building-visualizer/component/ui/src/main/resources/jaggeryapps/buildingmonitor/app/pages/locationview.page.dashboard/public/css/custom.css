@@ -14,3 +14,7 @@
 form .form-group label{
     color:#fff;
 }
+
+.dropdown-menu {
+    z-index: 1010;
+}
