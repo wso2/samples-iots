@@ -54,3 +54,9 @@
     margin-right: 20px;
     margin-left: 20px;
 }
+
+.datepicker-dropdown{
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+

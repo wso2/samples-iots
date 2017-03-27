@@ -21,7 +21,7 @@
 }
 
 .analytics-options{
-	float: right;
+	position: absolute;
 }
 .analytics-options label{
 	width: 100%;
