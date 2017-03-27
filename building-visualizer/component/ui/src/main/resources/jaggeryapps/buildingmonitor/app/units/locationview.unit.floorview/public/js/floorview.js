@@ -343,10 +343,10 @@ function hidePopup() {
                 return full + "h";
             }
         });
+	rangeSlider.bootstrapSlider('refresh');
         rangeSlider.bootstrapSlider('setAttribute', 'min', -30);
         rangeSlider.bootstrapSlider('setAttribute', 'max', 0);
-        rangeSlider.bootstrapSlider('setValue', 0);
-        rangeSlider.bootstrapSlider('refresh');
+        rangeSlider.bootstrapSlider('setValue', 0); 
 
         historicalSlider = $("#historical-slider").bootstrapSlider({
             ticks: [0, 4, 8, 12, 16, 20, 24],
@@ -355,6 +355,7 @@ function hidePopup() {
                 return value + "h";
             }
         });
+	historicalSlider.bootstrapSlider('refresh');
         historicalSlider.bootstrapSlider('setAttribute', 'min', 0);
         historicalSlider.bootstrapSlider('setAttribute', 'max', 24);
         historicalSlider.bootstrapSlider('setValue', 0);
