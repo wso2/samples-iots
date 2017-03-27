@@ -384,7 +384,7 @@ function hidePopup() {
         date.setMinutes(date.getMinutes() - 210);
         recentPastData = getHistoricalData("getRecentPastData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
         lastFetchedTime = new Date().getTime();
-        $('#image canvas').addClass('hidden');
+        //$('#image canvas').addClass('hidden');
         loadNotifications();
 
         $("#svg rect").click(function (e) {

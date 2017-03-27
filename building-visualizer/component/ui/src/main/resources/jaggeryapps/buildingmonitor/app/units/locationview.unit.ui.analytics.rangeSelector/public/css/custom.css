@@ -1,7 +1,7 @@
-.slider-wrapper{
-    /*display: block;*/
-    display:none;
-}
+/*.slider-wrapper{*/
+    /*/!*display: block;*!/*/
+    /*display:none;*/
+/*}*/
 
 .slider-wrapper{
     position: fixed;
