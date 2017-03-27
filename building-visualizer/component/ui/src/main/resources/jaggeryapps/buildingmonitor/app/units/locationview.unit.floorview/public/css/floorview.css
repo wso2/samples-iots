@@ -19,3 +19,11 @@
 	height: 100%;
 	width: 100%;
 }
+
+.analytics-options{
+	float: right;
+}
+.analytics-options label{
+	width: 100%;
+	padding: 12px;
+}
