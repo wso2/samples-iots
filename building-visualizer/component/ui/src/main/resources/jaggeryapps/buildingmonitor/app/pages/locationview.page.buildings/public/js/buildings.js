@@ -578,3 +578,8 @@ function loadLeafletMap() {
 		$("#map-error").show();
 	}
 }
+
+$(document).on( "click", ".view-analytics", function(e) {
+    e.stopPropagation();
+
+});
