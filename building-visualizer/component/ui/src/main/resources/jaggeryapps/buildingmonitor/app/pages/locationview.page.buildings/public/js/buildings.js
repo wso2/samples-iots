@@ -379,7 +379,6 @@ function setSlider(slider,sliderPointMin, sliderPointMax) {
     slider.bootstrapSlider('setAttribute', 'min', sliderPointMin);
     slider.bootstrapSlider('setAttribute', 'max', sliderPointMax);
     slider.bootstrapSlider('setValue', sliderPointMax);
-
 }
 
 /**
@@ -501,7 +500,7 @@ $(document).ready(function () {
     $(".slider-wrapper").show(1000);
     $('#historic-toggle').addClass("live");
     buildingId = getUrlVar("buildingId");
-    numOfFloors = $("#group-2").data("num_of_floors");
+    numOfFloors = $("#group-2").data("group-2");
 
     rangeSlider = $("#range-slider").bootstrapSlider(
         {
