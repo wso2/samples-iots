@@ -417,7 +417,7 @@ function addBuildingMenu(buildingId, buildingName, markerId, buildingdevice) {
 function focusBuilding(id) {
 	var buildingId = $("#" + id).attr('data-buildingid');
 	var markerId = $("#" + id).attr('data-markerid');
-	var mark = markers[markerId];
+	var mark = markers[markerId].openPopup();
 	var offset = map.panTo(mark.getLatLng());
 	map.panBy(offset);
 }
