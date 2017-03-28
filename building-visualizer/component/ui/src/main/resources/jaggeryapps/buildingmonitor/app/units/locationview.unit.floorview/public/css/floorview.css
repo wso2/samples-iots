@@ -1,3 +1,14 @@
+.datepicker-dropdown{
+	background: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.datepicker-dropdown.datepicker-orient-top:after {
+	bottom: -6px;
+	border-bottom: 0;
+	border-top: 6px solid #fff;
+}
+
 #image {
     width: 100%;
 }
