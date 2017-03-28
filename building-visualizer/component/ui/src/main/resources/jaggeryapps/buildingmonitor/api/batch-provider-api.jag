@@ -110,7 +110,7 @@
             var count =0
             while (newData.length == 100 || start == 0) {
                 var timeFrom = new Date();
-                timeFrom.setHours(timeFrom.getHours - 24);
+                timeFrom.setHours(timeFrom.getHours - 6);
                 var timeTo = new Date();
                 newData = providerAPI.getData(tableName, buildingSet[i], null, timeFrom.getTime(), timeTo
                         .getTime(), start, limit, "DESC");
