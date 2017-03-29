@@ -64,7 +64,7 @@
         var fd = parseInt(floorCount);
         var data =[];
         for (var i = 1; i < fd+1; i++) {
-            data[i-1] = providerAPI.getData(tableName, buildingId, i, timeFrom, timeTo, start, limit, sortBy);
+            data[i-1] = providerAPI.getData(tableName, buildingId, i, timeFrom, timeTo, start, limit, sortBy).reverse();
         }
 
         print(data);
