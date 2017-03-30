@@ -27,25 +27,12 @@ import java.io.File;
  */
 public class DeviceTypeConstants {
     public final static String DEVICE_TYPE = "senseme";
-    public final static String DEVICE_PLUGIN_DEVICE_NAME = "DEVICE_NAME";
-    public final static String DEVICE_PLUGIN_DEVICE_ID = "senseme_DEVICE_ID";
-    public final static String STATE_ON = "ON";
-    public final static String STATE_OFF = "OFF";
-    public final static String BUILDING_GROUP_ID = "building-%s";
     public final static String BUILDING_GROUP_NAME = "BUILDING-%s";
-    public final static String FLOOR_GROUP_ID = "floor-%s";
     public final static String FLOOR_GROUP_NAME = "BUILDING-%s-FLOOR-%s";
     public final static String BUILDING_ID = "buildingId";
     public final static String FLOOR_ID = "floorId";
     public final static String X_COORDINATE = "xCoordinate";
     public final static String Y_COORDINATE = "yCoordinate";
-
-
-    //sensor events summerized table name
-//    public static final String MOTION_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_MOTION";
-//    public static final String LIGHT_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_LIGHT";
-//    public static final String TEMPERATURE_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_TEMPERATURE";
-//    public static final String HUMIDITY_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_HUMIDITY";
 
     public static final String MOTION_EVENT_TABLE = "DEVICE_MOTION_SUMMARY";
     public static final String LIGHT_EVENT_TABLE = "DEVICE_LIGHT_SUMMARY";

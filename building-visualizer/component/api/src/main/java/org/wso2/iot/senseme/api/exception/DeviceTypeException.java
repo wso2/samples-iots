@@ -37,6 +37,11 @@ public class DeviceTypeException extends Exception {
         setErrorMessage(message);
     }
 
+    public DeviceTypeException(String message, Exception exception) {
+        super(message, exception);
+        setErrorMessage(message);
+    }
+
     public DeviceTypeException(String msg) {
         super(msg);
         setErrorMessage(msg);

@@ -22,17 +22,20 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.device.mgt.common.Device;
-import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
-import org.wso2.carbon.device.mgt.common.DeviceManagementException;
-import org.wso2.carbon.device.mgt.common.EnrolmentInfo;
-import org.wso2.carbon.device.mgt.common.InvalidDeviceException;
+import org.wso2.carbon.device.mgt.common.*;
 import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroup;
+import org.wso2.carbon.device.mgt.common.group.mgt.GroupAlreadyExistException;
 import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
+import org.wso2.carbon.device.mgt.common.group.mgt.RoleDoesNotExistException;
 import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
 import org.wso2.carbon.device.mgt.core.operation.mgt.ProfileOperation;
+import org.wso2.carbon.device.mgt.core.service.GroupManagementProviderService;
+import org.wso2.carbon.user.api.Permission;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAO;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAOManager;
@@ -42,6 +45,7 @@ import org.wso2.iot.senseme.api.dto.DeviceInfo;
 import org.wso2.iot.senseme.api.dto.FloorInfo;
 import org.wso2.iot.senseme.api.dto.Notification;
 import org.wso2.iot.senseme.api.dto.SenseMe;
+import org.wso2.iot.senseme.api.exception.DeviceTypeException;
 import org.wso2.iot.senseme.api.util.APIUtil;
 
 import javax.ws.rs.*;
@@ -51,20 +55,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * This is the API which is used to control and manage building data
  */
 @Path("building")
+@SuppressWarnings("NonJaxWsWebServices")
 public class BuildingServiceImpl implements BuildingService {
 
     private static Log log = LogFactory.getLog(BuildingServiceImpl.class);
-    BuildingPluginDAOManager buildingDAOManager = new BuildingPluginDAOManager();
-    BuildingPluginDAO buildingDAO = buildingDAOManager.getDeviceDAO();
+    private BuildingPluginDAOManager buildingDAOManager = new BuildingPluginDAOManager();
+    private BuildingPluginDAO buildingDAO = buildingDAOManager.getDeviceDAO();
     private static final String ANDROID_DEVICE_TYPE = "android";
     private static final String SENSEME_DEVICE_TYPE = "senseme";
-    public static final String NOTIFICATION = "NOTIFICATION";
+    private static final String NOTIFICATION = "NOTIFICATION";
 
 
     @POST
@@ -77,13 +83,20 @@ public class BuildingServiceImpl implements BuildingService {
             buildingDAOManager.getBuildingDAOHandler().beginTransaction();
             id = this.buildingDAO.addBuilding(building);
             buildingDAOManager.getBuildingDAOHandler().commitTransaction();
-            if (id!=0){
+            if (id != 0) {
+                String buildingRole = String.format(DeviceTypeConstants.BUILDING_ROLE, id);
+                String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, id);
+                addRolesForBuildingsAndFloors(buildingRole);
+                createAndAddGroups(buildingGroupName, buildingRole, "Group for the " + id);
                 return Response.status(Response.Status.OK).entity(id).build();
-            }else{
+            } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
             }
-        }catch (Exception e){
-            log.error(e.getMessage());
+        } catch (UserStoreException e) {
+            log.error("Cannot add the building " + building.getBuildingId(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } catch (DeviceTypeException e) {
+            log.error("Cannot create the group for the building " + building.getBuildingId(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
@@ -95,9 +108,21 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public Response getRegisteredBuildings(){
         try {
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             buildingDAOManager.getBuildingDAOHandler().openConnection();
             List<BuildingInfo> buildingList = this.buildingDAO.getAllBuildings();
-            return Response.status(Response.Status.OK).entity(buildingList).build();
+            List<DeviceGroup> userGroups = groupManagementProviderService
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
+            List<BuildingInfo> authorizedBuildings = new ArrayList<>();
+
+            for (BuildingInfo building : buildingList) {
+                String buildingGroupName = String
+                        .format(DeviceTypeConstants.BUILDING_GROUP_NAME, building.getBuildingId());
+                if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+                    authorizedBuildings.add(building);
+                }
+            }
+            return Response.status(Response.Status.OK).entity(authorizedBuildings).build();
 
         }catch (Exception e){
             log.error(e.getMessage());
@@ -113,7 +138,7 @@ public class BuildingServiceImpl implements BuildingService {
     @Consumes("application/json")
     @Override
     public Response updateBuilding(BuildingInfo buildingInfo) {
-        BuildingInfo building = null;
+        BuildingInfo building;
         try {
             buildingDAOManager.getBuildingDAOHandler().openConnection();
             buildingDAOManager.getBuildingDAOHandler().beginTransaction();
@@ -139,6 +164,7 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public Response getAvailableFloors(@PathParam("buildingId") int buildingId) {
         try {
+
             buildingDAOManager.getBuildingDAOHandler().openConnection();
             List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
             return Response.status(Response.Status.OK).entity(floorNums).build();
@@ -156,14 +182,21 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public Response getRegisteredBuilding(@PathParam("buildingId") int buildingId){
         try {
-            buildingDAOManager.getBuildingDAOHandler().openConnection();
-            BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
-            if (buildingInfo == null) {
-                return Response.status(Response.Status.NO_CONTENT).entity(buildingInfo).build();
+            String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId);
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
+            List<DeviceGroup> userGroups = groupManagementProviderService
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
+            if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+                buildingDAOManager.getBuildingDAOHandler().openConnection();
+                BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
+                if (buildingInfo == null) {
+                    return Response.status(Response.Status.NO_CONTENT).build();
+                }
+                return Response.status(Response.Status.OK).entity(buildingInfo).build();
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-            return Response.status(Response.Status.OK).entity(buildingInfo).build();
-
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
@@ -177,20 +210,31 @@ public class BuildingServiceImpl implements BuildingService {
     @Produces("image/*")
     public Response getFloorPlan(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId) {
         try {
-            buildingDAOManager.getBuildingDAOHandler().openConnection();
-            File file = buildingDAO.getFloorPlan(buildingId, floorId);
-            if (file != null) {
-                Response.ResponseBuilder response = Response.ok((Object) file);
-                response.status(Response.Status.OK);
-                response.type("image/*");
-                response.header("Content-Disposition",
-                                "attachment; filename=image_from_server.jpg");
-                return response.build();
+            String floorGroupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
+            List<DeviceGroup> userGroups = groupManagementProviderService
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
+
+            if (isUserAuthorizedToGroup(userGroups, floorGroupName)) {
+                buildingDAOManager.getBuildingDAOHandler().openConnection();
+                File file = buildingDAO.getFloorPlan(buildingId, floorId);
+                if (file != null) {
+                    Response.ResponseBuilder response = Response.ok(file);
+                    response.status(Response.Status.OK);
+                    response.type("image/*");
+                    response.header("Content-Disposition", "attachment; filename=image_from_server.jpg");
+                    return response.build();
+                } else {
+                    Response.ResponseBuilder response = Response.status(Response.Status.NO_CONTENT);
+                    return response.build();
+                }
             } else {
-                Response.ResponseBuilder response = Response.status(Response.Status.NO_CONTENT);
-                return response.build();
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
         } catch (SQLException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } catch (GroupManagementException e) {
+            log.error("Error while getting the group details for the floor " + floorId + " in building " + buildingId);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
@@ -203,12 +247,9 @@ public class BuildingServiceImpl implements BuildingService {
     @Produces("application/json")
     @Override
     public Response addFloor(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId, InputStream fileInputStream, Attachment fileDetail){
-
-        boolean status = false ;
+        boolean status;
 
         try {
-            String fileName = fileDetail.getContentDisposition().getParameter("filename");
-
             FloorInfo floor = new FloorInfo();
             floor.setBuildingId(buildingId);
             floor.setFloorNum(floorId);
@@ -216,20 +257,33 @@ public class BuildingServiceImpl implements BuildingService {
             byte[] imageBytes = IOUtils.toByteArray(fileInputStream);
             buildingDAOManager.getBuildingDAOHandler().openConnection();
             buildingDAOManager.getBuildingDAOHandler().beginTransaction();
-            status = buildingDAO.insertFloorDetails(buildingId,floorId, imageBytes);
+            status = buildingDAO.insertFloorDetails(buildingId, floorId, imageBytes);
             buildingDAOManager.getBuildingDAOHandler().commitTransaction();
 
-            if (status){
+            if (status) {
+                String floorRole = String.format(DeviceTypeConstants.FLOOR_ROLE, buildingId, floorId);
+                String floorGroupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+                addRolesForBuildingsAndFloors(floorRole);
+                createAndAddGroups(floorGroupName, floorRole,
+                        "Group for floor " + floorId + " in the building " + buildingId);
                 return Response.status(Response.Status.OK.getStatusCode()).build();
-            }else{
+            } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
             }
-        }catch (IOException e){
-            log.error(e.getMessage());
+        } catch (IOException e) {
+            log.error("Error occured while adding floor " + floorId + " to building " + buildingId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-        }
-        catch (Exception e){
-            log.error(e.getMessage());
+        } catch (SQLException e) {
+            log.error("Cannot add the floor " + floorId + " in building " + buildingId + ". SQL exceptions has "
+                    + "occurred.", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } catch (UserStoreException e) {
+            log.error("Cannot add the floor " + floorId + " in building " + buildingId + ". Use store exceptions has"
+                    + " occurred.", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } catch (DeviceTypeException e) {
+            log.error("Cannot create group for the floor " + floorId + " in building " + buildingId + ". Group "
+                    + "already exists.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
@@ -467,5 +521,74 @@ public class BuildingServiceImpl implements BuildingService {
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
+    }
+
+    /**
+     * Create user role for building and floors.
+     * @param role : Role that need to be created
+     * @throws UserStoreException User Store Exception
+     */
+    private void addRolesForBuildingsAndFloors(String role) throws UserStoreException {
+        Permission realTimeAnalytics = new Permission(DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION, CarbonConstants
+                .UI_PERMISSION_ACTION);
+
+        UserStoreManager userStoreManager = APIUtil.getUserStoreManager();
+        if (userStoreManager != null) {
+            if (!userStoreManager.isExistingRole(role)) {
+                userStoreManager.addRole(role, null, new Permission[]{realTimeAnalytics});
+            }
+        } else {
+            log.error("User Store Manager cannot found.");
+        }
+    }
+
+    /**
+     * Create device groups for building and floor and assign the given list of devices.
+     *
+     * @param groupName:  The name of the group
+     * @param role        : The role associated with the group
+     * @param description : The description for the group
+     * @throws DeviceTypeException Device Type Exception
+     */
+    private void createAndAddGroups(String groupName, String role, String description) throws DeviceTypeException {
+        try {
+            DeviceGroup buildingFloorGroup;
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
+
+            if (groupManagementProviderService.getGroup(groupName) != null) {
+                return;
+            }
+
+            buildingFloorGroup = new DeviceGroup();
+            buildingFloorGroup.setOwner(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
+            buildingFloorGroup.setName(groupName);
+            buildingFloorGroup.setDescription(description);
+            groupManagementProviderService.createGroup(buildingFloorGroup, role, new String[] { DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION });
+            buildingFloorGroup = groupManagementProviderService.getGroup(groupName);
+            groupManagementProviderService.manageGroupSharing(buildingFloorGroup.getGroupId(), new ArrayList<>(Arrays
+                    .asList(role)));
+        } catch (GroupManagementException e) {
+            throw new DeviceTypeException("Error occurred while creting group with the name " + groupName, e);
+        } catch (GroupAlreadyExistException e) {
+            throw new DeviceTypeException("A group with the name " + groupName + " already exists.", e);
+        } catch (RoleDoesNotExistException e) {
+            throw new DeviceTypeException("A role with the name " + role + " does not exist", e);
+        }
+    }
+
+    /**
+     * Whether user is authorized to view a group.
+     * @param userGroups User Groups
+     * @param groupName Group Name
+     * @return true if the user is authorized view the particular group unless false.
+     */
+    private boolean isUserAuthorizedToGroup(List<DeviceGroup> userGroups, String groupName) {
+        for (DeviceGroup userGroup: userGroups) {
+            if (userGroup.getName().equals(groupName)) {
+                return true;
+            }
+        }
+        return false;
+
     }
 }
