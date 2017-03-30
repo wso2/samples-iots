@@ -73,22 +73,27 @@ function loadLeafletMap() {
         zoomLevel = 13,
         tileSet = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         attribution = "&copy; <a href='https://openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
+    var menuItems = [{
+        text: 'Add Building',
+        callback: addBuilding
+    }, {
+        text: 'Locate me',
+        callback: locateMe
+    }, '-', {
+        text: 'Zoom in',
+        callback: zoomIn
+    }, {
+        text: 'Zoom out',
+        callback: zoomOut
+    }];
+
+    if (!$("#device-location").attr("add-building")) {
+        menuItems.shift();
+    }
     map = L.map(container, {
         contextmenu: true,
         contextmenuWidth: 140,
-        contextmenuItems: [{
-            text: 'Add Building',
-            callback: addBuilding
-        }, {
-            text: 'Locate me',
-            callback: locateMe
-        }, '-', {
-            text: 'Zoom in',
-            callback: zoomIn
-        }, {
-            text: 'Zoom out',
-            callback: zoomOut
-        }]
+        contextmenuItems: menuItems
     }).locate({setView: true, maxZoom: 17, animate: true, duration: 3});
     L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
 
@@ -111,10 +116,16 @@ function preLoadBuildings() {
 	var getBuildingDevicesApi = "/senseme/building/devices";
 	var devices = {};
 	invokerUtil.get(getBuildingDevicesApi, function (data, textStatus, jqXHR) {
-		if (jqXHR.status == 200) {
-			devices = JSON.parse(data);
+	    console.log("here");
+	    var status = jqXHR.status;
+	    console.log("status "  +status);
+		if (status >= 200 && status < 300) {
+		    if (status == 200) {
+                devices = JSON.parse(data);
+            }
 			var getBuildingApi = "/senseme/building";
 			invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
+			   console.log("here ///");
 				if (jqXHR.status == 200) {
 					//[{"buildingId":1,"buildingName":"ayyoobs1","owner":"admin","longitude":"79.97607422294095","latitude":"6.995539474716988","numFloors":4}
 					var buildings = JSON.parse(data);
@@ -132,6 +143,9 @@ function preLoadBuildings() {
 						$.ajax({
 							url: providerUrl,
 							method: "GET",
+							contentType: "application/json",
+							contentType: "application/json",
+							contentType: "application/json",
 							contentType: "application/json",
 							async: false,
 							success: function (buildingAlertCount) {
@@ -172,10 +186,13 @@ function preLoadBuildings() {
 					}
 				}
 			}, function (jqXHR) {
+                console.log(jqXHR.responseText);
+
 			}, "application/json");
 		}
 
 	}, function (jqXHR) {
+	    console.log(jqXHR.responseText);
 	}, "application/json");
 }
 

@@ -583,6 +583,18 @@ var userModule = function () {
         if (publicMethods.isAuthorized("/permission/admin/device-mgt/platform-configs/view")) {
             permissions["TENANT_CONFIGURATION"] = true;
         }
+        if (publicMethods.isAuthorized("/permission/admin/buildingmonitor/building/add")) {
+            permissions["ADD_BUILDING"] = true;
+        }
+        if (publicMethods.isAuthorized("/permission/admin/buildingmonitor/building/view")) {
+            permissions["VIEW_BUILDING"] = true;
+        }
+        if (publicMethods.isAuthorized("/permission/admin/buildingmonitor/building/floor/add")) {
+            permissions["ADD_FLOOR"] = true;
+        }
+        if (publicMethods.isAuthorized("/permission/admin/buildingmonitor/building/floor/view")) {
+            permissions["VIEW_FLOOR"] = true;
+        }
 
         return permissions;
     };

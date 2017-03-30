@@ -266,7 +266,7 @@ public class BuildingServiceImpl implements BuildingService {
                     if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
                         continue;
                     }
-                    if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE ||
+                    if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE &&
                             device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
                         continue;
                     }

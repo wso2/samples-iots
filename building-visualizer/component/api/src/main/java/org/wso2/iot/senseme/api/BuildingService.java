@@ -54,9 +54,33 @@ import java.io.InputStream;
         scopes = {
                 @Scope(
                         name = "Enroll device",
-                        description = "",
+                        description = "Enrolling a senseme device",
                         key = "perm:senseme:enroll",
                         permissions = {"/device-mgt/devices/enroll/senseme"}
+                ),
+                @Scope(
+                        name = "Add building",
+                        description = "Adding a building to map",
+                        key = "perm:building:add",
+                        permissions = {"/buildingmonitor/building/add"}
+                ),
+                @Scope(
+                        name = "Add floor",
+                        description = "Adding a floor to building",
+                        key = "perm:floor:add",
+                        permissions = {"/buildingmonitor/building/floor/add"}
+                ),
+                @Scope(
+                        name = "View building",
+                        description = "",
+                        key = "perm:building:view",
+                        permissions = {"/buildingmonitor/building/view"}
+                ),
+                @Scope(
+                        name = "View floor",
+                        description = "",
+                        key = "perm:floor:view",
+                        permissions = {"/buildingmonitor/building/floor/view"}
                 )
         }
 )
@@ -83,7 +107,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:add")
                     })
             }
     )
@@ -101,7 +125,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:view")
                     })
             }
     )
@@ -130,7 +154,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:floor:add")
                     })
             }
     )
@@ -167,7 +191,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:floor:view")
                     })
             }
     )
@@ -186,7 +210,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:view")
                     })
             }
     )
@@ -208,7 +232,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:add")
                     })
             }
     )
@@ -230,7 +254,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:view")
                     })
             }
     )
@@ -250,7 +274,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:view")
                     })
             }
     )
@@ -268,7 +292,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:view")
                     })
             }
     )
@@ -286,7 +310,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:view")
                     })
             }
     )

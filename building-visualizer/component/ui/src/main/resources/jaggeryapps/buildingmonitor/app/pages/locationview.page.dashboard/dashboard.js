@@ -23,12 +23,13 @@ function onRequest() {
 
     var user = session.get(constants["USER_SESSION_KEY"]);
     var permissions = userModule.getUIPermissions();
+    var viewModel = {};
+    viewModel.permissions = permissions;
 
-    if (!permissions.VIEW_DASHBOARD) {
-        response.sendRedirect(devicemgtProps["appContext"] + "devices");
-        return;
+
+    if (!permissions.ADD_BUILDING && !permissions.VIEW_BUILDING) {
+        viewModel.permittednone = true;
     }
 
-    var viewModel = {};
     return viewModel;
 }

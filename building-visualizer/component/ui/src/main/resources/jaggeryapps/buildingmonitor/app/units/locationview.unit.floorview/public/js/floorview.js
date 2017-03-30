@@ -373,6 +373,7 @@ function hidePopup() {
             endDate: "+0d",
             autoclose: true
         }).on("changeDate", function(e) {
+            $("#historical-view").removeClass("hidden");
             selectedDate = e.date;
             var date = new Date(e.date);
             date.setHours(date.getHours()-1);
@@ -682,7 +683,6 @@ function hidePopup() {
 
         if (isHistoricalView) {
             $("#live-view").addClass("hidden");
-            $("#historical-view").removeClass("hidden");
             switch (currentSelection) {
                 case "Temperature" :  temperatureMapInstance.setData({data:[]}); break;
                 case "Motion" : motionMapInstance.setData({data:[]});break;
@@ -861,6 +861,7 @@ function loadDevices() {
     invokerUtil.get(deviceApi, function (data, textStatus, jqXHR) {
         if (jqXHR.status == 200) {
             var devices = JSON.parse(data);
+            console.log(devices);
             for(var i = 0; i < devices.length; i++) {
                 var device = devices[i];
                 placeDevice(device.deviceId, device.xCord, device.yCord, device.status);
