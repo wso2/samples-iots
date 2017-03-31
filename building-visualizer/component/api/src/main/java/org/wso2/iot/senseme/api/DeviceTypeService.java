@@ -106,6 +106,7 @@ public interface DeviceTypeService {
      * To download device type agent source code as zip file
      *
      * @param senseMe for the device type instance
+     * @param deviceType type of the device
      * @return Agent source code as zip file
      */
     @Path("/enroll")
@@ -124,7 +125,7 @@ public interface DeviceTypeService {
                     })
             }
     )
-    Response partialEnrollment(SenseMe senseMe);
+    Response partialEnrollment(SenseMe senseMe, @QueryParam("deviceType") String deviceType);
 
 
     /**
