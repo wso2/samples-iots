@@ -392,4 +392,23 @@ public class BuildingPluginDAO {
         }
         return floorIds;
     }
+
+    public boolean removeBuilding(int buildingId) {
+        boolean check = false;
+        Connection conn;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = BuildingDAOHandler.getConnection();
+            String query = "DELETE from building WHERE buildingId=?";
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, buildingId);
+            check = stmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DeviceTypeUtils.cleanupResources(stmt, null);
+        }
+        return check;
+    }
 }

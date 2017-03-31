@@ -25,6 +25,7 @@ import org.wso2.carbon.apimgt.annotations.api.Scopes;
 import org.wso2.iot.senseme.api.dto.AlertMessage;
 import org.wso2.iot.senseme.api.dto.BuildingInfo;
 import org.wso2.iot.senseme.api.dto.FloorInfo;
+import org.wso2.iot.senseme.api.dto.QueryObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -351,5 +352,42 @@ public interface BuildingService {
             }
     )
     Response sendNotifications(AlertMessage alertMessage);
+
+    @Path("/remove/{buildingId}")
+    @POST
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Remove registered building.",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+    Response removeBuilding(int buildingId);
+
+
+    @Path("/search/notifications")
+    @POST
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Query and get the notifications.",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+    Response queryNotifications(QueryObject query);
 
 }

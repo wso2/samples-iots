@@ -1,25 +1,6 @@
 #include <DHT.h>
 #include <DHT_U.h>
 
-
-
-#include <ESP8266WiFi.h>
-#include <ESP8266WiFiAP.h>
-#include <ESP8266WiFiGeneric.h>
-#include <ESP8266WiFiMulti.h>
-#include <ESP8266WiFiScan.h>
-#include <ESP8266WiFiSTA.h>
-#include <ESP8266WiFiType.h>
-#include <WiFiClient.h>
-#include <WiFiClientSecure.h>
-#include <WiFiServer.h>
-#include <WiFiUdp.h>
-
-
-#include <ESP8266HTTPClient.h>
-
-#include <ESP8266wifi.h>
-
 /**
 * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -38,9 +19,20 @@
 * under the License.
 **/
 
-#include <ESP8266WiFi.h>
+#include <ESP8266WiFiAP.h>
+#include <ESP8266WiFiGeneric.h>
+#include <ESP8266WiFiMulti.h>
+#include <ESP8266WiFiScan.h>
+#include <ESP8266WiFiSTA.h>
+#include <ESP8266WiFiType.h>
 #include <ESP8266HTTPClient.h>
+#include <ESP8266wifi.h>
+#include <ESP8266WiFi.h>
 #include <ESP.h>
+#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
+#include <WiFiServer.h>
+#include <WiFiUdp.h>
 #include "PubSubClient.h"
 #include "FS.h"
 

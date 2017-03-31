@@ -65,12 +65,20 @@ function hidePopup() {
         radius: 100,
         maxOpacity: .5,
         minOpacity: 0,
-        blur: .75
+        blur: .75,
+        onExtremaChange: function onExtremaChange(data) {
+            updateLegend(data);
+        }
     };
     var historicalData = [];
     var recentPastData = [];
     var selectedDate;
     var lastFetchedTime;
+    var gradientCfg = {};
+    var legendCanvas = document.createElement('canvas');
+    var legendCtx = legendCanvas.getContext('2d');
+    legendCanvas.width = 100;
+    legendCanvas.height = 10;
 
     $("#show-analytics").on('click', function () {
         if ($("#show-analytics").hasClass("show-analytics")) {
@@ -125,7 +133,10 @@ function hidePopup() {
                 radius: 100,
                 maxOpacity: .5,
                 minOpacity: 0,
-                blur: .75
+                blur: .75,
+                onExtremaChange: function onExtremaChange(data) {
+                    updateLegend(data);
+                }
             };
             currentTemperatureMap = window.h337.create(config);
             currentHumidityMap = window.h337.create(config);
@@ -343,7 +354,7 @@ function hidePopup() {
                 return full + "h";
             }
         });
-	rangeSlider.bootstrapSlider('refresh');
+	    rangeSlider.bootstrapSlider('refresh');
         rangeSlider.bootstrapSlider('setAttribute', 'min', -30);
         rangeSlider.bootstrapSlider('setAttribute', 'max', 0);
         rangeSlider.bootstrapSlider('setValue', 0); 
@@ -355,7 +366,7 @@ function hidePopup() {
                 return value + "h";
             }
         });
-	historicalSlider.bootstrapSlider('refresh');
+	    historicalSlider.bootstrapSlider('refresh');
         historicalSlider.bootstrapSlider('setAttribute', 'min', 0);
         historicalSlider.bootstrapSlider('setAttribute', 'max', 24);
         historicalSlider.bootstrapSlider('setValue', 0);
@@ -379,7 +390,7 @@ function hidePopup() {
             date.setHours(date.getHours()-1);
             historicalData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
             updateHistoricData(historicalData[currentSliderValue]);
-            historicalSlider.bootstrapSlider('refresh');
+            //historicalSlider.bootstrapSlider('refresh');
         });
 
         var date = new Date();
@@ -625,7 +636,7 @@ function hidePopup() {
                         $("#pau").addClass("hidden");
                         $("#play").addClass('play').removeClass('pause');
                     }
-                }, i * 2000, currentSliderValue));
+                }, i * 500, currentSliderValue));
             }
         } else {
             $("#pla").removeClass("hidden");
@@ -684,10 +695,10 @@ function hidePopup() {
         if (isHistoricalView) {
             $("#live-view").addClass("hidden");
             switch (currentSelection) {
-                case "Temperature" :  temperatureMapInstance.setData({data:[]}); break;
-                case "Motion" : motionMapInstance.setData({data:[]});break;
-                case "Humidity" : humidityMapInstance.setData({data:[]});break;
-                case "Light" : lightMapInstance.setData({data:[]}); break;
+                case "Temperature" :  temperatureMapInstance.setData(currentTemperatureMap.getData()); break;
+                case "Motion" : motionMapInstance.setData(currentMotionMap.getData());break;
+                case "Humidity" : humidityMapInstance.setData(currentHumidityMap.getData());break;
+                case "Light" : lightMapInstance.setData(currentLightMap.getData()); break;
             }
             historicalSlider.bootstrapSlider("setValue", historicalSlider.bootstrapSlider("getAttribute", "max"));
             currentSliderValue = historicalSlider.bootstrapSlider("getValue");
@@ -707,19 +718,19 @@ function hidePopup() {
     var updateHeatMap = function () {
         switch (currentSelection) {
             case "Temperature" :
-                temperatureMapInstance.setData({data: []});
+                //temperatureMapInstance.setData({data: []});
                 temperatureMapInstance.setData(currentTemperatureMap.getData());
                 break;
             case "Motion" :
-                motionMapInstance.setData({data: []});
+                //motionMapInstance.setData({data: []});
                 motionMapInstance.setData(currentMotionMap.getData());
                 break;
             case "Humidity" :
-                humidityMapInstance.setData({data: []});
+                //humidityMapInstance.setData({data: []});
                 humidityMapInstance.setData(currentHumidityMap.getData());
                 break;
             case "Light" :
-                lightMapInstance.setData({data: []});
+                //lightMapInstance.setData({data: []});
                 lightMapInstance.setData(currentLightMap.getData());
                 break;
         }
@@ -793,6 +804,26 @@ function hidePopup() {
         });
         return providerData;
     };
+
+
+    function updateLegend(data) {
+        // the onExtremaChange callback gives us min, max, and the gradientConfig
+        // so we can update the legend
+        $('min').innerHTML = data.min;
+        $('max').innerHTML = data.max;
+        // regenerate gradient image
+        if (data.gradient != gradientCfg) {
+            gradientCfg = data.gradient;
+            var gradient = legendCtx.createLinearGradient(0, 0, 100, 1);
+            for (var key in gradientCfg) {
+                gradient.addColorStop(key, gradientCfg[key]);
+            }
+            legendCtx.fillStyle = gradient;
+            legendCtx.fillRect(0, 0, 100, 10);
+            $('gradient').src = legendCanvas.toDataURL();
+        }
+    };
+
     /**
      * Load devices;
      */
