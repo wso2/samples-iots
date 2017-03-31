@@ -51,6 +51,10 @@ function onRequest(context) {
 		},
 		function (responsePayload) {}
 	);
+
+	if (viewModel.permittednone) {
+		return viewModel;
+	}
 	var floors = {};
 	for (var i = floorsCount; i >= 1; i--) {
 		var floor = {};
