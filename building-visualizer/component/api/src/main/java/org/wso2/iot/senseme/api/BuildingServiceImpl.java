@@ -39,12 +39,7 @@ import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAO;
 import org.wso2.iot.senseme.api.dao.BuildingPluginDAOManager;
-import org.wso2.iot.senseme.api.dto.AlertMessage;
-import org.wso2.iot.senseme.api.dto.BuildingInfo;
-import org.wso2.iot.senseme.api.dto.DeviceInfo;
-import org.wso2.iot.senseme.api.dto.FloorInfo;
-import org.wso2.iot.senseme.api.dto.Notification;
-import org.wso2.iot.senseme.api.dto.SenseMe;
+import org.wso2.iot.senseme.api.dto.*;
 import org.wso2.iot.senseme.api.exception.DeviceTypeException;
 import org.wso2.iot.senseme.api.util.APIUtil;
 
@@ -380,6 +375,34 @@ public class BuildingServiceImpl implements BuildingService {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
         }
+    }
+
+    @Override
+    @POST
+    @Path("/remove/{deviceId}")
+    public Response removeBuilding(int buildingId) {
+        boolean res;
+        try {
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            buildingDAOManager.getBuildingDAOHandler().beginTransaction();
+            res = buildingDAO.removeBuilding(buildingId);
+            buildingDAOManager.getBuildingDAOHandler().commitTransaction();
+            return res ? Response.status(Response.Status.OK).build():Response.status(Response.Status.OK).entity
+                    ("Could not delete the building.").build();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
+        }
+    }
+
+    @Override
+    @POST
+    @Path("/search/notifications")
+    public Response queryNotifications(QueryObject query) {
+        String querys = "";
+        return null;
     }
 
     @Override

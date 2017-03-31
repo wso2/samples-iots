@@ -47,3 +47,7 @@
 	height: 30px;
 	padding: 2px 0px;
 }
+
+#heatmapLegend { background:white; position:absolute; bottom:0; right:0; padding:10px; }
+#min { float:left; }
+#max { float:right; }
