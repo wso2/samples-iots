@@ -902,3 +902,32 @@ function loadDevices() {
     }, "application/json");
 }
 
+/**
+ * to get existing device types
+ */
+function getDeviceTypes() {
+    var providerData = null;
+    var providerUrl = context + '/api/devices/types';
+    $("#deviceType").empty();
+    $.ajax({
+        url: providerUrl,
+        method: "GET",
+        contentType: "application/json",
+        async: false,
+        success: function (data) {
+            providerData = data.content.deviceTypes;
+
+            for (var i=0; i<providerData.length;i++){
+                $("#deviceType").append("<option>"+providerData[i]+"</option>");
+            }
+            console.log("success");
+
+        },
+        error: function (err) {
+            console.log("error");
+            console.log(err);
+        }
+    });
+}
+
+$("#device").click(getDeviceTypes);
