@@ -25,10 +25,6 @@ function onRequest(context) {
     var user = session.get(constants["USER_SESSION_KEY"]);
     var permissions = userModule.getUIPermissions();
 
-    if (!permissions.VIEW_DASHBOARD) {
-        response.sendRedirect(devicemgtProps["appContext"] + "devices");
-        return;
-    }
 	var buildingId = context.unit.params.buildingId;
 	var floorId = context.unit.params.floorId;
 

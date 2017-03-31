@@ -61,8 +61,6 @@ if (uriMatcher.match("/{context}/api/invoker/execute/")) {
                 serviceInvokers.XMLHttp.get(
                     restAPIEndpoint,
                     function (restAPIResponse) {
-                        new Log().info("#####");
-                        new Log().info(restAPIResponse["status"] + " " + restAPIEndpoint);
                         response["status"] = restAPIResponse["status"];
                         if (restAPIResponse["responseText"]) {
                             response["content"] = restAPIResponse["responseText"];

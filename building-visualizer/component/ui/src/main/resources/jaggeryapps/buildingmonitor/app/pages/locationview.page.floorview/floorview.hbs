@@ -29,7 +29,15 @@
     {{#if imageObj}}
         {{unit "locationview.unit.floorview" imageObj=imageObj }}
     {{else}}
-        {{unit "locationview.unit.floorcreate" buildingId=buildingId floorId=floorId}}
+        {{#if permissions.ADD_FLOOR}}
+            {{unit "locationview.unit.floorcreate" buildingId=buildingId floorId=floorId}}
+        {{else}}
+            <div class="message message-warning" style="margin: 20px">
+                <h4><i class="icon fw fw-warning"></i>Floor Image is not uplodaed</h4>
+                <p>Relevant floor image is not uploaded yet. Click <a href="{{@app
+                .context}}/buildings?buildingId={{buildingId}}">here</a> to go back to building view.</p>
+            </div>
+        {{/if}}
     {{/if}}
 {{/zone}}
 

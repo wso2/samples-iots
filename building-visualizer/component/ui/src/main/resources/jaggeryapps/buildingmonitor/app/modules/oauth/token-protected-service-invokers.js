@@ -125,6 +125,8 @@ var invokers = function () {
             } else if (privateMethods.isInvalidCredential(xmlHttpRequest.responseText)) {
                 tokenUtil.refreshTokenPair();
                 return privateMethods.execute(httpMethod, requestPayload, endpoint, responseCallback, ++count, headers);
+            } else {
+                return responseCallback(xmlHttpRequest);
             }
         } else {
             return responseCallback(xmlHttpRequest);
@@ -410,6 +412,7 @@ var invokers = function () {
             }
             var client = new HttpClient();
             try {
+
                 //noinspection JSUnresolvedFunction
                 client.executeMethod(httpMethodObject);
                 //noinspection JSUnresolvedFunction
@@ -423,16 +426,15 @@ var invokers = function () {
                             httpMethodObject.getResponseHeaders());
                     }
                 } else {
-                    return errorCallback(httpMethodObject.getResponseBodyAsString(),
-                        httpMethodObject.getResponseHeaders());
+                    return errorCallback(httpMethodObject);
                 }
             } catch (e) {
                 var status = httpMethodObject.getStatusCode();
 
                 if (status >= 200 && status < 300) {
-                    return successCallback(response);
+                    return successCallback(httpMethodObject);
                 }
-                return errorCallback(response);
+                return errorCallback(httpMethodObject);
             } finally {
                 //noinspection JSUnresolvedFunction
                 if (method != constants["HTTP_GET"] && method != constants["HTTP_POST"]) {
