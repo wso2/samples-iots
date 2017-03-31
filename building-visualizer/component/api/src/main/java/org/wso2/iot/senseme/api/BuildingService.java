@@ -241,7 +241,7 @@ public interface BuildingService {
     Response updateBuilding(BuildingInfo buildingInfo);
 
     @GET
-    @Path("/{bildingId}")
+    @Path("/{buildingId}")
     @Produces("application/json")
     @Consumes("application/json")
     @ApiOperation(
@@ -279,6 +279,24 @@ public interface BuildingService {
             }
     )
     Response getDevices(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId);
+
+    @Path("/authorizedFloors/{buildingId}")
+    @GET
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Get authorized floors of a building",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:view")
+                    })
+            }
+    )
+    Response getAuthorizedFloors(@PathParam("buildingId") int buildingId);
 
     @Path("/{buildingId}/devices")
     @GET

@@ -164,12 +164,25 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public Response getAvailableFloors(@PathParam("buildingId") int buildingId) {
         try {
+            String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId);
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
+            List<DeviceGroup> userGroups = groupManagementProviderService
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
+            if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+                buildingDAOManager.getBuildingDAOHandler().openConnection();
+                List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
+                return Response.status(Response.Status.OK).entity(floorNums).build();
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
 
-            buildingDAOManager.getBuildingDAOHandler().openConnection();
-            List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
-            return Response.status(Response.Status.OK).entity(floorNums).build();
+
         } catch (SQLException e) {
             log.error(e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (GroupManagementException e) {
+            log.error("Cannot get the group details while trying to get the floors with the images for the building "
+                    + buildingId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
@@ -337,6 +350,52 @@ public class BuildingServiceImpl implements BuildingService {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
         }
+    }
+
+    @Override
+    @Path("/authorizedFloors/{buildingId}")
+    @GET
+    @Produces("application/json")
+    public Response getAuthorizedFloors(@PathParam("buildingId") int buildingId) {
+        try {
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
+            List<DeviceGroup> userGroups = groupManagementProviderService
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
+            String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId);
+
+            if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+                buildingDAOManager.getBuildingDAOHandler().openConnection();
+                BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
+                Boolean[] authorizedFloors;
+
+                if (buildingInfo != null) {
+                    int numOfFloors = buildingInfo.getNumFloors();
+                    authorizedFloors = new Boolean[numOfFloors];
+
+                    for (int i = 1; i <= numOfFloors; i++) {
+                        String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, i);
+                        authorizedFloors[i - 1] = isUserAuthorizedToGroup(userGroups, groupName);
+
+                    }
+                    return Response.status(Response.Status.OK).entity(authorizedFloors).build();
+                } else {
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+        } catch (SQLException e) {
+            log.error("Database error has occurred while trying to get the authorized floors for the building " +
+                    buildingId, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } catch (GroupManagementException e) {
+            log.error("Group management error has occurref while trying to get the authorized floors for the "
+                    + "building " + buildingId, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+        } finally {
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
+        }
+
     }
 
     @Override

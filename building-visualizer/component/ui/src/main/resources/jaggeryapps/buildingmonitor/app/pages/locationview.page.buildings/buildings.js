@@ -23,31 +23,33 @@ function onRequest(context) {
 
     var user = session.get(constants["USER_SESSION_KEY"]);
     var permissions = userModule.getUIPermissions();
-
-    if (!permissions.VIEW_DASHBOARD) {
-        response.sendRedirect(devicemgtProps["appContext"] + "devices");
-        return;
-    }
-
+    var buildingId = request.getParameter("buildingId");
 	var viewModel = {};
-	viewModel["buildingId"] = request.getParameter("buildingId");;
+	viewModel["permissions"] = permissions;
+	viewModel["buildingId"] = request.getParameter("buildingId");
 	var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
 	var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
 	var url = devicemgtProps["httpsURL"] + "/senseme/building/" + viewModel["buildingId"];
 	var floorsCount = 0;
+	var authorizedFloors = [];
+
 	serviceInvokers.XMLHttp.get(
 		url, function (responsePayload) {
-			var building = JSON.parse(responsePayload.responseText);
-			floorsCount = building.numFloors;
-			viewModel["floorCount"] = floorsCount;
-			viewModel["buildingName"] = building.buildingName;
-			viewModel["longitude"] = building.longitude;
-			viewModel["latitude"] = building.latitude;
+			if (responsePayload.status == 403) {
+				viewModel.permittednone = true;
+			} else if (responsePayload.status == 401) {
+                viewModel.permittednone = true;
+			} else {
+                var building = JSON.parse(responsePayload.responseText);
+                floorsCount = building.numFloors;
+                viewModel["floorCount"] = floorsCount;
+                viewModel["buildingName"] = building.buildingName;
+                viewModel["longitude"] = building.longitude;
+                viewModel["latitude"] = building.latitude;
+            }
 
 		},
-		function (responsePayload) {
-			viewModel["floorCount"] = "0";
-		}
+		function (responsePayload) {}
 	);
 	var floors = {};
 	for (var i = floorsCount; i >= 1; i--) {
@@ -61,6 +63,14 @@ function onRequest(context) {
 		floors[i] = floor;
 	}
 
+    serviceInvokers.XMLHttp.get(devicemgtProps["httpsURL"] + "/senseme/building/authorizedFloors/" + viewModel["buildingId"] , function (responsePayload) {
+            if (responsePayload.status == 200) {
+            	authorizedFloors =  JSON.parse(responsePayload.responseText);
+			}
+
+        }, function (responsePayload) {
+
+        });
 	serviceInvokers.XMLHttp.get(
 		url+"/floors", function (responsePayload) {
 			var floorsImages = JSON.parse(responsePayload.responseText);
@@ -68,8 +78,8 @@ function onRequest(context) {
 			for (var i = 0; i < floorsImages.length; i++) {
 				for (var j = 1; j <= floorsCount; j++) {
 					if (floorsImages.indexOf(j) > -1) {
-
-						floors["" + j].image = "exist";
+						floors[j].image = "exist";
+						floors[j].isAuthorized = authorizedFloors[j-1];
 					}
 				}
 			}

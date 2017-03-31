@@ -41,11 +41,11 @@ if (uriMatcher.match("/{context}/api/floor/{buildingId}/{floorId}")) {
         serviceInvokers.HttpClient.post(
             restAPIEndpoint,
             requestPayload,
-            function (response) {
+            function (httpMethod) {
                 response.sendRedirect("/buildingmonitor/floor?buildingId=" + elements.buildingId + "&floorId=" +
                     elements.floorId);
             },
-            function (response) {
+            function (httpMethod) {
                 response.sendRedirect("/buildingmonitor/floor?buildingId=" + elements.buildingId + "&floorId=" +
                     elements.floorId + "&errorMessage=[" + response['status'] + "]-" + response['statusText']);
             },requestHeaders
