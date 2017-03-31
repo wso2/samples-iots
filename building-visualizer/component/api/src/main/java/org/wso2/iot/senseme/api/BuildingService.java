@@ -357,6 +357,7 @@ public interface BuildingService {
     @Path("/search/notifications")
     @POST
     @Produces("application/json")
+    @Consumes("application/json")
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
