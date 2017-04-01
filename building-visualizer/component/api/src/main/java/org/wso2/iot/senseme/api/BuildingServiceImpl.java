@@ -481,12 +481,10 @@ public class BuildingServiceImpl implements BuildingService {
             for (BuildingInfo buildingId : buildingList) {
                 String groupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId.getBuildingId());
 
-                if (isAdmin() || )
                 DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
                 if (floorDeviceGroup != null) {
                     DeviceInfo deviceInfo = new DeviceInfo("" +buildingId.getBuildingId());
-                    List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
-                            floorDeviceGroup.getGroupId(),
+                    List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(floorDeviceGroup.getGroupId(),
                             0, 1000);
                     for (Device device : devices) {
                         if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
