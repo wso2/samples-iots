@@ -23,8 +23,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
+import org.wso2.carbon.analytics.dataservice.commons.SortType;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.device.mgt.common.*;
+import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationException;
 import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroup;
 import org.wso2.carbon.device.mgt.common.group.mgt.GroupAlreadyExistException;
 import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
@@ -463,9 +467,26 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     @POST
     @Path("/search/notifications")
+    @Consumes("application/json")
     public Response queryNotifications(QueryObject query) {
-        String querys = "";
-        return null;
+//        String fromDate = String.valueOf(from * 1000);
+//        String toDate = String.valueOf(to * 1000);
+        String query1 = "buildingId:3 and timeStamp : [1490314307321 TO 1490333687321]";
+        String sensorTableName = DeviceTypeConstants.NOTIFICATION_TABLE;
+        try {
+            if (sensorTableName != null) {
+                List<SortByField> sortByFields = new ArrayList<>();
+                SortByField sortByField = new SortByField("timeStamp", SortType.ASC);
+                sortByFields.add(sortByField);
+                List<SensorRecord> sensorRecords = APIUtil.getAllEventsForDevice(sensorTableName, query1, sortByFields);
+                return Response.status(Response.Status.OK.getStatusCode()).entity(sensorRecords).build();
+            }
+        } catch (AnalyticsException e) {
+            String errorMsg = "Error on retrieving stats on table " + sensorTableName + " with query " + query;
+            log.error(errorMsg);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(errorMsg).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     @Override

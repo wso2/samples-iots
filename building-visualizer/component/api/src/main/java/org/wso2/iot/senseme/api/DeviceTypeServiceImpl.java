@@ -49,7 +49,9 @@ import org.wso2.iot.senseme.api.util.APIUtil;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * This is the API which is used to control and manage device type functionality
@@ -93,26 +95,26 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         String fromDate = String.valueOf(from * 1000);
         String toDate = String.valueOf(to * 1000);
         String query = "deviceId:" + deviceId + " AND deviceType:" +
-                       DeviceTypeConstants.DEVICE_TYPE + " AND time : [" + fromDate + " TO" +
+                DeviceTypeConstants.DEVICE_TYPE + " AND time : [" + fromDate + " TO" +
                 " " + toDate + "]";
         String sensorTableName = null;
         switch (sensorType) {
-        case DeviceTypeConstants.SENSOR_TYPE_MOTION:
-            sensorTableName = DeviceTypeConstants.MOTION_EVENT_TABLE;
-            break;
-        case DeviceTypeConstants.SENSOR_TYPE_LIGHT:
-            sensorTableName = DeviceTypeConstants.LIGHT_EVENT_TABLE;
-            break;
-        case DeviceTypeConstants.SENSOR_TYPE_TEMPERATURE:
-            sensorTableName = DeviceTypeConstants.TEMPERATURE_EVENT_TABLE;
-            break;
-        case DeviceTypeConstants.SENSOR_TYPE_HUMIDITY:
-            sensorTableName = DeviceTypeConstants.HUMIDITY_EVENT_TABLE;
-            break;
+            case DeviceTypeConstants.SENSOR_TYPE_MOTION:
+                sensorTableName = DeviceTypeConstants.MOTION_EVENT_TABLE;
+                break;
+            case DeviceTypeConstants.SENSOR_TYPE_LIGHT:
+                sensorTableName = DeviceTypeConstants.LIGHT_EVENT_TABLE;
+                break;
+            case DeviceTypeConstants.SENSOR_TYPE_TEMPERATURE:
+                sensorTableName = DeviceTypeConstants.TEMPERATURE_EVENT_TABLE;
+                break;
+            case DeviceTypeConstants.SENSOR_TYPE_HUMIDITY:
+                sensorTableName = DeviceTypeConstants.HUMIDITY_EVENT_TABLE;
+                break;
         }
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
-                                                                                                     DeviceTypeConstants.DEVICE_TYPE))) {
+                    DeviceTypeConstants.DEVICE_TYPE))) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
             if (sensorTableName != null) {
@@ -142,8 +144,9 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     @Path("/enroll")
     @POST
     @Produces("application/json")
-    public Response partialEnrollment(SenseMe senseMe) {
-        boolean status = partialRegister(senseMe);
+    public Response partialEnrollment(SenseMe senseMe, @QueryParam("deviceType") String deviceType) {
+
+        boolean status = partialRegister(senseMe, deviceType);
         List<DeviceIdentifier> deviceIdentifierList = new ArrayList<>();
         String buildingId = null;
         String floorId = null;
@@ -151,8 +154,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         if (status) {
 
             try {
-                DeviceIdentifier deviceIdentifier = new DeviceIdentifier(senseMe.getDeviceId(), DeviceTypeConstants
-                        .DEVICE_TYPE);
+                DeviceIdentifier deviceIdentifier = new DeviceIdentifier(senseMe.getDeviceId(), deviceType);
                 deviceIdentifierList.add(deviceIdentifier);
                 Device device = APIUtil.getDeviceManagementService().getDevice(deviceIdentifier);
 
@@ -179,7 +181,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             } catch (DeviceManagementException e) {
                 log.error(e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
-            }  catch (DeviceTypeException e) {
+            } catch (DeviceTypeException e) {
                 log.error("Error occured while adding the device " + senseMe.getDeviceId() + " to the building and "
                         + "floor groups ", e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
@@ -209,9 +211,9 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                     try {
                         PrivilegedCarbonContext.startTenantFlow();
                         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(MultitenantConstants
-                                                                                                      .SUPER_TENANT_DOMAIN_NAME, true);
+                                .SUPER_TENANT_DOMAIN_NAME, true);
                         PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(device.getEnrolmentInfo()
-                                                                                                  .getOwner());
+                                .getOwner());
                         if (apiApplicationKey == null) {
                             String applicationUsername =
                                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm()
@@ -229,10 +231,10 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                         String scopes = "device_type_" + DeviceTypeConstants.DEVICE_TYPE + " device_" + deviceId;
                         AccessTokenInfo accessTokenInfo = jwtClient.getAccessToken(apiApplicationKey.getConsumerKey()
                                 , apiApplicationKey.getConsumerSecret(), device.getEnrolmentInfo().getOwner()
-                                                                                           + "@" +
-                                                                                           APIUtil.getAuthenticatedUserTenantDomain(),
+                                        + "@" +
+                                        APIUtil.getAuthenticatedUserTenantDomain(),
 
-                                                                                   scopes);
+                                scopes);
 
                         //create token
                         TokenInfo tokenInfo = new TokenInfo();
@@ -258,9 +260,9 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                     try {
                         PrivilegedCarbonContext.startTenantFlow();
                         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(MultitenantConstants
-                                                                                                      .SUPER_TENANT_DOMAIN_NAME, true);
+                                .SUPER_TENANT_DOMAIN_NAME, true);
                         PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(device.getEnrolmentInfo()
-                                                                                                  .getOwner());
+                                .getOwner());
                         if (apiApplicationKey == null) {
                             String applicationUsername =
                                     PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm()
@@ -278,10 +280,10 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                         String scopes = "device_type_" + DeviceTypeConstants.DEVICE_TYPE + " device_" + deviceId;
                         AccessTokenInfo accessTokenInfo = jwtClient.getAccessToken(apiApplicationKey.getConsumerKey()
                                 , apiApplicationKey.getConsumerSecret(), device.getEnrolmentInfo().getOwner()
-                                                                                           + "@" +
-                                                                                           APIUtil.getAuthenticatedUserTenantDomain(),
+                                        + "@" +
+                                        APIUtil.getAuthenticatedUserTenantDomain(),
 
-                                                                                   scopes);
+                                scopes);
 
                         //create token
                         TokenInfo tokenInfo = new TokenInfo();
@@ -317,14 +319,14 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     /**
      * Register device into device management service
      *
-     * @param senseMe     name for the device type instance
+     * @param senseMe name for the device type instance
      * @return check whether device is installed into cdmf
      */
-    private boolean partialRegister(SenseMe senseMe) {
+    private boolean partialRegister(SenseMe senseMe, String deviceType) {
         try {
             DeviceIdentifier deviceIdentifier = new DeviceIdentifier();
             deviceIdentifier.setId(senseMe.getDeviceId());
-            deviceIdentifier.setType(DeviceTypeConstants.DEVICE_TYPE);
+            deviceIdentifier.setType(deviceType);
             if (APIUtil.getDeviceManagementService().isEnrolled(deviceIdentifier)) {
                 return false;
             }
@@ -362,7 +364,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
 
             device.setProperties(properties);
             device.setName(senseMe.getDeviceId());
-            device.setType(DeviceTypeConstants.DEVICE_TYPE);
+            device.setType(deviceType);
             enrolmentInfo.setOwner(APIUtil.getAuthenticatedUser());
             device.setEnrolmentInfo(enrolmentInfo);
             return APIUtil.getDeviceManagementService().enrollDevice(device);

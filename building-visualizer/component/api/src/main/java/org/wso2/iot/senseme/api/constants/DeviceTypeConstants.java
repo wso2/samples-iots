@@ -38,6 +38,7 @@ public class DeviceTypeConstants {
     public static final String LIGHT_EVENT_TABLE = "DEVICE_LIGHT_SUMMARY";
     public static final String TEMPERATURE_EVENT_TABLE = "DEVICE_TEMPERATURE_SUMMARY";
     public static final String HUMIDITY_EVENT_TABLE = "DEVICE_HUMIDITY_SUMMARY";
+    public static final String NOTIFICATION_TABLE = "ORG_WSO2_FLOOR_ALERTNOTIFICATIONS";
 
     public static final String DATA_SOURCE_NAME = "jdbc/WSO2_FLOOR_ANALYTICS";
     public final static String SENSOR_TYPE_MOTION = "motion";
