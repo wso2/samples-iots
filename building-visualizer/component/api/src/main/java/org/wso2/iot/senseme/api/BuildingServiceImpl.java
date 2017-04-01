@@ -31,9 +31,11 @@ import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
 import org.wso2.carbon.device.mgt.common.group.mgt.RoleDoesNotExistException;
 import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
+import org.wso2.carbon.device.mgt.core.internal.DeviceManagementDataHolder;
 import org.wso2.carbon.device.mgt.core.operation.mgt.ProfileOperation;
 import org.wso2.carbon.device.mgt.core.service.GroupManagementProviderService;
 import org.wso2.carbon.user.api.Permission;
+import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
@@ -110,11 +112,14 @@ public class BuildingServiceImpl implements BuildingService {
                     .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
             List<BuildingInfo> authorizedBuildings = new ArrayList<>();
 
-            for (BuildingInfo building : buildingList) {
-                String buildingGroupName = String
-                        .format(DeviceTypeConstants.BUILDING_GROUP_NAME, building.getBuildingId());
-                if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
-                    authorizedBuildings.add(building);
+            if (isAdmin()) {
+                authorizedBuildings = buildingList;
+            } else {
+                for (BuildingInfo building : buildingList) {
+                    String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, building.getBuildingId());
+                    if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+                        authorizedBuildings.add(building);
+                    }
                 }
             }
             return Response.status(Response.Status.OK).entity(authorizedBuildings).build();
@@ -163,7 +168,7 @@ public class BuildingServiceImpl implements BuildingService {
             GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             List<DeviceGroup> userGroups = groupManagementProviderService
                     .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
-            if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+            if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
                 List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
                 return Response.status(Response.Status.OK).entity(floorNums).build();
@@ -194,7 +199,7 @@ public class BuildingServiceImpl implements BuildingService {
             GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             List<DeviceGroup> userGroups = groupManagementProviderService
                     .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
-            if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+            if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
                 BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
                 if (buildingInfo == null) {
@@ -223,7 +228,7 @@ public class BuildingServiceImpl implements BuildingService {
             List<DeviceGroup> userGroups = groupManagementProviderService
                     .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
 
-            if (isUserAuthorizedToGroup(userGroups, floorGroupName)) {
+            if (isAdmin() || isUserAuthorizedToGroup(userGroups, floorGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
                 File file = buildingDAO.getFloorPlan(buildingId, floorId);
                 if (file != null) {
@@ -357,25 +362,24 @@ public class BuildingServiceImpl implements BuildingService {
             List<DeviceGroup> userGroups = groupManagementProviderService
                     .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
             String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId);
+            Boolean[] authorizedFloors ;
 
-            if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+            if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
                 BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
-                Boolean[] authorizedFloors;
+                int numOfFloors = buildingInfo.getNumFloors();
+                authorizedFloors = new Boolean[numOfFloors];
 
-                if (buildingInfo != null) {
-                    int numOfFloors = buildingInfo.getNumFloors();
-                    authorizedFloors = new Boolean[numOfFloors];
-
+                if (isAdmin()) {
+                    Arrays.fill(authorizedFloors, Boolean.TRUE);
+                } else {
                     for (int i = 1; i <= numOfFloors; i++) {
                         String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, i);
                         authorizedFloors[i - 1] = isUserAuthorizedToGroup(userGroups, groupName);
 
                     }
-                    return Response.status(Response.Status.OK).entity(authorizedFloors).build();
-                } else {
-                    return Response.status(Response.Status.NOT_FOUND).build();
                 }
+                return Response.status(Response.Status.OK).entity(authorizedFloors).build();
             } else {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
@@ -470,12 +474,14 @@ public class BuildingServiceImpl implements BuildingService {
     @Produces("application/json")
     public Response getDevicesForUser() {
         try {
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             List<DeviceInfo> deviceInfos = new ArrayList<>();
-
             buildingDAOManager.getBuildingDAOHandler().openConnection();
             List<BuildingInfo> buildingList = this.buildingDAO.getAllBuildings();
             for (BuildingInfo buildingId : buildingList) {
                 String groupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId.getBuildingId());
+
+                if (isAdmin() || )
                 DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
                 if (floorDeviceGroup != null) {
                     DeviceInfo deviceInfo = new DeviceInfo("" +buildingId.getBuildingId());
@@ -671,6 +677,21 @@ public class BuildingServiceImpl implements BuildingService {
             }
         }
         return false;
+    }
 
+    /**
+     * To check whether current user is admin
+     * @return true if current user is admin, otherwise returns false;
+     */
+    private boolean isAdmin() {
+        try {
+            return APIUtil.getAuthorizationManager().isUserAuthorized(PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getUsername(), CarbonConstants.UI_ADMIN_PERMISSION_COLLECTION,
+                    CarbonConstants.UI_PERMISSION_ACTION);
+
+        } catch (UserStoreException e) {
+            log.error(e);
+            return false;
+        }
     }
 }
