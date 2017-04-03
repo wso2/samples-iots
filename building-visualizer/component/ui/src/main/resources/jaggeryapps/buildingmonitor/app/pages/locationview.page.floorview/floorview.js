@@ -24,30 +24,42 @@ function onRequest() {
     var user = session.get(constants["USER_SESSION_KEY"]);
     var permissions = userModule.getUIPermissions();
 
-	var buildingId = request.getParameter("buildingId");
-	var floorId = request.getParameter("floorId");
+    var buildingId = request.getParameter("buildingId");
+    var floorId = request.getParameter("floorId");
 
-	var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
-	var hearders = [{"name": constants["ACCEPT_IDENTIFIER"], "value": "image/*"}];
-	var url = devicemgtProps["httpsURL"] + "/senseme/building/" + buildingId +"/" + floorId;
+    var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
+    var hearders = [{"name": constants["ACCEPT_IDENTIFIER"], "value": "image/*"}];
+    var url = devicemgtProps["httpsURL"] + "/senseme/building/" + buildingId +"/" + floorId;
 
-	var viewModel = {};
-	viewModel["permissions"] = permissions;
-	viewModel["buildingId"] = buildingId;
-	viewModel["floorId"] = floorId;
-	serviceInvokers.HttpClient.get(url , function (responsePayload, responseHeaders, status) {
-			if (status == 200) {
-				var streamObject = new Stream(responsePayload);
-				var IOUtils = Packages.org.apache.commons.io.IOUtils;
-				var Base64 = Packages.org.apache.commons.codec.binary.Base64;
-				viewModel["imageObj"] = Base64.encodeBase64String(IOUtils.toByteArray(streamObject.getStream()));
-			}
-		}, function (responsePayload) {
-			if (responsePayload.getStatusCode() == 401) {
-				viewModel.permittednone = true;
-			} else if (responsePayload.getStatusCode() == 403) {
-            	viewModel.permittednone = true;
-        	}
-		}, hearders);
+    var viewModel = {};
+    viewModel["permissions"] = permissions;
+    viewModel["buildingId"] = buildingId;
+    viewModel["floorId"] = floorId;
+
+    var isExistingCheckUrl = devicemgtProps["httpsURL"] + "/senseme/building/isExistingBuilding/" + buildingId;
+    serviceInvokers.XMLHttp.get(url, function (responsePayload) {
+        if (responsePayload.status == 404) {
+            viewModel.buildingNotFound = true;
+        }
+    }, function (responsePayload) {
+    }, null);
+
+    if (viewModel.buildingNotFound) {
+        return viewModel;
+    }
+    serviceInvokers.HttpClient.get(url , function (responsePayload, responseHeaders, status) {
+        if (status == 200) {
+            var streamObject = new Stream(responsePayload);
+            var IOUtils = Packages.org.apache.commons.io.IOUtils;
+            var Base64 = Packages.org.apache.commons.codec.binary.Base64;
+            viewModel["imageObj"] = Base64.encodeBase64String(IOUtils.toByteArray(streamObject.getStream()));
+        }
+    }, function (responsePayload) {
+        if (responsePayload.getStatusCode() == 401) {
+            viewModel.permittednone = true;
+        } else if (responsePayload.getStatusCode() == 403) {
+            viewModel.permittednone = true;
+        }
+    }, hearders);
     return viewModel;
 }

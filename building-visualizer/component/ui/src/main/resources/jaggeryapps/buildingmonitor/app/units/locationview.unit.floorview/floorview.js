@@ -19,7 +19,9 @@
 function onRequest(context) {
     var constants = require("/app/modules/constants.js");
     var userModule = require("/app/modules/business-controllers/user.js")["userModule"];
+    var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
     var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
+    var deviceModule = require("/app/modules/business-controllers/device.js")["deviceModule"];
 
     var user = session.get(constants["USER_SESSION_KEY"]);
     var permissions = userModule.getUIPermissions();
@@ -30,5 +32,11 @@ function onRequest(context) {
 	viewModel["buildingId"] = buildingId;
 	viewModel["floorId"] = floorId;
 	viewModel["imageObj"] = context.unit.params.imageObj;
+	viewModel["permissions"] = permissions;
+	viewModel["deviceTypes"] = [];
+
+    if (permissions.OWNING_DEVICE && permissions.SENSEME_ENROLLMENT) {
+        viewModel["deviceTypes"] = deviceModule.getDeviceTypes().content.deviceTypes;
+	}
     return viewModel;
 }

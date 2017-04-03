@@ -839,8 +839,10 @@ function addDevice () {
     var yCordValue = document.getElementsByName('yCord')[0].value;;
     var floorIdValue = $("#image").attr("floorId");
     var buildingIdValue = $("#image").attr("buildingId");
+    var deviceType = $("#deviceType").val();
     var deviceData = {deviceId:deviceIdValue, buildingId:buildingIdValue, floorNumber:floorIdValue, xCord:xCordValue, yCord:yCordValue };
-    var addDeviceApi = "/senseme/device/enroll";
+    var addDeviceApi = "/senseme/device/enroll?deviceType=" + deviceType;
+
     invokerUtil.post(addDeviceApi, deviceData, function(data, textStatus, jqXHR){
         if (jqXHR.status == 200) {
             placeDevice(deviceId, xCordValue, yCordValue)
@@ -901,33 +903,3 @@ function loadDevices() {
     }, function (jqXHR) {
     }, "application/json");
 }
-
-/**
- * to get existing device types
- */
-function getDeviceTypes() {
-    var providerData = null;
-    var providerUrl = context + '/api/devices/types';
-    $("#deviceType").empty();
-    $.ajax({
-        url: providerUrl,
-        method: "GET",
-        contentType: "application/json",
-        async: false,
-        success: function (data) {
-            providerData = data.content.deviceTypes;
-
-            for (var i=0; i<providerData.length;i++){
-                $("#deviceType").append("<option>"+providerData[i]+"</option>");
-            }
-            console.log("success");
-
-        },
-        error: function (err) {
-            console.log("error");
-            console.log(err);
-        }
-    });
-}
-
-$("#device").click(getDeviceTypes);

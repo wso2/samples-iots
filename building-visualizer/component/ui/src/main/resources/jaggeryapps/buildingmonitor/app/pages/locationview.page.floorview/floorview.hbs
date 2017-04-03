@@ -26,17 +26,24 @@
 {{/zone}}
 
 {{#zone "content"}}
-    {{#if imageObj}}
-        {{unit "locationview.unit.floorview" imageObj=imageObj }}
+    {{#if buildingNotFound}}
+        <div class="message message-warning" style="margin: 20px">
+            <h4><i class="icon fw fw-warning"></i>Relevant building is not found</h4>
+            <p>Building is not found Click <a href="{{@app.context}}/">here</a> to go back to map view.</p>
+        </div>
     {{else}}
-        {{#if permissions.ADD_FLOOR}}
-            {{unit "locationview.unit.floorcreate" buildingId=buildingId floorId=floorId}}
+        {{#if imageObj}}
+            {{unit "locationview.unit.floorview" imageObj=imageObj }}
         {{else}}
-            <div class="message message-warning" style="margin: 20px">
-                <h4><i class="icon fw fw-warning"></i>Floor Image is not uplodaed</h4>
-                <p>Relevant floor image is not uploaded yet. Click <a href="{{@app
-                .context}}/buildings?buildingId={{buildingId}}">here</a> to go back to building view.</p>
-            </div>
+            {{#if permissions.ADD_FLOOR}}
+                {{unit "locationview.unit.floorcreate" buildingId=buildingId floorId=floorId}}
+            {{else}}
+                <div class="message message-warning" style="margin: 20px">
+                    <h4><i class="icon fw fw-warning"></i>Floor Image is not uplodaed</h4>
+                    <p>Relevant floor image is not uploaded yet. Click <a href="{{@app
+                    .context}}/buildings?buildingId={{buildingId}}">here</a> to go back to building view.</p>
+                </div>
+            {{/if}}
         {{/if}}
     {{/if}}
 {{/zone}}

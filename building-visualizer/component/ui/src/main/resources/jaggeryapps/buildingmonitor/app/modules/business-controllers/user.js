@@ -595,6 +595,12 @@ var userModule = function () {
         if (publicMethods.isAuthorized("/permission/admin/buildingmonitor/building/floor/view")) {
             permissions["VIEW_FLOOR"] = true;
         }
+        if (publicMethods.isAuthorized("permission/admin/device-mgt/devices/owning-device/view")) {
+            permissions["OWNING_DEVICE"] = true;
+        }
+        if (publicMethods.isAuthorized("permission/admin/device-mgt/devices/enroll/senseme")) {
+            permissions["SENSEME_ENROLLMENT"] = true;
+        }
 
         return permissions;
     };

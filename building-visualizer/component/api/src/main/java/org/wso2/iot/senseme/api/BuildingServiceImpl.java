@@ -144,19 +144,35 @@ public class BuildingServiceImpl implements BuildingService {
     public Response updateBuilding(BuildingInfo buildingInfo) {
         BuildingInfo building;
         try {
-            buildingDAOManager.getBuildingDAOHandler().openConnection();
-            buildingDAOManager.getBuildingDAOHandler().beginTransaction();
-            building = this.buildingDAO.updateBuilding(buildingInfo);
-            buildingDAOManager.getBuildingDAOHandler().commitTransaction();
+            String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingInfo.getBuildingId());
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
+            List<DeviceGroup> userGroups = groupManagementProviderService
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
 
-            if (building != null) {
-                return Response.status(Response.Status.OK).entity(building).build();
+            if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+                buildingDAOManager.getBuildingDAOHandler().openConnection();
+                buildingDAOManager.getBuildingDAOHandler().beginTransaction();
+                building = this.buildingDAO.updateBuilding(buildingInfo);
+                buildingDAOManager.getBuildingDAOHandler().commitTransaction();
+
+                if (building != null) {
+                    return Response.status(Response.Status.OK).entity(building).build();
+                } else {
+                    return Response.status(Response.Status.NOT_FOUND).entity("Relevant building with the id " +
+                            buildingInfo.getBuildingId() + " is not found.").build();
+                }
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized to view group " +
+                        buildingGroupName + " for building " + buildingInfo.getBuildingId()).build();
             }
-            return Response.status(Response.Status.NO_CONTENT).build();
         } catch (SQLException e) {
-            e.printStackTrace();
             buildingDAOManager.getBuildingDAOHandler().rollbackTransaction();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (GroupManagementException e) {
+            log.error("Error checking group level authorizations for updating the building " + buildingInfo
+                    .getBuildingId(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause()).build();
+
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
@@ -327,26 +343,34 @@ public class BuildingServiceImpl implements BuildingService {
     public Response getDevices(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId) {
         try {
             String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
-            DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
+            DeviceGroup floorDeviceGroup = groupManagementProviderService.getGroup(groupName);
             List<SenseMe> senseMes = new ArrayList<>();
-            if (floorDeviceGroup != null) {
-                List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
-                        floorDeviceGroup.getGroupId(),
-                        0, 1000);
+            if (floorDeviceGroup == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            List<DeviceGroup> userGroups = groupManagementProviderService
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
+            if (isAdmin() || isUserAuthorizedToGroup(userGroups, groupName)) {
+
+                List<Device> devices = APIUtil.getGroupManagementProviderService()
+                        .getDevices(floorDeviceGroup.getGroupId(), 0, 1000);
                 for (Device device : devices) {
                     if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
                         continue;
                     }
-                    if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE &&
-                            device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
+                    if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE
+                            && device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
                         continue;
                     }
-                    device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
-                            device.getDeviceIdentifier(), device.getType()));
+                    device = APIUtil.getDeviceManagementService()
+                            .getDevice(new DeviceIdentifier(device.getDeviceIdentifier(), device.getType()));
                     senseMes.add(new SenseMe(device));
                 }
+                return Response.status(Response.Status.OK).entity(senseMes).build();
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-            return Response.status(Response.Status.OK).entity(senseMes).build();
         } catch (GroupManagementException e) {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
@@ -371,19 +395,23 @@ public class BuildingServiceImpl implements BuildingService {
             if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
                 BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
-                int numOfFloors = buildingInfo.getNumFloors();
-                authorizedFloors = new Boolean[numOfFloors];
 
-                if (isAdmin()) {
-                    Arrays.fill(authorizedFloors, Boolean.TRUE);
-                } else {
-                    for (int i = 1; i <= numOfFloors; i++) {
-                        String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, i);
-                        authorizedFloors[i - 1] = isUserAuthorizedToGroup(userGroups, groupName);
+                if (buildingInfo != null) {
+                    int numOfFloors = buildingInfo.getNumFloors();
+                    authorizedFloors = new Boolean[numOfFloors];
 
+                    if (isAdmin()) {
+                        Arrays.fill(authorizedFloors, Boolean.TRUE);
+                    } else {
+                        for (int i = 1; i <= numOfFloors; i++) {
+                            String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, i);
+                            authorizedFloors[i - 1] = isUserAuthorizedToGroup(userGroups, groupName);
+                        }
                     }
+                    return Response.status(Response.Status.OK).entity(authorizedFloors).build();
+                } else {
+                    return Response.status(Response.Status.NOT_FOUND).build();
                 }
-                return Response.status(Response.Status.OK).entity(authorizedFloors).build();
             } else {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
@@ -398,7 +426,6 @@ public class BuildingServiceImpl implements BuildingService {
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
-
     }
 
     @Override
@@ -446,22 +473,41 @@ public class BuildingServiceImpl implements BuildingService {
 
     @Override
     @POST
-    @Path("/remove/{deviceId}")
+    @Path("/remove/{buildingId}")
     public Response removeBuilding(int buildingId) {
         boolean res;
+        GroupManagementProviderService groupManagementProviderService;
+        List<DeviceGroup> userGroups = null;
+
         try {
-            buildingDAOManager.getBuildingDAOHandler().openConnection();
-            buildingDAOManager.getBuildingDAOHandler().beginTransaction();
-            res = buildingDAO.removeBuilding(buildingId);
-            buildingDAOManager.getBuildingDAOHandler().commitTransaction();
-            return res ? Response.status(Response.Status.OK).build():Response.status(Response.Status.OK).entity
-                    ("Could not delete the building.").build();
+            groupManagementProviderService = APIUtil.getGroupManagementProviderService();
+            userGroups = groupManagementProviderService
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
+        } catch (GroupManagementException e) {
+            log.error("Error while checking group level permissions before deleting the building " + buildingId, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+        try {
+            if (isAdmin() || isUserAuthorizedToGroup(userGroups,
+                    String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId))) {
+                buildingDAOManager.getBuildingDAOHandler().openConnection();
+                buildingDAOManager.getBuildingDAOHandler().beginTransaction();
+                res = buildingDAO.removeBuilding(buildingId);
+                buildingDAOManager.getBuildingDAOHandler().commitTransaction();
+                return res ?
+                        Response.status(Response.Status.OK).build() :
+                        Response.status(Response.Status.OK).entity("Could not delete the building.").build();
+            } else {
+                Response.status(Response.Status.UNAUTHORIZED).build();
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
+            buildingDAOManager.getBuildingDAOHandler().rollbackTransaction();
+            log.error("Error while performing database operations while deleting the building " + buildingId, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
     @Override
@@ -469,8 +515,6 @@ public class BuildingServiceImpl implements BuildingService {
     @Path("/search/notifications")
     @Consumes("application/json")
     public Response queryNotifications(QueryObject query) {
-//        String fromDate = String.valueOf(from * 1000);
-//        String toDate = String.valueOf(to * 1000);
         String query1 = "buildingId:3 and timeStamp : [1490314307321 TO 1490333687321]";
         String sensorTableName = DeviceTypeConstants.NOTIFICATION_TABLE;
         try {
@@ -490,6 +534,27 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
+    @Path("/isExistingBuilding/{buildingId}")
+    @GET
+    @Produces("application/json")
+    public Response isExistingBuilding(@PathParam("buildingId") int buildingId) {
+        try {
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
+
+            if (buildingInfo != null) {
+                return Response.status(Response.Status.OK).build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        } catch (SQLException e) {
+            log.error("Error occured while checking whether a building with the id " + buildingId + " exist.", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getCause()).build();
+        }
+
+    }
+
+    @Override
     @Path("/devices")
     @GET
     @Produces("application/json")
@@ -499,45 +564,49 @@ public class BuildingServiceImpl implements BuildingService {
             List<DeviceInfo> deviceInfos = new ArrayList<>();
             buildingDAOManager.getBuildingDAOHandler().openConnection();
             List<BuildingInfo> buildingList = this.buildingDAO.getAllBuildings();
+            List<DeviceGroup> userGroups = groupManagementProviderService
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
             for (BuildingInfo buildingId : buildingList) {
                 String groupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId.getBuildingId());
 
-                DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
-                if (floorDeviceGroup != null) {
-                    DeviceInfo deviceInfo = new DeviceInfo("" +buildingId.getBuildingId());
-                    List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(floorDeviceGroup.getGroupId(),
-                            0, 1000);
-                    for (Device device : devices) {
-                        if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
-                            continue;
-                        }
-                        if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE ||
-                                device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
-                            continue;
-                        }
-                        device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
-                                device.getDeviceIdentifier(), device.getType()));
-                        List<Device.Property> propertyList = device.getProperties();
-                        if (device.getEnrolmentInfo().getStatus() == EnrolmentInfo.Status.ACTIVE) {
-                            deviceInfo.increaseActive();
-                            for (Device.Property property : propertyList) {
-                                switch (property.getName()) {
+                if (isAdmin() || isUserAuthorizedToGroup(userGroups, groupName)) {
+                    DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
+                    if (floorDeviceGroup != null) {
+                        DeviceInfo deviceInfo = new DeviceInfo("" + buildingId.getBuildingId());
+                        List<Device> devices = APIUtil.getGroupManagementProviderService()
+                                .getDevices(floorDeviceGroup.getGroupId(), 0, 1000);
+                        for (Device device : devices) {
+                            if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
+                                continue;
+                            }
+                            if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE
+                                    && device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
+                                continue;
+                            }
+                            device = APIUtil.getDeviceManagementService()
+                                    .getDevice(new DeviceIdentifier(device.getDeviceIdentifier(), device.getType()));
+                            List<Device.Property> propertyList = device.getProperties();
+                            if (device.getEnrolmentInfo().getStatus() == EnrolmentInfo.Status.ACTIVE) {
+                                deviceInfo.increaseActive();
+                                for (Device.Property property : propertyList) {
+                                    switch (property.getName()) {
                                     case "lastKnown":
                                         if (property.getValue() != null) {
                                             long timestamp = Long.parseLong(property.getValue());
-                                            if ((System.currentTimeMillis() - timestamp)/1000 > 3600) {
+                                            if ((System.currentTimeMillis() - timestamp) / 1000 > 3600) {
                                                 deviceInfo.increaseFault();
                                                 deviceInfo.decreaseActive();
                                             }
                                         }
 
+                                    }
                                 }
+                            } else {
+                                deviceInfo.increaseInactive();
                             }
-                        } else {
-                            deviceInfo.increaseInactive();
                         }
+                        deviceInfos.add(deviceInfo);
                     }
-                    deviceInfos.add(deviceInfo);
                 }
             }
             if (deviceInfos.size() > 0) {

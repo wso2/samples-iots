@@ -314,6 +314,8 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
 	var content = $("#device-popup-template").clone();
 	var sidebar = $("#sidebar-messages");
 	content.attr("id","device-building-" + buildingId);
+
+	console.log(buildingdevice);
 	if (buildingdevice && buildingdevice != undefined) {
 		content.find("#building-active").text(buildingdevice.active);
 		content.find("#building-inactive").text(buildingdevice.inactive);

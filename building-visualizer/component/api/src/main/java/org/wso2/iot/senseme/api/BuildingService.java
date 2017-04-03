@@ -73,15 +73,21 @@ import java.io.InputStream;
                 ),
                 @Scope(
                         name = "View building",
-                        description = "",
+                        description = "To view a building",
                         key = "perm:building:view",
                         permissions = {"/buildingmonitor/building/view"}
                 ),
                 @Scope(
                         name = "View floor",
-                        description = "",
+                        description = "To view a floor",
                         key = "perm:floor:view",
                         permissions = {"/buildingmonitor/building/floor/view"}
+                ),
+                @Scope(
+                        name = "Delete building",
+                        description = "Deleting a building",
+                        key = "perm:building:remove",
+                        permissions = {"/buildingmonitor/building/remove"}
                 )
         }
 )
@@ -293,7 +299,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:building:view")
+                            @ExtensionProperty(name = SCOPE, value = "perm:floor:view")
                     })
             }
     )
@@ -365,7 +371,7 @@ public interface BuildingService {
             tags = "senseme",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                            @ExtensionProperty(name = SCOPE, value = "perm:building:remove")
                     })
             }
     )
@@ -391,4 +397,21 @@ public interface BuildingService {
     )
     Response queryNotifications(QueryObject query);
 
+    @Path("/isExistingBuilding/{buildingId}")
+    @GET
+    @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "To check whether a building exist with the given id",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:floor:add")
+                    })
+            }
+    )
+    Response isExistingBuilding(@PathParam("buildingId") int buildingId);
 }

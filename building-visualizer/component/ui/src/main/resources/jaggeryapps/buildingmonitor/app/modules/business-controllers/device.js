@@ -239,27 +239,6 @@ deviceModule = function () {
         return response;
     };
 
-    /*
-     @Updated
-     */
-    // publicMethods.getLicense = function (deviceType) {
-    //     var url;
-    //     var license;
-    //     if (deviceType == "windows") {
-    //         url = mdmProps["httpURL"] + "/mdm-windows-agent/services/device/license";
-    //     } else if (deviceType == "ios") {
-    //         url = mdmProps["httpsURL"] + "/ios-enrollment/license/";
-    //     }
-
-    //     if (url != null && url != undefined) {
-    //         serviceInvokers.XMLHttp.get(url, function (responsePayload) {
-    //             license = responsePayload.text;
-    //         }, function (responsePayload) {
-    //             return null;
-    //         });
-    //     }
-    //     return license;
-    // };
 
     publicMethods.getDevices = function (userName) {
         var url = devicemgtProps["httpsURL"] +
