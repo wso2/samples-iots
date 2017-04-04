@@ -32,14 +32,14 @@ select buildingId, floorId, avg(temperature) as temperature, avg(motion) as moti
 group by floorId insert into summarizedDataOut;
 
 from dataOut[temperature < 23]
-select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very cool. Please increase the temperature" as information,
-timeStamp insert into alertOut ;
+select buildingId, floorId, "Very_Low_Temperature" as type, temperature as value, "Floor seems to be very cold.
+Please turn OFF AC." as information, timeStamp insert into alertOut ;
 
-from dataOut[temperature > 27]
-select buildingId, floorId, "Temperature" as type, temperature as value, "Floor is very hot. Please decrease the temperature" as information,
-timeStamp insert into alertOut ;
+from dataOut[motion != 0 and temperature > 27]
+select buildingId, floorId, "High_Temperature_WITH_Motion" as type, temperature as value, "Floor is very hot. Please
+turn ON AC." as information, timeStamp insert into alertOut;
 
 from dataOut[motion == 0 and light < 500]
-select buildingId, floorId, "Light" as type, light as value,
-"Floor seem to be empty. Human motion seem to be nil. But lights are switched on. Please switch off the lights." as
-information, timeStamp insert into alertOut ;
+select buildingId, floorId, "Light_ON_WITH_NO_Motion" as type, light as value, "The floor seems to be empty. But lights
+are switched ON. Please switch off the lights." as information, timeStamp insert into alertOut;
+

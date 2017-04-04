@@ -379,12 +379,12 @@ public interface BuildingService {
 
 
     @Path("/search/notifications")
-    @POST
+    @GET
     @Produces("application/json")
     @Consumes("application/json")
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
-            httpMethod = "POST",
+            httpMethod = "GET",
             value = "Query and get the notifications.",
             notes = "",
             response = Response.class,
@@ -395,7 +395,7 @@ public interface BuildingService {
                     })
             }
     )
-    Response queryNotifications(QueryObject query);
+    Response queryNotifications(QueryObject queryObject);
 
     @Path("/isExistingBuilding/{buildingId}")
     @GET

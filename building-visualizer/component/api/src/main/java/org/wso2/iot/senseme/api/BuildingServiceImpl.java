@@ -18,7 +18,6 @@
 
 package org.wso2.iot.senseme.api;
 
-import org.apache.commons.collections.iterators.ObjectArrayIterator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -518,37 +517,20 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    @POST
+    @GET
     @Path("/search/notifications")
     @Consumes("application/json")
     @Produces("application/json")
-    public Response queryNotifications(QueryObject query) {
-        //        String fromDate = String.valueOf(from * 1000);
-        //        String toDate = String.valueOf(to * 1000);
-        String query1 =
-                "timeStamp: [" + (System.currentTimeMillis() - 1800000) + " TO " + System.currentTimeMillis() + "]";
-        log.info(query1);
-        String sensorTableName = DeviceTypeConstants.NOTIFICATION_TABLE;
+    public Response queryNotifications(QueryObject queryObject) {
+
+        String query = generateQuery(queryObject);
+        String sensorTableName = DeviceTypeConstants.ALERT_NOTIFICATIONS;
         try {
             if (sensorTableName != null) {
                 List<SortByField> sortByFields = new ArrayList<>();
                 SortByField sortByField = new SortByField("timeStamp", SortType.DESC);
                 sortByFields.add(sortByField);
-                List<SensorRecord> sensorRecords = APIUtil.getAllEventsForDevice(sensorTableName, query1, sortByFields);
-
-                double temp = 0;
-                int count = 0;
-                for (SensorRecord record : sensorRecords) {
-                    Map<String, Object> map = record.getValues();
-                    if (map.get("floorId").equals("5")) {
-                        log.info("Floor Id 5");
-                        count++;
-                        temp += (double)map.get("temperature");
-                    }
-                }
-
-                log.info("Avg temp : " + (temp/count));
-
+                List<SensorRecord> sensorRecords = APIUtil.getAllEventsForDevice(sensorTableName, query, sortByFields);
                 return Response.status(Response.Status.OK.getStatusCode()).entity(sensorRecords).build();
             }
         } catch (AnalyticsException e) {
@@ -816,4 +798,27 @@ public class BuildingServiceImpl implements BuildingService {
             return false;
         }
     }
-}
+
+    /**
+     * Generate search query based on the user specified criterias.
+     * @param queryObject : The query object from the request.
+     * @return : The query which is to be executed.
+     */
+    private String generateQuery(QueryObject queryObject) {
+        String query = "buildingId:" + queryObject.getBuildingId() + " AND floorId:" + queryObject.getFloorId();
+        String fromDate = String.valueOf(queryObject.getFrom() * 1000);
+        String toDate = String.valueOf(queryObject.getTo() * 1000);
+        String dateRange = " AND timeStamp: [" + fromDate + " TO " + toDate + "]";
+        if (queryObject.isLight() && !queryObject.isMotion()) { //Light is ON no motion
+            query = query + " AND type:\"Light_ON_WITH_NO_Motion\"";
+        } else if (queryObject.isMotion() && queryObject.getTemperature().equals("High")) { // High temperature
+            query = query + " AND type:\"High_Temperature_WITH_Motion\"";
+        } else if (queryObject.getTemperature().equals("LOW")) { // Very low temperature regardless of motion.
+            query = query + " AND type:\"Very_Low_Temperature\"";
+        } else { // Get all records.
+            return query + dateRange;
+        }
+        return query + dateRange;
+    }
+
+ }
