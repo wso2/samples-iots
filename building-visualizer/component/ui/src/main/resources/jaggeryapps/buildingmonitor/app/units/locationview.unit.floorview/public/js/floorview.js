@@ -2,6 +2,10 @@ var modalPopup = ".modal";
 var modalPopupContainer = modalPopup + " .modal-content";
 var modalPopupContent = modalPopup + " .modal-content";
 var isAddDeviceMode =false;
+var sensorConfigs  = null;
+var heatMapInstances = {};
+var currentHeatmapInstance = {};
+var sensorValues = {};
 
 /*
  * set popup maximum height function.
@@ -39,26 +43,14 @@ function hidePopup() {
     var SUCCESS_TIMEOUT = 10000;
     var ws;
     var wsAlert;
-    var temperatureMapInstance;
-    var motionMapInstance;
-    var lightMapInstance;
-    var humidityMapInstance;
-    var currentTemperatureMap;
-    var currentMotionMap;
-    var currentLightMap;
-    var currentHumidityMap;
     var floorId;
     var buildingId;
     var rangeSlider;
     var historicalSlider;
     var isSliderChanged = false;
     var currentSliderValue = 0;
-    var currentSelection = "Temperature";
+    var currentSelection = "temperature";
     var isHistoricalView = false;
-    var temperatureMapData = [];
-    var motionMapData = [];
-    var lightMapData = [];
-    var humidityMapData = [];
     var timeouts = [];
     var heatMapConfig = {
         container: document.getElementById('image'),
@@ -113,21 +105,19 @@ function hidePopup() {
      * Creates the heatMap.
      */
     var createHeatMap = function () {
-        if (!temperatureMapInstance) {
-            temperatureMapInstance = h337.create(heatMapConfig);
-            motionMapInstance = h337.create(heatMapConfig);
-            lightMapInstance = h337.create(heatMapConfig);
-            humidityMapInstance = h337.create(heatMapConfig);
-            temperatureMapInstance.setDataMin(1500);
-            temperatureMapInstance.setDataMax(3500);
-            motionMapInstance.setDataMin(0);
-            motionMapInstance.setDataMax(10000);
-            lightMapInstance.setDataMin(0);
-            lightMapInstance.setDataMax(1024);
-            humidityMapInstance.setDataMin(0);
-            humidityMapInstance.setDataMax(100);
+        if ($.isEmptyObject(heatMapInstances) && sensorConfigs != null) {
+
+            for (var key in sensorConfigs) {
+                if (sensorConfigs.hasOwnProperty(key)) {
+                    var instance;
+                    instance = h337.create(heatMapConfig);
+                    instance.setDataMin(sensorConfigs[key].min);
+                    instance.setDataMax(sensorConfigs[key].max);
+                    heatMapInstances[key]=instance;
+                }
+            }
         }
-        if (!currentTemperatureMap) {
+        if ($.isEmptyObject(currentHeatmapInstance) && sensorConfigs != null) {
             var config = {
                 container: document.getElementById('heat-map-hidden'),
                 radius: 100,
@@ -138,18 +128,16 @@ function hidePopup() {
                     updateLegend(data);
                 }
             };
-            currentTemperatureMap = window.h337.create(config);
-            currentHumidityMap = window.h337.create(config);
-            currentLightMap = window.h337.create(config);
-            currentMotionMap = window.h337.create(config);
-            currentTemperatureMap.setDataMin(1800);
-            currentTemperatureMap.setDataMax(3500);
-            currentHumidityMap.setDataMin(0);
-            currentHumidityMap.setDataMax(100);
-            currentLightMap.setDataMin(0);
-            currentLightMap.setDataMax(1024);
-            currentMotionMap.setDataMin(0);
-            currentMotionMap.setDataMax(10000);
+
+            for (var k in sensorConfigs) {
+                if (sensorConfigs.hasOwnProperty(k)) {
+                    var currentInstance;
+                    currentInstance = window.h337.create(config);
+                    currentInstance.setDataMin(sensorConfigs[k].min);
+                    currentInstance.setDataMax(sensorConfigs[k].max);
+                    currentHeatmapInstance[k]=currentInstance;
+                }
+            }
         }
     };
 
@@ -171,87 +159,37 @@ function hidePopup() {
         if (dataValues.location.building != buildingId || dataValues.location.floor != floorId) {
             return;
         }
-        var temperatureDataPoint = {
-            x: dataValues.location.coordinates[0],
-            y: dataValues.location.coordinates[1],
-            value: dataValues.temperature * 100
-        };
-        var currentTemperatureData = currentTemperatureMap.getData();
-        currentTemperatureData.data = processHeatMapDataPoints(currentTemperatureData.data, temperatureDataPoint);
-        currentTemperatureData.data.push(temperatureDataPoint);
-        currentTemperatureMap.setData(currentTemperatureData);
 
-        var humidityDataPoint = {
-            x: dataValues.location.coordinates[0],
-            y: dataValues.location.coordinates[1],
-            value: dataValues.humidity
-        };
+        for (var key in sensorConfigs) {
+            if (sensorConfigs.hasOwnProperty(key)) {
+                if (dataValues[key]) {
+                    var dataPoint = {
+                        x: dataValues.location.coordinates[0],
+                        y: dataValues.location.coordinates[1],
+                        value : dataValues[key] * Math.pow(10, sensorConfigs[key].decimal)
+                    };
+                    var currentData = currentHeatmapInstance[key].getData();
+                    currentData.data = processHeatMapDataPoints(currentData.data, dataPoint);
+                    currentData.data.push(dataPoint);
+                    currentHeatmapInstance[key].setData(currentData);
 
-        var currentHumidityData = currentHumidityMap.getData();
-        currentHumidityData.data = processHeatMapDataPoints(currentHumidityData.data, humidityDataPoint);
-        currentHumidityData.data.push(humidityDataPoint);
-        currentHumidityData.data.push(humidityDataPoint);
-        currentHumidityMap.setData(currentHumidityData);
+                }
+            }
 
-        var lightDataPoint = {
-            x: dataValues.location.coordinates[0],
-            y: dataValues.location.coordinates[1],
-            value: 1024 - dataValues.light
-        };
-        var currentLightData = currentLightMap.getData();
-        currentLightData.data = processHeatMapDataPoints(currentLightData.data, lightDataPoint);
-        currentLightData.data.push(lightDataPoint);
-        currentLightMap.setData(currentLightData);
+            if (sensorValues[key].length==16){
+                sensorValues[key].shift();
+            }
+            sensorValues[key].push(currentHeatmapInstance[key].getData());
+        }
 
-        var motionDataPoint = {
-            x: dataValues.location.coordinates[0],
-            y: dataValues.location.coordinates[1],
-            value: dataValues.motion * 10000
-        };
-        var currentMotionData = currentMotionMap.getData();
-        currentMotionData.data = processHeatMapDataPoints(currentMotionData.data, motionDataPoint);
-        currentMotionData.data.push(motionDataPoint);
-        currentMotionMap.setData(currentMotionData);
+        //problem in light data point
 
         if (!isHistoricalView) {
             if (!isSliderChanged || currentSliderValue == rangeSlider.bootstrapSlider('getAttribute', 'max')) {
-                switch (currentSelection) {
-                    case "Temperature" :
-                        temperatureMapInstance.setData({data: []});
-                        temperatureMapInstance.setData(currentTemperatureMap.getData());
-                        break;
-                    case "Motion" :
-                        motionMapInstance.setData({data: []});
-                        motionMapInstance.setData(currentMotionMap.getData());
-                        break;
-                    case "Humidity" :
-                        humidityMapInstance.setData({data: []});
-                        humidityMapInstance.setData(currentHumidityMap.getData());
-                        break;
-                    case "Light" :
-                        lightMapInstance.setData({data: []});
-                        lightMapInstance.setData(currentLightMap.getData());
-                        break;
-                }
+                heatMapInstances[currentSelection].setData({data: []});
+                heatMapInstances[currentSelection].setData(currentHeatmapInstance[currentSelection].getData());
             }
         }
-
-        if (temperatureMapData.length == 16) {
-            temperatureMapData.shift();
-        }
-        if (motionMapData.length == 16) {
-            motionMapData.shift();
-        }
-        if (humidityMapData.length == 16) {
-            humidityMapData.shift();
-        }
-        if (lightMapData.length == 16) {
-            lightMapData.shift();
-        }
-        temperatureMapData.push(currentTemperatureMap.getData());
-        motionMapData.push(currentMotionMap.getData());
-        humidityMapData.push(currentHumidityMap.getData());
-        lightMapData.push(currentLightMap.getData());
     };
 
     /**
@@ -340,6 +278,7 @@ function hidePopup() {
     };
 
     $(document).ready(function(){
+        getSensorConfiguration();
         intializeWebsockets();
         createHeatMap();
         floorId = $("#image").attr("floorId");
@@ -390,7 +329,6 @@ function hidePopup() {
             date.setHours(date.getHours()-1);
             historicalData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
             updateHistoricData(historicalData[currentSliderValue]);
-            //historicalSlider.bootstrapSlider('refresh');
         });
 
         var date = new Date();
@@ -410,8 +348,6 @@ function hidePopup() {
 
     });
 
-
-
     var isDataExist = function(dataArray, dataPoint) {
         for (var data in dataArray) {
             if (dataArray[data].x == dataPoint.x && dataArray[data].y == dataPoint.y) {
@@ -419,7 +355,6 @@ function hidePopup() {
             }
         }
     };
-
 
     var loadNotifications = function() {
         var messageSideBar = ".sidebar-messages";
@@ -469,77 +404,22 @@ function hidePopup() {
      */
     var updateHistoricData = function(historicalData) {
         var max = 0;
-        switch (currentSelection) {
-            case "Temperature" :
-                temperatureMapInstance.setData({data: []});
-
-                for (var data in historicalData) {
-                    var dataPoint = {
-                        x: historicalData[data].xCoordinate,
-                        y: historicalData[data].yCoordinate,
-                        value: historicalData[data].temperature * 100
-                    };
-
-                    if (!isDataExist(temperatureMapInstance.getData().data, dataPoint)) {
-                        temperatureMapInstance.addData(dataPoint);
-                    }
+        heatMapInstances[currentSelection].setData({data: []});
+        for (var data in historicalData) {
+            var dataPoint = {
+                x: historicalData[data].xCoordinate,
+                y: historicalData[data].yCoordinate,
+                value: historicalData[data].temperature * Math.pow(10, sensorConfigs[currentSelection].decimal)
+            };
+            if (!isDataExist(heatMapInstances[currentSelection].getData().data, dataPoint)) {
+                if (dataPoint.value > max) {
+                    max = dataPoint.value;
                 }
-                temperatureMapInstance.setDataMax(3500);
-                temperatureMapInstance.setDataMin(1800);
-                break;
-            case "Motion" :
-                motionMapInstance.setData({data: []});
-                for (var data in historicalData) {
-                    var dataPoint = {
-                        x: historicalData[data].xCoordinate,
-                        y: historicalData[data].yCoordinate,
-                        value: historicalData[data].motion * 10000
-                    };
-                    if (!isDataExist(motionMapInstance.getData().data, dataPoint)) {
-                        motionMapInstance.addData(dataPoint);
-                    }
-                }
-                motionMapInstance.setDataMin(0);
-                motionMapInstance.setDataMax(10000);
-                break;
-            case "Humidity" :
-                humidityMapInstance.setData({data: []});
-                for (var data in historicalData) {
-                    var dataPoint = {
-                        x: historicalData[data].xCoordinate,
-                        y: historicalData[data].yCoordinate,
-                        value: historicalData[data].humidity
-                    };
-                    if (!isDataExist(humidityMapInstance.getData().data, dataPoint)) {
-                        if (dataPoint.value > max) {
-                            max = dataPoint.value;
-                        }
-                        humidityMapInstance.addData(dataPoint);
-                    }
-                }
-                humidityMapInstance.setDataMin(0);
-                humidityMapInstance.setDataMax(100);
-                break;
-            case "Light" :
-                lightMapInstance.setData({data: []});
-                for (var data in historicalData) {
-                    var dataPoint = {
-                        x: historicalData[data].xCoordinate,
-                        y: historicalData[data].yCoordinate,
-                        value: 1024 - historicalData[data].light
-                    };
-                    if (!isDataExist(lightMapInstance.getData().data, dataPoint)) {
-                        if (dataPoint.value > max) {
-                            max = dataPoint.value;
-                        }
-                        lightMapInstance.addData(dataPoint)
-                    }
-                }
-                lightMapInstance.setDataMin(0);
-                lightMapInstance.setDataMax(1024);
-                break;
+                heatMapInstances[currentSelection].addData(dataPoint);
+            }
         }
-
+        heatMapInstances[currentSelection].setDataMax(sensorConfigs[currentSelection].max);
+        heatMapInstances[currentSelection].setDataMin(sensorConfigs[currentSelection].min);
     };
 
     /**
@@ -548,12 +428,7 @@ function hidePopup() {
     var updateHeatMapOnSlideChange = function () {
         var minuteToMilliseconds = 1800000;
         isSliderChanged = true;
-        switch (currentSelection) {
-            case "Temperature" :  temperatureMapInstance.setData({data:[]}); break;
-            case "Motion" : motionMapInstance.setData({data:[]});break;
-            case "Humidity" : humidityMapInstance.setData({data:[]});break;
-            case "Light" : lightMapInstance.setData({data:[]}); break;
-        }
+        heatMapInstances[currentSelection].setData({data:[]});
 
         if (!isHistoricalView) {
             var currentTime = new Date().getTime();
@@ -567,20 +442,7 @@ function hidePopup() {
             var min = rangeSlider.bootstrapSlider("getAttribute", 'min');
             currentSliderValue = rangeSlider.bootstrapSlider("getValue");
             if (currentSliderValue == 0) {
-                switch (currentSelection) {
-                    case "Temperature" :
-                        temperatureMapInstance.setData(currentTemperatureMap.getData());
-                        break;
-                    case "Motion" :
-                        motionMapInstance.setData(currentMotionMap.getData());
-                        break;
-                    case "Humidity" :
-                        humidityMapInstance.setData(currentHumidityMap.getData());
-                        break;
-                    case "Light" :
-                        lightMapInstance.setData(currentLightMap.getData());
-                        break;
-                }
+                heatMapInstances[currentSelection].setData(currentHeatmapInstance[currentSelection].getData());
             } else {
                 var effective_value = (currentSliderValue * -1)/5;
                 updateHistoricData(recentPastData[6-effective_value]);
@@ -654,31 +516,13 @@ function hidePopup() {
     });
 
     $("form input:radio").change(function () {
-        switch (currentSelection) {
-            case "Temperature" :  temperatureMapInstance.setData({data:[]}); break;
-            case "Motion" : motionMapInstance.setData({data:[]});break;
-            case "Humidity" : humidityMapInstance.setData({data:[]});break;
-            case "Light" : lightMapInstance.setData({data:[]}); break;
-        }
+        heatMapInstances[currentSelection].setData({data:[]});
 
         currentSelection = $(this).val();
 
         if (!isHistoricalView) {
             if (!isSliderChanged || currentSliderValue == rangeSlider.bootstrapSlider("getAttribute", "max")) {
-                switch (currentSelection) {
-                    case "Temperature" :
-                        temperatureMapInstance.setData(currentTemperatureMap.getData());
-                        break;
-                    case "Motion" :
-                        motionMapInstance.setData(currentMotionMap.getData());
-                        break;
-                    case "Humidity" :
-                        humidityMapInstance.setData(currentHumidityMap.getData());
-                        break;
-                    case "Light" :
-                        lightMapInstance.setData(currentLightMap.getData());
-                        break;
-                }
+                heatMapInstances[currentSelection].setData(currentHeatmapInstance[currentSelection].getData());
             } else {
                 updateHeatMapOnSlideChange();
             }
@@ -694,12 +538,7 @@ function hidePopup() {
 
         if (isHistoricalView) {
             $("#live-view").addClass("hidden");
-            switch (currentSelection) {
-                case "Temperature" :  temperatureMapInstance.setData(currentTemperatureMap.getData()); break;
-                case "Motion" : motionMapInstance.setData(currentMotionMap.getData());break;
-                case "Humidity" : humidityMapInstance.setData(currentHumidityMap.getData());break;
-                case "Light" : lightMapInstance.setData(currentLightMap.getData()); break;
-            }
+            heatMapInstances[currentSelection].setData(currentHeatmapInstance[currentSelection].getData());
             historicalSlider.bootstrapSlider("setValue", historicalSlider.bootstrapSlider("getAttribute", "max"));
             currentSliderValue = historicalSlider.bootstrapSlider("getValue");
         } else {
@@ -716,25 +555,7 @@ function hidePopup() {
     //});
 
     var updateHeatMap = function () {
-        switch (currentSelection) {
-            case "Temperature" :
-                //temperatureMapInstance.setData({data: []});
-                temperatureMapInstance.setData(currentTemperatureMap.getData());
-                break;
-            case "Motion" :
-                //motionMapInstance.setData({data: []});
-                motionMapInstance.setData(currentMotionMap.getData());
-                break;
-            case "Humidity" :
-                //humidityMapInstance.setData({data: []});
-                humidityMapInstance.setData(currentHumidityMap.getData());
-                break;
-            case "Light" :
-                //lightMapInstance.setData({data: []});
-                lightMapInstance.setData(currentLightMap.getData());
-                break;
-        }
-
+        heatMapInstances[currentSelection].setData(currentHeatmapInstance[currentSelection].getData());
     };
 
 
@@ -779,7 +600,6 @@ function hidePopup() {
      * To get the historical data for a certain period of time.
      * @param tableName Name of the table to fetch the data from
      * @param timeFrom Start time
-     * @param timeTo End time
      *
      */
     var getHistoricalData = function (action,tableName, timeFrom) {
@@ -822,7 +642,7 @@ function hidePopup() {
             legendCtx.fillRect(0, 0, 100, 10);
             $('gradient').src = legendCanvas.toDataURL();
         }
-    };
+    }
 
     /**
      * Load devices;
@@ -931,3 +751,32 @@ function getDeviceTypes() {
 }
 
 $("#device").click(getDeviceTypes);
+
+/**
+ * to get sensor configuration details
+ */
+function getSensorConfiguration() {
+    var providerUrl = context + '/api/sensors/all';
+    $.ajax({
+        url: providerUrl,
+        method: "GET",
+        contentType: "application/json",
+        async: false,
+        success: function (data) {
+            sensorConfigs = data;
+            console.log("success");
+            console.log(data);
+            for (var key in sensorConfigs) {
+                if (sensorConfigs.hasOwnProperty(key)) {
+                    sensorValues[key]={};
+                }
+            }
+            console.log(data);
+
+        },
+        error: function (err) {
+            console.log("error");
+            console.log(err);
+        }
+    });
+}
