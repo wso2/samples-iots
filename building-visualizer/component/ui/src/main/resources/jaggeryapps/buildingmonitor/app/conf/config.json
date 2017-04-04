@@ -181,5 +181,27 @@
   "isOAuthEnabled": true,
   "backendRestEndpoints": {
     "deviceMgt": "/api/device-mgt/v1.0"
+  },
+  "Sensors" : {
+    "light": {
+      "min": 1024,
+      "max": 0,
+      "decimal" : 2
+    },
+    "temperature" : {
+      "min": 1500,
+      "max": 3500,
+      "decimal" : 2
+    },
+    "motion":{
+      "min": 0,
+      "max": 10000,
+      "decimal" : 2
+    },
+    "humidity":{
+      "min": 0,
+      "max": 100,
+      "decimal" : 2
+    }
   }
 }
