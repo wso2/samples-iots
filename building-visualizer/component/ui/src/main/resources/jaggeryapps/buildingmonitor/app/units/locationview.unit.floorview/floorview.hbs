@@ -88,15 +88,20 @@
                 <div class="form-group">
                     <label for="deviceId">Device Type *</label>
                     <select id="deviceType" name="deviceType">
+                        {{#each deviceTypes}}
+                            <option value="{{this}}">{{this}}</option>
+                        {{/each}}
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="deviceId">Device Claim Id *</label>
                     <input type="text" class="form-control" id="deviceId" name="deviceId" >
                 </div>
+                {{#if permissions.OWNING_DEVICE}}
                 <div id="device-button" class="form-group">
                     <button id="enrolldevice" type="button" class="btn btn-primary" onclick="addDevice()" data-toggle="update-data">Add Device</button>
                 </div>
+                {{/if}}
             </form>
         </div>
     </div>

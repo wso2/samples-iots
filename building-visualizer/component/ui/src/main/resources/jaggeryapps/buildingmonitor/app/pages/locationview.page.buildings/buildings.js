@@ -95,6 +95,7 @@ function onRequest(context) {
 
 	serviceInvokers.XMLHttp.get(
 		url+"/devices", function (responsePayload) {
+			new Log().info(responsePayload);
 			var devices = JSON.parse(responsePayload.responseText);
 			if (devices) {
 

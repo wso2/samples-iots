@@ -173,11 +173,10 @@
     "perm:devicetype:deployment",
     "perm:senseme:enroll",
     "perm:building:add",
-    "perm:building:add",
     "perm:building:view",
     "perm:floor:add",
     "perm:floor:view",
-    "perm:building:add"
+    "perm:building:remove"
   ],
   "isOAuthEnabled": true,
   "backendRestEndpoints": {
