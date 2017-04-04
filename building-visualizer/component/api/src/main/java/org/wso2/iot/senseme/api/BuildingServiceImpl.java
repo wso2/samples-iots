@@ -18,6 +18,7 @@
 
 package org.wso2.iot.senseme.api;
 
+import org.apache.commons.collections.iterators.ObjectArrayIterator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,18 +29,15 @@ import org.wso2.carbon.analytics.dataservice.commons.SortType;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.device.mgt.common.*;
-import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationException;
 import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroup;
 import org.wso2.carbon.device.mgt.common.group.mgt.GroupAlreadyExistException;
 import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
 import org.wso2.carbon.device.mgt.common.group.mgt.RoleDoesNotExistException;
 import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
-import org.wso2.carbon.device.mgt.core.internal.DeviceManagementDataHolder;
 import org.wso2.carbon.device.mgt.core.operation.mgt.ProfileOperation;
 import org.wso2.carbon.device.mgt.core.service.GroupManagementProviderService;
 import org.wso2.carbon.user.api.Permission;
-import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
@@ -58,6 +56,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is the API which is used to control and manage building data
@@ -73,11 +72,10 @@ public class BuildingServiceImpl implements BuildingService {
     private static final String SENSEME_DEVICE_TYPE = "senseme";
     private static final String NOTIFICATION = "NOTIFICATION";
 
-
     @POST
     @Produces("application/json")
     @Override
-    public Response addBuilding(BuildingInfo building){
+    public Response addBuilding(BuildingInfo building) {
         try {
             int id;
             building.setOwner(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
@@ -107,20 +105,21 @@ public class BuildingServiceImpl implements BuildingService {
     @GET
     @Produces("application/json")
     @Override
-    public Response getRegisteredBuildings(){
+    public Response getRegisteredBuildings() {
         try {
             GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             buildingDAOManager.getBuildingDAOHandler().openConnection();
             List<BuildingInfo> buildingList = this.buildingDAO.getAllBuildings();
             List<DeviceGroup> userGroups = groupManagementProviderService
-                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
             List<BuildingInfo> authorizedBuildings = new ArrayList<>();
 
             if (isAdmin()) {
                 authorizedBuildings = buildingList;
             } else {
                 for (BuildingInfo building : buildingList) {
-                    String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, building.getBuildingId());
+                    String buildingGroupName = String
+                            .format(DeviceTypeConstants.BUILDING_GROUP_NAME, building.getBuildingId());
                     if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
                         authorizedBuildings.add(building);
                     }
@@ -128,7 +127,7 @@ public class BuildingServiceImpl implements BuildingService {
             }
             return Response.status(Response.Status.OK).entity(authorizedBuildings).build();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } finally {
@@ -187,7 +186,7 @@ public class BuildingServiceImpl implements BuildingService {
             String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId);
             GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             List<DeviceGroup> userGroups = groupManagementProviderService
-                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
             if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
                 List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
@@ -195,7 +194,6 @@ public class BuildingServiceImpl implements BuildingService {
             } else {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-
 
         } catch (SQLException e) {
             log.error(e);
@@ -213,12 +211,12 @@ public class BuildingServiceImpl implements BuildingService {
     @Path("/{buildingId}")
     @Produces("application/json")
     @Override
-    public Response getRegisteredBuilding(@PathParam("buildingId") int buildingId){
+    public Response getRegisteredBuilding(@PathParam("buildingId") int buildingId) {
         try {
             String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId);
             GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             List<DeviceGroup> userGroups = groupManagementProviderService
-                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
             if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
                 BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
@@ -246,7 +244,7 @@ public class BuildingServiceImpl implements BuildingService {
             String floorGroupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
             GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             List<DeviceGroup> userGroups = groupManagementProviderService
-                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
+                    .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
 
             if (isAdmin() || isUserAuthorizedToGroup(userGroups, floorGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
@@ -279,7 +277,8 @@ public class BuildingServiceImpl implements BuildingService {
     @Consumes("multipart/form-data")
     @Produces("application/json")
     @Override
-    public Response addFloor(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId, InputStream fileInputStream, Attachment fileDetail){
+    public Response addFloor(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId,
+            InputStream fileInputStream, Attachment fileDetail) {
         boolean status;
 
         try {
@@ -327,13 +326,15 @@ public class BuildingServiceImpl implements BuildingService {
     @GET
     @Produces("application/text")
     @Override
-    public Response test(){
+    public Response test() {
         try {
             String msg = "API works well";
             return Response.status(Response.Status.OK.getStatusCode()).entity(msg).build();
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();        }
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
+        }
     }
 
     @Override
@@ -373,10 +374,12 @@ public class BuildingServiceImpl implements BuildingService {
             }
         } catch (GroupManagementException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } catch (DeviceManagementException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         }
     }
 
@@ -390,7 +393,7 @@ public class BuildingServiceImpl implements BuildingService {
             List<DeviceGroup> userGroups = groupManagementProviderService
                     .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
             String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId);
-            Boolean[] authorizedFloors ;
+            Boolean[] authorizedFloors;
 
             if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
@@ -416,13 +419,15 @@ public class BuildingServiceImpl implements BuildingService {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
         } catch (SQLException e) {
-            log.error("Database error has occurred while trying to get the authorized floors for the building " +
-                    buildingId, e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            log.error("Database error has occurred while trying to get the authorized floors for the building "
+                    + buildingId, e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } catch (GroupManagementException e) {
             log.error("Group management error has occurref while trying to get the authorized floors for the "
                     + "building " + buildingId, e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
@@ -439,9 +444,8 @@ public class BuildingServiceImpl implements BuildingService {
             String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
             DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
             if (floorDeviceGroup != null) {
-                List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
-                        floorDeviceGroup.getGroupId(),
-                        0, 1000);
+                List<Device> devices = APIUtil.getGroupManagementProviderService()
+                        .getDevices(floorDeviceGroup.getGroupId(), 0, 1000);
                 List<DeviceIdentifier> androidDevices = new ArrayList<>();
                 for (Device device : devices) {
                     if (device.getType().equals(ANDROID_DEVICE_TYPE)) {
@@ -461,13 +465,16 @@ public class BuildingServiceImpl implements BuildingService {
             return Response.status(Response.Status.OK).build();
         } catch (GroupManagementException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } catch (OperationManagementException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } catch (InvalidDeviceException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         }
     }
 
@@ -514,15 +521,34 @@ public class BuildingServiceImpl implements BuildingService {
     @POST
     @Path("/search/notifications")
     @Consumes("application/json")
+    @Produces("application/json")
     public Response queryNotifications(QueryObject query) {
-        String query1 = "buildingId:3 and timeStamp : [1490314307321 TO 1490333687321]";
+        //        String fromDate = String.valueOf(from * 1000);
+        //        String toDate = String.valueOf(to * 1000);
+        String query1 =
+                "timeStamp: [" + (System.currentTimeMillis() - 1800000) + " TO " + System.currentTimeMillis() + "]";
+        log.info(query1);
         String sensorTableName = DeviceTypeConstants.NOTIFICATION_TABLE;
         try {
             if (sensorTableName != null) {
                 List<SortByField> sortByFields = new ArrayList<>();
-                SortByField sortByField = new SortByField("timeStamp", SortType.ASC);
+                SortByField sortByField = new SortByField("timeStamp", SortType.DESC);
                 sortByFields.add(sortByField);
                 List<SensorRecord> sensorRecords = APIUtil.getAllEventsForDevice(sensorTableName, query1, sortByFields);
+
+                double temp = 0;
+                int count = 0;
+                for (SensorRecord record : sensorRecords) {
+                    Map<String, Object> map = record.getValues();
+                    if (map.get("floorId").equals("5")) {
+                        log.info("Floor Id 5");
+                        count++;
+                        temp += (double)map.get("temperature");
+                    }
+                }
+
+                log.info("Avg temp : " + (temp/count));
+
                 return Response.status(Response.Status.OK.getStatusCode()).entity(sensorRecords).build();
             }
         } catch (AnalyticsException e) {
@@ -616,18 +642,20 @@ public class BuildingServiceImpl implements BuildingService {
             }
         } catch (GroupManagementException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } catch (DeviceManagementException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } catch (SQLException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
     }
-
 
     @Override
     @Path("/{buildingId}/devices")
@@ -643,33 +671,32 @@ public class BuildingServiceImpl implements BuildingService {
                 String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
                 DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
                 if (floorDeviceGroup != null) {
-                    DeviceInfo deviceInfo = new DeviceInfo("" +floorId);
-                    List<Device> devices = APIUtil.getGroupManagementProviderService().getDevices(
-                            floorDeviceGroup.getGroupId(),
-                            0, 1000);
+                    DeviceInfo deviceInfo = new DeviceInfo("" + floorId);
+                    List<Device> devices = APIUtil.getGroupManagementProviderService()
+                            .getDevices(floorDeviceGroup.getGroupId(), 0, 1000);
                     for (Device device : devices) {
                         if (!device.getType().equals(SENSEME_DEVICE_TYPE)) {
                             continue;
                         }
-                        if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE ||
-                                device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
+                        if (device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.ACTIVE
+                                || device.getEnrolmentInfo().getStatus() != EnrolmentInfo.Status.INACTIVE) {
                             continue;
                         }
-                        device = APIUtil.getDeviceManagementService().getDevice(new DeviceIdentifier(
-                                device.getDeviceIdentifier(), device.getType()));
+                        device = APIUtil.getDeviceManagementService()
+                                .getDevice(new DeviceIdentifier(device.getDeviceIdentifier(), device.getType()));
                         List<Device.Property> propertyList = device.getProperties();
                         if (device.getEnrolmentInfo().getStatus() == EnrolmentInfo.Status.ACTIVE) {
                             deviceInfo.increaseActive();
                             for (Device.Property property : propertyList) {
                                 switch (property.getName()) {
-                                    case "lastKnown":
-                                        if (property.getValue() != null) {
-                                            long timestamp = Long.parseLong(property.getValue());
-                                            if ((System.currentTimeMillis() - timestamp)/1000 > 3600) {
-                                                deviceInfo.increaseFault();
-                                                deviceInfo.decreaseActive();
-                                            }
+                                case "lastKnown":
+                                    if (property.getValue() != null) {
+                                        long timestamp = Long.parseLong(property.getValue());
+                                        if ((System.currentTimeMillis() - timestamp) / 1000 > 3600) {
+                                            deviceInfo.increaseFault();
+                                            deviceInfo.decreaseActive();
                                         }
+                                    }
 
                                 }
                             }
@@ -687,13 +714,16 @@ public class BuildingServiceImpl implements BuildingService {
             }
         } catch (GroupManagementException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } catch (DeviceManagementException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } catch (SQLException e) {
             log.error(e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
         } finally {
             buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
@@ -701,17 +731,18 @@ public class BuildingServiceImpl implements BuildingService {
 
     /**
      * Create user role for building and floors.
+     *
      * @param role : Role that need to be created
      * @throws UserStoreException User Store Exception
      */
     private void addRolesForBuildingsAndFloors(String role) throws UserStoreException {
-        Permission realTimeAnalytics = new Permission(DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION, CarbonConstants
-                .UI_PERMISSION_ACTION);
+        Permission realTimeAnalytics = new Permission(DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION,
+                CarbonConstants.UI_PERMISSION_ACTION);
 
         UserStoreManager userStoreManager = APIUtil.getUserStoreManager();
         if (userStoreManager != null) {
             if (!userStoreManager.isExistingRole(role)) {
-                userStoreManager.addRole(role, null, new Permission[]{realTimeAnalytics});
+                userStoreManager.addRole(role, null, new Permission[] { realTimeAnalytics });
             }
         } else {
             log.error("User Store Manager cannot found.");
@@ -739,10 +770,11 @@ public class BuildingServiceImpl implements BuildingService {
             buildingFloorGroup.setOwner(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
             buildingFloorGroup.setName(groupName);
             buildingFloorGroup.setDescription(description);
-            groupManagementProviderService.createGroup(buildingFloorGroup, role, new String[] { DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION });
+            groupManagementProviderService.createGroup(buildingFloorGroup, role,
+                    new String[] { DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION });
             buildingFloorGroup = groupManagementProviderService.getGroup(groupName);
-            groupManagementProviderService.manageGroupSharing(buildingFloorGroup.getGroupId(), new ArrayList<>(Arrays
-                    .asList(role)));
+            groupManagementProviderService
+                    .manageGroupSharing(buildingFloorGroup.getGroupId(), new ArrayList<>(Arrays.asList(role)));
         } catch (GroupManagementException e) {
             throw new DeviceTypeException("Error occurred while creting group with the name " + groupName, e);
         } catch (GroupAlreadyExistException e) {
@@ -754,12 +786,13 @@ public class BuildingServiceImpl implements BuildingService {
 
     /**
      * Whether user is authorized to view a group.
+     *
      * @param userGroups User Groups
-     * @param groupName Group Name
+     * @param groupName  Group Name
      * @return true if the user is authorized view the particular group unless false.
      */
     private boolean isUserAuthorizedToGroup(List<DeviceGroup> userGroups, String groupName) {
-        for (DeviceGroup userGroup: userGroups) {
+        for (DeviceGroup userGroup : userGroups) {
             if (userGroup.getName().equals(groupName)) {
                 return true;
             }
@@ -769,13 +802,14 @@ public class BuildingServiceImpl implements BuildingService {
 
     /**
      * To check whether current user is admin
+     *
      * @return true if current user is admin, otherwise returns false;
      */
     private boolean isAdmin() {
         try {
-            return APIUtil.getAuthorizationManager().isUserAuthorized(PrivilegedCarbonContext
-                    .getThreadLocalCarbonContext().getUsername(), CarbonConstants.UI_ADMIN_PERMISSION_COLLECTION,
-                    CarbonConstants.UI_PERMISSION_ACTION);
+            return APIUtil.getAuthorizationManager()
+                    .isUserAuthorized(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername(),
+                            CarbonConstants.UI_ADMIN_PERMISSION_COLLECTION, CarbonConstants.UI_PERMISSION_ACTION);
 
         } catch (UserStoreException e) {
             log.error(e);
