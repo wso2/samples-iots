@@ -49,7 +49,7 @@ function hidePopup() {
     var historicalSlider;
     var isSliderChanged = false;
     var currentSliderValue = 0;
-    var currentSelection = "temperature";
+    var currentSelection = $("form input:radio").val();
     var isHistoricalView = false;
     var timeouts = [];
     var heatMapConfig = {
@@ -96,6 +96,7 @@ function hidePopup() {
             $('#image').css('cursor', 'default');
         } else {
             isAddDeviceMode = true;
+            getDeviceTypes();
             $('#image').css('cursor', 'crosshair');
             $("#device").text("Cancel");
         }
@@ -278,6 +279,8 @@ function hidePopup() {
     };
 
     $(document).ready(function(){
+        console.log("current");
+        console.log(currentSelection);
         getSensorConfiguration();
         intializeWebsockets();
         createHeatMap();
@@ -409,8 +412,9 @@ function hidePopup() {
             var dataPoint = {
                 x: historicalData[data].xCoordinate,
                 y: historicalData[data].yCoordinate,
-                value: historicalData[data].temperature * Math.pow(10, sensorConfigs[currentSelection].decimal)
+                value: historicalData[data][currentSelection] * Math.pow(10, sensorConfigs[currentSelection].decimal)
             };
+
             if (!isDataExist(heatMapInstances[currentSelection].getData().data, dataPoint)) {
                 if (dataPoint.value > max) {
                     max = dataPoint.value;
@@ -752,7 +756,7 @@ function getDeviceTypes() {
     });
 }
 
-$("#device").click(getDeviceTypes);
+// $("#device").click(getDeviceTypes);
 
 /**
  * to get sensor configuration details

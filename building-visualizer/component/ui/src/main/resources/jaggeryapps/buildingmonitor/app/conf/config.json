@@ -186,7 +186,7 @@
     "light": {
       "min": 1024,
       "max": 0,
-      "decimal" : 2
+      "decimal" : 0
     },
     "temperature" : {
       "min": 1500,
@@ -196,12 +196,12 @@
     "motion":{
       "min": 0,
       "max": 10000,
-      "decimal" : 2
+      "decimal" : 4
     },
     "humidity":{
       "min": 0,
       "max": 100,
-      "decimal" : 2
+      "decimal" : 0
     }
   }
 }
