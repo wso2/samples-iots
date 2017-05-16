@@ -17,10 +17,19 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import org.wso2.androidtv.agent.mqtt.transport.MQTTTransportHandler;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This is used to store the values in either in memory or in shared preferences.
@@ -38,6 +47,7 @@ public class LocalRegistry {
     private static final String MQTT_ENDPOINT_KEY = "mqttEndpointKey";
     private static final String IS_ENROLLED_KEY = "enrolledKey";
     private static final String TENANT_DOMAIN_KEY = "tenantDomainKey";
+    private static final String EDGE_DEVICES_KEY = "edgeDevicesKey";
     private static boolean exists = false;
     private static String username;
     private static String deviceId;
@@ -45,6 +55,7 @@ public class LocalRegistry {
     private static MQTTTransportHandler mqttTransportHandler;
     private static volatile String accessToken;
     private static volatile String refreshToken;
+    private static volatile HashSet<String> edgeDevices = new HashSet<>();
     private static String consumerKey;
     private static String consumerSecret;
     private static String mqttEndpoint;
@@ -320,4 +331,39 @@ public class LocalRegistry {
         }
     }
 
+    public static synchronized void addEdgeDevice(Context context, String serial) {
+        LocalRegistry.edgeDevices.add(serial);
+        Gson gson = new GsonBuilder().create();
+        String json = gson.toJson(LocalRegistry.edgeDevices);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(SENSE_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString(EDGE_DEVICES_KEY, json);
+        editor.apply();
+    }
+
+    public static synchronized void removeEdgeDevice(Context context, String serial) {
+        if (LocalRegistry.edgeDevices.isEmpty()) {
+            return;
+        }
+        LocalRegistry.edgeDevices.remove(serial);
+        Gson gson = new GsonBuilder().create();
+        String json = gson.toJson(LocalRegistry.edgeDevices);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(SENSE_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString(EDGE_DEVICES_KEY, json);
+        editor.apply();
+    }
+
+    public static synchronized HashSet<String> getEdgeDevices(Context context) throws IOException {
+        if (LocalRegistry.edgeDevices.isEmpty()) {
+            SharedPreferences sharedpreferences = context.getSharedPreferences(SENSE_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+            String edgeDevicesJsonString = sharedpreferences.getString(EDGE_DEVICES_KEY, null);
+            if (edgeDevicesJsonString != null) {
+                Gson gson = new Gson();
+                Type type = new TypeToken<HashSet<String>>(){}.getType();
+                LocalRegistry.edgeDevices = gson.fromJson(edgeDevicesJsonString, type);
+            }
+        }
+        return LocalRegistry.edgeDevices;
+    }
 }

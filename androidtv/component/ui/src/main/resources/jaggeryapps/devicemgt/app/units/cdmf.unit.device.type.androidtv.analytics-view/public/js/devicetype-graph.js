@@ -17,7 +17,7 @@
  */
 
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
-var sensorType1 = "s1";
+var sensorType1 = "at_response";
 var sensorType2 = "s2";
 var sensorType1Graph;
 var sensorType2Graph;

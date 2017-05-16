@@ -20,9 +20,7 @@
     <property name="project-name" value="${ant.project.name}"/>
     <property name="target-dir" value="target/carbonapps"/>
     <property name="src-dir" value="src/main/resources/carbonapps"/>
-    <property name="sensorType1_dir" value="s1"/>
-    <property name="sensorType2_dir" value="s2"/>
-    <property name="sensorType3_dir" value="s3"/>
+    <property name="sensorType1_dir" value="at_response"/>
     <target name="clean">
         <delete dir="${target-dir}" />
     </target>
@@ -30,12 +28,6 @@
         <mkdir dir="${target-dir}"/>
         <zip destfile="${target-dir}/${sensorType1_dir}.car">
             <zipfileset dir="${src-dir}/${sensorType1_dir}"/>
-        </zip>
-        <zip destfile="${target-dir}/${sensorType2_dir}.car">
-            <zipfileset dir="${src-dir}/${sensorType2_dir}"/>
-        </zip>
-        <zip destfile="${target-dir}/${sensorType3_dir}.car">
-            <zipfileset dir="${src-dir}/${sensorType3_dir}"/>
         </zip>
     </target>
 </project>

@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.androidtv.agent.services;
 
 import android.app.DownloadManager;
@@ -28,11 +46,15 @@ import org.wso2.androidtv.agent.VideoActivity;
 import org.wso2.androidtv.agent.constants.TVConstants;
 import org.wso2.androidtv.agent.mqtt.AndroidTVMQTTHandler;
 import org.wso2.androidtv.agent.mqtt.MessageReceivedCallback;
+import org.wso2.androidtv.agent.mqtt.transport.TransportHandlerException;
+import org.wso2.androidtv.agent.util.AndroidTVUtils;
+import org.wso2.androidtv.agent.util.LocalRegistry;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
+import java.util.Calendar;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -157,7 +179,8 @@ public class DeviceManagementService extends Service {
         });
         androidTVMQTTHandler.connect();
         mHandler = new UsbServiceHandler(this);
-        startService(UsbService.class, usbConnection, null); // Start UsbService(if it was not started before) and Bind it
+        // Start UsbService(if it was not started before) and Bind it
+        startService(UsbService.class, usbConnection, null);
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
     }
 
@@ -184,6 +207,12 @@ public class DeviceManagementService extends Service {
                 break;
             case "config-url":
                 configureXBee(payload);
+                break;
+            case "xbee-add":
+                LocalRegistry.addEdgeDevice(getApplicationContext(), payload);
+                break;
+            case "xbee-remove":
+                LocalRegistry.removeEdgeDevice(getApplicationContext(), payload);
                 break;
             default:
                 if (usbService != null) { // if UsbService was correctly bind, Send data
@@ -213,7 +242,32 @@ public class DeviceManagementService extends Service {
             waitFlag = false;
         } else {
             Log.i(TAG, "Message> " + message);
+            try {
+                JSONObject jsonEvent = new JSONObject();
+                JSONObject jsonMetaData = new JSONObject();
+                jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
+                jsonMetaData.put("deviceId", getDeviceId());
+                jsonMetaData.put("type", TVConstants.DEVICE_TYPE);
+                jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
+                jsonEvent.put("metaData", jsonMetaData);
+
+                JSONObject payload = new JSONObject();
+                payload.put("serial", "0000000000000000");
+                payload.put("at_response", message);
+                jsonEvent.put("payloadData", payload);
+
+
+                JSONObject wrapper = new JSONObject();
+                wrapper.put("event", jsonEvent);
+                androidTVMQTTHandler.publishDeviceData(wrapper.toString());
+            } catch (TransportHandlerException | JSONException e) {
+                Log.e(TAG, e.getClass().getSimpleName(), e);
+            }
         }
+    }
+
+    private String getDeviceId() {
+        return AndroidTVUtils.generateDeviceId(getBaseContext(), getContentResolver());
     }
 
     private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {

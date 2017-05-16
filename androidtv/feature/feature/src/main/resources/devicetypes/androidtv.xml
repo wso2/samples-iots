@@ -46,6 +46,16 @@
                 </QueryParameters>
             </Operation>
         </Feature>
+        <Feature code="xbee">
+            <Name>Add XBee edge device</Name>
+            <Description>Add XBee edge device to Android TV gateway</Description>
+            <Operation context="/androidtv/device/{deviceId}/xbee" method="POST">
+                <QueryParameters>
+                    <Parameter>name</Parameter>
+                    <Parameter>serial</Parameter>
+                </QueryParameters>
+            </Operation>
+        </Feature>
     </Features>
 
     <ProvisioningConfig>

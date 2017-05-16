@@ -41,4 +41,5 @@ dependencies {
     compile 'com.netflix.feign:feign-jackson:8.16.0'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
     compile 'com.github.felHR85:UsbSerial:4.5'
+    compile 'com.google.code.gson:gson:2.4'
 }

@@ -48,7 +48,7 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
     private static final String TAG = AndroidTVMQTTHandler.class.getSimpleName();
 
     private MessageReceivedCallback messageReceivedCallback;
-
+    private String publishTopic;
     private Context context;
 
     /**
@@ -58,6 +58,8 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
         super(context);
         this.context = context;
         this.messageReceivedCallback = messageReceivedCallback;
+        this.publishTopic = LocalRegistry.getTenantDomain(context)+ "/" + TVConstants.DEVICE_TYPE + "/" +
+                LocalRegistry.getDeviceId(context) + "/at_response";
     }
 
     /**
@@ -137,11 +139,16 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
      */
     @Override
     public void publishDeviceData(String... publishData) throws TransportHandlerException {
-        if (publishData.length != 4) {
+        if (publishData.length < 1 || publishData.length > 2) {
             String errorMsg = "Incorrect number of arguments received to SEND-MQTT Message. " +
-                    "Need to be [owner, deviceId, content]";
+                    "Need to be [content, topic*] topic is optional";
             Log.e(TAG, errorMsg);
             throw new TransportHandlerException(errorMsg);
+        }
+        if (publishData.length == 2) {
+            publishToQueue(publishData[1], publishData[0]);
+        } else {
+            publishToQueue(publishTopic, publishData[0]);
         }
     }
 
