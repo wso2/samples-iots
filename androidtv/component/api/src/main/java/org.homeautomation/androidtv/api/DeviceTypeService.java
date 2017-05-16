@@ -18,7 +18,16 @@
 
 package org.homeautomation.androidtv.api;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Extension;
+import io.swagger.annotations.ExtensionProperty;
+import io.swagger.annotations.Info;
+import io.swagger.annotations.ResponseHeader;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import org.homeautomation.androidtv.api.constants.AndroidTVConstants;
 import org.wso2.carbon.apimgt.annotations.api.Scope;
 import org.wso2.carbon.apimgt.annotations.api.Scopes;
@@ -172,6 +181,62 @@ public interface DeviceTypeService {
                     value = "The message to be displayed.",
                     required = true)
             @QueryParam("message") String message);
+
+    /**
+     * End point to configure XBee gateway of Android TV device.
+     */
+    @POST
+    @Path("device/{deviceId}/xbee-config")
+    @ApiOperation(
+            httpMethod = "POST",
+            value = "Configure XBee gateway of Android TV device",
+            notes = "",
+            response = Response.class,
+            tags = "androidtv",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK.",
+                    response = Response.class,
+                    responseHeaders = {
+                            @ResponseHeader(
+                                    name = "Content-Type",
+                                    description = "The content type of the body"),
+                            @ResponseHeader(
+                                    name = "Last-Modified",
+                                    description = "Date and time the resource was last modified.\n" +
+                                                  "Used by caches, or in conditional requests."),
+                    }),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request. \n Invalid Device Identifiers found.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized. \n Unauthorized request."),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. \n Error occurred while executing command operation to"
+                              + " send threashold",
+                    response = Response.class)
+    })
+    Response configureXBeeDevice(
+            @ApiParam(
+                    name = "deviceId",
+                    value = "The registered device Id.",
+                    required = true)
+            @PathParam("deviceId") String deviceId,
+            @ApiParam(
+                    name = "config-url",
+                    value = "XBee configuration url for gateway device.",
+                    required = true)
+            @QueryParam("config-url") String url);
 
     /**
      * Enroll devices.

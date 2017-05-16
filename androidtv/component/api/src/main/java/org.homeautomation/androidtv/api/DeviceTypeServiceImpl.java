@@ -23,7 +23,12 @@ import org.apache.commons.logging.LogFactory;
 import org.homeautomation.androidtv.api.constants.AndroidTVConstants;
 import org.homeautomation.androidtv.api.util.APIUtil;
 import org.homeautomation.androidtv.api.util.AndroidConfiguration;
-import org.wso2.carbon.device.mgt.common.*;
+import org.json.JSONObject;
+import org.wso2.carbon.device.mgt.common.Device;
+import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
+import org.wso2.carbon.device.mgt.common.DeviceManagementException;
+import org.wso2.carbon.device.mgt.common.EnrolmentInfo;
+import org.wso2.carbon.device.mgt.common.InvalidDeviceException;
 import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationException;
 import org.wso2.carbon.device.mgt.common.configuration.mgt.ConfigurationManagementException;
 import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroupConstants;
@@ -56,6 +61,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
      */
     @POST
     @Path("device/{deviceId}/video")
+    @Override
     public Response playVideo(@PathParam("deviceId") String deviceId, @QueryParam("url") String url) {
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
@@ -63,13 +69,18 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                    + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command/video";
+                                  + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command";
 
             Operation commandOp = new CommandOperation();
             commandOp.setCode("video");
             commandOp.setType(Operation.Type.COMMAND);
             commandOp.setEnabled(true);
-            commandOp.setPayLoad(URLEncoder.encode(url, "UTF-8"));
+
+            JSONObject payload = new JSONObject();
+            payload.put("action", commandOp.getCode());
+            payload.put("payload", URLEncoder.encode(url, "UTF-8"));
+
+            commandOp.setPayLoad(payload.toString());
 
             Properties props = new Properties();
             props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
@@ -100,6 +111,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
      */
     @POST
     @Path("device/{deviceId}/message")
+    @Override
     public Response sendMessage(@PathParam("deviceId") String deviceId, @QueryParam("message") String message) {
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
@@ -107,13 +119,18 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                    + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command/message";
+                                  + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command";
 
             Operation commandOp = new CommandOperation();
             commandOp.setCode("message");
             commandOp.setType(Operation.Type.COMMAND);
             commandOp.setEnabled(true);
-            commandOp.setPayLoad(message);
+
+            JSONObject payload = new JSONObject();
+            payload.put("action", commandOp.getCode());
+            payload.put("payload", message);
+
+            commandOp.setPayLoad(payload.toString());
 
             Properties props = new Properties();
             props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
@@ -125,6 +142,56 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                     deviceIdentifiers);
             return Response.ok().build();
         } catch (InvalidDeviceException e) {
+            String msg = "Invalid Device Identifiers found.";
+            log.error(msg, e);
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (DeviceAccessAuthorizationException e) {
+            log.error(e.getErrorMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } catch (OperationManagementException e) {
+            log.error("Error occurred while executing command operation to remove words", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * End point to configure XBee gateway of Android TV device.
+     */
+    @POST
+    @Path("device/{deviceId}/xbee-config")
+    @Override
+    public Response configureXBeeDevice(@PathParam("deviceId") String deviceId,
+                                        @QueryParam("config-url") String url) {
+        try {
+            if (!APIUtil.getDeviceAccessAuthorizationService()
+                    .isUserAuthorized(new DeviceIdentifier(deviceId, AndroidTVConstants.DEVICE_TYPE),
+                                      DeviceGroupConstants.Permissions.DEFAULT_OPERATOR_PERMISSIONS)) {
+                return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
+            }
+            String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
+                                  + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command";
+
+            Operation commandOp = new CommandOperation();
+            commandOp.setCode("config-url");
+            commandOp.setType(Operation.Type.COMMAND);
+            commandOp.setEnabled(true);
+
+            JSONObject payload = new JSONObject();
+            payload.put("action", commandOp.getCode());
+            payload.put("payload", URLEncoder.encode(url, "UTF-8"));
+
+            commandOp.setPayLoad(payload.toString());
+
+            Properties props = new Properties();
+            props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
+            commandOp.setProperties(props);
+
+            List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+            deviceIdentifiers.add(new DeviceIdentifier(deviceId, AndroidTVConstants.DEVICE_TYPE));
+            APIUtil.getDeviceManagementService().addOperation(AndroidTVConstants.DEVICE_TYPE, commandOp,
+                                                              deviceIdentifiers);
+            return Response.ok().build();
+        } catch (InvalidDeviceException | UnsupportedEncodingException e) {
             String msg = "Invalid Device Identifiers found.";
             log.error(msg, e);
             return Response.status(Response.Status.BAD_REQUEST).build();

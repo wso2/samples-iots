@@ -37,6 +37,15 @@
                 </QueryParameters>
             </Operation>
         </Feature>
+        <Feature code="xbee-config">
+            <Name>Configure XBee gateway</Name>
+            <Description>Configure XBee gateway of Android TV device</Description>
+            <Operation context="/androidtv/device/{deviceId}/xbee-config" method="POST">
+                <QueryParameters>
+                    <Parameter>config-url</Parameter>
+                </QueryParameters>
+            </Operation>
+        </Feature>
     </Features>
 
     <ProvisioningConfig>
