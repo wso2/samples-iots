@@ -20,6 +20,28 @@
         .thumbnail.icon:before {
             padding-top: 0;
         }
+        .tab-responsive .arrow-left{
+            display: none;
+        }
+        #edge-device-data td{
+            vertical-align: middle;
+        }
+        #edge-device-data .form-group{
+            margin-right: 10px;
+        }
+        #edge-device-data .btn-small{
+            padding: 5px 20px;
+        }
+        #edge-device-data p{
+            margin: 0px;
+        }
+        #edge-device-data .btn-remove-device{
+            margin: 0px;
+            padding: 5px 20px;
+        }
+        #edge-device-data .btn-remove-device i{
+            font-size: 0.7em;
+        }
     </style>
 {{/zone}}
 
@@ -42,5 +64,24 @@
 {{/zone}}
 
 {{#zone "device-view-tab-contents"}}
+    <div id="edge-device-details" data-deviceid="{{device.deviceIdentifier}}">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Device Name</th>
+                <th>Serial Number</th>
+                <th class="text-center">Command</th>
+                <th>Incoming Message</th>
+                <th class="text-center">Utilities</th>
+            </tr>
+            </thead>
+            <tbody id="edge-device-data">
 
+            </tbody>
+        </table>
+    </div>
+{{/zone}}
+
+{{#zone "bottomJs"}}
+    {{js "js/edge-data.js"}}
 {{/zone}}
