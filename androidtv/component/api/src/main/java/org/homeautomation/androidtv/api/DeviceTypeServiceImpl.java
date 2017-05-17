@@ -270,8 +270,8 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             payload.put("command", command);
 
             JSONObject payloadWrapper = new JSONObject();
-            payload.put("action", commandOp.getCode());
-            payload.put("payload", payload);
+            payloadWrapper.put("action", commandOp.getCode());
+            payloadWrapper.put("payload", payload);
 
             commandOp.setPayLoad(payloadWrapper.toString());
 
