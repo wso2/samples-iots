@@ -64,7 +64,8 @@
 {{/zone}}
 
 {{#zone "device-view-tab-contents"}}
-    <div id="edge-device-details" data-deviceid="{{device.deviceIdentifier}}">
+    <div id="edge-device-details" data-deviceid="{{device.deviceIdentifier}}"
+         data-websocketurlStream="{{websocketendpoint}}">
         <table class="table table-striped">
             <thead>
             <tr>
@@ -83,5 +84,7 @@
 {{/zone}}
 
 {{#zone "bottomJs"}}
+    {{js "js/moment.min.js"}}
+    {{js "js/socket.io.min.js"}}
     {{js "js/edge-data.js"}}
 {{/zone}}

@@ -27,8 +27,33 @@ function onRequest(context) {
 	if (deviceType != null && deviceType != undefined && deviceId != null && deviceId != undefined) {
 		var deviceModule = require("/app/modules/business-controllers/device.js")["deviceModule"];
 		var device = deviceModule.viewDevice(deviceType, deviceId);
+
+		var log = new Log("stats.js");
+		var carbonServer = require("carbon").server;
+		var device = context.unit.params.device;
+		var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
+		var constants = require("/app/modules/constants.js");
+		var websocketEndpoint = devicemgtProps["wssURL"].replace("https", "wss");
+		var jwtService = carbonServer.osgiService(
+			'org.wso2.carbon.identity.jwt.client.extension.service.JWTClientManagerService');
+		var jwtClient = jwtService.getJWTClient();
+		var encodedClientKeys = session.get(constants["ENCODED_TENANT_BASED_WEB_SOCKET_CLIENT_CREDENTIALS"]);
+		var token = "";
+		if (encodedClientKeys) {
+			var tokenUtil = require("/app/modules/oauth/token-handler-utils.js")["utils"];
+			var resp = tokenUtil.decode(encodedClientKeys).split(":");
+			var tokenPair = jwtClient.getAccessToken(resp[0], resp[1], context.user.username,"default", {});
+			if (tokenPair) {
+				token = tokenPair.accessToken;
+			}
+			var websocketToken= {'name':'websocket-token','value': token, 'path':'/', "maxAge":18000};
+			response.addCookie(websocketToken);
+		}
+		var websocketEndpointForStream1 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.at_response/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+
 		if (device && device.status != "error") {
-			return {"device": device.content, "autoCompleteParams" : autoCompleteParams, "encodedFeaturePayloads": ""};
+			return {"device": device.content, "autoCompleteParams" : autoCompleteParams, "encodedFeaturePayloads": "",
+				"websocketendpoint" : websocketEndpointForStream1};
 		} else {
 			response.sendError(404, "Device Id " + deviceId + " of type " + deviceType + " cannot be found!");
 			exit();
