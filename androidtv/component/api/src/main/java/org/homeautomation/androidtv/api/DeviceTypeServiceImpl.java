@@ -18,6 +18,8 @@
 
 package org.homeautomation.androidtv.api;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.homeautomation.androidtv.api.constants.AndroidTVConstants;
@@ -45,6 +47,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -101,7 +104,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             log.error(e.getErrorMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } catch (OperationManagementException e) {
-            log.error("Error occurred while executing command operation to remove words", e);
+            log.error("Error occurred while executing command operation", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -150,7 +153,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             log.error(e.getErrorMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } catch (OperationManagementException e) {
-            log.error("Error occurred while executing command operation to remove words", e);
+            log.error("Error occurred while executing command operation", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -200,7 +203,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             log.error(e.getErrorMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } catch (OperationManagementException e) {
-            log.error("Error occurred while executing command operation to remove words", e);
+            log.error("Error occurred while executing command operation", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -220,28 +223,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                                       DeviceGroupConstants.Permissions.DEFAULT_OPERATOR_PERMISSIONS)) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
-            String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                                  + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command";
-
-            Operation commandOp = new CommandOperation();
-            commandOp.setCode("xbee-add");
-            commandOp.setType(Operation.Type.COMMAND);
-            commandOp.setEnabled(true);
-
-            JSONObject payload = new JSONObject();
-            payload.put("action", commandOp.getCode());
-            payload.put("payload", serial);
-
-            commandOp.setPayLoad(payload.toString());
-
-            Properties props = new Properties();
-            props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
-            commandOp.setProperties(props);
-
-            List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
-            deviceIdentifiers.add(new DeviceIdentifier(deviceId, AndroidTVConstants.DEVICE_TYPE));
-            APIUtil.getDeviceManagementService().addOperation(AndroidTVConstants.DEVICE_TYPE, commandOp,
-                                                              deviceIdentifiers);
+            sendAddEdgeDeviceNotification(deviceId, serial);
             EdgeDevice edgeDevice = new EdgeDevice();
             edgeDevice.setEdgeDeviceSerial(serial);
             edgeDevice.setGatewayId(deviceId);
@@ -256,9 +238,88 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             log.error(e.getClass().getSimpleName(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } catch (OperationManagementException e) {
-            log.error("Error occurred while executing command operation to remove words", e);
+            log.error("Error occurred while executing command operation", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    /**
+     * End point to Send command to XBee edge device connected with Android TV gateway.
+     */
+    @Override
+    @POST
+    @Path("device/{deviceId}/xbee-command")
+    public Response sendCommandToEdgeDevice(@PathParam("deviceId") String deviceId,
+                                            @QueryParam("serial") String serial,
+                                            @QueryParam("command") String command) {
+        try {
+            if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
+                                                                                                     AndroidTVConstants.DEVICE_TYPE), DeviceGroupConstants.Permissions.DEFAULT_OPERATOR_PERMISSIONS)) {
+                return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
+            }
+            String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
+                                  + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command";
+
+            Operation commandOp = new CommandOperation();
+            commandOp.setCode("xbee-command");
+            commandOp.setType(Operation.Type.COMMAND);
+            commandOp.setEnabled(true);
+
+            JSONObject payload = new JSONObject();
+            payload.put("serial", serial);
+            payload.put("command", command);
+
+            JSONObject payloadWrapper = new JSONObject();
+            payload.put("action", commandOp.getCode());
+            payload.put("payload", payload);
+
+            commandOp.setPayLoad(payloadWrapper.toString());
+
+            Properties props = new Properties();
+            props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
+            commandOp.setProperties(props);
+
+            List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+            deviceIdentifiers.add(new DeviceIdentifier(deviceId, AndroidTVConstants.DEVICE_TYPE));
+            APIUtil.getDeviceManagementService().addOperation(AndroidTVConstants.DEVICE_TYPE, commandOp,
+                                                              deviceIdentifiers);
+            return Response.ok().build();
+        } catch (InvalidDeviceException e) {
+            String msg = "Invalid Device Identifiers found.";
+            log.error(msg, e);
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (DeviceAccessAuthorizationException e) {
+            log.error(e.getErrorMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } catch (OperationManagementException e) {
+            log.error("Error occurred while executing command operation", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    private void sendAddEdgeDeviceNotification(String deviceId, String serial)
+            throws OperationManagementException, InvalidDeviceException {
+        String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
+                              + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command";
+        Operation commandOp = new CommandOperation();
+        commandOp.setCode("xbee-add");
+        commandOp.setType(Operation.Type.COMMAND);
+        commandOp.setEnabled(true);
+
+        JSONObject payload = new JSONObject();
+        payload.put("action", commandOp.getCode());
+        payload.put("payload", serial);
+
+        commandOp.setPayLoad(payload.toString());
+
+        Properties props = new Properties();
+        props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
+        commandOp.setProperties(props);
+
+        List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+        deviceIdentifiers.add(new DeviceIdentifier(deviceId, AndroidTVConstants.DEVICE_TYPE));
+        APIUtil.getDeviceManagementService().addOperation(AndroidTVConstants.DEVICE_TYPE, commandOp,
+                                                          deviceIdentifiers);
     }
 
     /**
@@ -309,7 +370,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             log.error(e.getClass().getSimpleName(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } catch (OperationManagementException e) {
-            log.error("Error occurred while executing command operation to remove words", e);
+            log.error("Error occurred while executing command operation", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -328,7 +389,10 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
             List<EdgeDevice> edgeDevices = APIUtil.getDeviceTypeManagementService().getAllEdgeDevices(deviceId);
-            return Response.ok().entity(edgeDevices).build();
+            Gson gson = new Gson();
+            Type listType = new TypeToken<List<EdgeDevice>>() {}.getType();
+            String jsonString = gson.toJson(edgeDevices, listType);
+            return Response.ok().entity(jsonString).build();
         } catch (DeviceAccessAuthorizationException | DeviceManagementException e) {
             log.error(e.getClass().getSimpleName(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
@@ -366,7 +430,15 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 AndroidConfiguration androidConfiguration = new AndroidConfiguration();
                 androidConfiguration.setTenantDomain(APIUtil.getAuthenticatedUserTenantDomain());
                 androidConfiguration.setMqttEndpoint(APIUtil.getMqttEndpoint());
-                        return Response.ok(androidConfiguration.toString()).build();
+                List<EdgeDevice> edgeDevices = APIUtil.getDeviceTypeManagementService().getAllEdgeDevices(deviceId);
+                for (EdgeDevice edgeDevice : edgeDevices) {
+                    try {
+                        sendAddEdgeDeviceNotification(deviceId, edgeDevice.getEdgeDeviceSerial());
+                    } catch (OperationManagementException | InvalidDeviceException e) {
+                        log.error(e.getClass().getSimpleName(), e);
+                    }
+                }
+                return Response.ok(androidConfiguration.toString()).build();
             } else {
                 return Response.status(Response.Status.NOT_ACCEPTABLE.getStatusCode()).entity(false).build();
             }

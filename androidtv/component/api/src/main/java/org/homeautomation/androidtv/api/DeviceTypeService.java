@@ -303,6 +303,67 @@ public interface DeviceTypeService {
             @QueryParam("name") String name);
 
     /**
+     * End point to Send command to XBee edge device connected with Android TV gateway.
+     */
+    @POST
+    @Path("device/{deviceId}/xbee-command")
+    @ApiOperation(
+            httpMethod = "POST",
+            value = "Send command to XBee edge device connected with Android TV gateway",
+            notes = "",
+            response = Response.class,
+            tags = "androidtv",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK.",
+                    response = Response.class,
+                    responseHeaders = {
+                            @ResponseHeader(
+                                    name = "Content-Type",
+                                    description = "The content type of the body"),
+                            @ResponseHeader(
+                                    name = "Last-Modified",
+                                    description = "Date and time the resource was last modified.\n" +
+                                                  "Used by caches, or in conditional requests."),
+                    }),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request. \n Invalid Device Identifiers found.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized. \n Unauthorized request."),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. \n Error occurred while executing command operation to"
+                              + " send threshold",
+                    response = Response.class)
+    })
+    Response sendCommandToEdgeDevice(
+            @ApiParam(
+                    name = "deviceId",
+                    value = "The registered device Id.",
+                    required = true)
+            @PathParam("deviceId") String deviceId,
+            @ApiParam(
+                    name = "serial",
+                    value = "Serial number of the Xbee edge module.",
+                    required = true)
+            @QueryParam("serial") String serial,
+            @ApiParam(
+                    name = "command",
+                    value = "Command to be send",
+                    required = true)
+            @QueryParam("command") String command);
+
+    /**
      * End point to remove XBee edge device to Android TV gateway.
      */
     @DELETE
