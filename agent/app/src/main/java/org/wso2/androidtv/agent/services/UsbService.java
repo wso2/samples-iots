@@ -158,7 +158,7 @@ public class UsbService extends Service {
     /*
      * This function will be called from MainActivity to write data through Serial Port
      */
-    public void write(byte[] data) {
+    public synchronized void write(byte[] data) {
         Log.d(TAG, "Tx: " + new String(data));
         if (serialPort != null) {
             serialPort.write(data);

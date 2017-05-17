@@ -51,11 +51,14 @@ import org.wso2.androidtv.agent.util.AndroidTVUtils;
 import org.wso2.androidtv.agent.util.LocalRegistry;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -67,27 +70,31 @@ public class DeviceManagementService extends Service {
     private AndroidTVMQTTHandler androidTVMQTTHandler;
     private UsbService usbService;
     private UsbServiceHandler mHandler;
+    private Timer timer;
     private boolean hasPendingConfigDownload = false;
     private long downloadId = -1;
     private static volatile boolean waitFlag = false;
-    private String incomingMessage = "";
+    private static volatile String serialOfCurrentEdgeDevice = "";
+    private static volatile String incomingMessage = "";
 
     private DownloadManager downloadManager;
 
     private final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-            usbService = ((UsbService.UsbBinder) arg1).getService();
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            usbService = ((UsbService.UsbBinder) iBinder).getService();
             usbService.setHandler(mHandler);
+            timer.schedule(timerTask, 60000, 60000);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
+            timer.cancel();
             usbService = null;
         }
     };
 
-    BroadcastReceiver configDownloadReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver configDownloadReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             long currentId = extras.getLong(DownloadManager.EXTRA_DOWNLOAD_ID);
@@ -133,18 +140,44 @@ public class DeviceManagementService extends Service {
                         }
                         sendConfigLine("ATWR\r");
                         sendConfigLine("ATAC\r");
-                        sendConfigLine("ATCN\r");
                     } catch (Exception e) {
                         usbService.write("ATNR0\r".getBytes());
                         Log.e(TAG, e.getMessage(), e);
                     }
                     Log.i(TAG, "Configs updated");
-                    usbService.write("ATND\r".getBytes());
+                    waitFlag = true;
+                    usbService.write("ATCN\r".getBytes());
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Log.e(TAG, e.getMessage(), e);
+                    }
                 }
             }
         };
         new Thread(installConfigThread).start();
     }
+
+    private TimerTask timerTask = new TimerTask() {
+        public void run() {
+            try {
+                for (String serial : LocalRegistry.getEdgeDevices(getApplicationContext())) {
+                    serialOfCurrentEdgeDevice = serial;
+                    String serialH = serial.substring(0, serial.length() - 8);
+                    String serialL = serial.substring(serial.length() - 8);
+
+                    sendConfigLine("+++");
+                    sendConfigLine("ATDH" + serialH + "\r");
+                    sendConfigLine("ATDL" + serialL + "\r");
+                    sendConfigLine("ATCN\r");
+                    Thread.sleep(1000);
+                    usbService.write("D\r".getBytes());
+                }
+            } catch (IOException | InterruptedException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+    };
 
     private void sendConfigLine(String line) throws InterruptedException {
         waitFlag = true;
@@ -182,10 +215,12 @@ public class DeviceManagementService extends Service {
         // Start UsbService(if it was not started before) and Bind it
         startService(UsbService.class, usbConnection, null);
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        timer = new Timer();
     }
 
     @Override
     public void onDestroy() {
+        timer.cancel();
         unbindService(usbConnection);
         if (androidTVMQTTHandler != null && androidTVMQTTHandler.isConnected()) {
             androidTVMQTTHandler.disconnect();
@@ -210,14 +245,44 @@ public class DeviceManagementService extends Service {
                 break;
             case "xbee-add":
                 LocalRegistry.addEdgeDevice(getApplicationContext(), payload);
+                serialOfCurrentEdgeDevice = payload;
                 break;
             case "xbee-remove":
                 LocalRegistry.removeEdgeDevice(getApplicationContext(), payload);
+                break;
+            case "xbee-command":
+                sendCommandToEdgeDevice(payload);
                 break;
             default:
                 if (usbService != null) { // if UsbService was correctly bind, Send data
                     usbService.write(payload.getBytes());
                 }
+        }
+    }
+
+    private void sendCommandToEdgeDevice(final String payload) {
+        if (usbService != null && UsbService.SERVICE_CONNECTED) {
+            Runnable sendCommandThread = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONObject commandJSON = new JSONObject(payload);
+                        String serial = commandJSON.getString("serial");
+                        String command = commandJSON.getString("command") + "\r";
+                        String serialH = serial.substring(0, serial.length() - 8);
+                        String serialL = serial.substring(serial.length() - 8);
+                        sendConfigLine("+++");
+                        sendConfigLine("ATDH" + serialH + "\r");
+                        sendConfigLine("ATDL" + serialL + "\r");
+                        sendConfigLine("ATCN\r");
+                        Thread.sleep(1000);
+                        usbService.write(command.getBytes());
+                    } catch (JSONException | InterruptedException e) {
+                        Log.e(TAG, e.getClass().getSimpleName(), e);
+                    }
+                }
+            };
+            new Thread(sendCommandThread).start();
         }
     }
 
@@ -228,7 +293,7 @@ public class DeviceManagementService extends Service {
         startActivity(intent);
     }
 
-    private void receivedXBeeData(String message) {
+    private synchronized void receivedXBeeData(String message) {
         incomingMessage += message;
         if (incomingMessage.endsWith("\r")) {
             message = incomingMessage;
@@ -247,15 +312,14 @@ public class DeviceManagementService extends Service {
                 JSONObject jsonMetaData = new JSONObject();
                 jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
                 jsonMetaData.put("deviceId", getDeviceId());
-                jsonMetaData.put("type", TVConstants.DEVICE_TYPE);
+                jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
                 jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
                 jsonEvent.put("metaData", jsonMetaData);
 
                 JSONObject payload = new JSONObject();
-                payload.put("serial", "0000000000000000");
+                payload.put("serial", serialOfCurrentEdgeDevice);
                 payload.put("at_response", message);
                 jsonEvent.put("payloadData", payload);
-
 
                 JSONObject wrapper = new JSONObject();
                 wrapper.put("event", jsonEvent);
