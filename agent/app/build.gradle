@@ -36,6 +36,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:leanback-v17:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
     compile 'commons-codec:commons-codec:1.10'
     compile 'com.netflix.feign:feign-jaxrs:8.16.0'
     compile 'com.netflix.feign:feign-jackson:8.16.0'

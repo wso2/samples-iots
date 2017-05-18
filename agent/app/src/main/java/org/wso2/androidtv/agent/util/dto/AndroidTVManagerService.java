@@ -14,6 +14,9 @@
 
 package org.wso2.androidtv.agent.util.dto;
 
+import java.util.List;
+
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -22,9 +25,14 @@ import javax.ws.rs.QueryParam;
 /**
  * This holds the android manager service definition that is used with netflix feign.
  */
-public interface AndroidSenseManagerService {
+public interface AndroidTVManagerService {
 
     @Path("/device/{device_id}/register")
     @POST
     AndroidConfiguration register(@PathParam("device_id") String deviceId, @QueryParam("deviceName") String deviceName);
+
+    @Path("device/{deviceId}/xbee-all")
+    @GET
+    List<EdgeDevice> getEdgeDevices(@PathParam("deviceId") String deviceId);
+
 }

@@ -223,7 +223,27 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                                       DeviceGroupConstants.Permissions.DEFAULT_OPERATOR_PERMISSIONS)) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
-            sendAddEdgeDeviceNotification(deviceId, serial);
+            String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
+                                  + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command";
+            Operation commandOp = new CommandOperation();
+            commandOp.setCode("xbee-add");
+            commandOp.setType(Operation.Type.COMMAND);
+            commandOp.setEnabled(true);
+
+            JSONObject payload = new JSONObject();
+            payload.put("action", commandOp.getCode());
+            payload.put("payload", serial);
+
+            commandOp.setPayLoad(payload.toString());
+
+            Properties props = new Properties();
+            props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
+            commandOp.setProperties(props);
+
+            List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+            deviceIdentifiers.add(new DeviceIdentifier(deviceId, AndroidTVConstants.DEVICE_TYPE));
+            APIUtil.getDeviceManagementService().addOperation(AndroidTVConstants.DEVICE_TYPE, commandOp,
+                                                              deviceIdentifiers);
             EdgeDevice edgeDevice = new EdgeDevice();
             edgeDevice.setEdgeDeviceSerial(serial);
             edgeDevice.setGatewayId(deviceId);
@@ -295,31 +315,6 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             log.error("Error occurred while executing command operation", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    private void sendAddEdgeDeviceNotification(String deviceId, String serial)
-            throws OperationManagementException, InvalidDeviceException {
-        String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                              + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command";
-        Operation commandOp = new CommandOperation();
-        commandOp.setCode("xbee-add");
-        commandOp.setType(Operation.Type.COMMAND);
-        commandOp.setEnabled(true);
-
-        JSONObject payload = new JSONObject();
-        payload.put("action", commandOp.getCode());
-        payload.put("payload", serial);
-
-        commandOp.setPayLoad(payload.toString());
-
-        Properties props = new Properties();
-        props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
-        commandOp.setProperties(props);
-
-        List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
-        deviceIdentifiers.add(new DeviceIdentifier(deviceId, AndroidTVConstants.DEVICE_TYPE));
-        APIUtil.getDeviceManagementService().addOperation(AndroidTVConstants.DEVICE_TYPE, commandOp,
-                                                          deviceIdentifiers);
     }
 
     /**
@@ -430,14 +425,6 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 AndroidConfiguration androidConfiguration = new AndroidConfiguration();
                 androidConfiguration.setTenantDomain(APIUtil.getAuthenticatedUserTenantDomain());
                 androidConfiguration.setMqttEndpoint(APIUtil.getMqttEndpoint());
-                List<EdgeDevice> edgeDevices = APIUtil.getDeviceTypeManagementService().getAllEdgeDevices(deviceId);
-                for (EdgeDevice edgeDevice : edgeDevices) {
-                    try {
-                        sendAddEdgeDeviceNotification(deviceId, edgeDevice.getEdgeDeviceSerial());
-                    } catch (OperationManagementException | InvalidDeviceException e) {
-                        log.error(e.getClass().getSimpleName(), e);
-                    }
-                }
                 return Response.ok(androidConfiguration.toString()).build();
             } else {
                 return Response.status(Response.Status.NOT_ACCEPTABLE.getStatusCode()).entity(false).build();

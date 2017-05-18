@@ -15,6 +15,10 @@
     <color name="orange">#FADCA7</color>
     <color name="yellow">#EEFF41</color>
     <color name="default_background">#3d3d3d</color>
-
+    <color name="colorPrimary">#ef6c00</color>
+    <color name="colorPrimaryDark">#bf360c</color>
+    <color name="colorButton">#EF6C00</color>
+    <color name="colorButtonPressed">#e78535</color>
+    <color name="colorButtonBorder">#C77627</color>
     <color name="black_overlay">#66000000</color>
 </resources>

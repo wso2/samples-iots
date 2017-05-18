@@ -19,19 +19,24 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.wso2.androidtv.agent.constants.TVConstants;
 import org.wso2.androidtv.agent.util.dto.AccessTokenInfo;
 import org.wso2.androidtv.agent.util.dto.AndroidConfiguration;
-import org.wso2.androidtv.agent.util.dto.AndroidSenseManagerService;
+import org.wso2.androidtv.agent.util.dto.AndroidTVManagerService;
 import org.wso2.androidtv.agent.util.dto.ApiApplicationKey;
 import org.wso2.androidtv.agent.util.dto.ApiApplicationRegistrationService;
 import org.wso2.androidtv.agent.util.dto.ApiRegistrationProfile;
+import org.wso2.androidtv.agent.util.dto.EdgeDevice;
 import org.wso2.androidtv.agent.util.dto.OAuthRequestInterceptor;
 import org.wso2.androidtv.agent.util.dto.TokenIssuerService;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -50,6 +55,8 @@ import feign.jackson.JacksonEncoder;
 import feign.jaxrs.JAXRSContract;
 
 public class RegistrationAsyncExecutor extends AsyncTask<String, Void, Map<String, String>> {
+
+    private static final String TAG = RegistrationAsyncExecutor.class.getSimpleName();
 
     private static final String STATUS = "status";
     private final String PASSWORD_GRANT_TYPE = "password";
@@ -88,15 +95,13 @@ public class RegistrationAsyncExecutor extends AsyncTask<String, Void, Map<Strin
     protected Map<String, String> doInBackground(String... parameters) {
         if (android.os.Debug.isDebuggerConnected())
             android.os.Debug.waitForDebugger();
-        String response;
-        Map<String, String> response_params = new HashMap<>();
         String username = parameters[0];
         String password = parameters[1];
         String deviceId = parameters[2];
         String endpoint = parameters[3];
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put(STATUS, "200");
-        AccessTokenInfo accessTokenInfo = null;
+        AccessTokenInfo accessTokenInfo;
         try {
             //ApiApplicationRegistration
             ApiApplicationRegistrationService apiApplicationRegistrationService = Feign.builder().client(disableHostnameVerification)
@@ -118,11 +123,11 @@ public class RegistrationAsyncExecutor extends AsyncTask<String, Void, Map<Strin
             accessTokenInfo = tokenIssuerService.getToken(PASSWORD_GRANT_TYPE, username, password, "device_" + deviceId, SCOPE);
 
             //DeviceRegister
-            AndroidSenseManagerService androidSenseManagerService = Feign.builder().client(disableHostnameVerification)
+            AndroidTVManagerService androidTVManagerService = Feign.builder().client(disableHostnameVerification)
                     .requestInterceptor(new OAuthRequestInterceptor(accessTokenInfo.getAccess_token()))
                     .contract(new JAXRSContract()).encoder(new JacksonEncoder()).decoder(new JacksonDecoder())
-                    .target(AndroidSenseManagerService.class, endpoint + TVConstants.REGISTER_CONTEXT);
-            AndroidConfiguration androidConfiguration = androidSenseManagerService.register(deviceId, DEVICE_NAME);
+                    .target(AndroidTVManagerService.class, endpoint + TVConstants.DEVICE_API_CONTEXT);
+            AndroidConfiguration androidConfiguration = androidTVManagerService.register(deviceId, DEVICE_NAME);
             if (androidConfiguration != null) {
                 LocalRegistry.addConsumerKey(context, apiApplicationKey.getConsumerKey());
                 LocalRegistry.addConsumerSecret(context, apiApplicationKey.getConsumerSecret());
@@ -131,9 +136,14 @@ public class RegistrationAsyncExecutor extends AsyncTask<String, Void, Map<Strin
                 LocalRegistry.addMqttEndpoint(context, androidConfiguration.getMqttEndpoint());
                 LocalRegistry.addTenantDomain(context, androidConfiguration.getTenantDomain());
             }
+            List<EdgeDevice> edgeDevices = androidTVManagerService.getEdgeDevices(deviceId);
+            for (EdgeDevice edgeDevice : edgeDevices) {
+                LocalRegistry.addEdgeDevice(context, edgeDevice.getEdgeDeviceSerial());
+            }
             return responseMap;
         } catch (FeignException e) {
             responseMap.put(STATUS, "" + e.status());
+            Log.e(TAG, e.getMessage(), e);
             return responseMap;
         }
     }

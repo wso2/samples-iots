@@ -18,7 +18,7 @@ package org.wso2.androidtv.agent.constants;
  */
 public class TVConstants {
     public final static String DEVICE_TYPE = "androidtv";
-    public final static String REGISTER_CONTEXT = "/androidtv";
+    public final static String DEVICE_API_CONTEXT = "/androidtv";
     public final static String DCR_CONTEXT = "/dynamic-client-web";
     public final static String TOKEN_ISSUER_CONTEXT = "/oauth2";
     public final static String API_APPLICATION_REGISTRATION_CONTEXT = "/api-application-registration";

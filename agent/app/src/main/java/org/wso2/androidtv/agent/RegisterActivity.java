@@ -48,6 +48,7 @@ public class RegisterActivity extends Activity {
         if (LocalRegistry.isExist(getApplicationContext())) {
             Intent intent = new Intent(getApplicationContext(), RegisteredActivity.class);
             startActivity(intent);
+            finish();
         }
         setContentView(R.layout.activity_register);
         mUsernameView = (EditText) findViewById(R.id.username);
@@ -125,6 +126,7 @@ public class RegisterActivity extends Activity {
                             public void run() {
                                 Intent intent = new Intent(getApplicationContext(), RegisteredActivity.class);
                                 startActivity(intent);
+                                finish();
                             }
                         });
 
