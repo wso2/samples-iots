@@ -21,7 +21,7 @@
     <property name="target-dir" value="target/carbonapps"/>
     <property name="src-dir" value="src/main/resources/carbonapps"/>
     <property name="sensorType1_dir" value="PIR"/>
-    <property name="sensorType2_dir" value="ULTRASONIC"/>
+    <property name="sensorType2_dir" value="TEMPERATURE"/>
     <target name="clean">
         <delete dir="${target-dir}" />
     </target>

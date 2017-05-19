@@ -18,7 +18,7 @@
 
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 var sensorType1 = "PIR";
-var sensorType2 = "ULTRASONIC";
+var sensorType2 = "TEMPERATURE";
 var sensorType1Graph;
 var sensorType2Graph;
 

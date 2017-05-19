@@ -17,7 +17,6 @@
   ~ under the License.
   -->
 
-<artifact name="ULTRASONIC_stream" version="1.0.0" type="event/stream" serverRole="DataAnalyticsServer">
-	<file>org.wso2.iot.devices.ULTRASONIC_1.0.0.json</file>
+<artifact name="TEMPERATURE_store" version="1.0.0" type="analytics/eventstore" serverRole="DataAnalyticsServer">
+    <file>org_wso2_iot_devices_TEMPERATURE.xml</file>
 </artifact>
-

@@ -18,11 +18,11 @@
   -->
 
 <Analytics>
-  <Name>ULTRASONIC_spark_script</Name>
+  <Name>TEMPERATURE_spark_script</Name>
   <Script>
-    CREATE TEMPORARY TABLE DeviceULTRASONICData USING CarbonAnalytics OPTIONS(tableName "ORG_WSO2_IOT_DEVICES_ULTRASONIC");
-    CREATE TEMPORARY TABLE DeviceULTRASONICSummaryData USING CarbonAnalytics OPTIONS (tableName "DEVICE_ULTRASONIC_SUMMARY", schema "ULTRASONIC FLOAT, deviceType STRING -i, deviceId STRING -i, owner STRING -i, time LONG -i",primaryKeys "deviceType, deviceId, owner, time");
-    insert overwrite table DeviceULTRASONICSummaryData select ULTRASONIC, meta_deviceType as deviceType, meta_deviceId as deviceId, meta_owner as owner, cast(meta_time as BIGINT)as time from DeviceULTRASONICData group by ULTRASONIC, meta_deviceType, meta_deviceId, meta_owner, cast(meta_time as BIGINT);
+    CREATE TEMPORARY TABLE DeviceTEMPERATUREData USING CarbonAnalytics OPTIONS(tableName "ORG_WSO2_IOT_DEVICES_TEMPERATURE");
+    CREATE TEMPORARY TABLE DeviceTEMPERATURESummaryData USING CarbonAnalytics OPTIONS (tableName "DEVICE_TEMPERATURE_SUMMARY", schema "TEMPERATURE FLOAT, deviceType STRING -i, deviceId STRING -i, owner STRING -i, time LONG -i",primaryKeys "deviceType, deviceId, owner, time");
+    insert overwrite table DeviceTEMPERATURESummaryData select TEMPERATURE, meta_deviceType as deviceType, meta_deviceId as deviceId, meta_owner as owner, cast(meta_time as BIGINT)as time from DeviceTEMPERATUREData group by TEMPERATURE, meta_deviceType, meta_deviceId, meta_owner, cast(meta_time as BIGINT);
   </Script>
   <CronExpression>0 * * * * ?</CronExpression>
 </Analytics>

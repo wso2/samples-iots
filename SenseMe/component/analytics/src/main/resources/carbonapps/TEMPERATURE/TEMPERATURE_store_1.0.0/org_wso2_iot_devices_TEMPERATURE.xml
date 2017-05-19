@@ -19,7 +19,7 @@
 
 <EventStoreConfiguration>
     <Source>
-        <StreamId>org.wso2.iot.devices.ULTRASONIC:1.0.0</StreamId>
+        <StreamId>org.wso2.iot.devices.TEMPERATURE:1.0.0</StreamId>
     </Source>
     <RecordStoreName>EVENT_STORE</RecordStoreName>
     <TableSchema>
@@ -52,7 +52,7 @@
 			<Type>LONG</Type>
 		</ColumnDefinition>
 		<ColumnDefinition>
-			<Name>ULTRASONIC</Name>
+			<Name>TEMPERATURE</Name>
 			<EnableIndexing>false</EnableIndexing>
 			<IsPrimaryKey>false</IsPrimaryKey>
 			<EnableScoreParam>false</EnableScoreParam>

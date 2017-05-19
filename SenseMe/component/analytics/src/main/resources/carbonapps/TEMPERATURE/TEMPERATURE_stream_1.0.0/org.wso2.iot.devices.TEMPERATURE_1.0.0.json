@@ -1,8 +1,8 @@
 {
-  "name": "org.wso2.iot.devices.ULTRASONIC",
+  "name": "org.wso2.iot.devices.TEMPERATURE",
   "version": "1.0.0",
-  "nickName": "ULTRASONIC",
-  "description": "ULTRASONIC data received from the Device",
+  "nickName": "TEMPERATURE",
+  "description": "TEMPERATURE data received from the Device",
   "metaData": [
     {"name":"owner","type":"STRING"},
     {"name":"deviceType","type":"STRING"},
@@ -11,7 +11,7 @@
   ],
   "payloadData": [
       {
-        "name": "ULTRASONIC","type": "FLOAT"
+        "name": "TEMPERATURE","type": "FLOAT"
       }
   ]
 }

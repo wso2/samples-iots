@@ -247,8 +247,8 @@ void loop() {
   if (now - lastDistanceMsg > 6000) {
     lastDistanceMsg = now;
     long _timeStamp = initialTimeStamp + (now / 1000);
-    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu},\"payloadData\":{\"ULTRASONIC\":%ld.0}}}", owner, device_id, _timeStamp, temp);
-    snprintf (publishTopic, 100, "%s/senseme/%s/ULTRASONIC", tenant_domain, device_id);
+    snprintf (msg, 150, "{\"event\":{\"metaData\":{\"owner\":\"%s\",\"deviceType\":\"senseme\",\"deviceId\":\"%s\",\"time\":%lu},\"payloadData\":{\"TEMPERATURE\":%ld.0}}}", owner, device_id, _timeStamp, temp);
+    snprintf (publishTopic, 100, "%s/senseme/%s/TEMPERATURE", tenant_domain, device_id);
     client.publish(publishTopic, msg);
     Serial.print("Publish message: ");
     Serial.println(msg);

@@ -17,6 +17,6 @@
   ~ under the License.
   -->
 
-<artifact name="ULTRASONIC_spark_script" version="1.0.0" type="analytics/spark" serverRole="DataAnalyticsServer">
-    <file>ULTRASONIC_spark_script.xml</file>
+<artifact name="TEMPERATURE_publisher" version="1.0.0" type="event/publisher" serverRole="DataAnalyticsServer">
+    <file>TEMPERATURE_publisher.xml</file>
 </artifact>

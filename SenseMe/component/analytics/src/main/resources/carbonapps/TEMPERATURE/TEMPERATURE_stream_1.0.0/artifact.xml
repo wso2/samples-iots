@@ -16,14 +16,8 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<eventReceiver name="ULTRASONIC-mqtt" statistics="disable" trace="disable" xmlns="http://wso2.org/carbon/eventreceiver">
-    <from eventAdapterType="oauth-mqtt">
-        <property name="topic">carbon.super/senseme/+/ULTRASONIC</property>
-		<property name="username">admin</property>
-		<property name="password">admin</property>
-		<property name="contentValidator">org.wso2.carbon.device.mgt.input.adapter.mqtt.util.MQTTContentValidator</property>
-		<property name="cleanSession">true</property>
-    </from>
-    <mapping customMapping="disable" type="json"/>
-    <to streamName="org.wso2.iot.devices.ULTRASONIC" version="1.0.0"/>
-</eventReceiver>
+
+<artifact name="TEMPERATURE_stream" version="1.0.0" type="event/stream" serverRole="DataAnalyticsServer">
+	<file>org.wso2.iot.devices.TEMPERATURE_1.0.0.json</file>
+</artifact>
+

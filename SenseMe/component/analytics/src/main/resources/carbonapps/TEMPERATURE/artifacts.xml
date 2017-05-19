@@ -17,6 +17,12 @@
   ~ under the License.
   -->
 
-<artifact name="ULTRASONIC_publisher" version="1.0.0" type="event/publisher" serverRole="DataAnalyticsServer">
-    <file>ULTRASONIC_publisher.xml</file>
-</artifact>
+<artifacts>
+    <artifact name="TEMPERATURE_CAPP" version="1.0.0" type="carbon/application">
+        <dependency artifact="TEMPERATURE_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+		<dependency artifact="TEMPERATURE_store" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="TEMPERATURE_mqtt_receiver" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="TEMPERATURE_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="TEMPERATURE_spark_script" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+    </artifact>
+</artifacts>

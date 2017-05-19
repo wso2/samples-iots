@@ -17,9 +17,6 @@
   ~ under the License.
   -->
 
-<eventPublisher name="EventPublisher_ULTRASONIC" statistics="disable" trace="disable" xmlns="http://wso2.org/carbon/eventpublisher">
-    <from streamName="org.wso2.iot.devices.ULTRASONIC" version="1.0.0"/>
-    <mapping customMapping="disable" type="wso2event"/>
-	<to eventAdapterType="secured-websocket"/>
-</eventPublisher>
-
+<artifact name="TEMPERATURE_spark_script" version="1.0.0" type="analytics/spark" serverRole="DataAnalyticsServer">
+    <file>TEMPERATURE_spark_script.xml</file>
+</artifact>

@@ -34,11 +34,11 @@ public class DeviceTypeConstants {
 
     //sensor events summerized table name
     public static final String SENSOR_TYPE1_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_PIR";
-    public static final String SENSOR_TYPE2_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_ULTRASONIC";
+    public static final String SENSOR_TYPE2_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_TEMPERATURE";
     public static final String DATA_SOURCE_NAME = "jdbc/sensemeDM_DB";
     public final static String DEVICE_TYPE_PROVIDER_DOMAIN = "carbon.super";
     public final static String SENSOR_TYPE1 = "PIR";
-    public final static String SENSOR_TYPE2 = "ULTRASONIC";
+    public final static String SENSOR_TYPE2 = "TEMPERATURE";
 
     //mqtt tranport related constants
     public static final String MQTT_ADAPTER_NAME = "PIR_mqtt";
@@ -67,7 +67,7 @@ public class DeviceTypeConstants {
     public final static String SENSOR_TYPE1_STREAM_DEFINITION = "org.wso2.iot.devices.PIR";
     public final static String SENSOR_TYPE1_STREAM_DEFINITION_VERSION = "1.0.0";
 
-    public final static String SENSOR_TYPE2_STREAM_DEFINITION = "org.wso2.iot.devices.ULTRASONIC";
+    public final static String SENSOR_TYPE2_STREAM_DEFINITION = "org.wso2.iot.devices.TEMPERATURE";
     public final static String SENSOR_TYPE2_STREAM_DEFINITION_VERSION = "1.0.0";
 
     public static final String MQTT_CONFIG_LOCATION = CarbonUtils.getEtcCarbonConfigDirPath() + File.separator
