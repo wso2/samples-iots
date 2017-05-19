@@ -1,0 +1,11 @@
+
+{
+  "deviceType": {
+    "label": "senseme",
+    "category": "iot",
+    "downloadAgentUri": "senseme/device/download",
+    "scopes" : [
+      "perm:senseme:enroll"
+    ]
+  }
+}
