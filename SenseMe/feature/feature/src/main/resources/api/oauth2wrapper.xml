@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/oauth2wrapper" name="oauth2wrapper" xmlns="http://ws.apache.org/ns/synapse">
+    <resource faultSequence="fault" methods="POST" url-mapping="/introspect">
+        <inSequence>
+            <call>
+                <endpoint>
+                    <address uri="http://localhost:9763/oauth2"/>
+                </endpoint>
+            </call>
+            <log level="full"/>
+            <property name="ContentType" value="application/json" scope="axis2"/>
+            <property expression="//active" name="payload" scope="default" type="STRING"/>
+            <log level="custom">
+                <property name="something" expression="get-property('payload')"/>
+            </log>
+            <payloadFactory>
+                <format>
+                    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                        <soapenv:Body>
+                            <text xmlns="http://ws.apache.org/commons/ns/payload">$1</text>
+                        </soapenv:Body>
+                    </soapenv:Envelope>
+                </format>
+                <args>
+                    <arg expression="get-property('payload')"></arg>
+                </args>
+            </payloadFactory>
+            <property name="messageType" value="text/plain" scope="axis2"/>
+            <respond/>
+        </inSequence>
+        <outSequence>
+        </outSequence>
+    </resource>
+    <resource faultSequence="fault" methods="POST" url-mapping="/token">
+        <inSequence>
+            <call>
+                <endpoint>
+                    <address uri="http://localhost:9763/oauth2"/>
+                </endpoint>
+            </call>
+            <log level="full"/>
+            <property name="ContentType" value="application/json" scope="axis2"/>
+            <property expression="//access_token" name="access_token" scope="default" type="STRING"/>
+            <property expression="//refresh_token" name="refresh_token" scope="default" type="STRING"/>
+            <payloadFactory>
+                <format>
+                    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                        <soapenv:Body>
+                            <text xmlns="http://ws.apache.org/commons/ns/payload">access_token:$1,refresh_token:$2,time_stamp:$3</text>
+                        </soapenv:Body>
+                    </soapenv:Envelope>
+                </format>
+                <args>
+                    <arg expression="get-property('access_token')"></arg>
+                    <arg expression="get-property('refresh_token')"></arg>
+                    <arg expression="get-property('SYSTEM_TIME')"></arg>
+                </args>
+            </payloadFactory>
+            <property name="messageType" value="text/plain" scope="axis2"/>
+            <respond/>
+        </inSequence>
+        <outSequence>
+        </outSequence>
+    </resource>
+</api>
