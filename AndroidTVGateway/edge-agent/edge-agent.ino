@@ -28,11 +28,11 @@ void loop() {
       digitalWrite(LED, LOW);
       XBee.print("OK\r");
     } else if (a == 'D') {
-      float h = dht.readHumidity();
-      float t = dht.readTemperature(); 
+      int h = dht.readHumidity();
+      int t = dht.readTemperature(); 
       XBee.print("Humidity: ");
       XBee.print(h);
-      XBee.print(" %\t");
+      XBee.print("%  ");
       XBee.print("Temperature: ");
       XBee.print(t);
       XBee.print("C\r");     
