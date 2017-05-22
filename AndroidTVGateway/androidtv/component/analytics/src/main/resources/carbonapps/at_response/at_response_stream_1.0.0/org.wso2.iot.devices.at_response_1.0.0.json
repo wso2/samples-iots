@@ -1,0 +1,19 @@
+{
+  "name": "org.wso2.iot.devices.at_response",
+  "version": "1.0.0",
+  "nickName": "at_response",
+  "description": "at_response data received from the Device",
+  "metaData": [
+    {"name":"owner","type":"STRING"},
+    {"name":"deviceType","type":"STRING"},
+    {"name":"deviceId","type":"STRING"},
+    {"name":"time","type":"LONG"}
+  ],
+  "payloadData": [
+    {"name": "serial","type": "STRING"},
+    {"name": "at_response","type": "STRING"}
+  ]
+}
+	
+
+				                                    		

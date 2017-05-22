@@ -1,0 +1,11 @@
+
+{
+  "deviceType": {
+    "label": "Android TV",
+    "category": "iot",
+    "downloadAgentUri": "androidtv/device/download",
+    "scopes" : [
+      "perm:androidtv:enroll"
+    ]
+  }
+}
