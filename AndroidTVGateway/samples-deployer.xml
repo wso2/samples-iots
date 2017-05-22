@@ -25,8 +25,7 @@
     </parent>
 
     <modules>
-       <!--module>connectedcup</module-->
-	<module>androidtv</module>
+        <module>androidtv</module>
     </modules>
 
     <modelVersion>4.0.0</modelVersion>
@@ -56,12 +55,9 @@
                             <publishArtifacts>true</publishArtifacts>
                             <publishArtifactRepository>true</publishArtifactRepository>
                             <featureArtifacts>
-                                <!--featureArtifactDef>
-                                    org.coffeeking:org.coffeeking.connectedcup.feature:${org.coffeeking.version}
-                                </featureArtifactDef-->
-				<featureArtifactDef>
-				    org.homeautomation:org.homeautomation.androidtv.feature:1.0.0
-				</featureArtifactDef>
+                                <featureArtifactDef>
+                                    org.homeautomation:org.homeautomation.androidtv.feature:1.0.0
+                                </featureArtifactDef>
                             </featureArtifacts>
                         </configuration>
                     </execution>
@@ -78,11 +74,7 @@
                             <destination>${basedir}/../core/repository/components</destination>
                             <deleteOldProfileFiles>false</deleteOldProfileFiles>
                             <features>
-                                <!--feature>
-                                    <id>org.coffeeking.connectedcup.feature.group</id>
-                                    <version>${org.coffeeking.version}</version>
-                                </feature-->
-				<feature>
+                                <feature>
                                     <id>org.homeautomation.androidtv.feature.group</id>
                                     <version>1.0.0</version>
                                 </feature>
@@ -198,6 +190,5 @@
     </repositories>
     <properties>
         <carbon.device.mgt.plugin.version>3.0.8</carbon.device.mgt.plugin.version>
-        <org.coffeeking.version>1.0.0</org.coffeeking.version>
     </properties>
 </project>
