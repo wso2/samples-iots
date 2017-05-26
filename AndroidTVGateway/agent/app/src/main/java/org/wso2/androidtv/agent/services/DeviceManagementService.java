@@ -49,6 +49,7 @@ import org.wso2.androidtv.agent.mqtt.MessageReceivedCallback;
 import org.wso2.androidtv.agent.mqtt.transport.TransportHandlerException;
 import org.wso2.androidtv.agent.util.AndroidTVUtils;
 import org.wso2.androidtv.agent.util.LocalRegistry;
+import org.wso2.siddhi.core.event.Event;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,9 +57,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
 import java.util.Calendar;
+import java.util.Random;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -69,11 +69,15 @@ public class DeviceManagementService extends Service {
 
     private AndroidTVMQTTHandler androidTVMQTTHandler;
     private UsbService usbService;
-    private UsbServiceHandler mHandler;
-    private Timer timer;
+    private SiddhiService siddhiService;
+    private UsbServiceHandler usbServiceHandler;
+    private SiddhiServiceHandler siddhiServiceHandler;
     private boolean hasPendingConfigDownload = false;
     private long downloadId = -1;
+
     private static volatile boolean waitFlag = false;
+    private static volatile boolean isSyncPaused = false;
+    private static volatile boolean isSyncStopped = false;
     private static volatile String serialOfCurrentEdgeDevice = "";
     private static volatile String incomingMessage = "";
 
@@ -83,14 +87,59 @@ public class DeviceManagementService extends Service {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             usbService = ((UsbService.UsbBinder) iBinder).getService();
-            usbService.setHandler(mHandler);
-            timer.schedule(timerTask, 60000, 60000);
+            usbService.setHandler(usbServiceHandler);
+            isSyncPaused = false;
+            isSyncStopped = false;
+            new Thread(syncScheduler).start();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            timer.cancel();
+            isSyncStopped = true;
             usbService = null;
+        }
+    };
+
+    private final ServiceConnection siddhiConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            siddhiService = ((SiddhiService.SiddhiBinder) iBinder).getService();
+            siddhiService.setHandler(siddhiServiceHandler);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            siddhiService = null;
+        }
+    };
+
+    private Runnable syncScheduler = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                while (!isSyncStopped) {
+                    for (String serial : LocalRegistry.getEdgeDevices(getApplicationContext())) {
+                        serialOfCurrentEdgeDevice = serial;
+                        String serialH = serial.substring(0, serial.length() - 8);
+                        String serialL = serial.substring(serial.length() - 8);
+                        sendConfigLine("+++");
+                        sendConfigLine("ATDH" + serialH + "\r");
+                        sendConfigLine("ATDL" + serialL + "\r");
+                        sendConfigLine("ATCN\r");
+                        Thread.sleep(1000);
+                        usbService.write("D\r".getBytes());
+                        Thread.sleep(5000);
+                        while (isSyncPaused && !isSyncStopped) {
+                            Thread.sleep(1000);
+                        }
+                        if (isSyncStopped) {
+                            break;
+                        }
+                    }
+                }
+            } catch (IOException | InterruptedException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
         }
     };
 
@@ -107,8 +156,12 @@ public class DeviceManagementService extends Service {
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         unregisterReceiver(configDownloadReceiver);
                         hasPendingConfigDownload = false;
-                        String fileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
-                        installConfigurations(fileName);
+                        String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                        if (downloadFileLocalUri != null) {
+                            File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
+                            String downloadFilePath = mFile.getAbsolutePath();
+                            installConfigurations(downloadFilePath);
+                        }
                     }
                 }
                 c.close();
@@ -120,7 +173,8 @@ public class DeviceManagementService extends Service {
         Runnable installConfigThread = new Runnable() {
             @Override
             public void run() {
-                if (usbService != null && UsbService.SERVICE_CONNECTED) {
+                if (usbService != null) {
+                    isSyncPaused = true;
                     try {
                         sendConfigLine("+++");
                         File fXmlFile = new File(fileName);
@@ -152,32 +206,12 @@ public class DeviceManagementService extends Service {
                     } catch (InterruptedException e) {
                         Log.e(TAG, e.getMessage(), e);
                     }
+                    isSyncPaused = false;
                 }
             }
         };
         new Thread(installConfigThread).start();
     }
-
-    private TimerTask timerTask = new TimerTask() {
-        public void run() {
-            try {
-                for (String serial : LocalRegistry.getEdgeDevices(getApplicationContext())) {
-                    serialOfCurrentEdgeDevice = serial;
-                    String serialH = serial.substring(0, serial.length() - 8);
-                    String serialL = serial.substring(serial.length() - 8);
-
-                    sendConfigLine("+++");
-                    sendConfigLine("ATDH" + serialH + "\r");
-                    sendConfigLine("ATDL" + serialL + "\r");
-                    sendConfigLine("ATCN\r");
-                    Thread.sleep(1000);
-                    usbService.write("D\r".getBytes());
-                }
-            } catch (IOException | InterruptedException e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-        }
-    };
 
     private void sendConfigLine(String line) throws InterruptedException {
         waitFlag = true;
@@ -211,16 +245,27 @@ public class DeviceManagementService extends Service {
             }
         });
         androidTVMQTTHandler.connect();
-        mHandler = new UsbServiceHandler(this);
+
+        usbServiceHandler = new UsbServiceHandler(this);
         // Start UsbService(if it was not started before) and Bind it
         startService(UsbService.class, usbConnection, null);
+
+        siddhiServiceHandler = new SiddhiServiceHandler(this);
+        Bundle extras = new Bundle();
+        String executionPlan = "@Plan:name('edgeAnalytics') " +
+                "define stream edgeDeviceEventStream " +
+                "(ac int, window int, light int, temperature float, humidity float, keycard int); " +
+                "@info(name = 'alertQuery') " +
+                "from edgeDeviceEventStream[(1 == ac or 1 == window or 1 == light) and 0 == keycard] " +
+                "select ac, window, light insert into alertOutputStream;";
+        extras.putString(TVConstants.EXECUTION_PLAN_EXTRA, executionPlan);
+        startService(SiddhiService.class, siddhiConnection, extras);
+
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        timer = new Timer();
     }
 
     @Override
     public void onDestroy() {
-        timer.cancel();
         unbindService(usbConnection);
         if (androidTVMQTTHandler != null && androidTVMQTTHandler.isConnected()) {
             androidTVMQTTHandler.disconnect();
@@ -261,7 +306,7 @@ public class DeviceManagementService extends Service {
     }
 
     private void sendCommandToEdgeDevice(final String payload) {
-        if (usbService != null && UsbService.SERVICE_CONNECTED) {
+        if (usbService != null) {
             Runnable sendCommandThread = new Runnable() {
                 @Override
                 public void run() {
@@ -324,7 +369,15 @@ public class DeviceManagementService extends Service {
                 JSONObject wrapper = new JSONObject();
                 wrapper.put("event", jsonEvent);
                 androidTVMQTTHandler.publishDeviceData(wrapper.toString());
-            } catch (TransportHandlerException | JSONException e) {
+
+                if (siddhiService != null) {
+                    Random rand = new Random();
+                    float temp = rand.nextFloat() * (75 - 65) + 65;
+                    float humidity = rand.nextLong() * (75 - 65) + 65;
+                    Log.e(TAG, "t:" + temp + " h: " + humidity);
+                    siddhiService.getInputHandler().send(new Object[]{1, 1, 1, temp, humidity, 0});
+                }
+            } catch (TransportHandlerException | InterruptedException | JSONException e) {
                 Log.e(TAG, e.getClass().getSimpleName(), e);
             }
         }
@@ -335,17 +388,15 @@ public class DeviceManagementService extends Service {
     }
 
     private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
-        if (!UsbService.SERVICE_CONNECTED) {
-            Intent startService = new Intent(this, service);
-            if (extras != null && !extras.isEmpty()) {
-                Set<String> keys = extras.keySet();
-                for (String key : keys) {
-                    String extra = extras.getString(key);
-                    startService.putExtra(key, extra);
-                }
+        Intent startService = new Intent(this, service);
+        if (extras != null && !extras.isEmpty()) {
+            Set<String> keys = extras.keySet();
+            for (String key : keys) {
+                String extra = extras.getString(key);
+                startService.putExtra(key, extra);
             }
-            startService(startService);
         }
+        startService(startService);
         Intent bindingIntent = new Intent(this, service);
         bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -361,7 +412,6 @@ public class DeviceManagementService extends Service {
         request.setDescription("Downloading XBee configurations");
         request.setDestinationUri(null);
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
-        request.setShowRunningNotification(true);
 
         // get download service and enqueue file
         downloadId = downloadManager.enqueue(request);
@@ -382,6 +432,25 @@ public class DeviceManagementService extends Service {
                 case UsbService.MESSAGE_FROM_SERIAL_PORT:
                     String data = (String) msg.obj;
                     mService.get().receivedXBeeData(data);
+                    break;
+            }
+        }
+    }
+
+    // This handler will be passed to SiddhiService. Data received from SiddhiQuery is displayed through this handler
+    private static class SiddhiServiceHandler extends Handler {
+        private final WeakReference<DeviceManagementService> mService;
+
+        SiddhiServiceHandler(DeviceManagementService service) {
+            mService = new WeakReference<>(service);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            Event data = (Event) msg.obj;
+            switch (msg.what) {
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_QUERY:
+                    Log.d(TAG, "Edge data received: " + data.toString());
                     break;
             }
         }

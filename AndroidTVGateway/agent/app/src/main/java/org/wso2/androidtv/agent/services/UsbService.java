@@ -58,7 +58,6 @@ public class UsbService extends Service {
     public static final String ACTION_CDC_DRIVER_NOT_WORKING = "org.wso2.androidtv.agent.connectivityservices.ACTION_CDC_DRIVER_NOT_WORKING";
     public static final String ACTION_USB_DEVICE_NOT_WORKING = "org.wso2.androidtv.agent.connectivityservices.ACTION_USB_DEVICE_NOT_WORKING";
     public static final int MESSAGE_FROM_SERIAL_PORT = 0;
-    public static boolean SERVICE_CONNECTED = false;
 
     private IBinder binder = new UsbBinder();
 
@@ -70,7 +69,8 @@ public class UsbService extends Service {
     private UsbSerialDevice serialPort;
 
     private boolean serialPortConnected;
-    /*
+
+    /**
      *  Data received from serial port will be received here. Just populate onReceivedData with your code
      *  In this particular example. byte stream is converted to String and send to UI thread to
      *  be treated there.
@@ -89,7 +89,7 @@ public class UsbService extends Service {
         }
     };
 
-    /*
+    /**
      * Different notifications from OS will be received here (USB attached, detached, permission responses...)
      * About BroadcastReceiver: http://developer.android.com/reference/android/content/BroadcastReceiver.html
      */
@@ -125,7 +125,7 @@ public class UsbService extends Service {
         }
     };
 
-    /*
+    /**
      * onCreate will be executed when service is started. It configures an IntentFilter to listen for
      * incoming Intents (USB ATTACHED, USB DETACHED...) and it tries to open a serial port.
      */
@@ -133,7 +133,6 @@ public class UsbService extends Service {
     public void onCreate() {
         this.context = this;
         serialPortConnected = false;
-        UsbService.SERVICE_CONNECTED = true;
         setFilter();
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         findSerialPortDevice();
@@ -152,7 +151,6 @@ public class UsbService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        UsbService.SERVICE_CONNECTED = false;
     }
 
     /*
@@ -221,13 +219,13 @@ public class UsbService extends Service {
         usbManager.requestPermission(device, mPendingIntent);
     }
 
-    public class UsbBinder extends Binder {
+    class UsbBinder extends Binder {
         UsbService getService() {
             return UsbService.this;
         }
     }
 
-    /*
+    /**
      * A simple thread to open a serial port.
      * Although it should be a fast operation. moving usb operations away from UI thread is a good thing.
      */
@@ -244,7 +242,7 @@ public class UsbService extends Service {
                     serialPort.setDataBits(UsbSerialInterface.DATA_BITS_8);
                     serialPort.setStopBits(UsbSerialInterface.STOP_BITS_1);
                     serialPort.setParity(UsbSerialInterface.PARITY_NONE);
-                    /**
+                    /*
                      * Current flow control Options:
                      * UsbSerialInterface.FLOW_CONTROL_OFF
                      * UsbSerialInterface.FLOW_CONTROL_RTS_CTS only for CP2102 and FT232

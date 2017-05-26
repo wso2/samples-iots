@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
     <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER_ADVANCED" />
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
 
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -64,8 +65,10 @@
             android:enabled="true" />
         <service
             android:name=".services.DeviceManagementService"
-            android:enabled="true"
-            android:exported="false" />
+            android:enabled="true" />
+        <service
+            android:name=".services.SiddhiService"
+            android:enabled="true" />
 
         <receiver
             android:name=".DeviceStartUpReceiver"

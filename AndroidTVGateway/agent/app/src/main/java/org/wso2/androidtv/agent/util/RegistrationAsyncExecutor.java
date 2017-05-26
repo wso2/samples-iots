@@ -19,9 +19,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.wso2.androidtv.agent.constants.TVConstants;
 import org.wso2.androidtv.agent.util.dto.AccessTokenInfo;
 import org.wso2.androidtv.agent.util.dto.AndroidConfiguration;

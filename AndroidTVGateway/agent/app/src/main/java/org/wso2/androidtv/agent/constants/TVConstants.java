@@ -22,6 +22,7 @@ public class TVConstants {
     public final static String DCR_CONTEXT = "/dynamic-client-web";
     public final static String TOKEN_ISSUER_CONTEXT = "/oauth2";
     public final static String API_APPLICATION_REGISTRATION_CONTEXT = "/api-application-registration";
+    public final static String EXECUTION_PLAN_EXTRA = "execution_plan";
 
     public final static String MESSAGE = "MESSAGE";
 

@@ -28,3 +28,9 @@ cache/
 hs_err_pid*
 
 .idea/
+
+.gradle
+local.properties
+build/
+captures/
+.externalNativeBuild
