@@ -46,6 +46,15 @@
                 </QueryParameters>
             </Operation>
         </Feature>
+        <Feature code="edgeQuery">
+            <Name>Edge Analytics</Name>
+            <Description>Send siddhi query to execute on gateway to perform edge analytics</Description>
+            <Operation context="/androidtv/device/{deviceId}/edgeQuery" method="POST">
+                <FormParameters>
+                    <Parameter>edgeQuery</Parameter>
+                </FormParameters>
+            </Operation>
+        </Feature>
         <Feature code="xbee">
             <Name>Add XBee edge device</Name>
             <Description>Add XBee edge device to Android TV gateway</Description>

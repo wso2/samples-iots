@@ -32,12 +32,7 @@ import org.homeautomation.androidtv.api.constants.AndroidTVConstants;
 import org.wso2.carbon.apimgt.annotations.api.Scope;
 import org.wso2.carbon.apimgt.annotations.api.Scopes;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 
@@ -183,6 +178,63 @@ public interface DeviceTypeService {
                     value = "The message to be displayed.",
                     required = true)
             @QueryParam("message") String message);
+
+
+    /**
+     * End point to send a siddhi query to Android TV device.
+     */
+    @POST
+    @Path("device/{deviceId}/edgeQuery")
+    @ApiOperation(
+            httpMethod = "POST",
+            value = "Send siddhi query to Android tv",
+            notes = "",
+            response = Response.class,
+            tags = "androidtv",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK.",
+                    response = Response.class,
+                    responseHeaders = {
+                            @ResponseHeader(
+                                    name = "Content-Type",
+                                    description = "The content type of the body"),
+                            @ResponseHeader(
+                                    name = "Last-Modified",
+                                    description = "Date and time the resource was last modified.\n" +
+                                            "Used by caches, or in conditional requests."),
+                    }),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request. \n Invalid Device Identifiers found.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized. \n Unauthorized request."),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. \n Error occurred while executing command operation to"
+                            + " send threashold",
+                    response = Response.class)
+    })
+    Response sendEdgeQuery(
+            @ApiParam(
+                    name = "deviceId",
+                    value = "The registered device Id.",
+                    required = true)
+            @PathParam("deviceId") String deviceId,
+            @ApiParam(
+                    name = "edgeQuery",
+                    value = "The query to be send.",
+                    required = true)
+            @FormParam("edgeQuery") String edgeQuery);
 
     /**
      * End point to configure XBee gateway of Android TV device.

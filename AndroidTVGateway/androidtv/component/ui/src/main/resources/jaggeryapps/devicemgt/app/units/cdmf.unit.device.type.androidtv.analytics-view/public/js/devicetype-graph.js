@@ -17,10 +17,11 @@
  */
 
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
-var sensorType1 = "at_response";
-var sensorType2 = "s2";
+var sensorType1 = "TEMPERATURE"
+var sensorType2 = "HUMIDITY"
 var sensorType1Graph;
 var sensorType2Graph;
+
 
 function drawGraph_androidtv(from, to)
 {
@@ -68,6 +69,7 @@ function drawGraph_androidtv(from, to)
                     }],
                     'name': devices[i].name
                 });
+
         }
     } else {
         graphConfigSensorType1['series'].push(
