@@ -353,33 +353,66 @@ public class DeviceManagementService extends Service {
         } else {
             Log.i(TAG, "Message> " + message);
             try {
-                JSONObject jsonEvent = new JSONObject();
-                JSONObject jsonMetaData = new JSONObject();
-                jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
-                jsonMetaData.put("deviceId", getDeviceId());
-                jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
-                jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
-                jsonEvent.put("metaData", jsonMetaData);
-
-                JSONObject payload = new JSONObject();
-                payload.put("serial", serialOfCurrentEdgeDevice);
-                payload.put("at_response", message);
-                jsonEvent.put("payloadData", payload);
-
-                JSONObject wrapper = new JSONObject();
-                wrapper.put("event", jsonEvent);
-                androidTVMQTTHandler.publishDeviceData(wrapper.toString());
-
-                if (siddhiService != null) {
-                    Random rand = new Random();
-                    float temp = rand.nextFloat() * (75 - 65) + 65;
-                    float humidity = rand.nextLong() * (75 - 65) + 65;
-                    Log.e(TAG, "t:" + temp + " h: " + humidity);
-                    siddhiService.getInputHandler().send(new Object[]{1, 1, 1, temp, humidity, 0});
+                JSONObject incomingMsg = new JSONObject(message);
+                switch (incomingMsg.getString("a")) {
+                    case "LON":
+                        sendATResponse("Light ON");
+                        break;
+                    case "LOFF":
+                        sendATResponse("Light OFF");
+                        break;
+                    case "DOPEN":
+                        sendATResponse("Door lock opened");
+                        break;
+                    case "DCLOSE":
+                        sendATResponse("Door lock closed");
+                        break;
+                    case "CIN":
+                        sendATResponse("Access card inserted");
+                        break;
+                    case "CO":
+                        sendATResponse("Access card removed");
+                        break;
+                    case "DATA":
+                        JSONObject payload = incomingMsg.getJSONObject("p");
+                        float temp = payload.getInt("t");
+                        float humidity = payload.getInt("h");
+                        int ac = payload.getInt("a");
+                        int window = payload.getInt("w");
+                        int light = payload.getInt("l");
+                        int keycard = payload.getInt("k");
+                        siddhiService.getInputHandler().send(new Object[]{ac, window, light, temp, humidity, keycard});
+                        //TODO: send data to relevant event streams
+                        break;
                 }
-            } catch (TransportHandlerException | InterruptedException | JSONException e) {
+            } catch (JSONException e) {
+                Log.e(TAG, "Incomplete incoming message. Ignored");
+            } catch (InterruptedException e) {
                 Log.e(TAG, e.getClass().getSimpleName(), e);
             }
+        }
+    }
+
+    private void sendATResponse(String message) {
+        try {
+            JSONObject jsonEvent = new JSONObject();
+            JSONObject jsonMetaData = new JSONObject();
+            jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
+            jsonMetaData.put("deviceId", getDeviceId());
+            jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
+            jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
+            jsonEvent.put("metaData", jsonMetaData);
+
+            JSONObject payload = new JSONObject();
+            payload.put("serial", serialOfCurrentEdgeDevice);
+            payload.put("at_response", message);
+            jsonEvent.put("payloadData", payload);
+
+            JSONObject wrapper = new JSONObject();
+            wrapper.put("event", jsonEvent);
+            androidTVMQTTHandler.publishDeviceData(wrapper.toString());
+        } catch (TransportHandlerException | JSONException e) {
+            Log.e(TAG, e.getClass().getSimpleName(), e);
         }
     }
 
@@ -451,6 +484,7 @@ public class DeviceManagementService extends Service {
             switch (msg.what) {
                 case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_QUERY:
                     Log.d(TAG, "Edge data received: " + data.toString());
+                    //TODO: Display message in screen based on the query result
                     break;
             }
         }
