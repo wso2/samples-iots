@@ -21,6 +21,12 @@
     <property name="target-dir" value="target/carbonapps"/>
     <property name="src-dir" value="src/main/resources/carbonapps"/>
     <property name="sensorType1_dir" value="at_response"/>
+    <property name="sensorType2_dir" value="TEMP"/>
+    <property name="sensorType3_dir" value="HUMIDITY"/>
+    <property name="sensorType4_dir" value="DOOR"/>
+    <property name="sensorType5_dir" value="WINDOW"/>
+    <property name="sensorType6_dir" value="AC"/>
+
     <target name="clean">
         <delete dir="${target-dir}" />
     </target>
@@ -29,6 +35,22 @@
         <zip destfile="${target-dir}/${sensorType1_dir}.car">
             <zipfileset dir="${src-dir}/${sensorType1_dir}"/>
         </zip>
+        <zip destfile="${target-dir}/${sensorType2_dir}.car">
+            <zipfileset dir="${src-dir}/${sensorType2_dir}"/>
+        </zip>
+        <zip destfile="${target-dir}/${sensorType3_dir}.car">
+            <zipfileset dir="${src-dir}/${sensorType3_dir}"/>
+        </zip>
+        <zip destfile="${target-dir}/${sensorType4_dir}.car">
+            <zipfileset dir="${src-dir}/${sensorType4_dir}"/>
+        </zip>
+        <zip destfile="${target-dir}/${sensorType5_dir}.car">
+            <zipfileset dir="${src-dir}/${sensorType5_dir}"/>
+        </zip>
+        <zip destfile="${target-dir}/${sensorType6_dir}.car">
+            <zipfileset dir="${src-dir}/${sensorType6_dir}"/>
+        </zip>
+
     </target>
 </project>
 

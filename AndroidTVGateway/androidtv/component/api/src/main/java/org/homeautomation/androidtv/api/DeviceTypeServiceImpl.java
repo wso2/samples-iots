@@ -39,12 +39,7 @@ import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
 import org.wso2.carbon.device.mgt.core.operation.mgt.CommandOperation;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
@@ -157,6 +152,59 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+
+    /**
+     * send siddhi query to execute on gateway to perform edge analytics.
+     * @param deviceId : The registered device id.
+     */
+    @POST
+    @Path("device/{deviceId}/edgeQuery")
+    @Override
+    public Response sendEdgeQuery(@PathParam("deviceId") String deviceId, @FormParam("edgeQuery") String edgeQuery) {
+        try {
+            if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(new DeviceIdentifier(deviceId,
+                    AndroidTVConstants.DEVICE_TYPE), DeviceGroupConstants.Permissions.DEFAULT_OPERATOR_PERMISSIONS)) {
+                return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
+            }
+            String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
+                    + "/" + AndroidTVConstants.DEVICE_TYPE + "/" + deviceId + "/command";
+
+            Operation commandOp = new CommandOperation();
+            commandOp.setCode("edgeQuery");
+            commandOp.setType(Operation.Type.COMMAND);
+            commandOp.setEnabled(true);
+
+            JSONObject payload = new JSONObject();
+            payload.put("action", commandOp.getCode());
+            payload.put("payload", edgeQuery);
+
+            commandOp.setPayLoad(payload.toString());
+
+            Properties props = new Properties();
+            props.setProperty(AndroidTVConstants.MQTT_ADAPTER_TOPIC_PROPERTY_NAME, publishTopic);
+            commandOp.setProperties(props);
+
+            List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+            deviceIdentifiers.add(new DeviceIdentifier(deviceId, AndroidTVConstants.DEVICE_TYPE));
+            APIUtil.getDeviceManagementService().addOperation(AndroidTVConstants.DEVICE_TYPE, commandOp,
+                    deviceIdentifiers);
+            return Response.ok().build();
+        } catch (InvalidDeviceException e) {
+            String msg = "Invalid Device Identifiers found.";
+            log.error(msg, e);
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (DeviceAccessAuthorizationException e) {
+            log.error(e.getErrorMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+        } catch (OperationManagementException e) {
+            log.error("Error occurred while executing command operation", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
 
     /**
      * End point to configure XBee gateway of Android TV device.
