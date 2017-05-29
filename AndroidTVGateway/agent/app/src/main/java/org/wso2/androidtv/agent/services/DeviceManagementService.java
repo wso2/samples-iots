@@ -57,7 +57,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
 import java.util.Calendar;
-import java.util.Random;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -78,6 +77,7 @@ public class DeviceManagementService extends Service {
     private static volatile boolean waitFlag = false;
     private static volatile boolean isSyncPaused = false;
     private static volatile boolean isSyncStopped = false;
+    private static volatile boolean isInCriticalPath = false;
     private static volatile String serialOfCurrentEdgeDevice = "";
     private static volatile String incomingMessage = "";
 
@@ -88,7 +88,7 @@ public class DeviceManagementService extends Service {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             usbService = ((UsbService.UsbBinder) iBinder).getService();
             usbService.setHandler(usbServiceHandler);
-            isSyncPaused = false;
+            isInCriticalPath = false;
             isSyncStopped = false;
             new Thread(syncScheduler).start();
         }
@@ -116,9 +116,17 @@ public class DeviceManagementService extends Service {
     private Runnable syncScheduler = new Runnable() {
         @Override
         public void run() {
-            try {
-                while (!isSyncStopped) {
+            while (!isSyncStopped) {
+                try {
                     for (String serial : LocalRegistry.getEdgeDevices(getApplicationContext())) {
+                        while ((isInCriticalPath || isSyncPaused) && !isSyncStopped) {
+                            Thread.sleep(1000);
+                        }
+                        if (isSyncStopped) {
+                            break;
+                        }
+                        isInCriticalPath = true;
+                        Thread.sleep(1000);
                         serialOfCurrentEdgeDevice = serial;
                         String serialH = serial.substring(0, serial.length() - 8);
                         String serialL = serial.substring(serial.length() - 8);
@@ -129,16 +137,15 @@ public class DeviceManagementService extends Service {
                         Thread.sleep(1000);
                         usbService.write("D\r".getBytes());
                         Thread.sleep(5000);
-                        while (isSyncPaused && !isSyncStopped) {
-                            Thread.sleep(1000);
-                        }
+                        isInCriticalPath = false;
+                        Thread.sleep(1000);
                         if (isSyncStopped) {
                             break;
                         }
                     }
+                } catch (IOException | InterruptedException e) {
+                    Log.e(TAG, e.getMessage(), e);
                 }
-            } catch (IOException | InterruptedException e) {
-                Log.e(TAG, e.getMessage(), e);
             }
         }
     };
@@ -175,6 +182,13 @@ public class DeviceManagementService extends Service {
             public void run() {
                 if (usbService != null) {
                     isSyncPaused = true;
+                    while (isInCriticalPath) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                    isInCriticalPath = true;
                     try {
                         sendConfigLine("+++");
                         File fXmlFile = new File(fileName);
@@ -203,10 +217,10 @@ public class DeviceManagementService extends Service {
                     usbService.write("ATCN\r".getBytes());
                     try {
                         Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        Log.e(TAG, e.getMessage(), e);
+                    } catch (InterruptedException ignored) {
                     }
-                    isSyncPaused = false;
+                    isInCriticalPath = false;
+                    isSyncPaused = true;
                 }
             }
         };
@@ -298,10 +312,6 @@ public class DeviceManagementService extends Service {
             case "xbee-command":
                 sendCommandToEdgeDevice(payload);
                 break;
-            default:
-                if (usbService != null) { // if UsbService was correctly bind, Send data
-                    usbService.write(payload.getBytes());
-                }
         }
     }
 
@@ -311,6 +321,12 @@ public class DeviceManagementService extends Service {
                 @Override
                 public void run() {
                     try {
+                        isSyncPaused = true;
+                        while (isInCriticalPath) {
+                            Thread.sleep(1000);
+                        }
+                        isInCriticalPath = true;
+                        Thread.sleep(1000);
                         JSONObject commandJSON = new JSONObject(payload);
                         String serial = commandJSON.getString("serial");
                         String command = commandJSON.getString("command") + "\r";
@@ -322,8 +338,12 @@ public class DeviceManagementService extends Service {
                         sendConfigLine("ATCN\r");
                         Thread.sleep(1000);
                         usbService.write(command.getBytes());
+                        Thread.sleep(5000);
                     } catch (JSONException | InterruptedException e) {
                         Log.e(TAG, e.getClass().getSimpleName(), e);
+                    } finally {
+                        isInCriticalPath = false;
+                        isSyncPaused = false;
                     }
                 }
             };
@@ -386,7 +406,7 @@ public class DeviceManagementService extends Service {
                         break;
                 }
             } catch (JSONException e) {
-                Log.e(TAG, "Incomplete incoming message. Ignored");
+                Log.e(TAG, "Incomplete incoming message. Ignored", e);
             } catch (InterruptedException e) {
                 Log.e(TAG, e.getClass().getSimpleName(), e);
             }
