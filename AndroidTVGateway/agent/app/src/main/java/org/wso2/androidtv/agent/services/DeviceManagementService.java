@@ -375,7 +375,7 @@ public class DeviceManagementService extends Service {
     private void startActivity(Class<?> cls, String extra) {
         Intent intent = new Intent(this, cls);
         intent.putExtra(TVConstants.MESSAGE, extra);
-        intent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
