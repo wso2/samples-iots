@@ -36,4 +36,17 @@ public class AndroidTVConstants {
 
     public static final String ROLE_NAME = "internal/devicemgt-user";
 
+    //sensor events sumerized table name for temperature
+
+    public final static String SENSOR_TYPE1 = "TEMP";
+    public final static String SENSOR_TYPE2 = "HUMIDITY";
+    public final static String SENSOR_TYPE3 = "DOOR";
+    public final static String SENSOR_TYPE4 = "WINDOW";
+    public final static String SENSOR_TYPE5 = "AC";
+    public static final String SENSOR_TYPE1_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_TEMP";
+    public static final String SENSOR_TYPE2_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_HUMIDITY";
+    public static final String SENSOR_TYPE3_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_DOOR";
+    public static final String SENSOR_TYPE4_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_WINDOW";
+    public static final String SENSOR_TYPE5_EVENT_TABLE = "ORG_WSO2_IOT_DEVICES_AC";
+
 }

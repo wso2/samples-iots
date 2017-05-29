@@ -17,10 +17,17 @@
  */
 
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
-var sensorType1 = "TEMPERATURE"
+var sensorType1 = "TEMP"
 var sensorType2 = "HUMIDITY"
+var sensorType3 = "DOOR"
+var sensorType4 = "WINDOW"
+var sensorType5 = "AC"
+
 var sensorType1Graph;
 var sensorType2Graph;
+var sensorType3Graph;
+var sensorType4Graph;
+var sensorType5Graph;
 
 
 function drawGraph_androidtv(from, to)
@@ -31,6 +38,9 @@ function drawGraph_androidtv(from, to)
     var graphWidth = $(chartWrapperElmId).width() - 50;
     var graphConfigSensorType1 = getGraphConfig("chartSensorType1");
     var graphConfigSensorType2 = getGraphConfig("chartSensorType2");
+    var graphConfigSensorType3 = getGraphConfig("chartSensorType3");
+    var graphConfigSensorType4 = getGraphConfig("chartSensorType4");
+    var graphConfigSensorType5 = getGraphConfig("chartSensorType5");
 
     function getGraphConfig(placeHolder) {
         return {
@@ -69,7 +79,34 @@ function drawGraph_androidtv(from, to)
                     }],
                     'name': devices[i].name
                 });
+            graphConfigSensorType3['series'].push(
+                {
+                    'color': palette.color(),
+                    'data': [{
+                        x: parseInt(new Date().getTime() / 1000),
+                        y: 0
+                    }],
+                    'name': devices[i].name
+                });
 
+            graphConfigSensorType4['series'].push(
+                {
+                    'color': palette.color(),
+                    'data': [{
+                        x: parseInt(new Date().getTime() / 1000),
+                        y: 0
+                    }],
+                    'name': devices[i].name
+                });
+            graphConfigSensorType5['series'].push(
+                {
+                    'color': palette.color(),
+                    'data': [{
+                        x: parseInt(new Date().getTime() / 1000),
+                        y: 0
+                    }],
+                    'name': devices[i].name
+                });
         }
     } else {
         graphConfigSensorType1['series'].push(
@@ -90,14 +127,51 @@ function drawGraph_androidtv(from, to)
                 }],
                 'name': $("#details").data("devicename")
             });
+        graphConfigSensorType3['series'].push(
+            {
+                'color': palette.color(),
+                'data': [{
+                    x: parseInt(new Date().getTime() / 1000),
+                    y: 0
+                }],
+                'name': $("#details").data("devicename")
+            });
+        graphConfigSensorType4['series'].push(
+            {
+                'color': palette.color(),
+                'data': [{
+                    x: parseInt(new Date().getTime() / 1000),
+                    y: 0
+                }],
+                'name': $("#details").data("devicename")
+            });
+        graphConfigSensorType5['series'].push(
+            {
+                'color': palette.color(),
+                'data': [{
+                    x: parseInt(new Date().getTime() / 1000),
+                    y: 0
+                }],
+                'name': $("#details").data("devicename")
+            });
     }
 
     sensorType1Graph = new Rickshaw.Graph(graphConfigSensorType1);
     sensorType2Graph = new Rickshaw.Graph(graphConfigSensorType2);
+    sensorType3Graph = new Rickshaw.Graph(graphConfigSensorType3);
+    sensorType4Graph = new Rickshaw.Graph(graphConfigSensorType4);
+    sensorType5Graph = new Rickshaw.Graph(graphConfigSensorType5);
+
     drawGraph(sensorType1Graph, "sensorType1yAxis", "sensorType1Slider", "sensorType1Legend", sensorType1
         , graphConfigSensorType1, "chartSensorType1");
     drawGraph(sensorType2Graph, "sensorType2yAxis", "sensorType2Slider", "sensorType2Legend", sensorType2
         , graphConfigSensorType2, "chartSensorType2");
+    drawGraph(sensorType3Graph, "sensorType3yAxis", "sensorType3Slider", "sensorType3Legend", sensorType3
+            , graphConfigSensorType3, "chartSensorType3");
+    drawGraph(sensorType4Graph, "sensorType4yAxis", "sensorType4Slider", "sensorType4Legend", sensorType4
+            , graphConfigSensorType4, "chartSensorType4");
+    drawGraph(sensorType5Graph, "sensorType5yAxis", "sensorType5Slider", "sensorType5Legend", sensorType5
+            , graphConfigSensorType5, "chartSensorType5");
 
     function drawGraph(graph, yAxis, slider, legend, sensorType, graphConfig, chart) {
         console.log("1");

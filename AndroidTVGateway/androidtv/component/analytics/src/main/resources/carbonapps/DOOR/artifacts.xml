@@ -23,7 +23,6 @@
 		<dependency artifact="DOOR_store" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="DOOR_mqtt_receiver" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="DOOR_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
-        <dependency artifact="DOOR_spark_script" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
     </artifact>
 </artifacts>
 
