@@ -72,7 +72,7 @@ void loop() {
   } else if (lastId) {
     lastId = 0;
     digitalWrite(DOOR_LOCK, HIGH);
-    isCardIn = true;    
+    isCardIn = false;    
   }
 }
 

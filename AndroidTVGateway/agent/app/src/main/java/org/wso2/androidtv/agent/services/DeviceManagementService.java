@@ -271,7 +271,22 @@ public class DeviceManagementService extends Service {
                 "(ac int, window int, light int, temperature float, humidity float, keycard int); " +
                 "@info(name = 'alertQuery') " +
                 "from edgeDeviceEventStream[(1 == ac or 1 == window or 1 == light) and 0 == keycard] " +
-                "select ac, window, light insert into alertOutputStream;";
+                "select ac, window, light insert into alertOutputStream; " +
+                "@info(name = 'temperatureQuery') " +
+                "from every te1=edgeDeviceEventStream, te2=edgeDeviceEventStream[te1.temperature != temperature ] " +
+                "select te2.temperature insert into temperatureOutputStream; " +
+                "@info(name = 'humidityQuery') " +
+                "from every he1=edgeDeviceEventStream, he2=edgeDeviceEventStream[he1.humidity != humidity ] " +
+                "select he2.humidity insert into humidityOutputStream; " +
+                "@info(name = 'acQuery') " +
+                "from every ae1=edgeDeviceEventStream, ae2=edgeDeviceEventStream[ae1.ac != ac ] " +
+                "select ae2.ac insert into acOutputStream; " +
+                "@info(name = 'windowQuery') " +
+                "from every we1=edgeDeviceEventStream, we2=edgeDeviceEventStream[we1.window != window ] " +
+                "select we2.window insert into windowOutputStream; " +
+                "@info(name = 'keycardQuery') " +
+                "from every ke1=edgeDeviceEventStream, ke2=edgeDeviceEventStream[ke1.keycard != keycard ] " +
+                "select ke2.keycard insert into keycardOutputStream;";
         extras.putString(TVConstants.EXECUTION_PLAN_EXTRA, executionPlan);
         startService(SiddhiService.class, siddhiConnection, extras);
 
@@ -400,9 +415,8 @@ public class DeviceManagementService extends Service {
                         int ac = payload.getInt("a");
                         int window = payload.getInt("w");
                         int light = payload.getInt("l");
-                        int keycard = payload.getInt("k");
-                        siddhiService.getInputHandler().send(new Object[]{ac, window, light, temp, humidity, keycard});
-                        //TODO: send data to relevant event streams
+                        int keyCard = payload.getInt("k");
+                        siddhiService.getInputHandler().send(new Object[]{ac, window, light, temp, humidity, keyCard});
                         break;
                 }
             } catch (JSONException e) {
@@ -431,6 +445,28 @@ public class DeviceManagementService extends Service {
             JSONObject wrapper = new JSONObject();
             wrapper.put("event", jsonEvent);
             androidTVMQTTHandler.publishDeviceData(wrapper.toString());
+        } catch (TransportHandlerException | JSONException e) {
+            Log.e(TAG, e.getClass().getSimpleName(), e);
+        }
+    }
+
+    private void publishStats(String topic, String key, float value) {
+        try {
+            JSONObject jsonEvent = new JSONObject();
+            JSONObject jsonMetaData = new JSONObject();
+            jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
+            jsonMetaData.put("deviceId", getDeviceId());
+            jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
+            jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
+            jsonEvent.put("metaData", jsonMetaData);
+
+            JSONObject payload = new JSONObject();
+            payload.put(key, value);
+            jsonEvent.put("payloadData", payload);
+
+            JSONObject wrapper = new JSONObject();
+            wrapper.put("event", jsonEvent);
+            androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
         } catch (TransportHandlerException | JSONException e) {
             Log.e(TAG, e.getClass().getSimpleName(), e);
         }
@@ -493,18 +529,35 @@ public class DeviceManagementService extends Service {
     // This handler will be passed to SiddhiService. Data received from SiddhiQuery is displayed through this handler
     private static class SiddhiServiceHandler extends Handler {
         private final WeakReference<DeviceManagementService> mService;
+        private static  String publishTopic;
 
         SiddhiServiceHandler(DeviceManagementService service) {
             mService = new WeakReference<>(service);
+            publishTopic = LocalRegistry.getTenantDomain(mService.get())+ "/" + TVConstants.DEVICE_TYPE + "/" +
+                    LocalRegistry.getDeviceId(mService.get());
         }
 
         @Override
         public void handleMessage(Message msg) {
             Event data = (Event) msg.obj;
+            Log.d(TAG, "Edge data received: " + data.toString());
             switch (msg.what) {
-                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_QUERY:
-                    Log.d(TAG, "Edge data received: " + data.toString());
-                    //TODO: Display message in screen based on the query result
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_ALERT_QUERY:
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_TEMPERATURE_QUERY:
+                    mService.get().publishStats(publishTopic + "/TEMP", "TEMP", (Float) data.getData(0));
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_HUMIDITY_QUERY:
+                    mService.get().publishStats(publishTopic + "/HUMIDITY", "HUMIDITY", (Float) data.getData(0));
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_AC_QUERY:
+                    mService.get().publishStats(publishTopic + "/AC", "AC", (Integer) data.getData(0));
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_WINDOW_QUERY:
+                    mService.get().publishStats(publishTopic + "/WINDOW", "WINDOW", (Integer) data.getData(0));
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_KEYCARD_QUERY:
+                    mService.get().publishStats(publishTopic + "/DOOR", "DOOR", (Integer) data.getData(0));
                     break;
             }
         }

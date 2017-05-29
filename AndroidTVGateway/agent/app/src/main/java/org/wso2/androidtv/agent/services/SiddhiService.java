@@ -18,12 +18,18 @@ public class SiddhiService extends Service {
 
     private static final String TAG = SiddhiService.class.getSimpleName();
 
-    public static final int MESSAGE_FROM_SIDDHI_SERVICE_QUERY = 1;
+    public static final int MESSAGE_FROM_SIDDHI_SERVICE_ALERT_QUERY = 1;
+    public static final int MESSAGE_FROM_SIDDHI_SERVICE_TEMPERATURE_QUERY = 2;
+    public static final int MESSAGE_FROM_SIDDHI_SERVICE_HUMIDITY_QUERY = 3;
+    public static final int MESSAGE_FROM_SIDDHI_SERVICE_WINDOW_QUERY = 4;
+    public static final int MESSAGE_FROM_SIDDHI_SERVICE_AC_QUERY = 5;
+    public static final int MESSAGE_FROM_SIDDHI_SERVICE_KEYCARD_QUERY = 6;
     private SiddhiManager siddhiManager;
     private ExecutionPlanRuntime executionPlanRuntime;
     private InputHandler inputHandler;
     private Handler mHandler;
     private IBinder binder = new SiddhiBinder();
+    private String executionPlan = "";
 
     public SiddhiService() {
     }
@@ -36,7 +42,9 @@ public class SiddhiService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Starting service.");
-        String executionPlan = intent.getExtras().getString(TVConstants.EXECUTION_PLAN_EXTRA);
+        if (intent.hasExtra(TVConstants.EXECUTION_PLAN_EXTRA)) {
+            executionPlan = intent.getExtras().getString(TVConstants.EXECUTION_PLAN_EXTRA);
+        }
         if (siddhiManager != null && executionPlan != null) {
             invokeExecutionPlan(executionPlan);
         }
@@ -57,7 +65,62 @@ public class SiddhiService extends Service {
                 Log.d(TAG, "Event arrived on alertQuery");
                 if (mHandler != null) {
                     for (Event e : inEvents) {
-                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_QUERY, e).sendToTarget();
+                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_ALERT_QUERY, e).sendToTarget();
+                    }
+                }
+            }
+        });
+        executionPlanRuntime.addCallback("temperatureQuery", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                Log.d(TAG, "Event arrived on temperatureQuery");
+                if (mHandler != null) {
+                    for (Event e : inEvents) {
+                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_TEMPERATURE_QUERY, e).sendToTarget();
+                    }
+                }
+            }
+        });
+        executionPlanRuntime.addCallback("humidityQuery", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                Log.d(TAG, "Event arrived on humidityQuery");
+                if (mHandler != null) {
+                    for (Event e : inEvents) {
+                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_HUMIDITY_QUERY, e).sendToTarget();
+                    }
+                }
+            }
+        });
+        executionPlanRuntime.addCallback("acQuery", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                Log.d(TAG, "Event arrived on acQuery");
+                if (mHandler != null) {
+                    for (Event e : inEvents) {
+                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_AC_QUERY, e).sendToTarget();
+                    }
+                }
+            }
+        });
+        executionPlanRuntime.addCallback("windowQuery", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                Log.d(TAG, "Event arrived on windowQuery");
+                if (mHandler != null) {
+                    for (Event e : inEvents) {
+                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_WINDOW_QUERY, e).sendToTarget();
+                    }
+                }
+            }
+        });
+        executionPlanRuntime.addCallback("keycardQuery", new QueryCallback() {
+            @Override
+            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
+                Log.d(TAG, "Event arrived on keycardQuery");
+                if (mHandler != null) {
+                    for (Event e : inEvents) {
+                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_KEYCARD_QUERY, e).sendToTarget();
                     }
                 }
             }
