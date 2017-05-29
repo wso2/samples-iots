@@ -296,6 +296,7 @@ public class DeviceManagementService extends Service {
     @Override
     public void onDestroy() {
         unbindService(usbConnection);
+        unbindService(siddhiConnection);
         if (androidTVMQTTHandler != null && androidTVMQTTHandler.isConnected()) {
             androidTVMQTTHandler.disconnect();
         }
@@ -326,6 +327,11 @@ public class DeviceManagementService extends Service {
                 break;
             case "xbee-command":
                 sendCommandToEdgeDevice(payload);
+                break;
+            case "edgeQuery":
+                Bundle extras = new Bundle();
+                extras.putString(TVConstants.EXECUTION_PLAN_EXTRA, payload);
+                startService(SiddhiService.class, siddhiConnection, extras);
                 break;
         }
     }
@@ -369,7 +375,7 @@ public class DeviceManagementService extends Service {
     private void startActivity(Class<?> cls, String extra) {
         Intent intent = new Intent(this, cls);
         intent.putExtra(TVConstants.MESSAGE, extra);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         startActivity(intent);
     }
 
@@ -472,6 +478,30 @@ public class DeviceManagementService extends Service {
         }
     }
 
+    public void displayAlert(boolean ac, boolean window, boolean light){
+        String alertMsg = "Please ";
+        if (window) {
+            alertMsg += "close the window ";
+        }
+        if (ac || light) {
+            if (window) {
+                alertMsg += "and ";
+            }
+            alertMsg += "turn off ";
+            if (ac) {
+                alertMsg += "AC ";
+            }
+            if (ac && light) {
+                alertMsg += "and ";
+            }
+            if (light) {
+                alertMsg += "Light ";
+            }
+        }
+        alertMsg += "before leaving the room.";
+        startActivity(MessageActivity.class, alertMsg);
+    }
+
     private String getDeviceId() {
         return AndroidTVUtils.generateDeviceId(getBaseContext(), getContentResolver());
     }
@@ -543,6 +573,7 @@ public class DeviceManagementService extends Service {
             Log.d(TAG, "Edge data received: " + data.toString());
             switch (msg.what) {
                 case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_ALERT_QUERY:
+                    mService.get().displayAlert((Integer) data.getData(0) == 1, (Integer) data.getData(1) == 1, (Integer) data.getData(2) == 1);
                     break;
                 case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_TEMPERATURE_QUERY:
                     mService.get().publishStats(publishTopic + "/TEMP", "TEMP", (Float) data.getData(0));

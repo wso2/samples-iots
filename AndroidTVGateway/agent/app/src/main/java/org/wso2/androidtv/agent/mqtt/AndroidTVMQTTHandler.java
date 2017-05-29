@@ -72,9 +72,9 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
         Runnable connector = new Runnable() {
             public void run() {
                 AndroidTVClient client = new AndroidTVClient(context);
-                client.renewToken();
-                setUsernameAndPassword(LocalRegistry.getAccessToken(context), "");
                 while (!isConnected()) {
+                    client.renewToken();
+                    setUsernameAndPassword(LocalRegistry.getAccessToken(context), "");
                     try {
                         connectToQueue();
                     } catch (TransportHandlerException e) {
