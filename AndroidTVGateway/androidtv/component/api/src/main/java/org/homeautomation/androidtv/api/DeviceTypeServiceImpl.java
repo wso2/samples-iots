@@ -25,8 +25,12 @@ import org.apache.commons.logging.LogFactory;
 import org.homeautomation.androidtv.api.constants.AndroidTVConstants;
 import org.homeautomation.androidtv.api.util.APIUtil;
 import org.homeautomation.androidtv.api.util.AndroidConfiguration;
+import org.homeautomation.androidtv.api.util.SensorRecord;
 import org.homeautomation.androidtv.plugin.dto.EdgeDevice;
 import org.json.JSONObject;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
+import org.wso2.carbon.analytics.dataservice.commons.SortType;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.device.mgt.common.Device;
 import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
@@ -39,6 +43,7 @@ import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
 import org.wso2.carbon.device.mgt.core.operation.mgt.CommandOperation;
 
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
@@ -49,11 +54,53 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+
 /**
  * This is the API which is used to control and manage device type functionality
  */
 public class DeviceTypeServiceImpl implements DeviceTypeService {
     private static Log log = LogFactory.getLog(DeviceTypeService.class);
+
+
+    @Path("device/stats/{deviceId}")
+    @GET
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response getAndroidTVStats(@PathParam("deviceId") String deviceId, @QueryParam("from") long from,
+                                   @QueryParam("to") long to, @QueryParam("sensorType") String sensorType) {
+        String fromDate = String.valueOf(from*1000); //converting to ms
+        String toDate = String.valueOf(to*1000); // converting to ms
+        String query = "meta_deviceId:" + deviceId + " AND meta_deviceType:" +
+                AndroidTVConstants.DEVICE_TYPE + " AND meta_time : [" + fromDate + " TO " + toDate + "]";
+
+        String sensorTableName = null;
+        switch(sensorType){
+            case AndroidTVConstants.SENSOR_TYPE1:{sensorTableName=AndroidTVConstants.SENSOR_TYPE1_EVENT_TABLE;break;}
+            case AndroidTVConstants.SENSOR_TYPE2:{sensorTableName=AndroidTVConstants.SENSOR_TYPE2_EVENT_TABLE;break;}
+            case AndroidTVConstants.SENSOR_TYPE3:{sensorTableName=AndroidTVConstants.SENSOR_TYPE3_EVENT_TABLE;break;}
+            case AndroidTVConstants.SENSOR_TYPE4:{sensorTableName=AndroidTVConstants.SENSOR_TYPE4_EVENT_TABLE;break;}
+            case AndroidTVConstants.SENSOR_TYPE5:{sensorTableName=AndroidTVConstants.SENSOR_TYPE5_EVENT_TABLE;break;}
+        }
+        try {
+            if (!APIUtil.getDeviceAccessAuthorizationService().isUserAuthorized(
+                    new DeviceIdentifier(deviceId, AndroidTVConstants.DEVICE_TYPE),
+                    DeviceGroupConstants.Permissions.DEFAULT_STATS_MONITOR_PERMISSIONS)) {
+                return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
+            }
+            List<SortByField> sortByFields = new ArrayList<>();
+            SortByField sortByField = new SortByField("_timestamp", SortType.ASC);
+            sortByFields.add(sortByField);
+            List<SensorRecord> sensorRecords = APIUtil.getAllEventsForDevice(sensorTableName, query, sortByFields);
+            return Response.status(Response.Status.OK.getStatusCode()).entity(sensorRecords).build();
+        } catch (AnalyticsException e) {
+            String errorMsg = "Error on retrieving stats on table " + sensorTableName + " with query " + query;
+            log.error(errorMsg);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(errorMsg).build();
+        } catch (DeviceAccessAuthorizationException e) {
+            log.error(e.getErrorMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     /**
      * Play video on Android TV with given URL.

@@ -18,11 +18,11 @@
   -->
 
 <artifacts>
-    <artifact name="ULTRASONIC_CAPP" version="1.0.0" type="carbon/application">
-        <dependency artifact="ULTRASONIC_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
-		<dependency artifact="ULTRASONIC_store" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
-        <dependency artifact="ULTRASONIC_mqtt_receiver" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
-        <dependency artifact="ULTRASONIC_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
-        <dependency artifact="ULTRASONIC_spark_script" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+    <artifact name="AC_CAPP" version="1.0.0" type="carbon/application">
+        <dependency artifact="AC_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+		<dependency artifact="AC_store" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="AC_mqtt_receiver" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="AC_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+
     </artifact>
 </artifacts>

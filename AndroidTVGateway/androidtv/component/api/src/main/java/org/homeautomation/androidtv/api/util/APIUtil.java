@@ -5,8 +5,15 @@ import org.apache.commons.logging.LogFactory;
 import org.homeautomation.androidtv.api.constants.AndroidTVConstants;
 import org.homeautomation.androidtv.plugin.constants.DeviceTypeConstants;
 import org.homeautomation.androidtv.plugin.impl.DeviceTypeManager;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
+import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
+import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
+import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
+import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.datasource.commons.Record;
+import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
 import org.wso2.carbon.apimgt.application.extension.APIManagementProviderService;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.Utils;
 import org.wso2.carbon.device.mgt.common.DeviceManager;
@@ -18,6 +25,7 @@ import org.wso2.carbon.device.mgt.common.configuration.mgt.PlatformConfiguration
 import org.wso2.carbon.device.mgt.common.spi.DeviceManagementService;
 import org.wso2.carbon.device.mgt.core.service.DeviceManagementProviderService;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +127,54 @@ public class APIUtil {
 		}
 		return tenantConfigurationManagementService;
 	}
+
+	public static AnalyticsDataAPI getAnalyticsDataAPI() {
+		PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+		AnalyticsDataAPI analyticsDataAPI =
+				(AnalyticsDataAPI) ctx.getOSGiService(AnalyticsDataAPI.class, null);
+		if (analyticsDataAPI == null) {
+			String msg = "Analytics api service has not initialized.";
+			log.error(msg);
+			throw new IllegalStateException(msg);
+		}
+		return analyticsDataAPI;
+	}
+
+	private static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
+		List<String> ids = new ArrayList<>();
+		for (SearchResultEntry searchResult : searchResults) {
+			ids.add(searchResult.getId());
+		}
+		return ids;
+	}
+
+	public static List<SensorRecord> getSortedSensorData(Map<String, SensorRecord> sensorDatas,
+														 List<SearchResultEntry> searchResults) {
+		List<SensorRecord> sortedRecords = new ArrayList<>();
+		for (SearchResultEntry searchResultEntry : searchResults) {
+			sortedRecords.add(sensorDatas.get(searchResultEntry.getId()));
+		}
+		return sortedRecords;
+	}
+
+	public static List<SensorRecord> getAllEventsForDevice(String tableName, String query,
+														   List<SortByField> sortByFields) throws AnalyticsException {
+		int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+		AnalyticsDataAPI analyticsDataAPI = getAnalyticsDataAPI();
+		int eventCount = analyticsDataAPI.searchCount(tenantId, tableName, query);
+		if (eventCount == 0) {
+			return null;
+		}
+		List<SearchResultEntry> resultEntries = analyticsDataAPI.search(tenantId, tableName, query, 0, eventCount,
+				sortByFields);
+		List<String> recordIds = getRecordIds(resultEntries);
+		AnalyticsDataResponse response = analyticsDataAPI.get(tenantId, tableName, 1, null, recordIds);
+		Map<String, SensorRecord> sensorDatas = createSensorData(AnalyticsDataAPIUtil.listRecords(
+				analyticsDataAPI, response));
+		List<SensorRecord> sortedSensorData = getSortedSensorData(sensorDatas, resultEntries);
+		return sortedSensorData;
+	}
+
 
 	public static String getMqttEndpoint() throws ConfigurationManagementException {
 		String iotServerIP = Utils.replaceSystemProperty(AndroidTVConstants.DEFAULT_ENDPOINT);

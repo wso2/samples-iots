@@ -33,6 +33,7 @@ import org.wso2.carbon.apimgt.annotations.api.Scope;
 import org.wso2.carbon.apimgt.annotations.api.Scopes;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
@@ -563,5 +564,29 @@ public interface DeviceTypeService {
                     value = "Device name of the device to be added",
                     required = true)
             @QueryParam("deviceName") String deviceName);
+
+    /**
+     * Retrieve Sensor data for the device type
+     */
+    @Path("device/stats/{deviceId}")
+    @GET
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Retrieve Sensor data for the device type",
+            notes = "",
+            response = Response.class,
+            tags = "androidtv",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
+                    })
+            }
+    )
+    @Consumes("application/json")
+    @Produces("application/json")
+    Response getAndroidTVStats(@PathParam("deviceId") String deviceId, @QueryParam("from") long from,
+                                      @QueryParam("to") long to,@QueryParam("sensorType") String sensorType);
+
 
 }
