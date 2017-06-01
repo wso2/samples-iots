@@ -210,5 +210,9 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
 
     }
 
+    public String getDefaultPublishTopic() {
+        return publishTopic;
+    }
+
 }
 
