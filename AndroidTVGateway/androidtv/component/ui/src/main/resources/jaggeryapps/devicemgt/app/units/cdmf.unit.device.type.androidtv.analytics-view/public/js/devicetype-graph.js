@@ -17,18 +17,18 @@
  */
 
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
-var sensorType1 = "TEMP"
-var sensorType2 = "HUMIDITY"
-var sensorType3 = "DOOR"
-var sensorType4 = "WINDOW"
-var sensorType5 = "AC"
+var sensorType1 = "TEMP";
+var sensorType2 = "HUMIDITY";
+var sensorType3 = "DOOR";
+var sensorType4 = "WINDOW";
+var sensorType5 = "AC";
 
 var sensorType1Graph;
 var sensorType2Graph;
 var sensorType3Graph;
 var sensorType4Graph;
 var sensorType5Graph;
-
+var previousPointValue =0;
 
 function drawGraph_androidtv(from, to)
 {
@@ -258,17 +258,48 @@ function drawGraph_androidtv(from, to)
     }
 
     function drawLineGraph(data, sensorType, deviceIndex, graphConfig, graph) {
+        previousPointValue =0;
         if (data.length === 0 || data.length === undefined) {
             return;
         }
         var chartData = [];
         for (var i = 0; i < data.length; i++) {
-            chartData.push(
-                {
+            var currentPointValue;
+            if (sensorType == 'AC') {
+                currentPointValue = parseInt(data[i].values.AC);
+            }
+            else if (sensorType == 'DOOR') {
+                currentPointValue = parseInt(data[i].values.DOOR);
+            }
+            else if (sensorType == 'WINDOW') {
+                currentPointValue = parseInt(data[i].values.WINDOW);
+                console.log(currentPointValue);
+            }
+            else {
+                previousPointValue = parseInt(data[i].values[sensorType]);
+                currentPointValue = previousPointValue;
+            }
+
+            if(currentPointValue == previousPointValue) {
+                chartData.push({
                     x: parseInt(data[i].values.meta_time) - tzOffset,
                     y: parseInt(data[i].values[sensorType])
-                }
-            );
+                });
+            } else {
+                chartData.push({
+                    x: parseInt(data[i].values.meta_time) - tzOffset,
+                    y: previousPointValue
+                });
+
+                chartData.push({
+                    x: parseInt(data[i].values.meta_time) - tzOffset,
+                    y: currentPointValue
+                });
+
+                previousPointValue = currentPointValue;
+            }
+
+
         }
         graphConfig.series[deviceIndex].data = chartData;
         graph.update();
