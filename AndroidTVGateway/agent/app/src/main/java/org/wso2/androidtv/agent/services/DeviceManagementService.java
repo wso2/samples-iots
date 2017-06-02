@@ -46,6 +46,7 @@ import org.wso2.androidtv.agent.VideoActivity;
 import org.wso2.androidtv.agent.constants.TVConstants;
 import org.wso2.androidtv.agent.mqtt.AndroidTVMQTTHandler;
 import org.wso2.androidtv.agent.mqtt.MessageReceivedCallback;
+import org.wso2.androidtv.agent.cache.CacheEntry;
 import org.wso2.androidtv.agent.mqtt.transport.TransportHandlerException;
 import org.wso2.androidtv.agent.util.AndroidTVUtils;
 import org.wso2.androidtv.agent.util.LocalRegistry;
@@ -57,6 +58,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -73,6 +75,7 @@ public class DeviceManagementService extends Service {
     private SiddhiServiceHandler siddhiServiceHandler;
     private boolean hasPendingConfigDownload = false;
     private long downloadId = -1;
+    private CacheManagementService cacheManagementService;
 
     private static volatile boolean waitFlag = false;
     private static volatile boolean isSyncPaused = false;
@@ -80,6 +83,7 @@ public class DeviceManagementService extends Service {
     private static volatile boolean isInCriticalPath = false;
     private static volatile String serialOfCurrentEdgeDevice = "";
     private static volatile String incomingMessage = "";
+    private static volatile boolean isCacheEnabled = false;
 
     private DownloadManager downloadManager;
 
@@ -291,6 +295,7 @@ public class DeviceManagementService extends Service {
         startService(SiddhiService.class, siddhiConnection, extras);
 
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        runCacheManagementService();
     }
 
     @Override
@@ -304,6 +309,9 @@ public class DeviceManagementService extends Service {
         if (hasPendingConfigDownload) {
             unregisterReceiver(configDownloadReceiver);
             hasPendingConfigDownload = false;
+        }
+        if (cacheManagementService != null) {
+            cacheManagementService.removeAllCacheEntries();
         }
     }
 
@@ -450,7 +458,14 @@ public class DeviceManagementService extends Service {
 
             JSONObject wrapper = new JSONObject();
             wrapper.put("event", jsonEvent);
-            androidTVMQTTHandler.publishDeviceData(wrapper.toString());
+            if (androidTVMQTTHandler.isConnected()) {
+                androidTVMQTTHandler.publishDeviceData(wrapper.toString());
+            } else {
+                Log.i("SendATResponse", "Connection not available, hence entry is added to cache");
+                cacheManagementService.addCacheEntry(androidTVMQTTHandler.getDefaultPublishTopic(),
+                        wrapper.toString());
+                isCacheEnabled = true;
+            }
         } catch (TransportHandlerException | JSONException e) {
             Log.e(TAG, e.getClass().getSimpleName(), e);
         }
@@ -472,7 +487,13 @@ public class DeviceManagementService extends Service {
 
             JSONObject wrapper = new JSONObject();
             wrapper.put("event", jsonEvent);
-            androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
+            if (androidTVMQTTHandler.isConnected()) {
+                androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
+            } else {
+                Log.i("PublishStats", "Connection not available, hence entry is added to cache");
+                cacheManagementService.addCacheEntry(topic, wrapper.toString());
+                isCacheEnabled = true;
+            }
         } catch (TransportHandlerException | JSONException e) {
             Log.e(TAG, e.getClass().getSimpleName(), e);
         }
@@ -591,6 +612,64 @@ public class DeviceManagementService extends Service {
                     mService.get().publishStats(publishTopic + "/DOOR", "DOOR", (Integer) data.getData(0));
                     break;
             }
+        }
+    }
+
+    private void runCacheManagementService() {
+        cacheManagementService = new CacheManagementService(getApplicationContext());
+        final long threadWaitingTime = 10000; //10 seconds
+        if (cacheManagementService.getNumberOfEntries() > 0) {
+            isCacheEnabled = true;
+        }
+
+        Log.d("CacheManagementService", "Background process is started");
+        Thread cacheThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    Log.d("CacheManagementService", "Searching for a connection");
+                    if (isCacheEnabled) {
+                        Log.d("CacheManagementService", "Number of cache entries: "
+                                + cacheManagementService.getNumberOfEntries());
+                        if (androidTVMQTTHandler.isConnected()) {
+                            Log.d("CacheManagementService", "Connection is established");
+                            try {
+                                publishCacheData();
+                            } catch (TransportHandlerException e) {
+                                Log.e("CacheManagementService", "Unable to publish cached data", e);
+                            }
+                        } else {
+                            Log.d("CacheManagerService", "Unable to connect to the MQTT server, " +
+                                    "hence retry in " + (threadWaitingTime )/1000 + " seconds");
+                        }
+                    }
+                    try {
+                        Thread.sleep(threadWaitingTime);
+                    } catch (InterruptedException e) {
+                        Log.e("CacheManagementService", "Error occurred while checking cache", e);
+                    }
+                }
+            }
+        });
+        cacheThread.start();
+    }
+
+    private void publishCacheData() throws TransportHandlerException {
+        List<CacheEntry> cacheEntries = cacheManagementService.getCacheEntries();
+        Log.d("PublishCacheData", "Publishing cached data to the server");
+        for (CacheEntry entry : cacheEntries) {
+            if (androidTVMQTTHandler.isConnected()) {
+                Log.d("PublishCacheData", "Publishing cache entry: " + entry.getId());
+                androidTVMQTTHandler.publishDeviceData(entry.getMessage(), entry.getTopic());
+                cacheManagementService.removeCacheEntry(entry.getId());
+            }else {
+                break;
+            }
+        }
+        cacheEntries = cacheManagementService.getCacheEntries();
+        if (cacheEntries.size() == 0) {
+            Log.d("PublishCacheData", "Cache disabled");
+            isCacheEnabled = false;
         }
     }
 }

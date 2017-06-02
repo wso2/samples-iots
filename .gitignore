@@ -18,7 +18,7 @@ target
 
 #cache folders
 cache/
-
+!AndroidTVGateway/agent/app/src/main/java/org/wso2/androidtv/agent/cache
 # Package Files #
 *.jar
 *.war
