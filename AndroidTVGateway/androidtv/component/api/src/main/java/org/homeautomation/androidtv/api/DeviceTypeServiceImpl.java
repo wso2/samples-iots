@@ -71,7 +71,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         String fromDate = String.valueOf(from*1000); //converting to ms
         String toDate = String.valueOf(to*1000); // converting to ms
         String query = "meta_deviceId:" + deviceId + " AND meta_deviceType:" +
-                AndroidTVConstants.DEVICE_TYPE + " AND meta_time : [" + fromDate + " TO " + toDate + "]";
+                AndroidTVConstants.DEVICE_TYPE + " AND _timestamp : [" + fromDate + " TO " + toDate + "]";
 
         String sensorTableName = null;
         switch(sensorType){
