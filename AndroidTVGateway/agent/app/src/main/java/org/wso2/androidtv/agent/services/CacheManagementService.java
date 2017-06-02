@@ -85,4 +85,13 @@ public class CacheManagementService implements CacheManager {
             cacheDAO.close();
         }
     }
+
+    public int getNumberOfEntries() {
+        try {
+            cacheDAO.open();
+            return cacheDAO.getAllEntries().size();
+        } finally {
+            cacheDAO.close();
+        }
+    }
 }

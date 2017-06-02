@@ -31,7 +31,6 @@ public class CacheDAO {
 
     private SQLiteDatabase db;
     private DBHelper dbHelper;
-    private static int AUTO_INCREMENT_ID;
 
     public CacheDAO(Context context) {
         dbHelper = DBHelper.getInstance(context);
@@ -53,7 +52,6 @@ public class CacheDAO {
 
     public void addEntry(CacheEntry entry) {
         ContentValues values = new ContentValues();
-        values.put(DBHelper.CACHE_TABLE_ID, AUTO_INCREMENT_ID++);
         values.put(DBHelper.CACHE_TABLE_TOPIC, entry.getTopic());
         values.put(DBHelper.CACHE_TABLE_MESSAGE, entry.getMessage());
         values.put(DBHelper.CACHE_TABLE_RECEIVED_TIME, getCurrentTime());

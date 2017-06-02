@@ -31,11 +31,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String CACHE_TABLE_NAME = "cache";
     public static final String CACHE_TABLE_ID = "id";
     public static final String CACHE_TABLE_TOPIC = "topic";
-    public static final String CACHE_TABLE_MESSAGE = "topic";
+    public static final String CACHE_TABLE_MESSAGE = "message";
     public static final String CACHE_TABLE_RECEIVED_TIME = "received_time";
 
     private static final String CREATE_CACHE_TABLE = "CREATE TABLE " + CACHE_TABLE_NAME +
-            "(" + CACHE_TABLE_ID + " integer primary key, " +
+            "(" + CACHE_TABLE_ID + " integer primary key autoincrement, " +
             CACHE_TABLE_TOPIC + " text not null, " +
             CACHE_TABLE_MESSAGE + " text not null, " +
             CACHE_TABLE_RECEIVED_TIME + " text not null)";
