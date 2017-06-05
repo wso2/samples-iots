@@ -40,9 +40,15 @@ function onRequest(context) {
     	}
     	var websocketEndpointForStream1 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.TEMP/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
     	var websocketEndpointForStream2 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.HUMIDITY/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+    	var websocketEndpointForStream3 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.AC/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+        var websocketEndpointForStream4 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.DOOR/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+        var websocketEndpointForStream5 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.WINDOW/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
     	return {
     		"device": device,
     		"websocketEndpointForStream1": websocketEndpointForStream1,
-    		"websocketEndpointForStream2": websocketEndpointForStream2
+    		"websocketEndpointForStream2": websocketEndpointForStream2,
+    		"websocketEndpointForStream3": websocketEndpointForStream3,
+            "websocketEndpointForStream4": websocketEndpointForStream4,
+            "websocketEndpointForStream5": websocketEndpointForStream5
     	};
 }

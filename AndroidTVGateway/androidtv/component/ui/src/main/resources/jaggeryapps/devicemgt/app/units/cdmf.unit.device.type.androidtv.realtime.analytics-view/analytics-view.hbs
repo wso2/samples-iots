@@ -3,7 +3,7 @@
 
 {{unit "cdmf.unit.lib.rickshaw-graph"}}
 
-<div id="div-chart-sensorType1" data-websocketurlStream="{{websocketEndpointForStream1}}">
+<div id="div-chart-sensorType1" data-websocketurlStream="{{websocketEndpointForStream1}}" data-sensorType="TEMPERATURE">
     <div class="chartWrapper" id="chartWrapper">
         <div id="yAxisSensorType1" class="custom_y_axis">TEMPERATURE</div>
         <div class="legend_container">
@@ -18,7 +18,7 @@
 
 {{unit "cdmf.unit.lib.rickshaw-graph"}}
 
-<div id="div-chart-sensorType2" data-websocketurlStream="{{websocketEndpointForStream2}}">
+<div id="div-chart-sensorType2" data-websocketurlStream="{{websocketEndpointForStream2}}" data-sensorType="HUMIDITY">
     <div class="chartWrapper" id="chartWrapper">
         <div id="yAxisSensorType2" class="custom_y_axis">HUMIDITY</div>
         <div class="legend_container">
@@ -31,6 +31,49 @@
 </div>
 
 
+{{unit "cdmf.unit.lib.rickshaw-graph"}}
+
+<div id="div-chart-sensorType3" data-websocketurlStream="{{websocketEndpointForStream3}}" data-sensorType="AC">
+    <div class="chartWrapper" id="chartWrapper">
+        <div id="yAxisSensorType3" class="custom_y_axis">AC</div>
+        <div class="legend_container">
+            <div id="smootherSensorType3" title="Smoothing"></div>
+            <div id="legendSensorType3"></div>
+        </div>
+        <div id="chartSensorType3" class="custom_rickshaw_graph"></div>
+        <div class="custom_x_axis">Time</div>
+    </div>
+</div>
+
+
+{{unit "cdmf.unit.lib.rickshaw-graph"}}
+
+<div id="div-chart-sensorType4" data-websocketurlStream="{{websocketEndpointForStream4}}" data-sensorType="DOOR">
+    <div class="chartWrapper" id="chartWrapper">
+        <div id="yAxisSensorType4" class="custom_y_axis">DOOR</div>
+        <div class="legend_container">
+            <div id="smootherSensorType4" title="Smoothing"></div>
+            <div id="legendSensorType4"></div>
+        </div>
+        <div id="chartSensorType4" class="custom_rickshaw_graph"></div>
+        <div class="custom_x_axis">Time</div>
+    </div>
+</div>
+
+
+{{unit "cdmf.unit.lib.rickshaw-graph"}}
+
+<div id="div-chart-sensorType5" data-websocketurlStream="{{websocketEndpointForStream5}}" data-sensorType="WINDOW">
+    <div class="chartWrapper" id="chartWrapper">
+        <div id="yAxisSensorType5" class="custom_y_axis">WINDOW</div>
+        <div class="legend_container">
+            <div id="smootherSensorType5" title="Smoothing"></div>
+            <div id="legendSensorType5"></div>
+        </div>
+        <div id="chartSensorType5" class="custom_rickshaw_graph"></div>
+        <div class="custom_x_axis">Time</div>
+    </div>
+</div>
 
 <a class="padding-left"
    href="{{@app.context}}/device/{{device.type}}/analytics?deviceId={{device.deviceIdentifier}}
