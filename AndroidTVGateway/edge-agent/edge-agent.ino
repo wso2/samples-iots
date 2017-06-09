@@ -19,6 +19,7 @@ byte readCard[4];   // Stores scanned ID read from RFID Module
 int lastId = 0;
 char msg[100];
 boolean isCardIn = false;
+boolean isBulbOn = false;
 
 // Create MFRC522 instance.
 constexpr uint8_t RST_PIN = 9;     // Configurable, see typical pin layout above
@@ -47,9 +48,11 @@ void loop() {
     if (incomingMsg == "LON\r") {
       digitalWrite(LED_LIGHT, HIGH);
       XBee.print("{\"a\":\"LON\"}\r");
+      isBulbOn = true;
     } else if (incomingMsg == "LOFF\r") {
       digitalWrite(LED_LIGHT, LOW);
       XBee.print("{\"a\":\"LOFF\"}\r");
+      isBulbOn = false;
     }else if (incomingMsg == "DOPEN\r") {
       digitalWrite(DOOR_LOCK, LOW);
       XBee.print("{\"a\":\"DOPEN\"}\r");
@@ -69,7 +72,7 @@ void loop() {
   } else if (lastId) {
     lastId = 0;
     digitalWrite(DOOR_LOCK, HIGH);
-    isCardIn = true;    
+    isCardIn = false;    
   }
 }
 
@@ -79,7 +82,7 @@ void syncNode() {
   int window = digitalRead(WINDOWPIN);
   int ac = digitalRead(ACPIN);
   char syncmsg[100];
-  sprintf (syncmsg, "{\"a\":\"DATA\",\"p\":{\"t\":%d,\"h\":%d,\"a\":%d,\"w\":%d,\"d\":%d}}\r", (int) t, (int) h, ac, window, (isCardIn ? 1 : 0));
+  sprintf (syncmsg, "{\"a\":\"DATA\",\"p\":{\"t\":%d,\"h\":%d,\"a\":%d,\"w\":%d,\"k\":%d,\"l\":%d}}\r", (int) t, (int) h, ac, window, isCardIn, isBulbOn);
   XBee.print(syncmsg);
   Serial.println(syncmsg);
 }

@@ -46,6 +46,7 @@ import org.wso2.androidtv.agent.VideoActivity;
 import org.wso2.androidtv.agent.constants.TVConstants;
 import org.wso2.androidtv.agent.mqtt.AndroidTVMQTTHandler;
 import org.wso2.androidtv.agent.mqtt.MessageReceivedCallback;
+import org.wso2.androidtv.agent.cache.CacheEntry;
 import org.wso2.androidtv.agent.mqtt.transport.TransportHandlerException;
 import org.wso2.androidtv.agent.util.AndroidTVUtils;
 import org.wso2.androidtv.agent.util.LocalRegistry;
@@ -57,7 +58,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
 import java.util.Calendar;
-import java.util.Random;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -74,12 +75,15 @@ public class DeviceManagementService extends Service {
     private SiddhiServiceHandler siddhiServiceHandler;
     private boolean hasPendingConfigDownload = false;
     private long downloadId = -1;
+    private CacheManagementService cacheManagementService;
 
     private static volatile boolean waitFlag = false;
     private static volatile boolean isSyncPaused = false;
     private static volatile boolean isSyncStopped = false;
+    private static volatile boolean isInCriticalPath = false;
     private static volatile String serialOfCurrentEdgeDevice = "";
     private static volatile String incomingMessage = "";
+    private static volatile boolean isCacheEnabled = false;
 
     private DownloadManager downloadManager;
 
@@ -88,7 +92,7 @@ public class DeviceManagementService extends Service {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             usbService = ((UsbService.UsbBinder) iBinder).getService();
             usbService.setHandler(usbServiceHandler);
-            isSyncPaused = false;
+            isInCriticalPath = false;
             isSyncStopped = false;
             new Thread(syncScheduler).start();
         }
@@ -116,9 +120,17 @@ public class DeviceManagementService extends Service {
     private Runnable syncScheduler = new Runnable() {
         @Override
         public void run() {
-            try {
-                while (!isSyncStopped) {
+            while (!isSyncStopped) {
+                try {
                     for (String serial : LocalRegistry.getEdgeDevices(getApplicationContext())) {
+                        while ((isInCriticalPath || isSyncPaused) && !isSyncStopped) {
+                            Thread.sleep(1000);
+                        }
+                        if (isSyncStopped) {
+                            break;
+                        }
+                        isInCriticalPath = true;
+                        Thread.sleep(1000);
                         serialOfCurrentEdgeDevice = serial;
                         String serialH = serial.substring(0, serial.length() - 8);
                         String serialL = serial.substring(serial.length() - 8);
@@ -129,16 +141,15 @@ public class DeviceManagementService extends Service {
                         Thread.sleep(1000);
                         usbService.write("D\r".getBytes());
                         Thread.sleep(5000);
-                        while (isSyncPaused && !isSyncStopped) {
-                            Thread.sleep(1000);
-                        }
+                        isInCriticalPath = false;
+                        Thread.sleep(1000);
                         if (isSyncStopped) {
                             break;
                         }
                     }
+                } catch (IOException | InterruptedException e) {
+                    Log.e(TAG, e.getMessage(), e);
                 }
-            } catch (IOException | InterruptedException e) {
-                Log.e(TAG, e.getMessage(), e);
             }
         }
     };
@@ -175,6 +186,13 @@ public class DeviceManagementService extends Service {
             public void run() {
                 if (usbService != null) {
                     isSyncPaused = true;
+                    while (isInCriticalPath) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                    isInCriticalPath = true;
                     try {
                         sendConfigLine("+++");
                         File fXmlFile = new File(fileName);
@@ -203,10 +221,10 @@ public class DeviceManagementService extends Service {
                     usbService.write("ATCN\r".getBytes());
                     try {
                         Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        Log.e(TAG, e.getMessage(), e);
+                    } catch (InterruptedException ignored) {
                     }
-                    isSyncPaused = false;
+                    isInCriticalPath = false;
+                    isSyncPaused = true;
                 }
             }
         };
@@ -257,16 +275,33 @@ public class DeviceManagementService extends Service {
                 "(ac int, window int, light int, temperature float, humidity float, keycard int); " +
                 "@info(name = 'alertQuery') " +
                 "from edgeDeviceEventStream[(1 == ac or 1 == window or 1 == light) and 0 == keycard] " +
-                "select ac, window, light insert into alertOutputStream;";
+                "select ac, window, light insert into alertOutputStream; " +
+                "@info(name = 'temperatureQuery') " +
+                "from every te1=edgeDeviceEventStream, te2=edgeDeviceEventStream[te1.temperature != temperature ] " +
+                "select te2.temperature insert into temperatureOutputStream; " +
+                "@info(name = 'humidityQuery') " +
+                "from every he1=edgeDeviceEventStream, he2=edgeDeviceEventStream[he1.humidity != humidity ] " +
+                "select he2.humidity insert into humidityOutputStream; " +
+                "@info(name = 'acQuery') " +
+                "from every ae1=edgeDeviceEventStream, ae2=edgeDeviceEventStream[ae1.ac != ac ] " +
+                "select ae2.ac insert into acOutputStream; " +
+                "@info(name = 'windowQuery') " +
+                "from every we1=edgeDeviceEventStream, we2=edgeDeviceEventStream[we1.window != window ] " +
+                "select we2.window insert into windowOutputStream; " +
+                "@info(name = 'keycardQuery') " +
+                "from every ke1=edgeDeviceEventStream, ke2=edgeDeviceEventStream[ke1.keycard != keycard ] " +
+                "select ke2.keycard insert into keycardOutputStream;";
         extras.putString(TVConstants.EXECUTION_PLAN_EXTRA, executionPlan);
         startService(SiddhiService.class, siddhiConnection, extras);
 
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        runCacheManagementService();
     }
 
     @Override
     public void onDestroy() {
         unbindService(usbConnection);
+        unbindService(siddhiConnection);
         if (androidTVMQTTHandler != null && androidTVMQTTHandler.isConnected()) {
             androidTVMQTTHandler.disconnect();
         }
@@ -274,6 +309,9 @@ public class DeviceManagementService extends Service {
         if (hasPendingConfigDownload) {
             unregisterReceiver(configDownloadReceiver);
             hasPendingConfigDownload = false;
+        }
+        if (cacheManagementService != null) {
+            cacheManagementService.removeAllCacheEntries();
         }
     }
 
@@ -298,10 +336,11 @@ public class DeviceManagementService extends Service {
             case "xbee-command":
                 sendCommandToEdgeDevice(payload);
                 break;
-            default:
-                if (usbService != null) { // if UsbService was correctly bind, Send data
-                    usbService.write(payload.getBytes());
-                }
+            case "edgeQuery":
+                Bundle extras = new Bundle();
+                extras.putString(TVConstants.EXECUTION_PLAN_EXTRA, payload);
+                startService(SiddhiService.class, siddhiConnection, extras);
+                break;
         }
     }
 
@@ -311,6 +350,12 @@ public class DeviceManagementService extends Service {
                 @Override
                 public void run() {
                     try {
+                        isSyncPaused = true;
+                        while (isInCriticalPath) {
+                            Thread.sleep(1000);
+                        }
+                        isInCriticalPath = true;
+                        Thread.sleep(1000);
                         JSONObject commandJSON = new JSONObject(payload);
                         String serial = commandJSON.getString("serial");
                         String command = commandJSON.getString("command") + "\r";
@@ -322,8 +367,12 @@ public class DeviceManagementService extends Service {
                         sendConfigLine("ATCN\r");
                         Thread.sleep(1000);
                         usbService.write(command.getBytes());
+                        Thread.sleep(5000);
                     } catch (JSONException | InterruptedException e) {
                         Log.e(TAG, e.getClass().getSimpleName(), e);
+                    } finally {
+                        isInCriticalPath = false;
+                        isSyncPaused = false;
                     }
                 }
             };
@@ -380,13 +429,12 @@ public class DeviceManagementService extends Service {
                         int ac = payload.getInt("a");
                         int window = payload.getInt("w");
                         int light = payload.getInt("l");
-                        int keycard = payload.getInt("k");
-                        siddhiService.getInputHandler().send(new Object[]{ac, window, light, temp, humidity, keycard});
-                        //TODO: send data to relevant event streams
+                        int keyCard = payload.getInt("k");
+                        siddhiService.getInputHandler().send(new Object[]{ac, window, light, temp, humidity, keyCard});
                         break;
                 }
             } catch (JSONException e) {
-                Log.e(TAG, "Incomplete incoming message. Ignored");
+                Log.e(TAG, "Incomplete incoming message. Ignored", e);
             } catch (InterruptedException e) {
                 Log.e(TAG, e.getClass().getSimpleName(), e);
             }
@@ -410,10 +458,69 @@ public class DeviceManagementService extends Service {
 
             JSONObject wrapper = new JSONObject();
             wrapper.put("event", jsonEvent);
-            androidTVMQTTHandler.publishDeviceData(wrapper.toString());
+            if (androidTVMQTTHandler.isConnected()) {
+                androidTVMQTTHandler.publishDeviceData(wrapper.toString());
+            } else {
+                Log.i("SendATResponse", "Connection not available, hence entry is added to cache");
+                cacheManagementService.addCacheEntry(androidTVMQTTHandler.getDefaultPublishTopic(),
+                        wrapper.toString());
+                isCacheEnabled = true;
+            }
         } catch (TransportHandlerException | JSONException e) {
             Log.e(TAG, e.getClass().getSimpleName(), e);
         }
+    }
+
+    private void publishStats(String topic, String key, float value) {
+        try {
+            JSONObject jsonEvent = new JSONObject();
+            JSONObject jsonMetaData = new JSONObject();
+            jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
+            jsonMetaData.put("deviceId", getDeviceId());
+            jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
+            jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
+            jsonEvent.put("metaData", jsonMetaData);
+
+            JSONObject payload = new JSONObject();
+            payload.put(key, value);
+            jsonEvent.put("payloadData", payload);
+
+            JSONObject wrapper = new JSONObject();
+            wrapper.put("event", jsonEvent);
+            if (androidTVMQTTHandler.isConnected()) {
+                androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
+            } else {
+                Log.i("PublishStats", "Connection not available, hence entry is added to cache");
+                cacheManagementService.addCacheEntry(topic, wrapper.toString());
+                isCacheEnabled = true;
+            }
+        } catch (TransportHandlerException | JSONException e) {
+            Log.e(TAG, e.getClass().getSimpleName(), e);
+        }
+    }
+
+    public void displayAlert(boolean ac, boolean window, boolean light){
+        String alertMsg = "Please ";
+        if (window) {
+            alertMsg += "close the window ";
+        }
+        if (ac || light) {
+            if (window) {
+                alertMsg += "and ";
+            }
+            alertMsg += "turn off ";
+            if (ac) {
+                alertMsg += "AC ";
+            }
+            if (ac && light) {
+                alertMsg += "and ";
+            }
+            if (light) {
+                alertMsg += "Light ";
+            }
+        }
+        alertMsg += "before leaving the room.";
+        startActivity(MessageActivity.class, alertMsg);
     }
 
     private String getDeviceId() {
@@ -473,20 +580,96 @@ public class DeviceManagementService extends Service {
     // This handler will be passed to SiddhiService. Data received from SiddhiQuery is displayed through this handler
     private static class SiddhiServiceHandler extends Handler {
         private final WeakReference<DeviceManagementService> mService;
+        private static  String publishTopic;
 
         SiddhiServiceHandler(DeviceManagementService service) {
             mService = new WeakReference<>(service);
+            publishTopic = LocalRegistry.getTenantDomain(mService.get())+ "/" + TVConstants.DEVICE_TYPE + "/" +
+                    LocalRegistry.getDeviceId(mService.get());
         }
 
         @Override
         public void handleMessage(Message msg) {
             Event data = (Event) msg.obj;
+            Log.d(TAG, "Edge data received: " + data.toString());
             switch (msg.what) {
-                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_QUERY:
-                    Log.d(TAG, "Edge data received: " + data.toString());
-                    //TODO: Display message in screen based on the query result
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_ALERT_QUERY:
+                    mService.get().displayAlert((Integer) data.getData(0) == 1, (Integer) data.getData(1) == 1, (Integer) data.getData(2) == 1);
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_TEMPERATURE_QUERY:
+                    mService.get().publishStats(publishTopic + "/TEMP", "TEMP", (Float) data.getData(0));
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_HUMIDITY_QUERY:
+                    mService.get().publishStats(publishTopic + "/HUMIDITY", "HUMIDITY", (Float) data.getData(0));
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_AC_QUERY:
+                    mService.get().publishStats(publishTopic + "/AC", "AC", (Integer) data.getData(0));
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_WINDOW_QUERY:
+                    mService.get().publishStats(publishTopic + "/WINDOW", "WINDOW", (Integer) data.getData(0));
+                    break;
+                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_KEYCARD_QUERY:
+                    mService.get().publishStats(publishTopic + "/DOOR", "DOOR", (Integer) data.getData(0));
                     break;
             }
+        }
+    }
+
+    private void runCacheManagementService() {
+        cacheManagementService = new CacheManagementService(getApplicationContext());
+        final long threadWaitingTime = 10000; //10 seconds
+        if (cacheManagementService.getNumberOfEntries() > 0) {
+            isCacheEnabled = true;
+        }
+
+        Log.d("CacheManagementService", "Background process is started");
+        Thread cacheThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    Log.d("CacheManagementService", "Searching for a connection");
+                    if (isCacheEnabled) {
+                        Log.d("CacheManagementService", "Number of cache entries: "
+                                + cacheManagementService.getNumberOfEntries());
+                        if (androidTVMQTTHandler.isConnected()) {
+                            Log.d("CacheManagementService", "Connection is established");
+                            try {
+                                publishCacheData();
+                            } catch (TransportHandlerException e) {
+                                Log.e("CacheManagementService", "Unable to publish cached data", e);
+                            }
+                        } else {
+                            Log.d("CacheManagerService", "Unable to connect to the MQTT server, " +
+                                    "hence retry in " + (threadWaitingTime )/1000 + " seconds");
+                        }
+                    }
+                    try {
+                        Thread.sleep(threadWaitingTime);
+                    } catch (InterruptedException e) {
+                        Log.e("CacheManagementService", "Error occurred while checking cache", e);
+                    }
+                }
+            }
+        });
+        cacheThread.start();
+    }
+
+    private void publishCacheData() throws TransportHandlerException {
+        List<CacheEntry> cacheEntries = cacheManagementService.getCacheEntries();
+        Log.d("PublishCacheData", "Publishing cached data to the server");
+        for (CacheEntry entry : cacheEntries) {
+            if (androidTVMQTTHandler.isConnected()) {
+                Log.d("PublishCacheData", "Publishing cache entry: " + entry.getId());
+                androidTVMQTTHandler.publishDeviceData(entry.getMessage(), entry.getTopic());
+                cacheManagementService.removeCacheEntry(entry.getId());
+            }else {
+                break;
+            }
+        }
+        cacheEntries = cacheManagementService.getCacheEntries();
+        if (cacheEntries.size() == 0) {
+            Log.d("PublishCacheData", "Cache disabled");
+            isCacheEnabled = false;
         }
     }
 }

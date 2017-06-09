@@ -53,6 +53,7 @@
             android:name=".MessageActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape"
+            android:launchMode="singleTask"
             android:theme="@style/FullscreenTheme" />
         <activity
             android:name=".VideoActivity"
