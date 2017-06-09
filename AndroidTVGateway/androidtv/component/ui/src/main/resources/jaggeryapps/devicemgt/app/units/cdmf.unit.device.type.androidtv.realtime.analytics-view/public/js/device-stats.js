@@ -18,19 +18,11 @@
 
 var wsConnection1;
 var wsConnection2;
-var wsConnection3;
-var wsConnection4;
-var wsConnection5;
 var graphForSensorType1;
 var graphForSensorType2;
-var graphForSensorType3;
-var graphForSensorType4;
-var graphForSensorType5;
 var chartDataSensorType1 = [];
 var chartDataSensorType2 = [];
-var chartDataSensorType3 = [];
-var chartDataSensorType4 = [];
-var chartDataSensorType5 = [];
+
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
     var tNow = new Date().getTime() / 1000;
