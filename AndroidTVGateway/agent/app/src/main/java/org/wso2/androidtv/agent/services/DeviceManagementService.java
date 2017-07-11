@@ -316,6 +316,7 @@ public class DeviceManagementService extends Service {
     }
 
     private void performAction(String action, String payload) {
+        System.out.println("TagPayLoad  :  "+payload);
         switch (action) {
             case "video":
                 startActivity(VideoActivity.class, payload);

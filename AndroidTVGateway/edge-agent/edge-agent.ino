@@ -13,7 +13,7 @@
 #define LED_LIGHT         8
 
 DHT dht(DHTPIN, DHTTYPE);
-SoftwareSerial XBee(2, 3); // RX, TX
+SoftwareSerial XBee(2, 3); // RX, TX.  SWITCH IS IN THE "DLINE" POSITION. That will connect the XBee's DOUT and DIN pins to Arduino pins 2 and 3.
 uint8_t successRead;    // Variable integer to keep if we have Successful Read from Reader
 byte readCard[4];   // Stores scanned ID read from RFID Module
 int lastId = 0;
@@ -42,7 +42,7 @@ void setup() {
 }
 
 void loop() {
-  if (XBee.available()) {
+  if (XBee.available()) {                   // If data comes in from XBee
     String incomingMsg = XBee.readString();
     Serial.println(incomingMsg);
     if (incomingMsg == "LON\r") {

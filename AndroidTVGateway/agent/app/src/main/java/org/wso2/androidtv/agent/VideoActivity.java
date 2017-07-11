@@ -19,10 +19,13 @@
 package org.wso2.androidtv.agent;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -32,6 +35,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 public class VideoActivity extends Activity {
+    
+    String youTube1 = "false";
+    String youTubeID="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +47,32 @@ public class VideoActivity extends Activity {
         String url = getIntent().getStringExtra(TVConstants.MESSAGE);
 
         VideoView videoView = (VideoView) findViewById(R.id.videoView);
-        try {
-            videoView.setVideoURI(Uri.parse(URLDecoder.decode(url, "UTF-8")));
-        } catch (UnsupportedEncodingException e) {
-            Log.e("VideoActivity", "Unable to parse url", e);
-            Toast.makeText(getApplicationContext(), "Unable to play video. " + e.getMessage(), Toast.LENGTH_LONG).show();
-            finish();
+        
+        Log.i("VIDEO URL", " " + url);
+
+
+        if(url.toLowerCase().contains("youtube")){                   // Checks whether the video is from YouTube
+
+            youTubeID = url.substring(url.length() - 11);           //ID given for the video by YouTube
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youTubeID));
+            startActivity(appIntent);
+
+        }else {
+
+
+            try {
+
+                videoView.setVideoURI(Uri.parse(URLDecoder.decode(url, "UTF-8")));
+
+
+            } catch (UnsupportedEncodingException e) {
+                Log.e("VideoActivity", "Unable to parse url", e);
+                Toast.makeText(getApplicationContext(), "Unable to play video. " + e.getMessage(), Toast.LENGTH_LONG).show();
+                finish();
+            }
+
         }
+
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
                 finish();
