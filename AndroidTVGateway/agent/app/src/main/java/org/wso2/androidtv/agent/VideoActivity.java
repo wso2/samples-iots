@@ -35,7 +35,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 public class VideoActivity extends Activity {
-    
 
     private String youTubeVideoID="";
 

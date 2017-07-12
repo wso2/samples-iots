@@ -316,7 +316,6 @@ public class DeviceManagementService extends Service {
     }
 
     private void performAction(String action, String payload) {
-
         switch (action) {
             case "video":
                 startActivity(VideoActivity.class, payload);
