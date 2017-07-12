@@ -48,24 +48,17 @@ public class VideoActivity extends Activity {
         VideoView videoView = (VideoView) findViewById(R.id.videoView);
         
         if(url.toLowerCase().contains("youtube.com")){                   // Checks whether the video is from YouTube
-
             youTubeVideoID = url.substring(url.length() - 11);           //ID given for the video by YouTube
             Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youTubeVideoID));
             startActivity(appIntent);
-
         }else {
-
             try {
-
                 videoView.setVideoURI(Uri.parse(URLDecoder.decode(url, "UTF-8")));
-
             } catch (UnsupportedEncodingException e) {
-
                 Log.e("VideoActivity", "Unable to parse url", e);
                 Toast.makeText(getApplicationContext(), "Unable to play video. " + e.getMessage(), Toast.LENGTH_LONG).show();
                 finish();
             }
-
         }
 
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
