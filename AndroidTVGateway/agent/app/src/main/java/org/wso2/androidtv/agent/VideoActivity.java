@@ -51,7 +51,7 @@ public class VideoActivity extends Activity {
         Log.i("VIDEO URL", " " + url);
 
 
-        if(url.toLowerCase().contains("youtube")){                   // Checks whether the video is from YouTube
+        if(url.toLowerCase().contains("youtube.com")){                   // Checks whether the video is from YouTube
 
             youTubeID = url.substring(url.length() - 11);           //ID given for the video by YouTube
             Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youTubeID));
