@@ -36,8 +36,8 @@ import java.net.URLDecoder;
 
 public class VideoActivity extends Activity {
     
-    String youTube1 = "false";
-    String youTubeID="";
+
+    private String youTubeVideoID="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +48,10 @@ public class VideoActivity extends Activity {
 
         VideoView videoView = (VideoView) findViewById(R.id.videoView);
         
-        Log.i("VIDEO URL", " " + url);
-
-
         if(url.toLowerCase().contains("youtube.com")){                   // Checks whether the video is from YouTube
 
-            youTubeID = url.substring(url.length() - 11);           //ID given for the video by YouTube
-            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youTubeID));
+            youTubeVideoID = url.substring(url.length() - 11);           //ID given for the video by YouTube
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youTubeVideoID));
             startActivity(appIntent);
 
         }else {
@@ -64,8 +61,8 @@ public class VideoActivity extends Activity {
 
                 videoView.setVideoURI(Uri.parse(URLDecoder.decode(url, "UTF-8")));
 
-
             } catch (UnsupportedEncodingException e) {
+
                 Log.e("VideoActivity", "Unable to parse url", e);
                 Toast.makeText(getApplicationContext(), "Unable to play video. " + e.getMessage(), Toast.LENGTH_LONG).show();
                 finish();
