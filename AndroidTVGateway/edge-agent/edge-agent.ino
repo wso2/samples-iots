@@ -14,7 +14,7 @@
 
 DHT dht(DHTPIN, DHTTYPE);
 SoftwareSerial XBee(2, 3); // RX, TX
-uint8_t successRead;    
+uint8_t successRead;    // Variable integer to keep if we have Successful Read from Reader
 byte readCard[4];   // Stores scanned ID read from RFID Module
 int lastId = 0;
 char msg[100];
@@ -42,7 +42,7 @@ void setup() {
 }
 
 void loop() {
-  if (XBee.available()) {                   
+  if (XBee.available()) {
     String incomingMsg = XBee.readString();
     Serial.println(incomingMsg);
     if (incomingMsg == "LON\r") {
