@@ -56,7 +56,6 @@ public class VideoActivity extends Activity {
 
         }else {
 
-
             try {
 
                 videoView.setVideoURI(Uri.parse(URLDecoder.decode(url, "UTF-8")));
