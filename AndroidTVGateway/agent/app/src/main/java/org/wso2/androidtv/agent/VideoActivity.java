@@ -33,10 +33,9 @@ import org.wso2.androidtv.agent.constants.TVConstants;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.regex.Pattern;
 
 public class VideoActivity extends Activity {
-
-    private String youTubeVideoID="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +45,27 @@ public class VideoActivity extends Activity {
         String url = getIntent().getStringExtra(TVConstants.MESSAGE);
 
         VideoView videoView = (VideoView) findViewById(R.id.videoView);
-        
-        if(url.toLowerCase().contains("youtube.com")){                   // Checks whether the video is from YouTube
-            youTubeVideoID = url.substring(url.length() - 11);           //ID given for the video by YouTube
-            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youTubeVideoID));
+
+        //regex to check whether the URL belongs to YouTube
+        String checkYouTubeRegEx = "^(http%3A%2F%2F|https%3A%2F%2F)(youtu\\.be|www\\.youtube\\." +
+                "com)(.*)";
+        //checks whether the URL belongs to YouTube
+        boolean isYouTubeURL = Pattern.matches(checkYouTubeRegEx, url);
+
+        // Checks whether the URL is from YouTube
+        if (isYouTubeURL) {
+            //ID given for the video by YouTube
+            String youTubeVideoID = url.substring(url.length() - 11);
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" +
+                    youTubeVideoID));
             startActivity(appIntent);
-        }else {
+        } else {
             try {
                 videoView.setVideoURI(Uri.parse(URLDecoder.decode(url, "UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 Log.e("VideoActivity", "Unable to parse url", e);
-                Toast.makeText(getApplicationContext(), "Unable to play video. " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Unable to play video. " + e.getMessage(),
+                        Toast.LENGTH_LONG).show();
                 finish();
             }
         }
