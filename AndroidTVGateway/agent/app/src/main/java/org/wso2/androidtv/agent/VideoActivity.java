@@ -46,13 +46,13 @@ public class VideoActivity extends Activity {
 
         VideoView videoView = (VideoView) findViewById(R.id.videoView);
 
-        //variable containing a regex to check whether the URL belongs to YouTube
+        //regex to check whether the URL belongs to YouTube
         String checkYouTubeRegEx = "^(http%3A%2F%2F|https%3A%2F%2F)(youtu\\.be|www\\.youtube\\." +
                 "com)(.*)";
         //checks whether the URL belongs to YouTube
         boolean isYouTubeURL = Pattern.matches(checkYouTubeRegEx, url);
 
-        //variable which keeps whether the URL is from YouTube
+
         if (isYouTubeURL) {
             //ID given for the video by YouTube
             String youTubeVideoID = url.substring(url.length() - 11);
