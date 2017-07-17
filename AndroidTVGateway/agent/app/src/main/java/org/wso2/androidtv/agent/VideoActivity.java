@@ -19,6 +19,7 @@
 package org.wso2.androidtv.agent;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -29,6 +30,7 @@ import android.webkit.WebSettings;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import org.apache.commons.codec.binary.Hex;
 import org.wso2.androidtv.agent.constants.TVConstants;
 
 import java.io.UnsupportedEncodingException;
@@ -46,20 +48,35 @@ public class VideoActivity extends Activity {
 
         VideoView videoView = (VideoView) findViewById(R.id.videoView);
 
+
         //regex to check whether the URL belongs to YouTube
         String checkYouTubeRegEx = "^(http%3A%2F%2F|https%3A%2F%2F)(youtu\\.be|www\\.youtube\\." +
                 "com)(.*)";
+        String checkVimeoRegEx = "^(http%3A%2F%2F|https%3A%2F%2F)(vimeo\\.com)(.*)";
+        String checkURL = "^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$";
         //checks whether the URL belongs to YouTube
         boolean isYouTubeURL = Pattern.matches(checkYouTubeRegEx, url);
-
+        boolean isVimeoURL = Pattern.matches(checkVimeoRegEx, url);
+        boolean isURL = Pattern.matches(checkURL,url);
 
         if (isYouTubeURL) {
             //ID given for the video by YouTube
             String youTubeVideoID = url.substring(url.length() - 11);
-            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" +
+            Intent youTubeAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" +
                     youTubeVideoID));
-            startActivity(appIntent);
-        } else {
+            startActivity(youTubeAppIntent);
+
+        } else if (isVimeoURL) {
+            String vimeoVideoID = url.substring(url.length() - 9);
+            Intent webAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://vimeo.com/" + vimeoVideoID));
+            startActivity(webAppIntent);
+
+        }  else if (isURL) {
+            String vimeoVideoID = url.substring(url.length() - 9);
+            Intent webAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://vimeo.com/" + vimeoVideoID));
+            startActivity(webAppIntent);
+
+        }else {
             try {
                 videoView.setVideoURI(Uri.parse(URLDecoder.decode(url, "UTF-8")));
             } catch (UnsupportedEncodingException e) {
