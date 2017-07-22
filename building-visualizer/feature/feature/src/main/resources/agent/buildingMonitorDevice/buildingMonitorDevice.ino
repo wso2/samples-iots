@@ -1,5 +1,3 @@
-#include <DHT.h>
-#include <DHT_U.h>
 
 /**
 * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -19,16 +17,11 @@
 * under the License.
 **/
 
-#include <ESP8266WiFiAP.h>
-#include <ESP8266WiFiGeneric.h>
-#include <ESP8266WiFiMulti.h>
-#include <ESP8266WiFiScan.h>
-#include <ESP8266WiFiSTA.h>
-#include <ESP8266WiFiType.h>
+#include <DHT.h>
+#include <DHT_U.h>
 #include <ESP8266HTTPClient.h>
-//#include <ESP8266wifi.h>
 #include <ESP8266WiFi.h>
-#include <ESP.h>
+#include <Esp.h>
 #include <WiFiClient.h>
 #include <WiFiClientSecure.h>
 #include <WiFiServer.h>
@@ -46,7 +39,7 @@
 DHT dht(DHT11_PIN, DHTTYPE, 30); 
 
 unsigned long previousMillis = 0;        // will store last temp was read
-const long interval = 12200;              // interval at which to read sensor
+const long interval = 2000;              // interval at which to read sensor
 long startDelay = millis();
 // Update these with values suitable for your network.
 //const char* ssid = "linksys";
@@ -54,8 +47,8 @@ long startDelay = millis();
 //const char* gateway = "http://192.168.1.103:8280";
 //const char* mqtt_server = "192.168.1.103";
 
-const char* ssid = "WSO2-Restricted";
-const char* password = "LKvene8xIOT";
+const char* ssid = "....";
+const char* password = "....";
 
 const char* gateway = "http://192.168.57.100:8280";
 const char* mqtt_server = "192.168.57.100";
@@ -301,6 +294,7 @@ void loop() {
     float humidity = dht.readHumidity();
     int airQuality = 0;//digitalRead(GAS);
     int light = analogRead(A0);
+    
     snprintf (msg, 150, "{\"event\":{\"payloadData\":{\"deviceId\":\"%s\", \"temperature\":%d.0 , \"motion\":%ld.0, \"humidity\":%d.0  , \"airQuality\":%ld.0, \"light\":%ld.0}}}"
     , device_id, (int)temperature, isMoving, (int)humidity, airQuality, light);
     snprintf (publishTopic, 100, "%s/senseme/%s", tenant_domain, device_id);
@@ -309,6 +303,7 @@ void loop() {
     }
     isMoving = 0;
     Serial.println(msg);
+    
     startDelay = millis();
   }
 }

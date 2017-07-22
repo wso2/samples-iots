@@ -46,8 +46,8 @@
                             <goal>p2-repo-gen</goal>
                         </goals>
                         <configuration>
-                            <metadataRepository>file:${basedir}/p2-repo</metadataRepository>
-                            <artifactRepository>file:${basedir}/p2-repo</artifactRepository>
+                            <metadataRepository>file:${basedir}/target/p2-repo</metadataRepository>
+                            <artifactRepository>file:${basedir}/target/p2-repo</artifactRepository>
                             <publishArtifacts>true</publishArtifacts>
                             <publishArtifactRepository>true</publishArtifactRepository>
                             <featureArtifacts>
@@ -65,9 +65,9 @@
                         </goals>
                         <configuration>
                             <profile>default</profile>
-                            <metadataRepository>file:${basedir}/p2-repo</metadataRepository>
-                            <artifactRepository>file:${basedir}/p2-repo</artifactRepository>
-                            <destination>${basedir}/wso2iot-3.1.0-SNAPSHOT/core/repository/components</destination>
+                            <metadataRepository>file:${basedir}/target/p2-repo</metadataRepository>
+                            <artifactRepository>file:${basedir}/target/p2-repo</artifactRepository>
+                            <destination>${basedir}/../wso2/components</destination>
                             <deleteOldProfileFiles>false</deleteOldProfileFiles>
                             <features>
                                 <feature>
@@ -90,16 +90,16 @@
                         <configuration>
                             <tasks>
                                 <replace token="false" value="true"
-                                         dir="wso2iot-3.1.0-SNAPSHOT/core/repository/components/default/configuration/org.eclipse.equinox.simpleconfigurator">
+                                         dir="../wso2/components/default/configuration/org.eclipse.equinox.simpleconfigurator">
                                     <include name="**/bundles.info"/>
                                 </replace>
-                                <copy todir="wso2iot-3.1.0-SNAPSHOT/analytics/repository/deployment/server/carbonapps">
-                                    <fileset dir="wso2iot-3.1.0-SNAPSHOT/core/repository/deployment/server/carbonapps">
+                                <copy todir="../wso2/analytics/repository/deployment/server/carbonapps">
+                                    <fileset dir="../repository/deployment/server/carbonapps">
                                         <include name="*.car"/>
                                     </fileset>
                                 </copy>
-                                <copy todir="wso2iot-3.1.0-SNAPSHOT/analytics/repository/conf/datasources">
-                                    <fileset dir="wso2iot-3.1.0-SNAPSHOT/core/repository/conf/datasources">
+                                <copy todir="../wso2/analytics/conf/datasources">
+                                    <fileset dir="../conf/datasources">
                                         <include name="senseme-datasources.xml"/>
                                     </fileset>
                                 </copy>
@@ -190,7 +190,7 @@
         </repository>
     </repositories>
     <properties>
-        <carbon.device.mgt.plugin.version>3.0.8</carbon.device.mgt.plugin.version>
+        <carbon.device.mgt.plugin.version>4.0.34</carbon.device.mgt.plugin.version>
         <org.wso2.iot.version>1.0.0-SNAPSHOT</org.wso2.iot.version>
     </properties>
 </project>
