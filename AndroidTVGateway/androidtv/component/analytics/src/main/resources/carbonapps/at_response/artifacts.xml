@@ -19,9 +19,9 @@
 
 <artifacts>
     <artifact name="at_response_CAPP" version="1.0.0" type="carbon/application">
-        <dependency artifact="at_response_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+       <dependency artifact="at_response_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
 		<dependency artifact="at_response_store" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="at_response_mqtt_receiver" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
-        <dependency artifact="at_response_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="at_response_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/> 
     </artifact>
 </artifacts>
