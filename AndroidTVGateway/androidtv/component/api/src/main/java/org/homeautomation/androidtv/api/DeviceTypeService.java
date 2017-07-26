@@ -36,7 +36,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-
 /**
  * This is the API which is used to control and manage device type functionality
  */

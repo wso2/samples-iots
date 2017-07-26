@@ -25,56 +25,9 @@
        class="btn-operations"
        target="_blank"><i class="fw fw-api add-margin-1x"></i> View API</i>
     </a>
-    <a href="#" class="download-link btn-operations">
+    <a href="{{@unit.publicUri}}/asserts/app.apk" class="btn-operations">
         <i class="fw fw-download add-margin-1x"></i>Download Agent
     </a>
-    <div id="download-device-modal-content" class="hide">
-        <div class="modal-content">
-            <div class="row">
-                <div class="col-md-7  center-container">
-                    <h3>Name your device and download the agent from following link.</h3>
-                    <br/>
-                    <form id="downloadForm" method="GET"
-                          action="{{@app.context}}/api/devices/sketch/download">
-                        <div id="invalid-username-error-msg" class="alert alert-danger hidden"
-                             role="alert">
-                            <i class="icon fw fw-error"></i><span></span>
-                        </div>
-                        <div class="control-group">
-                            <div class="controls">
-                                <input class="new-device-name" style="color:#3f3f3f;padding:5px"
-                                       type="text"
-                                       placeholder="Ex. Lobby_Device"
-                                       name="deviceName" size="60" required>
-                                <br/>
-                                <input type="hidden" class="deviceType" name="deviceType"
-                                       value="androidtv"/>
-                                <input type="hidden" class="sketchType" name="sketchType"
-                                       value="androidtv"/>
-                            </div>
-                        </div>
-                        <div class="buttons" style="padding-bottom: 0px">
-                            <a class="btn btn-operations" onclick="downloadAgent()">Download Now</a>
-
-                            <a href="#" id="download-device-download-link"
-                               class="btn btn-operations"> Copy Link
-                            </a>
-
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="device-agent-downloading-content" class="hide">
-        <div class="modal-content">
-            <div class="row">
-                <div class="col-md-7 col-centered center-container">
-                    <h3>Device Agent will downloading shortly.</h3>
-                </div>
-            </div>
-        </div>
-    </div>
     <div id="device-400-content" class="hide">
         <div class="modal-content">
             <div class="row">

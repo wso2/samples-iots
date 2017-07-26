@@ -16,21 +16,10 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.homeautomation</groupId>
-        <artifactId>androidtv</artifactId>
-        <version>1.0.0</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-    <artifactId>androidtv-feature</artifactId>
-    <modelVersion>4.0.0</modelVersion>
-    <packaging>pom</packaging>
-    <version>1.0.0</version>
-    <modules>
-        <module>backend-feature</module>
-        <module>analytics-feature</module>
-        <module>ui-feature</module>
-    </modules>
-</project>
+<eventReceiver name="DOOR-mqtt" statistics="disable" trace="disable" xmlns="http://wso2.org/carbon/eventreceiver">
+    <from eventAdapterType="oauth-mqtt">
+        <property name="topic">carbon.super/androidtv/+/DOOR</property>
+    </from>
+    <mapping customMapping="disable" type="json"/>
+    <to streamName="org.wso2.iot.devices.DOOR" version="1.0.0"/>
+</eventReceiver>
