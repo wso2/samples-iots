@@ -19,7 +19,7 @@
 
 <artifacts>
     <artifact name="TEMP_CAPP" version="1.0.0" type="carbon/application">
-        <dependency artifact="TEMP_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+       <dependency artifact="TEMP_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
 		<dependency artifact="TEMP_store" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="TEMP_mqtt_receiver" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="TEMP_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>

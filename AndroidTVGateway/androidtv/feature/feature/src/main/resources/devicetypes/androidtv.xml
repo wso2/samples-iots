@@ -71,10 +71,10 @@
         <SharedWithAllTenants>false</SharedWithAllTenants>
     </ProvisioningConfig>
 
-    <PushNotificationProvider type="MQTT">
-        <FileBasedProperties>true</FileBasedProperties>
+   <PushNotificationProvider type="MQTT">
+        <FileBasedProperties>true</FileBasedProperties> 
         <!--if file based properties is set to false then the cdmf.unit.device.type.android_tv.platform.configuration will be picked from platform cdmf.unit.device.type.android_tv.platform.configuration-->
-        <ConfigProperties>
+       <ConfigProperties>
             <Property Name="mqttAdapterName">androidtv.mqtt.adapter</Property>
             <Property Name="username">admin</Property>
             <Property Name="password">admin</Property>
@@ -83,6 +83,8 @@
             <Property Name="clearSession">true</Property>
         </ConfigProperties>
     </PushNotificationProvider>
+
+
 
     <License>
         <Language>en_US</Language>

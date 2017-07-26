@@ -19,6 +19,7 @@
 package org.wso2.androidtv.agent;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -29,6 +30,7 @@ import android.webkit.WebSettings;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import org.apache.commons.codec.binary.Hex;
 import org.wso2.androidtv.agent.constants.TVConstants;
 
 import java.io.UnsupportedEncodingException;

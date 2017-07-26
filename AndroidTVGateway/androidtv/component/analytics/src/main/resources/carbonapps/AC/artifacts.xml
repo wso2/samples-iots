@@ -19,10 +19,10 @@
 
 <artifacts>
     <artifact name="AC_CAPP" version="1.0.0" type="carbon/application">
-        <dependency artifact="AC_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+      <dependency artifact="AC_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
 		<dependency artifact="AC_store" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="AC_mqtt_receiver" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
-        <dependency artifact="AC_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="AC_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/> 
 
     </artifact>
 </artifacts>

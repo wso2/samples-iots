@@ -203,7 +203,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
 
 
     /**
-     * send siddhi query to execute on gateway to perform edge analytics.
+     * send siddhi query to execute on gateway to perform edge analytics.SE
      * @param deviceId : The registered device id.
      */
     @POST
