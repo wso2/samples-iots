@@ -1,0 +1,36 @@
+{
+  "name": "org.wso2.floor.average.SensorStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "deviceId",
+      "type": "STRING"
+    },
+    {
+      "name": "avgTemperature",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avgMotion",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avgHumidity",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avgAirQuality",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avgLight",
+      "type": "DOUBLE"
+    },
+    {
+      "name" : "timeStamp",
+      "type" : "LONG"
+    }
+  ]
+}

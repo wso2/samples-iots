@@ -1,0 +1,45 @@
+.slider-wrapper{
+    /*display: block;*/
+    display:none;
+}
+
+.slider-wrapper{
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transition: bottom 0.1s linear,margin-bottom 0.1s linear;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+    border: 1px solid #d8d4dc;
+    background-color: #fafeff;
+    border-radius: 3px;
+    z-index:100;
+}
+
+.dropdown-container{
+    padding: 4px 6px;
+}
+
+.slider-container{
+    padding: 4px 6px;
+}
+
+.datepicker-container{
+    padding: 4px 6px;
+    display: table;
+    /*margin: 0 auto;*/
+}
+
+#ex1Slider .slider-selection {
+    background: #222c31;
+}
+
+.slider-handle{
+    background-color: #d8d4dc;
+    background-image: -webkit-linear-gradient(top,#0d0f10 0,#3e4346 100%);
+    background-image: linear-gradient(to bottom,#eaeaea 0,#eaeaea 100%);
+}
+
+.date-picker{
+    display:none;
+}

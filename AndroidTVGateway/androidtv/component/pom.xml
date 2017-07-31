@@ -26,6 +26,11 @@
     <version>1.0.0</version>
     <artifactId>androidtv-component</artifactId>
     <packaging>pom</packaging>
+    <modules>
+        <module>api</module>
+        <module>ui</module>
+        <module>analytics</module>
+    </modules>
     <build>
         <pluginManagement>
             <plugins>
@@ -45,10 +50,4 @@
             </plugins>
         </pluginManagement>
     </build>
-  <modules>
-    <module>plugin</module>
-    <module>api</module>
-    <module>ui</module>
-    <module>analytics</module>
-  </modules>
 </project>

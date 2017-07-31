@@ -1,0 +1,54 @@
+{{unit "locationview.unit.lib.slider"}}
+{{unit "locationview.unit.lib.datepicker"}}
+
+{{#zone "topLibCss"}}
+    <link href="{{@unit.publicUri}}/css/custom.css" rel="stylesheet" type="text/css"/>
+{{/zone}}
+
+<div class="slider-wrapper">
+    <div class="slider-horizontal add-padding-bottom-2x">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="slider-container add-padding-left-3x add-padding-top-2x">
+                    <a id="play" class="col-sm-2 play" href="#" title="Play">
+                                <span id="pla" class="icon fw-stack">
+                                    <i class="fw fw-right fw-helper fw-helper-circle-outline"></i>
+                                </span>
+                        <span id="pau" class="icon fw-stack hidden">
+                                    <i class="fw fw-circle fw-helper fw-helper-circle-outline"></i>
+                                </span>
+                    </a>
+                    <div class="col-sm-10" id="live-view">
+                        <input id="range-slider" type="text"/>
+                    </div>
+                    <div class="col-sm-10 hidden" id = "historical-view">
+                        <input id="historical-slider" type="text"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group add-padding-top-2x">
+                    <div class="col-sm-12 form-inline">
+                        <label class="control-label col-sm-8">Historical View</label>
+                        <label class="switch">
+                            <input type="checkbox" id="historic-toggle">
+                            <span class="helper"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="date-picker">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="datepicker-container add-padding-left-3x">
+                    <label for="daterange" class="col-sm-3 control-label"> Date: </label>
+                    <input type="text" name="daterange" placeholder="03/22/2017"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

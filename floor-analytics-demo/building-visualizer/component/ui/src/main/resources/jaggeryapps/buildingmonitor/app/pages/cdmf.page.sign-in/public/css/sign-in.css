@@ -1,0 +1,16 @@
+.login-bg{
+    background: url('images/bg-login.png') bottom left no-repeat fixed;
+}
+
+body.login-bg{
+    background-color: cornflowerblue;
+}
+
+.block-login{
+    background: rgba(245, 245, 245, 0.47);
+    padding: 20px;
+    border-radius: 10px;
+}
+form .form-group label{
+    color: #000 !important;
+}

@@ -54,7 +54,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-
 /**
  * This is the API which is used to control and manage device type functionality
  */
@@ -200,10 +199,8 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         }
     }
 
-
-
     /**
-     * send siddhi query to execute on gateway to perform edge analytics.
+     * send siddhi query to execute on gateway to perform edge analytics.SE
      * @param deviceId : The registered device id.
      */
     @POST
@@ -250,8 +247,6 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
 
     /**
      * End point to configure XBee gateway of Android TV device.

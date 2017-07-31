@@ -1,0 +1,70 @@
+/* Enter a unique ExecutionPlan */
+@Plan:name('Floor-Analysis-Sensor-Floor-Mapping-Execution-Plan')
+
+/* Enter a unique description for ExecutionPlan */
+@Plan:description('ExecutionPlan for getting the floor details of the relevant event')
+
+/* define streams/tables and write queries here ... */
+
+@Import('org.wso2.floor.average.SensorStream:1.0.0')
+define stream dataIn (deviceId string, avgTemperature double, avgMotion double, avgHumidity double, avgAirQuality
+double, avgLight double, timeStamp long);
+
+@Import('org.wso2.floor.summarized.SensorStream:1.0.0')
+define stream summarizedDataIn (deviceId string, temperature double, motion double, humidity double, airQuality double,
+light double, timeStamp long);
+
+@Export('org.wso2.floor.device.SensorStream:1.0.0')
+define stream dataOut (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@Export('org.wso2.iot.devices.motion:1.0.0')
+define stream motionOut (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, motion double);
+
+@Export('org.wso2.iot.devices.humidity:1.0.0')
+define stream humidityOut (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, humidity double);
+
+@Export('org.wso2.iot.devices.light:1.0.0')
+define stream lightOut (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long, light double);
+
+@Export('org.wso2.iot.devices.temperature:1.0.0')
+define stream temperatureOut (meta_owner string, meta_deviceType string, meta_deviceId string, meta_time long,
+temperature double);
+
+@Export('org.wso2.floor.summarized.device.floor.SensorStream:1.0.0')
+define stream summarizedDataOut (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@from(eventtable = 'rdbms' , datasource.name = 'WSO2_FLOOR_ANALYTICS' , table.name = 'device')
+define table deviceLocationTable (deviceId string, buildingId string, floorId string, xCoordinate int, yCoordinate int, lastKnown long);
+
+from dataIn as d join deviceLocationTable as l on d.deviceId == l.deviceId
+select d.deviceId as deviceId, d.avgTemperature as temperature, d.avgMotion as motion, d.avgHumidity as humidity, d
+.avgAirQuality as  airQuality, d.avgLight as light, d.timeStamp as timeStamp, l.buildingId as buildingId,
+l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into dataOut;
+
+from summarizedDataIn as d join deviceLocationTable as l on d.deviceId == l.deviceId
+select d.deviceId as deviceId, d.temperature as temperature, d.motion as motion, d.humidity as humidity, d
+.airQuality as  airQuality, d.light as light, d.timeStamp as timeStamp, l.buildingId as buildingId,
+l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into summarizedDataOut;
+
+from dataIn
+select "owner" as meta_owner, "senseme" as meta_deviceType, deviceId as meta_deviceId, time:timestampInMilliseconds() as meta_time,
+avgMotion as motion insert into motionOut ;
+
+from dataIn
+select "owner" as meta_owner, "senseme" as meta_deviceType, deviceId as meta_deviceId, time:timestampInMilliseconds() as meta_time,
+avgTemperature as temperature insert into temperatureOut ;
+
+from dataIn
+select "owner" as meta_owner, "senseme" as meta_deviceType, deviceId as meta_deviceId, time:timestampInMilliseconds() as meta_time,
+avgLight as light insert into lightOut ;
+
+from dataIn
+select "owner" as meta_owner, "senseme" as meta_deviceType, deviceId as meta_deviceId, time:timestampInMilliseconds() as meta_time,
+avgHumidity as humidity insert into humidityOut ;
+
+from dataIn
+select deviceId, timeStamp as lastKnown
+update deviceLocationTable
+    on deviceId == deviceLocationTable.deviceId;

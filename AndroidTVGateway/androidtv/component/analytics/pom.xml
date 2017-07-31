@@ -25,10 +25,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>${groupId}.androidtv.analytics</artifactId>
+    <artifactId>${project.groupId}.androidtv.analytics</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
-    <name> ${groupId}.androidtv.analytics </name>
+    <name> ${project.groupId}.androidtv.analytics </name>
     <url>http://wso2.org</url>
     <build>
         <plugins>

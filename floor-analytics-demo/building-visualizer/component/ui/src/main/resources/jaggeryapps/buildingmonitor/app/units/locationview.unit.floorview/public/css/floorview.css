@@ -1,0 +1,53 @@
+.datepicker-dropdown{
+	background: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.datepicker-dropdown.datepicker-orient-top:after {
+	bottom: -6px;
+	border-bottom: 0;
+	border-top: 6px solid #fff;
+}
+
+#image {
+    width: 100%;
+}
+
+#floor-image {
+    width: 100%;
+}
+
+#image canvas {
+    width: 100%;
+}
+
+#svg {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	display: inline-block;
+	height: 100%;
+	width: 100%;
+}
+
+.analytics-options{
+	position: absolute;
+}
+.analytics-options label{
+	width: 100%;
+	padding: 12px;
+}
+
+.keys {
+	margin-top: 1em;
+}
+.keys .wr-stats-board-sidebar{
+	width: 17%;
+	height: 30px;
+	padding: 2px 0px;
+}
+
+#heatmapLegend { background:white; position:absolute; bottom:0; right:0; padding:10px; }
+#min { float:left; }
+#max { float:right; }
