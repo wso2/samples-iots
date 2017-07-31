@@ -1,0 +1,177 @@
+@charset "UTF-8";
+/*
+~   Copyright (c) WSO2 Inc. (http://wso2.com) All Rights Reserved.
+~
+~   Licensed under the Apache License, Version 2.0 (the "License");
+~   you may not use this file except in compliance with the License.
+~   You may obtain a copy of the License at
+~
+~        http://www.apache.org/licenses/LICENSE-2.0
+~
+~   Unless required by applicable law or agreed to in writing, software
+~   distributed under the License is distributed on an "AS IS" BASIS,
+~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~   See the License for the specific language governing permissions and
+~   limitations under the License.
+*/
+
+body.fixed {
+    height: 100%;
+}
+
+body.fixed .page-content-wrapper {
+    min-height: auto;
+    height: calc(100% - 90px);
+    overflow-y:auto;
+    overflow-x: hidden;
+    position: relative;
+}
+
+a{
+    color:#0088cc;
+
+}
+
+.item {
+    /*height:30px;*/
+    /*border: 1px solid;*/
+    /*padding: 5px 10px 20px 10px;*/
+    /*margin: 2px 2px;*/
+    /*border-radius: 5px;*/
+    border-bottom:solid 2px #ccc;
+    background-color: rgba(255, 128, 0, 0.5);
+    cursor: pointer;
+}
+
+label{
+    font-weight: normal;
+}
+
+.marker-cursor {
+    cursor: url('images/marker-icon.png')12 41 , auto;
+}
+
+.error {
+    border-color: #ff2222;
+}
+.leaflet-popup-content{
+    background: #cce5ff;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+
+.leaflet-popup-content ul{
+padding-left: 0px;
+    font-weight: 300;
+    font-size: 13px;
+    list-style-type: square;
+    /*background: #cce5ff;*/
+    /*padding: 20px;*/
+}
+
+.leaflet-popup-content ul li{
+    /*background: #cce5ff;*/
+    /*margin: 5px;*/
+}
+
+.sidebar-tabs,
+.sidebar-header {
+    background: #181e22;
+}
+
+.sidebar-tabs > li,
+.sidebar-tabs > ul > li {
+    color: #eee;
+}
+
+.sidebar-nav {
+    width: 51px;
+    top: 90px;
+    position: fixed;
+    z-index: 100;
+}
+
+.sidebar.sidebar-right {
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 0;
+    border-width: 0;
+}
+
+.sidebar-content{
+    /*overflow-y: hidden;*/
+}
+
+@media (min-width: 768px){
+    #wrapper {
+        padding-left: 0;
+    }
+}
+
+#get_image_wrapper {
+    z-index: 0;
+}
+
+.panel-default > .panel-heading {
+background-color: #ecf0f1;
+}
+
+.panel-default > .panel-heading:hover {
+    background-color: #FEB41C;
+}
+
+/*.panel-default > .panel-heading .active-marker {*/
+    /*background-color: #e69753;*/
+/*}*/
+
+#click-coords{
+    position: absolute;
+    top: 25px;
+    right: 15px;
+    color: #060606;
+    font-weight: normal;
+    font-size: 12px;
+}
+
+#save_details{
+padding:0px 5px 0px 5px;
+}
+
+.heatmap-info{
+    position: absolute;
+    right: 0%;
+    bottom: 50%;
+    transition: bottom 0.1s linear,margin-bottom 0.1s linear;
+    -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
+    border: 3px solid #73AD21;
+}
+
+#draw-tools{
+    display:none;
+}
+
+#show-visualization{
+    display:none;
+}
+
+#new_image{
+    display:none;
+}
+
+#clear{
+    display:none;
+}
+
+#save{
+    display:none;
+}
+
+#preview{
+    display:none;
+}
+/*device.selected{*/
+    /*pointer-events: none;*/
+/*}*/

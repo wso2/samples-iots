@@ -1,0 +1,128 @@
+<%
+/**
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+(function () {
+
+
+    response.contentType = 'application/json';
+    var tableName = request.getParameter("tableName");
+    var action = request.getParameter("action");
+    var timeFrom = request.getParameter("timeFrom");
+    var timeTo = request.getParameter("timeTo");
+    var start = request.getParameter("start");
+    var limit = request.getParameter("limit");
+    var sortBy = request.getParameter("sortBy");
+    var buildingId = request.getParameter("buildingId");
+    var floorId = request.getParameter("floorId");
+    var floorCount = request.getParameter("floorCount");
+    var buildingSet = request.getParameter("buildingSet");
+
+    var providerAPI = require('/app/modules/batch-provider-api.js');
+    if (action === 'getData') {
+        if (!limit) {
+            var newData = [];
+            var data = [];
+            start = 0;
+            limit = 100;
+
+            while (newData.length == 100 || start == 0) {
+                newData = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, sortBy);
+                data = data.concat(newData);
+                start += 100;
+            }
+        } else {
+            data = providerAPI.getData(tableName, buildingId, floorId, timeFrom, timeTo, start, limit, sortBy);
+        }
+        print(data);
+    } else if (action == 'getHistoricalData') {
+        var hourToMilliSeconds = 3600000;
+        var data = [];
+        for (var i = 0; i < 25; i++) {
+            var startTime = parseFloat(timeFrom) + hourToMilliSeconds * i;
+            var endTime = parseFloat(timeFrom) + hourToMilliSeconds * (i + 1);
+            data[i] = providerAPI.getData(tableName, buildingId, floorId, String(startTime), String(endTime), 0, 20,
+                "DESC");
+        }
+        print(data);
+    } else if (action === 'getBuildingData') {
+        var fd = parseInt(floorCount);
+        var data =[];
+        for (var i = 1; i < fd+1; i++) {
+            data[i-1] = providerAPI.getData(tableName, buildingId, i, timeFrom, timeTo, start, limit, sortBy).reverse();
+        }
+
+        print(data);
+    } else if (action === 'getRecentPastData') {
+        var minutesToMilliSeconds = 1800000;
+        var data = [];
+        var start = new Date();
+        start.setMinutes(start.getMinutes() - 210);
+        timeFrom = start.getTime();
+        for (var i = 0; i < 6; i++) {
+            var startTime = parseFloat(timeFrom) + minutesToMilliSeconds * i;
+            var endTime = parseFloat(timeFrom) + minutesToMilliSeconds * (i + 1);
+            data[i] = providerAPI.getData(tableName, buildingId, floorId, String(startTime), String(endTime), 0, 20,
+                "DESC");
+        }
+        print(data);
+    } else if (action === 'getCount') {
+        var data = [];
+        var newData = [];
+
+        for (var i = 0; i < parseInt(floorCount); i++) {
+            start = 0;
+            data[i] = 0;
+            while (newData.length == 100 || start == 0) {
+                var timeFrom = new Date();
+                timeFrom.setHours(timeFrom.getHours - 24);
+
+                var timeTo = new Date();
+                newData = providerAPI.getData(tableName, buildingId, String(i + 1), timeFrom.getTime(), timeTo
+                    .getTime(), start, limit, "DESC");
+                data[i] += newData.length;
+                start += 100;
+            }
+        }
+        print(data);
+    }  else if (action === 'getMapAlertCount') {
+        var data = {};
+        var newData = [];
+        var buildingSet = buildingSet.split(",");
+
+        for (var i in buildingSet) {
+            start = 0;
+            var count =0
+            while (newData.length == 100 || start == 0) {
+                var timeFrom = new Date();
+                timeFrom.setHours(timeFrom.getHours - 6);
+                var timeTo = new Date();
+                newData = providerAPI.getData(tableName, buildingSet[i], null, timeFrom.getTime(), timeTo
+                        .getTime(), start, limit, "DESC");
+                count += newData.length;
+                start += 100;
+            }
+            data[buildingSet[i]] = count;
+
+        }
+        print(data);
+    }
+
+}());
+
+%>

@@ -1,0 +1,42 @@
+/* Enter a unique ExecutionPlan */
+@Plan:name('Floor-Analysis-Sensor-Floor-Averaged-Execution-Plan')
+
+/* Enter a unique description for ExecutionPlan */
+@Plan:description('ExecutionPlan for getting average values for floor')
+
+/* define streams/tables and write queries here ... */
+
+@Import('org.wso2.floor.device.SensorStream:1.0.0')
+define stream dataIn (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@Export('org.wso2.floor.perFloor.SensorStream:1.0.0')
+define stream dataOut (buildingId string, floorId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long);
+
+@Export('org.wso2.floor.summarized.perFloor.SensorStream:1.0.0')
+define stream summarizedDataOut (buildingId string, floorId string, temperature double, motion double, humidity double,
+airQuality double, light double, timeStamp long);
+
+@Export('org.wso2.floor.AlertNotifications:1.0.0')
+define stream alertOut (buildingId string, floorId string, type string, value double, information string, timeStamp long);
+
+from dataIn#window.timeBatch(1 min)
+select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
+(airQuality) as airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
+group by floorId insert into dataOut ;
+
+from dataIn#window.timeBatch(60 min)
+select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
+(airQuality) as airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
+group by floorId insert into summarizedDataOut;
+
+from dataOut[temperature < 23]
+select buildingId, floorId, "Very_Low_Temperature" as type, temperature as value, "Floor seems to be very cold. Please turn OFF AC." as information, timeStamp insert into alertOut ;
+
+from dataOut[motion != 0 and temperature > 27]
+select buildingId, floorId, "High_Temperature_WITH_Motion" as type, temperature as value, "Floor is very hot. Please turn ON AC." as information, timeStamp insert into alertOut;
+
+from dataOut[motion == 0 and light < 500]
+select buildingId, floorId, "Light_ON_WITH_NO_Motion" as type, light as value, "The floor seems to be empty. But lights are switched ON. Please switch off the lights." as information, timeStamp insert into alertOut;
+

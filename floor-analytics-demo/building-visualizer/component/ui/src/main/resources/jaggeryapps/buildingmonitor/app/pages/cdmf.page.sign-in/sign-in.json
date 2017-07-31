@@ -1,0 +1,6 @@
+{
+    "version": "1.0.0",
+    "layout": "cdmf.layout.sign-in",
+    "uri": "/login",
+    "isAnonymous": true
+}
