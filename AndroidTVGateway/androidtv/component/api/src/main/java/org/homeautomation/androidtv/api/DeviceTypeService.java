@@ -51,7 +51,7 @@ import javax.ws.rs.core.Response;
                 }
         ),
         tags = {
-                @Tag(name = "androidtv", description = "")
+                @Tag(name = "androidtv,device_management", description = "")
         }
 )
 @Scopes(
