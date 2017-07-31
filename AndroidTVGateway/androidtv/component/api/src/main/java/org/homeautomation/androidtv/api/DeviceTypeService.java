@@ -36,6 +36,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+
 /**
  * This is the API which is used to control and manage device type functionality
  */
@@ -74,6 +75,7 @@ public interface DeviceTypeService {
     @POST
     @Path("device/{deviceId}/video")
     @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
             value = "End point to send video to the android TV",
             notes = "",
@@ -129,6 +131,7 @@ public interface DeviceTypeService {
     @POST
     @Path("device/{deviceId}/message")
     @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
             value = "Send message to Android tv",
             notes = "",
@@ -186,6 +189,7 @@ public interface DeviceTypeService {
     @POST
     @Path("device/{deviceId}/edgeQuery")
     @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
             value = "Send siddhi query to Android tv",
             notes = "",
@@ -242,6 +246,7 @@ public interface DeviceTypeService {
     @POST
     @Path("device/{deviceId}/xbee-config")
     @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
             value = "Configure XBee gateway of Android TV device",
             notes = "",
@@ -299,6 +304,7 @@ public interface DeviceTypeService {
     @POST
     @Path("device/{deviceId}/xbee")
     @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
             value = "Add XBee edge device to Android TV gateway",
             notes = "",
@@ -360,6 +366,7 @@ public interface DeviceTypeService {
     @POST
     @Path("device/{deviceId}/xbee-command")
     @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
             value = "Send command to XBee edge device connected with Android TV gateway",
             notes = "",
@@ -421,6 +428,7 @@ public interface DeviceTypeService {
     @DELETE
     @Path("device/{deviceId}/xbee")
     @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
             httpMethod = "DELETE",
             value = "Remove XBee edge device from Android TV gateway",
             notes = "",
@@ -477,6 +485,7 @@ public interface DeviceTypeService {
     @GET
     @Path("device/{deviceId}/xbee-all")
     @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Get all XBee edge device attached to Android TV gateway",
             notes = "",
@@ -528,6 +537,7 @@ public interface DeviceTypeService {
     @POST
     @Path("device/{device_id}/register")
     @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
             value = "Enroll device",
             notes = "",
@@ -570,6 +580,7 @@ public interface DeviceTypeService {
     @Path("device/stats/{deviceId}")
     @GET
     @ApiOperation(
+
             consumes = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Retrieve Sensor data for the device type",
