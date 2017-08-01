@@ -25,6 +25,15 @@ public class BuildingInfo {
     private String longitude;
     private String latitude;
     private int numFloors;
+    private boolean isLocation;
+
+    public boolean isLocation() {
+        return isLocation;
+    }
+
+    public void setLocation(boolean location) {
+        isLocation = location;
+    }
 
     public void setBuildingName(String buildingName) {
         this.buildingName = buildingName;
@@ -74,4 +83,5 @@ public class BuildingInfo {
     public void setBuildingId(int buildingId) {
         this.buildingId = buildingId;
     }
+
 }

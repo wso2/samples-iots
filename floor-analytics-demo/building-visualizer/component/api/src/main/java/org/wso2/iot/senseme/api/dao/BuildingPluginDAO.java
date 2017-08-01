@@ -55,8 +55,8 @@ public class BuildingPluginDAO {
         try {
 
             conn = BuildingDAOHandler.getConnection();
-            String createDBQuery = "INSERT INTO building(buildingName, owner, lng, lat, numOfFloors)" +
-                    " VALUES (?, ?, ?, ?, ?)";
+            String createDBQuery = "INSERT INTO building(buildingName, owner, lng, lat, numOfFloors,isLocation)" +
+                    " VALUES (?, ?, ?, ?, ?,?)";
 
             stmt = conn.prepareStatement(createDBQuery);
             stmt.setString(1, building.getBuildingName());
@@ -64,6 +64,7 @@ public class BuildingPluginDAO {
             stmt.setString(3, building.getLongitude());
             stmt.setString(4, building.getLatitude());
             stmt.setInt(5, building.getNumFloors());
+            stmt.setBoolean(6, building.isLocation());
 
             int rows = stmt.executeUpdate();
             if (rows == 1) {
@@ -98,6 +99,7 @@ public class BuildingPluginDAO {
                 building.setLatitude(resultSet.getString("LNG"));
                 building.setLongitude(resultSet.getString("LAT"));
                 building.setNumFloors(resultSet.getInt("NUMOFFLOORS"));
+                building.setLocation(resultSet.getBoolean("ISLOCATION"));
                 buildingList.add(building);
             }
 
@@ -155,6 +157,7 @@ public class BuildingPluginDAO {
                 building.setLatitude(resultSet.getString("LNG"));
                 building.setLongitude(resultSet.getString("LAT"));
                 building.setNumFloors(resultSet.getInt("NUMOFFLOORS"));
+                building.setLocation(resultSet.getBoolean("ISLOCATION"));
                 return building;
             }
 
@@ -248,6 +251,7 @@ public class BuildingPluginDAO {
                 building.setLatitude(rows.getString("LNG"));
                 building.setLongitude(rows.getString("LAT"));
                 building.setNumFloors(rows.getInt("NUMOFFLOORS"));
+                building.setLocation(rows.getBoolean("ISLOCATION"));
             }
         } catch (SQLException e) {
             String msg = "SQL Exception";

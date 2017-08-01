@@ -43,7 +43,16 @@
                 <i class="fw fw-add fw-stack-1x"></i>
                 <i class="fw fw-circle-outline fw-stack-2x"></i>
             </span>
-                Add Building
+                Add Building asdjfkjdsa
+            </a>
+        </li>
+        <li>
+            <a href="#" class="cu-btn" onclick="onAddMarkerLocation()">
+            <span class="icon fw-stack">
+                <i class="fw fw-add fw-stack-1x"></i>
+                <i class="fw fw-circle-outline fw-stack-2x"></i>
+            </span>
+                Add Location
             </a>
         </li>
     {{/if}}
@@ -64,9 +73,9 @@
             <div class="row">
                 <div class="col-lg-5 col-md-6 col-centered">
                     <form action="" method="post" id="register-form-'+ markerId +'" novalidate="novalidate">
-                        <h3>Add Building/ Location</h3>
+                        <h3>Add Building</h3>
                         <div class="form-group">
-                            <label for="locationName">Building/ Location Name *</label>
+                            <label for="locationName">Building Name *</label>
                             <input type="text" class="form-control" id="locationName" name="locationName"
                                    placeholder="e.g.: Home">
                         </div>
@@ -82,6 +91,30 @@
                         <div id="building-button" class="form-group">
                             <button id="buttonme" type="button" class="btn btn-primary" data-toggle="update-data"
                                     onclick="saveBuilding()">Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="building-response-template-location" style="display: none">
+            <div class="row">
+                <div class="col-lg-5 col-md-6 col-centered">
+                    <form action="" method="post" id="register-form-'+ markerId +'" novalidate="novalidate">
+                        <h3>Add Location</h3>
+                        <div class="form-group">
+                            <label for="locationName">Location Name *</label>
+                            <input type="text" class="form-control" id="locationName" name="locationName"
+                                   placeholder="e.g.: Home">
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" class="form-control required" name="lat" id="lat" name="floors">
+                            <input type="hidden" class="form-control required" name="long" id="long" name="floors">
+                        </div>
+                        <div id="building-button" class="form-group">
+                            <button id="buttonme" type="button" class="btn btn-primary" data-toggle="update-data"
+                                    onclick="saveLocation()">Save
                             </button>
                         </div>
                     </form>
@@ -128,121 +161,121 @@
 
     {{#zone "navbarCollapsableRightItems"}}
         {{#if permissions.VIEW_BUILDING}}
-        <ul id="notification-bubble-wrapper" class="nav navbar-nav navbar-right">
-            <li class="visible-inline-block  active">
-                <!--<a href="{{@app.context}}notification-listing" title="Failures of operations on the device side will be listed here">-->
-                <a data-toggle="sidebar" data-target="#right-sidebar" data-container=".page-content"
-                   aria-expanded="true" rel="notifications-sidebar">
+            <ul id="notification-bubble-wrapper" class="nav navbar-nav navbar-right">
+                <li class="visible-inline-block  active">
+                    <!--<a href="{{@app.context}}notification-listing" title="Failures of operations on the device side will be listed here">-->
+                    <a data-toggle="sidebar" data-target="#right-sidebar" data-container=".page-content"
+                       aria-expanded="true" rel="notifications-sidebar">
             <span class="icon fw-stack">
                 <i class="fw fw-menu fw-stack-1x"></i>
             </span>
-                    <span class="hidden-xs">Manage Buildings/ Locations</span>
-                    <span class="badge notifications" id="notification-bubble"></span>
-                </a>
-            </li>
-        </ul>
+                        <span class="hidden-xs">Manage Buildings/ Locations</span>
+                        <span class="badge notifications" id="notification-bubble"></span>
+                    </a>
+                </li>
+            </ul>
         {{/if}}
 
     {{/zone}}
 
     {{#zone "sidePanes"}}
         {{#if permissions.VIEW_BUILDING}}
-        <div class="sidebar-wrapper sidebar-wrapper-animation-fix toggled" id="right-sidebar"
-             data-side="right" data-width="350" data-sidebar-fixed="true" data-top="90" data-fixed-offset="90"
-             data-offset-top="50" data-spy="affix">
-            <ul class="sidebar-messages" id="sidebar-messages">
-            </ul>
-        </div>
-        <div style="display:none">
-            <div id="device-building-template">
-                <li class="message message-info building-info" onclick="focusBuilding(this.id)"
-                    id="building-content-div"
-                    data-type="selectable">
-                    <a>
-                        <h4><i class="icon fw fw-success"></i><a id="building-content"></a></h4>
-                        <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-active">
-                            <div>
-                                <span id="building-active"></span>
-                            </div>
-                            <div>
-                                <span class="wr-stats-board-sidebar-text">ACTIVE DEVICES</span>
-                            </div>
-                        </div>
-                        <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-inactive">
-                            <div>
-                                <span id="building-inactive"></span>
-                            </div>
-                            <div>
-                                <span class="wr-stats-board-sidebar-text">INACTIVE DEVICES</span>
-                            </div>
-                        </div>
-                        <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-fault">
-                            <div>
-                                <span id="building-fault"></span>
-                            </div>
-                            <div>
-                                <span class="wr-stats-board-sidebar-text">FAULTY DEVICES</span>
-                            </div>
-                        </div>
-                        <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-alerts">
-                            <div>
-                                <span id="building-alerts"></span>
-                            </div>
-                            <div>
-                                <span class="wr-stats-board-sidebar-text">TRIGGERED ALERTS</span>
-                            </div>
-                        </div>
-
-
-                    </a>
-
-                </li>
+            <div class="sidebar-wrapper sidebar-wrapper-animation-fix toggled" id="right-sidebar"
+                 data-side="right" data-width="350" data-sidebar-fixed="true" data-top="90" data-fixed-offset="90"
+                 data-offset-top="50" data-spy="affix">
+                <ul class="sidebar-messages" id="sidebar-messages">
+                </ul>
             </div>
-            <div id="device-popup-template">
-                <div id="building-content-div">
-                    <h4><a id="building-content"></a></h4>
-                    <div>
-                        <div class="wr-stats-board-tile wr-popup-board-sidebar wr-stats-board-active">
-                            <div>
+            <div style="display:none">
+                <div id="device-building-template">
+                    <li class="message message-info building-info" onclick="focusBuilding(this.id)"
+                        id="building-content-div"
+                        data-type="selectable">
+                        <a>
+                            <h4><i class="icon fw fw-success"></i><a id="building-content"></a></h4>
+                            <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-active">
+                                <div>
+                                    <span id="building-active"></span>
+                                </div>
+                                <div>
+                                    <span class="wr-stats-board-sidebar-text">ACTIVE DEVICES</span>
+                                </div>
+                            </div>
+                            <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-inactive">
+                                <div>
+                                    <span id="building-inactive"></span>
+                                </div>
+                                <div>
+                                    <span class="wr-stats-board-sidebar-text">INACTIVE DEVICES</span>
+                                </div>
+                            </div>
+                            <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-fault">
+                                <div>
+                                    <span id="building-fault"></span>
+                                </div>
+                                <div>
+                                    <span class="wr-stats-board-sidebar-text">FAULTY DEVICES</span>
+                                </div>
+                            </div>
+                            <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-alerts">
+                                <div>
+                                    <span id="building-alerts"></span>
+                                </div>
+                                <div>
+                                    <span class="wr-stats-board-sidebar-text">TRIGGERED ALERTS</span>
+                                </div>
+                            </div>
+
+
+                        </a>
+
+                    </li>
+                </div>
+                <div id="device-popup-template">
+                    <div id="building-content-div">
+                        <h4><a id="building-content"></a></h4>
+                        <div>
+                            <div class="wr-stats-board-tile wr-popup-board-sidebar wr-stats-board-active">
+                                <div>
                                 <span class="wr-popup-board-sidebar-text"
                                       class="pull-left text-left">ACTIVE DEVICES</span>
-                                <span id="building-active" class="pull-right text-right"></span>
+                                    <span id="building-active" class="pull-right text-right"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="wr-stats-board-tile wr-popup-board-sidebar wr-stats-board-inactive">
-                            <div>
+                            <div class="wr-stats-board-tile wr-popup-board-sidebar wr-stats-board-inactive">
+                                <div>
                             <span class="wr-popup-board-sidebar-text"
                                   class="pull-left text-left">INACTIVE DEVICES</span>
-                                <span id="building-inactive" class="pull-right text-right"></span>
+                                    <span id="building-inactive" class="pull-right text-right"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="wr-stats-board-tile wr-popup-board-sidebar wr-stats-board-fault">
-                            <div>
+                            <div class="wr-stats-board-tile wr-popup-board-sidebar wr-stats-board-fault">
+                                <div>
                                 <span class="wr-popup-board-sidebar-text"
                                       class="pull-left text-left">FAULTY DEVICES</span>
-                                <span id="building-fault" class="pull-right text-right"></span>
+                                    <span id="building-fault" class="pull-right text-right"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="wr-stats-board-tile wr-popup-board-sidebar wr-stats-board-alerts">
-                            <div>
+                            <div class="wr-stats-board-tile wr-popup-board-sidebar wr-stats-board-alerts">
+                                <div>
                             <span class="wr-popup-board-sidebar-text"
                                   class="pull-left text-left">TRIGGERED ALERTS</span>
-                                <span id="building-alerts" class="pull-right text-right"></span>
+                                    <span id="building-alerts" class="pull-right text-right"></span>
+                                </div>
                             </div>
-                        </div>
-                        </p>
+                            </p>
 
-                    </div>
-                    <a id="building-location">
+                        </div>
+                        <a id="building-location">
                     <span class="fw-stack">
                         <i class="fw fw-circle-outline fw-stack-2x"></i>
                         <i class="fw fw-view fw-stack-1x"></i>
                     </span>
-                        View
-                    </a>
+                            View
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
         {{/if}}
     {{/zone}}
 
