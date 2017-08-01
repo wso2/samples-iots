@@ -39,7 +39,7 @@
 DHT dht(DHT11_PIN, DHTTYPE, 30); 
 
 unsigned long previousMillis = 0;        // will store last temp was read
-const long interval = 2000;              // interval at which to read sensor
+const long interval = 500;              // interval at which to read sensor
 long startDelay = millis();
 // Update these with values suitable for your network.
 //const char* ssid = "linksys";
@@ -47,11 +47,12 @@ long startDelay = millis();
 //const char* gateway = "http://192.168.1.103:8280";
 //const char* mqtt_server = "192.168.1.103";
 
-const char* ssid = "....";
-const char* password = "....";
 
-const char* gateway = "http://192.168.57.100:8280";
-const char* mqtt_server = "192.168.57.100";
+const char* ssid = "....";
+const char* password = "...";
+
+const char* gateway = "http://192.168.43.178:8280";
+const char* mqtt_server = "192.168.43.178";
 const int mqtt_port = 1886;
 const char* tenant_domain = "carbon.super";
 char device_id[100] ;
@@ -141,8 +142,7 @@ boolean registerme() {
         Serial.println("test");
         Serial.println(apiKey);
         Serial.println(accessToken);
-        Serial.println(refreshToken);
-      
+        Serial.println(refreshToken);      
         return true;
       }else{
         Serial.println("\nUsing hardcoded access token");
@@ -266,9 +266,12 @@ void loop() {
      } else {
         Serial.print("\nConnecting MQTT client using access token: ");
         Serial.println(accessToken);
+        snprintf (subscribedTopic, 100, "%s/senseme/%s/command", tenant_domain, device_id);
         if (!mqttConnected) {
           if (client.connect(device_id, accessToken, "")) {
+            client.subscribe(subscribedTopic);
             Serial.println("MQTT Client Connected");
+            Serial.println(subscribedTopic);
             mqttConnected = true;
           } else {
             Serial.println("Error while connecting with MQTT server.");
@@ -300,9 +303,14 @@ void loop() {
     snprintf (publishTopic, 100, "%s/senseme/%s", tenant_domain, device_id);
     if (temperature <= 100 && humidity <= 100 ) {
       client.publish(publishTopic, msg);
+      Serial.println(publishTopic);
+      Serial.println(msg);
+      Serial.println();
+      //Serial.println(msg);
     }
     isMoving = 0;
-    Serial.println(msg);
+    
+    //client.publish("carbon.super/senseme/2940205", "{\"event\":{\"payloadData\":{\"deviceId\":\"2940205\", \"temperature\":27.0 , \"motion\":1.0, \"humidity\":85.0  , \"airQuality\":50.0, \"light\":1024.0}}}");
     
     startDelay = millis();
   }
