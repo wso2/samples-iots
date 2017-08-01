@@ -82,8 +82,16 @@ public class BuildingServiceImpl implements BuildingService {
             id = this.buildingDAO.addBuilding(building);
             buildingDAOManager.getBuildingDAOHandler().commitTransaction();
             if (id != 0) {
-                String buildingRole = String.format(DeviceTypeConstants.BUILDING_ROLE, id);
-                String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, id);
+                String buildingRole= null;
+                String buildingGroupName = null;
+                if(building.isLocation()) {
+                    buildingRole = String.format(DeviceTypeConstants.LOCATION_ROLE, id);
+                    buildingGroupName = String.format(DeviceTypeConstants.LOCATION_GROUP_NAME, id);
+                }
+                else {
+                    buildingRole = String.format(DeviceTypeConstants.BUILDING_ROLE, id);
+                    buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, id);
+                }
                 addRolesForBuildingsAndFloors(buildingRole);
                 createAndAddGroups(buildingGroupName, buildingRole, "Group for the " + id);
                 return Response.status(Response.Status.OK).entity(id).build();
@@ -117,8 +125,13 @@ public class BuildingServiceImpl implements BuildingService {
                 authorizedBuildings = buildingList;
             } else {
                 for (BuildingInfo building : buildingList) {
-                    String buildingGroupName = String
-                            .format(DeviceTypeConstants.BUILDING_GROUP_NAME, building.getBuildingId());
+                    String buildingGroupName =null;
+                    if(building.isLocation()) {
+                        buildingGroupName = String.format(DeviceTypeConstants.LOCATION_GROUP_NAME, building.getBuildingId());
+                    }
+                    else {
+                        buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, building.getBuildingId());
+                    }
                     if (isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
                         authorizedBuildings.add(building);
                     }
@@ -142,7 +155,13 @@ public class BuildingServiceImpl implements BuildingService {
     public Response updateBuilding(BuildingInfo buildingInfo) {
         BuildingInfo building;
         try {
-            String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingInfo.getBuildingId());
+            String buildingGroupName =null;
+            if(buildingInfo.isLocation()) {
+                buildingGroupName = String.format(DeviceTypeConstants.LOCATION_GROUP_NAME, buildingInfo.getBuildingId());
+            }
+            else {
+                buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingInfo.getBuildingId());
+            }
             GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             List<DeviceGroup> userGroups = groupManagementProviderService
                     .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
@@ -212,11 +231,15 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     public Response getRegisteredBuilding(@PathParam("buildingId") int buildingId) {
         try {
+
             String buildingGroupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId);
+            String locationGroupName = String.format(DeviceTypeConstants.LOCATION_GROUP_NAME, buildingId);
+
             GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             List<DeviceGroup> userGroups = groupManagementProviderService
                     .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
-            if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName)) {
+
+            if (isAdmin() || isUserAuthorizedToGroup(userGroups, buildingGroupName) || isUserAuthorizedToGroup(userGroups, locationGroupName)) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
                 BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
                 if (buildingInfo == null) {
@@ -290,13 +313,16 @@ public class BuildingServiceImpl implements BuildingService {
             buildingDAOManager.getBuildingDAOHandler().beginTransaction();
             status = buildingDAO.insertFloorDetails(buildingId, floorId, imageBytes);
             buildingDAOManager.getBuildingDAOHandler().commitTransaction();
+            BuildingInfo building = buildingDAO.getBuilding(buildingId);
 
             if (status) {
                 String floorRole = String.format(DeviceTypeConstants.FLOOR_ROLE, buildingId, floorId);
                 String floorGroupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
-                addRolesForBuildingsAndFloors(floorRole);
-                createAndAddGroups(floorGroupName, floorRole,
-                        "Group for floor " + floorId + " in the building " + buildingId);
+                if(!building.isLocation()) {
+                    addRolesForBuildingsAndFloors(floorRole);
+                    createAndAddGroups(floorGroupName, floorRole,
+                            "Group for floor " + floorId + " in the building " + buildingId);
+                }
                 return Response.status(Response.Status.OK.getStatusCode()).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
@@ -342,7 +368,15 @@ public class BuildingServiceImpl implements BuildingService {
     @Produces("application/json")
     public Response getDevices(@PathParam("buildingId") int buildingId, @PathParam("floorId") int floorId) {
         try {
-            String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+            String groupName;
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
+
+            if (buildingInfo.isLocation()) {
+                groupName = String.format(DeviceTypeConstants.LOCATION_GROUP_NAME, buildingId);
+            } else {
+                groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+            }
             GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
             DeviceGroup floorDeviceGroup = groupManagementProviderService.getGroup(groupName);
             List<SenseMe> senseMes = new ArrayList<>();
@@ -375,6 +409,12 @@ public class BuildingServiceImpl implements BuildingService {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
                     .build();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).entity(e.getMessage())
+                    .build();
+        } finally {
+            buildingDAOManager.getBuildingDAOHandler().closeConnection();
         }
     }
 
@@ -491,7 +531,8 @@ public class BuildingServiceImpl implements BuildingService {
         }
         try {
             if (isAdmin() || isUserAuthorizedToGroup(userGroups,
-                    String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId))) {
+                    String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId)) || isUserAuthorizedToGroup(userGroups,
+                            String.format(DeviceTypeConstants.LOCATION_GROUP_NAME, buildingId))) {
                 buildingDAOManager.getBuildingDAOHandler().openConnection();
                 buildingDAOManager.getBuildingDAOHandler().beginTransaction();
                 res = buildingDAO.removeBuilding(buildingId);
@@ -572,8 +613,8 @@ public class BuildingServiceImpl implements BuildingService {
                     .getGroups(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername()) ;
             for (BuildingInfo buildingId : buildingList) {
                 String groupName = String.format(DeviceTypeConstants.BUILDING_GROUP_NAME, buildingId.getBuildingId());
-
-                if (isAdmin() || isUserAuthorizedToGroup(userGroups, groupName)) {
+                String locationGroupName = String.format(DeviceTypeConstants.LOCATION_GROUP_NAME, buildingId.getBuildingId());
+                if (isAdmin() || isUserAuthorizedToGroup(userGroups, groupName)|| isUserAuthorizedToGroup(userGroups, locationGroupName)) {
                     DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
                     if (floorDeviceGroup != null) {
                         DeviceInfo deviceInfo = new DeviceInfo("" + buildingId.getBuildingId());
@@ -638,12 +679,21 @@ public class BuildingServiceImpl implements BuildingService {
     @Produces("application/json")
     public Response getDevicesForFloor(@PathParam("buildingId") int buildingId) {
         try {
+            buildingDAOManager.getBuildingDAOHandler().openConnection();
+            BuildingInfo buildingInfo = this.buildingDAO.getBuilding(buildingId);
             List<DeviceInfo> deviceInfos = new ArrayList<>();
 
-            buildingDAOManager.getBuildingDAOHandler().openConnection();
+
+
             List<Integer> floorNums = buildingDAO.getAvailableFloors(buildingId);
             for (int floorId : floorNums) {
-                String groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+                String groupName= null;
+                if(buildingInfo.isLocation()) {
+                    groupName = String.format(DeviceTypeConstants.LOCATION_GROUP_NAME, buildingId);
+                }
+                else {
+                    groupName = String.format(DeviceTypeConstants.FLOOR_GROUP_NAME, buildingId, floorId);
+                }
                 DeviceGroup floorDeviceGroup = APIUtil.getGroupManagementProviderService().getGroup(groupName);
                 if (floorDeviceGroup != null) {
                     DeviceInfo deviceInfo = new DeviceInfo("" + floorId);

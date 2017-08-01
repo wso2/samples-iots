@@ -44,6 +44,10 @@ function showPopup() {
     $(modalPopup).modal('show');
 }
 
+function showPopupLocation() {
+    $(modalPopup).modal('show');
+}
+
 /*
  * hide popup function.
  */
@@ -113,87 +117,87 @@ function loadLeafletMap() {
 }
 
 function preLoadBuildings() {
-	var getBuildingDevicesApi = "/senseme/building/devices";
-	var devices = {};
-	invokerUtil.get(getBuildingDevicesApi, function (data, textStatus, jqXHR) {
-	    console.log("here");
-	    var status = jqXHR.status;
-	    console.log("status "  +status);
-		if (status >= 200 && status < 300) {
-		    if (status == 200) {
+    var getBuildingDevicesApi = "/senseme/building/devices";
+    var devices = {};
+    invokerUtil.get(getBuildingDevicesApi, function (data, textStatus, jqXHR) {
+        console.log("here");
+        var status = jqXHR.status;
+        console.log("status "  +status);
+        if (status >= 200 && status < 300) {
+            if (status == 200) {
                 devices = JSON.parse(data);
             }
-			var getBuildingApi = "/senseme/building";
-			invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
-			   console.log("here ///");
-				if (jqXHR.status == 200) {
-					//[{"buildingId":1,"buildingName":"ayyoobs1","owner":"admin","longitude":"79.97607422294095","latitude":"6.995539474716988","numFloors":4}
-					var buildings = JSON.parse(data);
-					var buildingIds;
-					if (buildings.length > 0) {
-						for (var i = 0; i < buildings.length; i++) {
-							if (i == 0) {
-								buildingIds = buildings[i].buildingId;
-							} else {
-								buildingIds = buildingIds + "," + buildings[i].buildingId;
-							}
-						}
-						var providerUrl = context + '/api/batch-provider?action=getMapAlertCount&tableName=ORG_WSO2_FLOOR_ALERTNOTIFICATIONS&buildingSet=' + buildingIds;
+            var getBuildingApi = "/senseme/building";
+            invokerUtil.get(getBuildingApi, function (data, textStatus, jqXHR) {
+                console.log("here ///");
+                if (jqXHR.status == 200) {
+                    //[{"buildingId":1,"buildingName":"ayyoobs1","owner":"admin","longitude":"79.97607422294095","latitude":"6.995539474716988","numFloors":4}
+                    var buildings = JSON.parse(data);
+                    var buildingIds;
+                    if (buildings.length > 0) {
+                        for (var i = 0; i < buildings.length; i++) {
+                            if (i == 0) {
+                                buildingIds = buildings[i].buildingId;
+                            } else {
+                                buildingIds = buildingIds + "," + buildings[i].buildingId;
+                            }
+                        }
+                        var providerUrl = context + '/api/batch-provider?action=getMapAlertCount&tableName=ORG_WSO2_FLOOR_ALERTNOTIFICATIONS&buildingSet=' + buildingIds;
 
-						$.ajax({
-							url: providerUrl,
-							method: "GET",
-							contentType: "application/json",
-							contentType: "application/json",
-							contentType: "application/json",
-							contentType: "application/json",
-							async: false,
-							success: function (buildingAlertCount) {
-								for (var i = 0; i < buildings.length; i++) {
-									var obj = buildings[i];
-									var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
-									var buildingdevice = {"active" : 0,
-										"inactive" : 0,
-										"fault":0, "total":0, "alerts" : 0};
-									for(var j = 0; j < devices.length; j++) {
-
-
-										if (devices[j].id == obj.buildingId) {
-											var deviceobj = devices[j];
-											//[{"id":"9","activeDevices":0,"faultDevices":0,"inactiveDevices":4,"totalDevices":4}]
-											var alert = buildingAlertCount[obj.buildingId];
-											if (!alert && alert== undefined) {
-												alert = 0;
-											}
-											buildingdevice = {"active" : deviceobj.activeDevices,
-												"inactive" : deviceobj.inactiveDevices,
-												"fault":deviceobj.faultDevices, "total":deviceobj.totalDevices, "alerts" : alert};
-											break;
-										}
-
-									}
-									addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i], buildingdevice);
-									//printBuildingData(obj);
+                        $.ajax({
+                            url: providerUrl,
+                            method: "GET",
+                            contentType: "application/json",
+                            contentType: "application/json",
+                            contentType: "application/json",
+                            contentType: "application/json",
+                            async: false,
+                            success: function (buildingAlertCount) {
+                                for (var i = 0; i < buildings.length; i++) {
+                                    var obj = buildings[i];
+                                    var cord = {"lat" : obj.latitude, "lng" : obj.longitude};
+                                    var buildingdevice = {"active" : 0,
+                                        "inactive" : 0,
+                                        "fault":0, "total":0, "alerts" : 0};
+                                    for(var j = 0; j < devices.length; j++) {
 
 
-								}
+                                        if (devices[j].id == obj.buildingId) {
+                                            var deviceobj = devices[j];
+                                            //[{"id":"9","activeDevices":0,"faultDevices":0,"inactiveDevices":4,"totalDevices":4}]
+                                            var alert = buildingAlertCount[obj.buildingId];
+                                            if (!alert && alert== undefined) {
+                                                alert = 0;
+                                            }
+                                            buildingdevice = {"active" : deviceobj.activeDevices,
+                                                "inactive" : deviceobj.inactiveDevices,
+                                                "fault":deviceobj.faultDevices, "total":deviceobj.totalDevices, "alerts" : alert};
+                                            break;
+                                        }
 
-							},
-							error: function (err) {
-								console.log(err);
-							}
-						});
-					}
-				}
-			}, function (jqXHR) {
+                                    }
+                                    addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i], buildingdevice);
+                                    //printBuildingData(obj);
+
+
+                                }
+
+                            },
+                            error: function (err) {
+                                console.log(err);
+                            }
+                        });
+                    }
+                }
+            }, function (jqXHR) {
                 console.log(jqXHR.responseText);
 
-			}, "application/json");
-		}
+            }, "application/json");
+        }
 
-	}, function (jqXHR) {
-	    console.log(jqXHR.responseText);
-	}, "application/json");
+    }, function (jqXHR) {
+        console.log(jqXHR.responseText);
+    }, "application/json");
 }
 
 
@@ -206,16 +210,20 @@ function printBuildingData(buildingInfo) {
 
 $(document).ready(function () {
     loadLeafletMap();
-
 });
 
 function onAddMarker() {
-
     map.once('click', addBuilding);
 //        if(click !== null){
     $('body.fixed ').addClass('marker-cursor');
     $('#device-location').addClass('marker-cursor');
 //        }
+}
+
+function onAddMarkerLocation() {
+    map.once('click', addLocation);
+    $('body.fixed ').addClass('marker-cursor-location');
+    $('#device-location').addClass('marker-cursor-location');
 }
 
 function onMarkerClick(e) {
@@ -262,6 +270,38 @@ function saveBuilding() {
     hidePopup();
 }
 
+function saveLocation() {
+    var buildingName = document.getElementsByName('locationName')[0].value;
+    var noOffloors = 1;
+    var lat = document.getElementsByName('lat')[0].value;
+    var long = document.getElementsByName('long')[0].value;
+    var addBuildingApi = "/senseme/building";
+    var buildingdata = {buildingName: buildingName, longitude: lat, latitude: long, numFloors: noOffloors};
+
+    invokerUtil.post(addBuildingApi, buildingdata, function (data, textStatus, jqXHR) {
+        if (jqXHR.status == 200 && data) {
+            var cord = {"lat": lat, "lng": long};
+            var building = {
+                buildingName: buildingName,
+                longitude: lat,
+                latitude: long,
+                numFloors: noOffloors,
+                buildingId: data
+            };
+            addingMarkerLocation(cord, buildingName, data, building);
+        }
+    }, function (jqXHR) {
+        if (jqXHR.status == 400) {
+            console.log("error")
+        } else {
+            var response = JSON.parse(jqXHR.responseText).message;
+
+        }
+    }, "application/json", "application/json");
+
+    hidePopup();
+}
+
 function addBuilding(e) {
     //save building here.
     tmpEventStore = e;
@@ -271,6 +311,17 @@ function addBuilding(e) {
     content.find("#long").attr('value', cord.lng);
     $(modalPopupContent).html(content.html());
     showPopup();
+}
+
+function addLocation(e) {
+    //save building here.
+    tmpEventStore = e;
+    var cord = e.latlng;
+    var content = $("#building-response-template-location");
+    content.find("#lat").attr('value', cord.lat);
+    content.find("#long").attr('value', cord.lng);
+    $(modalPopupContent).html(content.html());
+    showPopupLocation();
 }
 
 function onMarkerDragged(event) {
@@ -303,35 +354,34 @@ function onMarkerDragged(event) {
 
 }
 
-
 function addingMarker(cord, locationName, buildingId, building, buildingdevice) {
-	var markerId,
-		popup;
+    var markerId,
+        popup;
 
-	$('body.fixed ').removeClass('marker-cursor');
-	$('#device-location').removeClass('marker-cursor');
+    $('body.fixed ').removeClass('marker-cursor');
+    $('#device-location').removeClass('marker-cursor');
 
-	var content = $("#device-popup-template").clone();
-	var sidebar = $("#sidebar-messages");
-	content.attr("id","device-building-" + buildingId);
+    var content = $("#device-popup-template").clone();
+    var sidebar = $("#sidebar-messages");
+    content.attr("id","device-building-" + buildingId);
 
-	console.log(buildingdevice);
-	if (buildingdevice && buildingdevice != undefined) {
-		content.find("#building-active").text(buildingdevice.active);
-		content.find("#building-inactive").text(buildingdevice.inactive);
-		content.find("#building-fault").text(buildingdevice.fault);
-		content.find("#building-alerts").text(buildingdevice.alerts);
-	} else {
-		content.find("#building-active").text("0");
-		content.find("#building-inactive").text("0");
-		content.find("#building-fault").text("0");
-		content.find("#building-alerts").text("0");
-	}
-	content.find("#building-content").text(locationName);
-	content.find("#building-content-div").attr("data-buildingid", buildingId);
-	content.find("#building-content-div").attr("data-markerid", markerId);
-	content.find("#building-content-div").attr("id","building-content-" + buildingId);
-	content.find("#building-location").attr("href","/buildingmonitor/buildings?buildingId=" + buildingId);
+    console.log(buildingdevice);
+    if (buildingdevice && buildingdevice != undefined) {
+        content.find("#building-active").text(buildingdevice.active);
+        content.find("#building-inactive").text(buildingdevice.inactive);
+        content.find("#building-fault").text(buildingdevice.fault);
+        content.find("#building-alerts").text(buildingdevice.alerts);
+    } else {
+        content.find("#building-active").text("0");
+        content.find("#building-inactive").text("0");
+        content.find("#building-fault").text("0");
+        content.find("#building-alerts").text("0");
+    }
+    content.find("#building-content").text(locationName);
+    content.find("#building-content-div").attr("data-buildingid", buildingId);
+    content.find("#building-content-div").attr("data-markerid", markerId);
+    content.find("#building-content-div").attr("id","building-content-" + buildingId);
+    content.find("#building-location").attr("href","/buildingmonitor/buildings?buildingId=" + buildingId);
 
     popup = L.popup({
         autoPan: true,
@@ -369,33 +419,33 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
     }
 
     markers[markerId] = marker;
-	addBuildingMenu(buildingId,locationName, markerId, buildingdevice);
+    addBuildingMenu(buildingId,locationName, markerId, buildingdevice);
 
-	// Remove Marker
-	$('.remove').on("click", function () {
-		// Remove the marker
-		map.removeLayer(markers[$(this).attr('id')]);
+    // Remove Marker
+    $('.remove').on("click", function () {
+        // Remove the marker
+        map.removeLayer(markers[$(this).attr('id')]);
 
-		var idNo = $(this).attr('id');
-		// Remove the link
-		$(this).parent('div').remove();
+        var idNo = $(this).attr('id');
+        // Remove the link
+        $(this).parent('div').remove();
 
-		$('#home').find('#' + idNo).remove();
+        $('#home').find('#' + idNo).remove();
 
-		if(window.localStorage.getItem(KEY_NAME) !== null){
-			$.each(objectJSON.metaData, function(i, values){
-				if(values.id == idNo){
-					objectJSON.metaData.splice(i, 1);
-					var result = JSON.stringify(objectJSON);
-					window.localStorage.setItem(KEY_NAME, result);
-				}
-			});
-		}
-	});
+        if(window.localStorage.getItem(KEY_NAME) !== null){
+            $.each(objectJSON.metaData, function(i, values){
+                if(values.id == idNo){
+                    objectJSON.metaData.splice(i, 1);
+                    var result = JSON.stringify(objectJSON);
+                    window.localStorage.setItem(KEY_NAME, result);
+                }
+            });
+        }
+    });
 
-	/*
-	 Pan to Marker on item panel hover
-	 */
+    /*
+     Pan to Marker on item panel hover
+     */
     $('.item').on("mouseover", function (e) {
         $('div').removeClass('active-marker');
         $('#' + $(this).attr('id') + ' .panel-default > .panel-heading').addClass('active-marker');
@@ -411,32 +461,153 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
     });
 }
 
+
+
+
+
+
+
+
+
+
+function addingMarkerLocation(cord, locationName, buildingId, building, buildingdevice) {
+    var markerId,
+        popup;
+
+    $('body.fixed ').removeClass('marker-cursor-location');
+    $('#device-location').removeClass('marker-cursor-location');
+
+    var content = $("#device-popup-template").clone();
+    var sidebar = $("#sidebar-messages");
+    content.attr("id","device-building-" + buildingId);
+
+    console.log(buildingdevice);
+    if (buildingdevice && buildingdevice != undefined) {
+        content.find("#building-active").text(buildingdevice.active);
+        content.find("#building-inactive").text(buildingdevice.inactive);
+        content.find("#building-fault").text(buildingdevice.fault);
+        content.find("#building-alerts").text(buildingdevice.alerts);
+    } else {
+        content.find("#building-active").text("0");
+        content.find("#building-inactive").text("0");
+        content.find("#building-fault").text("0");
+        content.find("#building-alerts").text("0");
+    }
+    content.find("#building-content").text(locationName);
+    content.find("#building-content-div").attr("data-buildingid", buildingId);
+    content.find("#building-content-div").attr("data-markerid", markerId);
+    content.find("#building-content-div").attr("id","building-content-" + buildingId);
+    content.find("#building-location").attr("href","/buildingmonitor/buildings?buildingId=" + buildingId);
+
+    popup = L.popup({
+        autoPan: true,
+        keepInView: true
+    })
+        .setContent(content.html());
+
+    //variable for marker
+    var marker;
+
+    //markers info JSON array
+    var markerInfo = {
+        info: []
+    };
+
+    marker = new L.marker(cord, {
+        title: locationName,
+        alt: locationName,
+        riseOnHover: true,
+        draggable: true
+    }).bindPopup(popup);
+
+    marker._leaflet_id = markerId;
+
+    marker.on('click', onMarkerClick);
+
+    marker.on('dragend', onMarkerDragged);
+
+    //marker.on("popupopen", onPopupOpen);
+    marker.addTo(map);
+    markerId = marker._leaflet_id;
+
+    if (building != null) {
+        buildingsMap[markerId] = building;
+    }
+
+    markers[markerId] = marker;
+    addBuildingMenu(buildingId,locationName, markerId, buildingdevice);
+
+    // Remove Marker
+    $('.remove').on("click", function () {
+        // Remove the marker
+        map.removeLayer(markers[$(this).attr('id')]);
+
+        var idNo = $(this).attr('id');
+        // Remove the link
+        $(this).parent('div').remove();
+
+        $('#home').find('#' + idNo).remove();
+
+        if(window.localStorage.getItem(KEY_NAME) !== null){
+            $.each(objectJSON.metaData, function(i, values){
+                if(values.id == idNo){
+                    objectJSON.metaData.splice(i, 1);
+                    var result = JSON.stringify(objectJSON);
+                    window.localStorage.setItem(KEY_NAME, result);
+                }
+            });
+        }
+    });
+
+
+    $('.item').on("mouseover", function (e) {
+        $('div').removeClass('active-marker');
+        $('#' + $(this).attr('id') + ' .panel-default > .panel-heading').addClass('active-marker');
+        for (var mark in markers) {
+            markers[mark].setIcon(smallIcon);
+        }
+        markerFunction($(this).attr('id'));
+        markers[$(this).attr('id')].setIcon(bigIcon);
+        var mid = $(this).attr('id');
+        var LatLng = markers[mid].getLatLng();
+        var offset = baseMap.panTo(LatLng);
+        baseMap.panBy(offset);
+    });
+}
+
+
+
+
+
+
+
+
 function addBuildingMenu(buildingId, buildingName, markerId, buildingdevice) {
-	var content = $("#device-building-template").clone();
-	var sidebar = $("#sidebar-messages");
-	content.attr("id","device-building-" + buildingId);
-	if (buildingdevice && buildingdevice != undefined) {
-		content.find("#building-active").text(buildingdevice.active);
-		content.find("#building-inactive").text(buildingdevice.inactive);
-		content.find("#building-fault").text(buildingdevice.fault);
-		content.find("#building-alerts").text(buildingdevice.alerts);
-	} else {
-		content.find("#building-active").text("0");
-		content.find("#building-inactive").text("0");
-		content.find("#building-fault").text("0");
-		content.find("#building-alerts").text("0");
-	}
-	content.find("#building-content").text(buildingName);
-	content.find("#building-content-div").attr("data-buildingid", buildingId);
-	content.find("#building-content-div").attr("data-markerid", markerId);
-	content.find("#building-content-div").attr("id","building-content-" + buildingId);
-	sidebar.append(content);
+    var content = $("#device-building-template").clone();
+    var sidebar = $("#sidebar-messages");
+    content.attr("id","device-building-" + buildingId);
+    if (buildingdevice && buildingdevice != undefined) {
+        content.find("#building-active").text(buildingdevice.active);
+        content.find("#building-inactive").text(buildingdevice.inactive);
+        content.find("#building-fault").text(buildingdevice.fault);
+        content.find("#building-alerts").text(buildingdevice.alerts);
+    } else {
+        content.find("#building-active").text("0");
+        content.find("#building-inactive").text("0");
+        content.find("#building-fault").text("0");
+        content.find("#building-alerts").text("0");
+    }
+    content.find("#building-content").text(buildingName);
+    content.find("#building-content-div").attr("data-buildingid", buildingId);
+    content.find("#building-content-div").attr("data-markerid", markerId);
+    content.find("#building-content-div").attr("id","building-content-" + buildingId);
+    sidebar.append(content);
 }
 
 function focusBuilding(id) {
-	var buildingId = $("#" + id).attr('data-buildingid');
-	var markerId = $("#" + id).attr('data-markerid');
-	var mark = markers[markerId].openPopup();
-	var offset = map.panTo(mark.getLatLng());
-	map.panBy(offset);
+    var buildingId = $("#" + id).attr('data-buildingid');
+    var markerId = $("#" + id).attr('data-markerid');
+    var mark = markers[markerId].openPopup();
+    var offset = map.panTo(mark.getLatLng());
+    map.panBy(offset);
 }

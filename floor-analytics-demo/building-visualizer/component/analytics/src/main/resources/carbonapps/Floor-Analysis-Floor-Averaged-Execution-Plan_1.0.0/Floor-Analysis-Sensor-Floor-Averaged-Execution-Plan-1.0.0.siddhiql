@@ -21,7 +21,7 @@ airQuality double, light double, timeStamp long);
 @Export('org.wso2.floor.AlertNotifications:1.0.0')
 define stream alertOut (buildingId string, floorId string, type string, value double, information string, timeStamp long);
 
-from dataIn#window.timeBatch(1 min)
+from dataIn#window.timeBatch(60 sec)
 select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
 (airQuality) as airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
 group by floorId insert into dataOut ;
