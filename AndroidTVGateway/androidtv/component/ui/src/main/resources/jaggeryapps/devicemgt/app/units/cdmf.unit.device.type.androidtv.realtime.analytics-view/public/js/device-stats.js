@@ -32,10 +32,11 @@ var chartDataSensorType2 = [];
 var chartDataSensorType3 = [];
 var chartDataSensorType4 = [];
 var chartDataSensorType5 = [];
-
+ 
 var previousACPointValue = 0;
 var previousDOORPointValue = 0;
 var previousWINDOWPointValue = 0;
+
 
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 

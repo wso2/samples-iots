@@ -19,7 +19,7 @@
 
 <artifacts>
     <artifact name="WINDOW_CAPP" version="1.0.0" type="carbon/application">
-        <dependency artifact="WINDOW_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+       <dependency artifact="WINDOW_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
 		<dependency artifact="WINDOW_store" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="WINDOW_mqtt_receiver" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
         <dependency artifact="WINDOW_publisher" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>

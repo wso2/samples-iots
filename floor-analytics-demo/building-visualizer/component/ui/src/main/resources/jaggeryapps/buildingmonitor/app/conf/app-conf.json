@@ -1,0 +1,45 @@
+{
+  "appName": "BuildingMonitor",
+  "cachingEnabled": false,
+  "debuggingEnabled": false,
+  "permissionRoot": "/",
+  "portalURL": "https://${server.ip}:9445",
+  "loginPage": "cdmf.page.sign-in",
+  "adminServicesUrl": "https://${server.ip}:${server.https_port}/admin/services/",
+  "authModule": {
+    "enabled": true,
+    "login": {
+      "onSuccess": {
+        "script": "/app/modules/login.js",
+        "page": "locationview.page.dashboard"
+      },
+      "onFail": {
+        "script": "/app/modules/login.js",
+        "page": "cdmf.page.sign-in"
+      }
+    },
+    "logout": {
+      "onSuccess": {
+        "page": "cdmf.page.sign-in"
+      },
+      "onFail": {
+        "page": "locationview.page.dashboard"
+      }
+    },
+    "sso": {
+      "enabled": false,
+      "issuer" : "buildingmonitor",
+      "appName" : "buildingmonitor",
+      "identityProviderUrl" : "https://%iot.keymanager.host%:%iot.keymanager.https.port%/samlsso",
+      "acs": "https://%iot.manager.host%:%iot.manager.https.port%/devicemgt/uuf/sso/acs",
+      "identityAlias": "wso2carbon",
+      "responseSigningEnabled" : true,
+      "validateAssertionValidityPeriod": true,
+      "validateAudienceRestriction": true,
+      "assertionSigningEnabled": true
+    }
+  },
+  "errorPages": {
+    "default": "uuf.page.error"
+  }
+}

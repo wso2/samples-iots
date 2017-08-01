@@ -1,0 +1,193 @@
+{{!
+  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+  WSO2 Inc. licenses this file to you under the Apache License,
+  Version 2.0 (the "License"); you may not use this file except
+  in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+}}
+{{unit "cdmf.unit.lib.leaflet"}}
+{{unit "cdmf.unit.ui.title" pageTitle="Home"}}
+{{#zone "topCss"}}
+    {{css "css/buildings.css"}}
+    {{css "css/custom.css"}}
+{{/zone}}
+{{#zone "breadcrumbs"}}
+    <li>
+        <a href="{{@app.context}}/">
+            <i class="icon fw fw-home"></i>
+        </a>
+    </li>
+{{/zone}}
+
+{{#zone "navbarActions"}}
+    <li>
+        <!--suppress HtmlUnknownTarget -->
+        <a href="/buildingmonitor" class="cu-btn">
+        <span class="icon fw-stack">
+            <i class="fw fw-left fw-stack-1x"></i>
+            <i class="fw fw-circle-outline fw-stack-2x"></i>
+        </span>
+            Go Back to Map View
+        </a>
+    </li>
+{{/zone}}
+
+{{#zone "content"}}
+    {{#if permittednone}}
+        <div class="message message-danger" style="margin: 20px">
+            <h4><i class="icon fw fw-error"></i>401- Unauthorized</h4>
+            <p>You do not have permissions to view this page. Please contact administrator.</p>
+        </div>
+    {{else}}
+        <div>
+            <h1>{{buildingName}}</h1>
+        </div>
+        <div>
+            <div class="panel-body">
+                <div id="building-location"
+                     data-lat="{{latitude}}"
+                     data-long="{{longitude}}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Add floors to accordion -->
+
+        <!-- collapse -->
+        <div id="group-2" class="floors panel-group panel-extended add-margin-bottom-2x" role="tablist"
+             data-num_of_floors="{{floorCount}}" id="buildingView" aria-multiselectable="true">
+            {{#each floors}}
+                <div class="panel panel-default" id="div_{{this.num}}">
+                    <div class="panel-heading flex-container collapsed" role="tab" id="heading{{this.num}}"
+                         data-toggle="collapse"
+                         href="#accordion{{this.num}}" aria-controls="accordion{{this.num}}">
+
+                        <h4 class="panel-title flex-item">
+                            <span class="heading">{{this.suffix}} Floor</span>
+                            {{#if this.isAuthorized}}
+                                <span class="description truncate pull-right" title="">
+                                    <a href="/buildingmonitor/floor?buildingId={{../../buildingId}}&floorId={{this.num}}"
+                                       class="view-analytics">
+                                            <span class="fw-stack">
+                                                <i class="fw fw-circle-outline fw-stack-2x"></i>
+                                                <i class="fw fw-view fw-stack-1x"></i>
+                                            </span>
+                                        View
+                                    </a>
+                                </span> 
+                            {{/if}}
+
+                        </h4>
+                        <div class="status flex-item"></div>
+                    </div>
+                    <div id="accordion{{this.num}}" class="panel-collapse {{#if this.image}}collapse-in{{else}}collapse {{/if}}"
+                         role="tabpanel" aria-labelledby="heading{{this.num}}">
+                        <div class="panel-body">
+                            {{#if this.image}}
+                                <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-active">
+                                    <div>
+                                        <span id="active_{{../this.num}}">{{../this.active}}</span>
+                                    </div>
+                                    <div>
+                                        <span class="wr-stats-board-sidebar-text">ACTIVE DEVICES</span>
+                                    </div>
+                                </div>
+                                <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-inactive">
+                                    <div>
+                                        <span id="inactive_{{../this.num}}">{{../this.inactive}}</span>
+                                    </div>
+                                    <div>
+                                        <span class="wr-stats-board-sidebar-text">INACTIVE DEVICES</span>
+                                    </div>
+                                </div>
+                                <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-fault">
+                                    <div>
+                                        <span id="fault_{{../this.num}}">{{../this.fault}}</span>
+                                    </div>
+                                    <div>
+                                        <span class="wr-stats-board-sidebar-text">FAULTY DEVICES</span>
+                                    </div>
+                                </div>
+                                <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-alerts">
+                                    <div>
+                                        <span id="alerts_{{../this.num}}">0</span>
+                                    </div>
+                                    <div>
+                                        <span class="wr-stats-board-sidebar-text">TRIGGERED ALERTS</span>
+                                    </div>
+                                </div>
+                                <div id="{{num}}">
+                                    <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-temperature">
+                                        <div>
+                                            <span id="temperature">-</span>
+                                        </div>
+                                        <div>
+                                            <span class="wr-stats-board-sidebar-text">TEMPERATURE</span>
+                                        </div>
+                                    </div>
+                                    <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-motion">
+                                        <div>
+                                            <span id="motion">-</span>
+                                        </div>
+                                        <div>
+                                            <span class="wr-stats-board-sidebar-text">MOTION</span>
+                                        </div>
+                                    </div>
+                                    <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-humidity">
+                                        <div>
+                                            <span id="humidity">-</span>
+                                        </div>
+                                        <div>
+                                            <span class="wr-stats-board-sidebar-text">HUMIDITY</span>
+                                        </div>
+                                    </div>
+                                    <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-light">
+                                        <div>
+                                            <span id="light">-</span>
+                                        </div>
+                                        <div>
+                                            <span class="wr-stats-board-sidebar-text">LIGHT</span>
+                                        </div>
+                                    </div>
+                                    <div class="wr-stats-board-tile wr-stats-board-sidebar wr-stats-board-air"
+                                         style="display:none">
+                                        <div>
+                                            <span id="airquality" >-</span>
+                                        </div>
+                                        <div>
+                                            <span class="wr-stats-board-sidebar-text">airquality</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            {{else}}
+                                {{#if ../../permissions.ADD_FLOOR}}
+                                    <div id="upload-view" class = "{{../../../buildingId}}">
+                                        {{unit "locationview.unit.floorcreate" buildingId=../../../buildingId floorId=../this.num}}
+                                    </div>
+                                {{/if}}
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+        <!-- /collapse -->
+
+        {{unit "locationview.unit.ui.analytics.rangeSelector"}}
+    {{/if}}
+{{/zone}}
+
+{{#zone "bottomJs"}}
+    {{js "js/buildings.js"}}
+{{/zone}}

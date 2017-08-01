@@ -1,0 +1,108 @@
+{{!
+  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+  WSO2 Inc. licenses this file to you under the Apache License,
+  Version 2.0 (the "License"); you may not use this file except
+  in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+}}
+
+{{unit "cdmf.unit.lib.leaflet"}}
+{{#zone "topCss"}}
+    <style>
+        .thumbnail.icon:before {
+            padding-top: 0;
+        }
+    </style>
+{{/zone}}
+
+{{#zone "navbarActions"}}
+    <li>
+        <!--suppress HtmlUnknownTarget -->
+        <a href="{{@app.context}}/floor?buildingId={{device.buildingId}}&floorId={{device.floorId}}">
+        <span class="icon fw-stack">
+            <i class="fw fw-left fw-stack-1x"></i>
+            <i class="fw fw-circle-outline fw-stack-2x"></i>
+        </span>
+            Go back to floor view
+        </a>
+    </li>
+{{/zone}}
+
+{{#zone "device-thumbnail"}}
+    <img src="{{@unit.publicUri}}/images/deviceType.png"/>
+{{/zone}}
+
+{{#zone "device-view-tabs"}}
+    <li class="active"><a class="list-group-item" href="#device_statistics" role="tab"
+                          data-toggle="tab" aria-controls="device_statistics">Device
+                                                                              Statistics</a>
+    </li>
+    <li role="presentation" class="list-group-item location_tab">
+        <a href="#device_location_tab" role="tab" data-toggle="tab"
+           data-lat="{{device.location.latitude}}"
+           data-long="{{device.location.longitude}}"
+           aria-controls="device_location_tab">
+            <i class="icon fw fw-map-location"></i><span
+                class="hidden-sm">Device Location</span>
+        </a>
+    </li>
+{{/zone}}
+
+{{#zone "device-view-tab-contents"}}
+    <div class="panel panel-default tab-pane active"
+         id="device_statistics" role="tabpanel" aria-labelledby="device_statistics">
+        <div class="panel-heading">Device Statistics</div>
+        {{unit "cdmf.unit.device.type.wso2sense.realtime.analytics-view" device=device}}
+    </div>
+    <div class="panel panel-default visible-xs-block" role="tabpanel"
+         id="device_location_tab">
+        <div class="panel-heading visible-xs collapsed" id="device_location">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#tabs"
+                   href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                    <i class="fw fw-map-location fw-2x"></i>
+                    Device Location
+                    <i class="caret-updown fw fw-down"></i>
+                </a>
+            </h4>
+        </div>
+        <div class="panel-heading display-none-xs">Device Location</div>
+        <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel"
+             aria-labelledby="device_location">
+            <div class="panel-body">
+                {{#if device.location}}
+                    <div id="device-location"
+                         data-lat="{{device.location.latitude}}"
+                         data-long="{{device.location.longitude}}"
+                         data-locations="{{device.locationHistory}}">
+                    </div>
+                    <br/>
+                {{else}}
+                    <div id="map-error" class="message message-warning">
+                        <h4 class="remove-margin">
+                            <i class="icon fw fw-warning"></i>
+                            Device location information is not available.
+                        </h4>
+                    </div>
+                    <p class="add-padding-5x"></p>
+                    <p class="add-padding-5x"></p>
+                    <p class="add-padding-5x"></p>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+{{/zone}}
+
+{{#zone "bottomJs"}}
+    {{js "js/load-map.js"}}
+{{/zone}}

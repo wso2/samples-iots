@@ -1,0 +1,23 @@
+.building-status{
+    padding: 6px 10px;
+    border-left: 3px solid red;
+    margin: 5px 3px;
+    height: 30px;
+    border-bottom: 1px solid rgba(51, 51, 51, 0.67);
+}
+.building-status span{
+    width: 30px;
+}
+.modal-content{
+    padding: 20px;
+}
+form .form-group label{
+    color:#fff;
+}
+
+.dropdown-menu {
+    z-index: 1010;
+}
+.building-info{
+    overflow: auto;
+}

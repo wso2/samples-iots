@@ -1,0 +1,64 @@
+{{!
+  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+  WSO2 Inc. licenses this file to you under the Apache License,
+  Version 2.0 (the "License"); you may not use this file except
+  in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+}}
+{{#zone "topCss"}}
+    {{~css "css/floorcreate.css"}}
+{{/zone}}
+
+<div class="row">
+    <div class="col-lg-5 col-md-6 col-centered">
+        {{#if errorMessage}}
+            <div class="alert alert-danger" role="alert" id="error-div-plan-{{floorId}}">
+        {{else}}
+            <div class="alert alert-danger hide" role="alert" id="error-div-plan-{{floorId}}">
+        {{/if}}
+            <i class="icon fw fw-error"></i><strong>Error!</strong>
+            <span id = "error-message-plan-{{floorId}}">{{errorMessage}}</span>
+        </div>
+        <form id = "plan-{{floorId}}" class="form-horizontal" method="post" action="{{@app.context}}/api/floor/{{buildingId}}/{{floorId}}" enctype="multipart/form-data">
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <label class="control-label">Please select a floor plan</label>
+                    <div class="input-group input-wrap file-upload-control">
+                        <input type="text" class="form-control" readonly="">
+                        <input type="file" class="form-control files"  id = "plan-{{floorId}}" name="files">
+                        <div class="input-group-btn">
+                            <button class="btn browse" type="button" title="Browse File">
+                                <i class="fw fw-file-browse" aria-hidden="true"></i>
+                                <span class="hidden-xs">Browse</span>
+                            </button>
+                        </div>
+                        <div class="input-group-btn"></div>
+                        <div class="input-group-btn">
+                            <button class="btn btn-default btn-primary file-upload" type="button" title="Upload" id = "plan-{{floorId}}">
+                                <i class="fw fw-upload" aria-hidden="true"></i>
+                                <span class="hidden-xs">Upload</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-12 upload-preview">
+                    <img id="floor-plan-preview-plan-{{floorId}}" src="#" class="hidden" title = "Floor plan preview"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{{~#zone "bottomJs"}}
+    {{~js "js/floorcreate.js"}}
+{{/zone}}
