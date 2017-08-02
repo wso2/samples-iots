@@ -753,7 +753,7 @@ function getSensorConfiguration() {
             console.log(data);
             for (var key in sensorConfigs) {
                 if (sensorConfigs.hasOwnProperty(key)) {
-                    sensorValues[key]={};
+                    sensorValues[key]=[];
                 }
             }
             console.log(data);
