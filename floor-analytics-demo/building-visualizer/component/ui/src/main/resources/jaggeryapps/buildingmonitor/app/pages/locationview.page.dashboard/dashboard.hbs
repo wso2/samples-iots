@@ -38,6 +38,14 @@
     {{#if permissions.ADD_BUILDING}}
         <li>
             <!--suppress HtmlUnknownTarget -->
+            <a href="/buildingmonitor/devices" class="cu-btn" onclick="onAddMarker()">
+            <span class="icon fw-apple fw-2x">
+            </span>
+                Devices
+            </a>
+        </li>
+        <li>
+            <!--suppress HtmlUnknownTarget -->
             <a href="#" class="cu-btn" onclick="onAddMarker()">
             <span class="icon fw-stack">
                 <i class="fw fw-add fw-stack-1x"></i>
@@ -46,6 +54,17 @@
                 Add Building
             </a>
         </li>
+        <li>
+            <!--suppress HtmlUnknownTarget -->
+            <a href="#" class="cu-btn" onclick="onAddMarker()">
+            <span class="icon fw-stack">
+                <i class="fw fw-add fw-stack-1x"></i>
+                <i class="fw fw-circle-outline fw-stack-2x"></i>
+            </span>
+                Add Location
+            </a>
+        </li>
+
     {{/if}}
 {{/zone}}
 
