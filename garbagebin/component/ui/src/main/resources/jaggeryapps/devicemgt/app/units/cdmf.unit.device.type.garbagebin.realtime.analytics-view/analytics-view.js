@@ -17,16 +17,42 @@
  */
 
 function onRequest(context) {
+    var log = new Log("stats.js");
+    var carbonServer = require("carbon").server;
     var device = context.unit.params.device;
-    var devicemgtProps = require('/app/conf/devicemgt-props.js').config();
+    var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
     var constants = require("/app/modules/constants.js");
-    var websocketEndpoint = devicemgtProps["httpsURL"].replace("https", "wss");
-    var tokenPair = session.get(constants.ACCESS_TOKEN_PAIR_IDENTIFIER);
+    var websocketEndpoint = devicemgtProps["wssURL"].replace("https", "wss");
+    var jwtService = carbonServer.osgiService(
+        'org.wso2.carbon.identity.jwt.client.extension.service.JWTClientManagerService');
+    var jwtClient = jwtService.getJWTClient();
+    var encodedClientKeys = session.get(constants["ENCODED_TENANT_BASED_WEB_SOCKET_CLIENT_CREDENTIALS"]);
     var token = "";
-    if (tokenPair) {
-        token = tokenPair.accessToken;
+    var user = session.get(constants.USER_SESSION_KEY);
+    if (!user) {
+        log.error("User object was not found in the session");
+        throw constants.ERRORS.USER_NOT_FOUND;
     }
-    websocketEndpoint = websocketEndpoint + "/secured-outputui/org.wso2.iot.garbagebin/1.0.0?" +
-                        "token=" + token + "&deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+
+    if (encodedClientKeys) {
+        var tokenUtil = require("/app/modules/oauth/token-handler-utils.js")["utils"];
+        var resp = tokenUtil.decode(encodedClientKeys).split(":");
+        if (user.domain == "carbon.super") {
+            var tokenPair = jwtClient.getAccessToken(resp[0], resp[1], context.user.username, "default", {});
+            if (tokenPair) {
+                token = tokenPair.accessToken;
+            }
+            websocketEndpoint = websocketEndpoint + "/secured-websocket/org.wso2.iot.garbagebin/1.0.0?"
+                + "deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;
+        } else {
+            var tokenPair = jwtClient.getAccessToken(resp[0], resp[1], context.user.username + "@" + user.domain
+                , "default", {});
+            if (tokenPair) {
+                token = tokenPair.accessToken;
+            }
+            websocketEndpoint = websocketEndpoint + "/secured-websocket/t/" + user.domain + "/org.wso2.iot.garbagebin/1.0.0?"
+                + "deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;
+        }
+    }
     return {"device": device, "websocketEndpoint": websocketEndpoint};
 }

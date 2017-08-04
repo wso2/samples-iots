@@ -21,5 +21,5 @@
                 xmlns="http://wso2.org/carbon/eventpublisher">
     <from streamName="org.wso2.iot.garbagebin" version="1.0.0"/>
     <mapping customMapping="disable" type="wso2event"/>
-    <to eventAdapterType="iot-ui"/>
+    <to eventAdapterType="secured-websocket"/>
 </eventPublisher>

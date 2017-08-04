@@ -49,7 +49,6 @@
         </pluginManagement>
     </build>
     <modules>
-        <module>plugin</module>
         <module>api</module>
         <module>ui</module>
         <module>analytics</module>
