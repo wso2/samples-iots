@@ -18,12 +18,25 @@
 
 package org.homeautomation.garbagebin.api;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Extension;
+import io.swagger.annotations.ExtensionProperty;
+import io.swagger.annotations.Info;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import org.wso2.carbon.apimgt.annotations.api.Scope;
 import org.wso2.carbon.apimgt.annotations.api.Scopes;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -98,7 +111,7 @@ public interface DeviceTypeService {
             value = "Retreive Sensor data for the device type",
             notes = "",
             response = Response.class,
-            tags = "raspberrypi",
+            tags = "garbagebin",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = "scope", value = "perm:garbagebin:enroll")
@@ -110,6 +123,19 @@ public interface DeviceTypeService {
 
     @Path("/device/{device_id}")
     @DELETE
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Remove Device",
+            notes = "",
+            response = Response.class,
+            tags = "garbagebin",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = "scope", value = "perm:garbagebin:enroll")
+                    })
+            }
+    )
     Response removeDevice(@PathParam("device_id") String deviceId);
 
     @Path("/device/{device_id}")
