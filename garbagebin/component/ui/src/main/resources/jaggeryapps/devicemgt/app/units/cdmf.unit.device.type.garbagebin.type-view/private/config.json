@@ -2,6 +2,9 @@
   "deviceType": {
     "label": "Smart Garbage Bin",
     "category": "iot",
-    "downloadAgentUri": "garbagebin/device/download"
+    "downloadAgentUri": "garbagebin/device/download",
+    "scopes": [
+      "perm:garbagebin:enroll"
+    ]
   }
 }

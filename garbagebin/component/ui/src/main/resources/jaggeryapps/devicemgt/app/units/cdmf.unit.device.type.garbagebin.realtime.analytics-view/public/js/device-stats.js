@@ -28,22 +28,22 @@ var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 $(window).load(function () {
     temperature = lineGraph("temperature", temperatureData);
     humidity = lineGraph("humidity", humidityData);
-    
+
     var websocketUrl = $("#div-chart").data("websocketurl");
     connect(websocketUrl);
 });
 
-$(window).unload(function () {
+window.onbeforeunload = function () {
     disconnect();
-});
+};
 
 function lineGraph(type, chartData) {
     var tNow = new Date().getTime() / 1000;
     for (var i = 0; i < 30; i++) {
         chartData.push({
-                           x: tNow - (30 - i) * 15,
-                           y: parseFloat(0)
-                       });
+            x: tNow - (30 - i) * 15,
+            y: parseFloat(0)
+        });
     }
 
     var graph = new Rickshaw.Graph({
@@ -113,9 +113,9 @@ function connect(target) {
 
 function graphUpdate(chartData, xValue, yValue, graph) {
     chartData.push({
-                       x: parseInt(xValue),
-                       y: parseFloat(yValue)
-                   });
+        x: parseInt(xValue),
+        y: parseFloat(yValue)
+    });
     chartData.shift();
     graph.update();
 }

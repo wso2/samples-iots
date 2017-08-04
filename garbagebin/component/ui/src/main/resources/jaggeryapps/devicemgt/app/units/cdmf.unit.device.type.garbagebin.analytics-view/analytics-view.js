@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,6 +16,7 @@
  * under the License.
  */
 
+
 function onRequest(context) {
     var devices = context.unit.params.devices;
     var deviceType = context.uriParams.deviceType;
@@ -24,15 +25,15 @@ function onRequest(context) {
     if (devices) {
         return {
             "devices": stringify(devices),
-            "backendApiUri": devicemgtProps["httpsURL"] + "/garbagebin/device/stats/"
+            "backendApiUrl": "/garbagebin/device/stats/"
         };
     } else if (deviceType != null && deviceType != undefined && deviceId != null && deviceId != undefined) {
-        var deviceModule = require("/app/modules/device.js").deviceModule;
+        var deviceModule = require("/app/modules/business-controllers/device.js").deviceModule;
         var device = deviceModule.viewDevice(deviceType, deviceId);
         if (device && device.status != "error") {
             return {
-                "device": device,
-                "backendApiUrl": devicemgtProps["httpsURL"] + "/garbagebin/device/stats/" + deviceId + "/sensors/"
+                "device": device.content,
+                "backendApiUrl": "/garbagebin/device/stats/" + deviceId
             };
         } else {
             response.sendError(404, "Device Id " + deviceId + " of type " + deviceType + " cannot be found!");

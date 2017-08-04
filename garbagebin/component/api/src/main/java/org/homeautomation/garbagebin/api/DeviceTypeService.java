@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * WSO2 Inc. licenses this file to you under the Apache License,
 * Version 2.0 (the "License"); you may not use this file except
@@ -18,11 +18,14 @@
 
 package org.homeautomation.garbagebin.api;
 
-import org.homeautomation.garbagebin.api.dto.DeviceJSON;
-import org.wso2.carbon.apimgt.annotations.api.API;
-import org.wso2.carbon.apimgt.annotations.api.Permission;
-import org.wso2.carbon.device.mgt.extensions.feature.mgt.annotations.DeviceType;
-import org.wso2.carbon.device.mgt.extensions.feature.mgt.annotations.Feature;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Extension;
+import io.swagger.annotations.ExtensionProperty;
+import io.swagger.annotations.Info;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
+import org.wso2.carbon.apimgt.annotations.api.Scope;
+import org.wso2.carbon.apimgt.annotations.api.Scopes;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -41,46 +44,52 @@ import javax.ws.rs.core.Response;
 /**
  * This is the controller API which is used to control agent side functionality
  */
-@SuppressWarnings("NonJaxWsWebServices")
-@API(name = "garbagebin", version = "1.0.0", context = "/garbagebin", tags = "garbagebin")
-@DeviceType(value = "garbagebin")
-interface DeviceTypeService {
 
-    /**
-     * @param agentInfo device owner,id and sensor value
-     */
-    @Path("device/register")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/user/register"})
-    Response registerDevice(final DeviceJSON agentInfo);
+@SwaggerDefinition(
+        info = @Info(
+                version = "1.0.0",
+                title = "",
+                extensions = {
+                        @Extension(properties = {
+                                @ExtensionProperty(name = "name", value = "garbagebin"),
+                                @ExtensionProperty(name = "context", value = "/garbagebin"),
+                        })
+                }
+        ),
+        tags = {
+                @Tag(name = "garbagebin,device_management", description = "")
+        }
+)
+@Scopes(
+        scopes = {
+                @Scope(
+                        name = "Enroll device",
+                        description = "",
+                        key = "perm:garbagebin:enroll",
+                        permissions = {"/device-mgt/devices/enroll/garbagebin"}
+                )
+        }
+)
+public interface DeviceTypeService {
 
-    /**
-     * @param deviceId     unique identifier for given device type
-     * @param maxLevel     maximum level
-     * @param sensorHeight height to water level sensor from bottom of the tank
-     */
     @Path("device/{deviceId}/change-levels")
     @POST
-    @Feature(code = "change-levels", name = "Update configurations",
-            description = "Change maximum level and set sensor height from the bottom of the garbage bin")
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/change-levels"})
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Change Levels",
+            notes = "",
+            response = Response.class,
+            tags = "garbagebin",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = "scope", value = "perm:garbagebin:enroll")
+                    })
+            }
+    )
     Response updateConfigs(@PathParam("deviceId") String deviceId,
-                           @QueryParam("max") int maxLevel,
-                           @QueryParam("height") int sensorHeight,
-                           @Context HttpServletResponse response);
-
-    /**
-     * @param deviceId     unique identifier for given device type.
-     * @param url          url of the OTA upgrade file.
-     */
-    @Path("device/{deviceId}/upgrade-firmware")
-    @POST
-    @Feature(code = "upgrade-firmware", name = "Upgrade device firmware",
-            description = "Upgrade firmware of the garbage bin with specified OTA url.")
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/upgrade-firmware"})
-    Response upgradeFirmware(@PathParam("deviceId") String deviceId,
-                           @QueryParam("url") String url,
+                           @QueryParam("max_height") int maxLevel,
+                           @QueryParam("sensor_height") int sensorHeight,
                            @Context HttpServletResponse response);
 
     /**
@@ -96,37 +105,74 @@ interface DeviceTypeService {
     @GET
     @Consumes("application/json")
     @Produces("application/json")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Retreive Sensor data for the device type",
+            notes = "",
+            response = Response.class,
+            tags = "garbagebin",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = "scope", value = "perm:garbagebin:enroll")
+                    })
+            }
+    )
     Response getSensorStats(@PathParam("deviceId") String deviceId, @PathParam("sensorName") String sensorName,
                             @QueryParam("from") long from, @QueryParam("to") long to);
 
     @Path("/device/{device_id}")
     @DELETE
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/removeDevice"})
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Remove Device",
+            notes = "",
+            response = Response.class,
+            tags = "garbagebin",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = "scope", value = "perm:garbagebin:enroll")
+                    })
+            }
+    )
     Response removeDevice(@PathParam("device_id") String deviceId);
 
     @Path("/device/{device_id}")
     @PUT
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/updateDevice"})
     Response updateDevice(@PathParam("device_id") String deviceId, @QueryParam("name") String name);
 
     @Path("/device/{device_id}")
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/updateDevice"})
     Response getDevice(@PathParam("device_id") String deviceId);
 
     @Path("/devices")
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/devices"})
     Response getAllDevices();
 
-    @Path("/device/download")
-    @GET
-    @Produces("application/zip")
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/download"})
-    Response downloadSketch(@QueryParam("deviceName") String deviceName, @QueryParam("sketchType") String sketchType);
 
+    /**
+     * download the agent.
+     */
+    @Path("device/download")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Download the agent.",
+            notes = "",
+            response = Response.class,
+            tags = "garbagebin",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = "scope", value = "perm:garbagebin:enroll")
+                    })
+            }
+    )
+    Response downloadSketch(@QueryParam("deviceName") String deviceName, @QueryParam("sketch_type") String sketchType);
 }

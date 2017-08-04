@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * WSO2 Inc. licenses this file to you under the Apache License,
 * Version 2.0 (the "License"); you may not use this file except
@@ -18,37 +18,29 @@
 
 package org.homeautomation.garbagebin.api;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.homeautomation.garbagebin.api.dto.DeviceJSON;
 import org.homeautomation.garbagebin.api.dto.SensorRecord;
 import org.homeautomation.garbagebin.api.util.APIUtil;
 import org.homeautomation.garbagebin.api.util.ZipUtil;
-import org.homeautomation.garbagebin.plugin.constants.DeviceTypeConstants;
-import org.wso2.carbon.analytics.dataservice.commons.SORT;
 import org.wso2.carbon.analytics.dataservice.commons.SortByField;
+import org.wso2.carbon.analytics.dataservice.commons.SortType;
 import org.wso2.carbon.analytics.datasource.commons.exception.AnalyticsException;
-import org.wso2.carbon.apimgt.annotations.api.API;
-import org.wso2.carbon.apimgt.annotations.api.Permission;
 import org.wso2.carbon.apimgt.application.extension.APIManagementProviderService;
 import org.wso2.carbon.apimgt.application.extension.dto.ApiApplicationKey;
 import org.wso2.carbon.apimgt.application.extension.exception.APIManagerException;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.device.mgt.common.Device;
-import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
-import org.wso2.carbon.device.mgt.common.DeviceManagementException;
-import org.wso2.carbon.device.mgt.common.EnrolmentInfo;
+import org.wso2.carbon.device.mgt.common.*;
 import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationException;
-import org.wso2.carbon.device.mgt.extensions.feature.mgt.annotations.DeviceType;
-import org.wso2.carbon.device.mgt.extensions.feature.mgt.annotations.Feature;
-import org.wso2.carbon.device.mgt.iot.util.ZipArchive;
+import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
+import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
+import org.wso2.carbon.device.mgt.core.operation.mgt.CommandOperation;
 import org.wso2.carbon.identity.jwt.client.extension.JWTClient;
 import org.wso2.carbon.identity.jwt.client.extension.dto.AccessTokenInfo;
-import org.wso2.carbon.identity.jwt.client.extension.dto.JWTConfig;
 import org.wso2.carbon.identity.jwt.client.extension.exception.JWTClientException;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.homeautomation.garbagebin.api.util.ZipArchive;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -63,26 +55,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This is the API which is used to control and manage device type functionality.
  */
-@SuppressWarnings("NonJaxWsWebServices")
-@API(name = "garbagebin", version = "1.0.0", context = "/garbagebin", tags = "garbagebin")
-@DeviceType(value = "garbagebin")
 public class DeviceTypeServiceImpl implements DeviceTypeService {
 
     private static final String KEY_TYPE = "PRODUCTION";
@@ -112,19 +91,16 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
     }
 
     /**
-     * @param deviceId     unique identifier for given device type
-     * @param maxLevel     maximum level
-     * @param sensorHeight height to water level sensor from bottom of the tank
+     * @param deviceId unique identifier for given device type
+     * @param maxLevel maximum level
+     *                 //     * @param sensorHeight height to water level sensor from bottom of the tank
      */
     @Path("device/{deviceId}/change-levels")
     @POST
-    @Feature(code = "change-levels", name = "Update configurations",
-            description = "Change maximum level and set sensor height from the bottom of the garbage bin")
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/change-levels"})
     public Response updateConfigs(@PathParam("deviceId") String deviceId,
-                           @QueryParam("max") int maxLevel,
-                           @QueryParam("height") int sensorHeight,
-                           @Context HttpServletResponse response){
+                                  @QueryParam("max_height") int maxLevel,
+                                  @QueryParam("sensor_height") int sensorHeight,
+                                  @Context HttpServletResponse response) {
         try {
             if (!APIUtil.getDeviceAccessAuthorizationService()
                     .isUserAuthorized(new DeviceIdentifier(deviceId, DeviceTypeConstants.DEVICE_TYPE))) {
@@ -132,65 +108,34 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             }
 
             String configs = "conf:" + maxLevel + "," + sensorHeight;
-            Map<String, String> dynamicProperties = new HashMap<>();
             String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                                  + "/" + DeviceTypeConstants.DEVICE_TYPE + "/" + deviceId + "/command";
-            dynamicProperties.put(DeviceTypeConstants.ADAPTER_TOPIC_PROPERTY, publishTopic);
-            APIUtil.getOutputEventAdapterService().publish(DeviceTypeConstants.MQTT_ADAPTER_NAME,
-                                                           dynamicProperties, configs);
+                    + "/" + DeviceTypeConstants.DEVICE_TYPE + "/" + deviceId + "/command";
+
+            Operation commandOp = new CommandOperation();
+            commandOp.setCode("test");
+            commandOp.setType(Operation.Type.COMMAND);
+            commandOp.setEnabled(true);
+            commandOp.setPayLoad(configs);
+
+            Properties props = new Properties();
+            props.setProperty("mqtt.adapter.topic", publishTopic);
+            commandOp.setProperties(props);
+
+            List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+            deviceIdentifiers.add(new DeviceIdentifier(deviceId, DeviceTypeConstants.DEVICE_TYPE));
+            APIUtil.getDeviceManagementService().addOperation(DeviceTypeConstants.DEVICE_TYPE, commandOp,
+                    deviceIdentifiers);
+
             return Response.ok().build();
         } catch (DeviceAccessAuthorizationException e) {
             log.error("Unable to update configs", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
-    }
-
-    /**
-     * @param deviceId     unique identifier for given device type.
-     * @param urlString    url of the OTA upgrade file.
-     */
-    @Path("device/{deviceId}/upgrade-firmware")
-    @POST
-    @Feature(code = "upgrade-firmware", name = "Upgrade device firmware",
-            description = "Upgrade firmware of the garbage bin with specified OTA url.")
-    @Permission(scope = "garbagebin_user", permissions = {"/permission/admin/device-mgt/upgrade-firmware"})
-    public Response upgradeFirmware(@PathParam("deviceId") String deviceId,
-                             @QueryParam("url") String urlString,
-                             @Context HttpServletResponse response) {
-        try {
-            if (!APIUtil.getDeviceAccessAuthorizationService()
-                    .isUserAuthorized(new DeviceIdentifier(deviceId, DeviceTypeConstants.DEVICE_TYPE))) {
-                return Response.status(Response.Status.UNAUTHORIZED).build();
-            }
-
-            URL url = new URL(urlString);
-            InetAddress address = InetAddress.getByName(url.getHost());
-            int port = url.getPort();
-            if (port == -1) {
-                port = 80;
-            }
-            String path = url.getPath();
-            String[] pathParts = path.split("/");
-            String otaPayload = "ota:" + address.getHostAddress() + "," + port + "," + path + "," + pathParts[pathParts.length -1];
-
-            Map<String, String> dynamicProperties = new HashMap<>();
-            String publishTopic = APIUtil.getAuthenticatedUserTenantDomain()
-                                  + "/" + DeviceTypeConstants.DEVICE_TYPE + "/" + deviceId + "/command";
-            dynamicProperties.put(DeviceTypeConstants.ADAPTER_TOPIC_PROPERTY, publishTopic);
-            APIUtil.getOutputEventAdapterService().publish(DeviceTypeConstants.MQTT_ADAPTER_NAME,
-                                                           dynamicProperties, otaPayload);
-            return Response.ok().build();
-        } catch (DeviceAccessAuthorizationException e) {
-            log.error("Unable to upgrade firmware.", e);
+        } catch (OperationManagementException e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        } catch (MalformedURLException e) {
-            String msg = "Malformed OTA url: " + urlString;
-            log.warn(msg);
-            return Response.status(Response.Status.BAD_REQUEST).entity(msg).build();
-        } catch (UnknownHostException e) {
-            String msg = "Unknown host name in url: " + urlString;
-            log.warn(msg);
-            return Response.status(Response.Status.BAD_REQUEST).entity(msg).build();
+        } catch (InvalidDeviceException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
 
@@ -212,7 +157,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         String fromDate = String.valueOf(from);
         String toDate = String.valueOf(to);
         String query = "deviceId:" + deviceId + " AND deviceType:" +
-                       DeviceTypeConstants.DEVICE_TYPE + " AND time : [" + fromDate + " TO " + toDate + "]";
+                DeviceTypeConstants.DEVICE_TYPE + " AND time : [" + fromDate + " TO " + toDate + "]";
         String sensorTableName;
         switch (sensorName) {
             case DeviceTypeConstants.STREAM_TEMPERATURE:
@@ -234,7 +179,8 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
             List<SortByField> sortByFields = new ArrayList<>();
-            SortByField sortByField = new SortByField("time", SORT.ASC, false);
+            // SortByField sortByField = new SortByField("time", SORT.ASC, false);
+            SortByField sortByField = new SortByField("time", SortType.ASC);
             sortByFields.add(sortByField);
             List<SensorRecord> sensorRecords = APIUtil.getAllEventsForDevice(sensorTableName, query, sortByFields);
             return Response.status(Response.Status.OK).entity(sensorRecords).build();
@@ -348,7 +294,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             ArrayList<Device> garbagebinDevices = new ArrayList<>();
             for (Device device : userDevices) {
                 if (device.getType().equals(DeviceTypeConstants.DEVICE_TYPE) &&
-                    device.getEnrolmentInfo().getStatus().equals(EnrolmentInfo.Status.ACTIVE)) {
+                        device.getEnrolmentInfo().getStatus().equals(EnrolmentInfo.Status.ACTIVE)) {
                     garbagebinDevices.add(device);
                 }
             }
@@ -367,21 +313,24 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
      * @param sketchType folder name where device type agent was installed into server.
      * @return Agent source code as zip file.
      */
+    @Override
     @Path("/device/download")
     @GET
     @Produces("application/zip")
     public Response downloadSketch(@QueryParam("deviceName") String deviceName,
                                    @QueryParam("sketchType") String sketchType) {
         try {
-            ZipArchive zipFile = createDownloadFile(APIUtil.getAuthenticatedUser(), deviceName, sketchType);
-            Response.ResponseBuilder response = Response.ok(FileUtils.readFileToByteArray(zipFile.getZipFile()));
+            String username = APIUtil.getAuthenticatedUser() + "@" + PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getTenantDomain();
+            ZipArchive zipFile = createDownloadFile(username, deviceName, sketchType);
+            Response.ResponseBuilder response = Response.ok(zipFile.getZipFileContent());
             response.status(Response.Status.OK);
             response.type("application/zip");
             response.header("Content-Disposition", "attachment; filename=\"" + zipFile.getFileName() + "\"");
             return response.build();
         } catch (IllegalArgumentException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();//bad request
-        } catch (DeviceManagementException | JWTClientException | APIManagerException | IOException
+        } catch (DeviceManagementException | JWTClientException | APIManagerException
                 | UserStoreException ex) {
             log.error("Unable to download sketch", ex);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
@@ -434,9 +383,14 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
      */
     private ZipArchive createDownloadFile(String owner, String deviceName, String sketchType)
             throws DeviceManagementException, JWTClientException, APIManagerException,
-                   UserStoreException {
+            UserStoreException {
         //create new device id
         String deviceId = shortUUID();
+        boolean status = register(deviceId, deviceName);
+        if (!status) {
+            String msg = "Error occurred while registering the device with " + "id: " + deviceId + " owner:" + owner;
+            throw new DeviceManagementException(msg);
+        }
         if (apiApplicationKey == null) {
             String applicationUsername = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm()
                     .getRealmConfiguration().getAdminUserName();
@@ -444,25 +398,22 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             APIManagementProviderService apiManagementProviderService = APIUtil.getAPIManagementProviderService();
             String[] tags = {DeviceTypeConstants.DEVICE_TYPE};
             apiApplicationKey = apiManagementProviderService.generateAndRetrieveApplicationKeys(
-                    DeviceTypeConstants.DEVICE_TYPE, tags, KEY_TYPE, applicationUsername, true);
+                    DeviceTypeConstants.DEVICE_TYPE, tags, KEY_TYPE, applicationUsername, true, "3600");
+            //TODO //ok
         }
         JWTClient jwtClient = APIUtil.getJWTClientManagerService().getJWTClient();
         String scopes = "device_type_" + DeviceTypeConstants.DEVICE_TYPE + " device_" + deviceId;
         AccessTokenInfo accessTokenInfo = jwtClient.getAccessToken(apiApplicationKey.getConsumerKey(),
-                                                                   apiApplicationKey.getConsumerSecret(),
-                                                                   owner + "@" + APIUtil.getAuthenticatedUserTenantDomain(),
-                                                                   scopes);
+                apiApplicationKey.getConsumerSecret(),
+                owner + "@" + APIUtil.getAuthenticatedUserTenantDomain(),
+                scopes);
         //create token
         String accessToken = accessTokenInfo.getAccessToken();
         String refreshToken = accessTokenInfo.getRefreshToken();
-        boolean status = register(deviceId, deviceName);
-        if (!status) {
-            String msg = "Error occurred while registering the device with " + "id: " + deviceId + " owner:" + owner;
-            throw new DeviceManagementException(msg);
-        }
+
         ZipUtil ziputil = new ZipUtil();
-        return ziputil.createZipFile(owner, APIUtil.getTenantDomainOftheUser(), sketchType,
-                                     deviceId, deviceName, accessToken, refreshToken);
+        return ziputil.createZipFile(owner, sketchType, deviceId, deviceName, apiApplicationKey.toString(),
+                accessToken, refreshToken);
     }
 
 }

@@ -2,9 +2,10 @@ package org.homeautomation.garbagebin.api.util;
 
 import org.homeautomation.garbagebin.api.dto.SensorRecord;
 
-import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
+import org.wso2.carbon.device.mgt.common.configuration.mgt.PlatformConfigurationManagementService;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
-import org.wso2.carbon.analytics.dataservice.core.AnalyticsDataServiceUtils;
+
+import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
 import org.wso2.carbon.analytics.dataservice.commons.SearchResultEntry;
 import org.wso2.carbon.analytics.dataservice.commons.SortByField;
@@ -147,11 +148,11 @@ public class APIUtil {
         if (eventCount == 0) {
             return null;
         }
-        List<SearchResultEntry> resultEntries = analyticsDataAPI.search(tenantId, tableName, query, 0, eventCount,
+        List<SearchResultEntry> resultEntries = analyticsDataAPI.search(tenantId, tableName, query, 0, 100,
                 sortByFields);
         List<String> recordIds = getRecordIds(resultEntries);
         AnalyticsDataResponse response = analyticsDataAPI.get(tenantId, tableName, 1, null, recordIds);
-        Map<String, SensorRecord> sensorDatas = createSensorData(AnalyticsDataServiceUtils.listRecords(
+        Map<String, SensorRecord> sensorDatas = createSensorData(AnalyticsDataAPIUtil.listRecords(
                 analyticsDataAPI, response));
         List<SensorRecord> sortedSensorData = getSortedSensorData(sensorDatas, resultEntries);
         return sortedSensorData;
@@ -207,15 +208,16 @@ public class APIUtil {
         return threadLocalCarbonContext.getTenantDomain();
     }
 
-    public static OutputEventAdapterService getOutputEventAdapterService() {
+    public static PlatformConfigurationManagementService getTenantConfigurationManagementService() {
         PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        OutputEventAdapterService outputEventAdapterService =
-                (OutputEventAdapterService) ctx.getOSGiService(OutputEventAdapterService.class, null);
-        if (outputEventAdapterService == null) {
-            String msg = "Device Authorization service has not initialized.";
+        PlatformConfigurationManagementService tenantConfigurationManagementService =
+                (PlatformConfigurationManagementService) ctx.getOSGiService(PlatformConfigurationManagementService.class, null);
+        if (tenantConfigurationManagementService == null) {
+            String msg = "Tenant configuration Management service not initialized.";
             log.error(msg);
             throw new IllegalStateException(msg);
         }
-        return outputEventAdapterService;
+        return tenantConfigurationManagementService;
     }
+
 }

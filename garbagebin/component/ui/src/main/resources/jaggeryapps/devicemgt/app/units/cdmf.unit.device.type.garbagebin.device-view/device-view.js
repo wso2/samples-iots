@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -17,21 +17,27 @@
  */
 
 function onRequest(context) {
-    var log = new Log("cdmf.unit.device.type.garbagebin.device-view.js");
+    var log = new Log("device-view.js");
     var deviceType = context.uriParams.deviceType;
     var deviceId = request.getParameter("id");
+    var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
     var autoCompleteParams = [
         {"name": "deviceId", "value": deviceId}
     ];
 
     if (deviceType != null && deviceType != undefined && deviceId != null && deviceId != undefined) {
-        var deviceModule = require("/app/modules/device.js").deviceModule;
+        var deviceModule = require("/app/modules/business-controllers/device.js")["deviceModule"];
         var device = deviceModule.viewDevice(deviceType, deviceId);
         if (device && device.status != "error") {
+            var anchor = {"device": {"id": device.content.deviceIdentifier, "type": device.content.type}};
+
             return {
-                "device": device,
+                "device": device.content,
+                "autoCompleteParams": autoCompleteParams,
+                "encodedFeaturePayloads": "",
                 "backendApiUri": devicemgtProps["httpsURL"] + "/" + deviceType + "/",
-                "autoCompleteParams": autoCompleteParams
+                "portalUrl": devicemgtProps['portalURL'],
+                "anchor": JSON.stringify(anchor)
             };
         } else {
             response.sendError(404, "Device Id " + deviceId + " of type " + deviceType + " cannot be found!");
