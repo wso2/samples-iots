@@ -46,8 +46,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/https_localhost_8243"
                     android:inputType="text"
-                    android:text="https://10.100.5.48:8243"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:text="https://10.42.0.1:8243" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
