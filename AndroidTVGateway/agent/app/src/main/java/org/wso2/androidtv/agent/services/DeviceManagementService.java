@@ -401,6 +401,7 @@ public class DeviceManagementService extends Service {
             waitFlag = false;
         } else {
             Log.i(TAG, "Message> " + message);
+            System.out.println("sendmessage : "+(message));
             try {
                 JSONObject incomingMsg = new JSONObject(message);
                 switch (incomingMsg.getString("a")) {

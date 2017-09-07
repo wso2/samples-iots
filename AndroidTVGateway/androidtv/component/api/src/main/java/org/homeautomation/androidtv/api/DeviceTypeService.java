@@ -79,7 +79,7 @@ public interface DeviceTypeService {
             httpMethod = "POST",
             value = "End point to send video to the android TV",
             notes = "",
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
@@ -136,7 +136,7 @@ public interface DeviceTypeService {
             value = "Send message to Android tv",
             notes = "",
             response = Response.class,
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
@@ -194,7 +194,7 @@ public interface DeviceTypeService {
             value = "Send siddhi query to Android tv",
             notes = "",
             response = Response.class,
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
@@ -251,7 +251,7 @@ public interface DeviceTypeService {
             value = "Configure XBee gateway of Android TV device",
             notes = "",
             response = Response.class,
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
@@ -309,7 +309,7 @@ public interface DeviceTypeService {
             value = "Add XBee edge device to Android TV gateway",
             notes = "",
             response = Response.class,
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
@@ -371,7 +371,7 @@ public interface DeviceTypeService {
             value = "Send command to XBee edge device connected with Android TV gateway",
             notes = "",
             response = Response.class,
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
@@ -433,7 +433,7 @@ public interface DeviceTypeService {
             value = "Remove XBee edge device from Android TV gateway",
             notes = "",
             response = Response.class,
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
@@ -490,7 +490,7 @@ public interface DeviceTypeService {
             value = "Get all XBee edge device attached to Android TV gateway",
             notes = "",
             response = Response.class,
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
@@ -542,7 +542,7 @@ public interface DeviceTypeService {
             value = "Enroll device",
             notes = "",
             response = Response.class,
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
@@ -586,7 +586,7 @@ public interface DeviceTypeService {
             value = "Retrieve Sensor data for the device type",
             notes = "",
             response = Response.class,
-            tags = "androidtv",
+            tags = "androidtv,device_management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = AndroidTVConstants.SCOPE, value = "perm:androidtv:enroll")
