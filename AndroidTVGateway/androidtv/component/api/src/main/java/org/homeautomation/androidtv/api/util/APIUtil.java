@@ -1,10 +1,28 @@
+/*
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.homeautomation.androidtv.api.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.homeautomation.androidtv.api.constants.AndroidTVConstants;
-import org.homeautomation.androidtv.plugin.constants.DeviceTypeConstants;
-import org.homeautomation.androidtv.plugin.impl.DeviceTypeManager;
+import org.homeautomation.androidtv.api.service.AndroidTVManagementService;
+import org.homeautomation.androidtv.api.service.impl.AndroidTVManagementServiceImpl;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
@@ -16,14 +34,13 @@ import org.wso2.carbon.apimgt.application.extension.APIManagementProviderService
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.Utils;
-import org.wso2.carbon.device.mgt.common.DeviceManager;
 import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationService;
 import org.wso2.carbon.device.mgt.common.configuration.mgt.ConfigurationEntry;
 import org.wso2.carbon.device.mgt.common.configuration.mgt.ConfigurationManagementException;
 import org.wso2.carbon.device.mgt.common.configuration.mgt.PlatformConfiguration;
 import org.wso2.carbon.device.mgt.common.configuration.mgt.PlatformConfigurationManagementService;
-import org.wso2.carbon.device.mgt.common.spi.DeviceManagementService;
 import org.wso2.carbon.device.mgt.core.service.DeviceManagementProviderService;
+
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -204,24 +221,9 @@ public class APIUtil {
 		}
 	}
 
-    public static DeviceTypeManager getDeviceTypeManagementService() {
-        PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        List<Object> deviceManagementServices = ctx.getOSGiServices(DeviceManagementService.class, null);
-        DeviceTypeManager deviceTypeManager = null;
-        for (Object service : deviceManagementServices) {
-            DeviceManagementService dmService = (DeviceManagementService) service;
-            if (DeviceTypeConstants.DEVICE_TYPE.equals(dmService.getType())
-                && DeviceTypeManager.class.isInstance(dmService.getDeviceManager())){
-                deviceTypeManager = (DeviceTypeManager) dmService.getDeviceManager();
-            }
-        }
-
-        if (deviceTypeManager == null) {
-            String msg = "Device Type Management service has not initialized.";
-            log.error(msg);
-            throw new IllegalStateException(msg);
-        }else{
-            return deviceTypeManager;
-        }
+    public static AndroidTVManagementService getAndroidTVManagementService() {
+        AndroidTVManagementService androidTVManagementService;
+        androidTVManagementService = new AndroidTVManagementServiceImpl();
+        return androidTVManagementService;
     }
 }

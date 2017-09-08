@@ -88,11 +88,6 @@
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<scope>provided</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.homeautomation</groupId>
-            <artifactId>${project-base-package}.plugin</artifactId>
-            <scope>provided</scope>
-        </dependency>
 
 		<!--JAX-RS -->
 		<dependency>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -71,20 +71,9 @@
         <SharedWithAllTenants>false</SharedWithAllTenants>
     </ProvisioningConfig>
 
-   <PushNotificationProvider type="MQTT">
-        <FileBasedProperties>true</FileBasedProperties> 
-        <!--if file based properties is set to false then the cdmf.unit.device.type.android_tv.platform.configuration will be picked from platform cdmf.unit.device.type.android_tv.platform.configuration-->
-       <ConfigProperties>
-            <Property Name="mqttAdapterName">androidtv.mqtt.adapter</Property>
-            <Property Name="username">admin</Property>
-            <Property Name="password">admin</Property>
-            <Property Name="qos">0</Property>
-            <Property Name="scopes"/>
-            <Property Name="clearSession">true</Property>
-        </ConfigProperties>
-    </PushNotificationProvider>
-
-
+    <PushNotificationProviderConfig type="MQTT">
+        <FileBasedProperties>true</FileBasedProperties>
+    </PushNotificationProviderConfig>
 
     <License>
         <Language>en_US</Language>

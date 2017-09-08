@@ -14,7 +14,11 @@ org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../featur
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.homeautomation.androidtv.backend_${feature.version}/receiver/,target:${installFolder}/../../resources/devicetypes/androidtv/eventreceivers/,overwrite:true);\
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.homeautomation.androidtv.backend_${feature.version}/streams/,target:${installFolder}/../../resources/devicetypes/androidtv/eventstreams/,overwrite:true);\
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.homeautomation.androidtv.backend_${feature.version}/carbonapps/,target:${installFolder}/../../resources/devicetypes/androidtv/,overwrite:true);\
-
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../../repository/database/);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.homeautomation.androidtv.backend_${feature.version}/database/,target:${installFolder}/../../../repository/database/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../../dbscripts/cdm/plugins/androidtv/);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.homeautomation.androidtv.backend_${feature.version}/dbscripts/,target:${installFolder}/../../../dbscripts/cdm/plugins/androidtv/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.homeautomation.androidtv.backend_${feature.version}/datasources/,target:${installFolder}/../../../conf/datasources/,overwrite:true);\
 
 instructions.unconfigure = \
 org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../../repository/deployment/server/webapps/androidtv.war);\

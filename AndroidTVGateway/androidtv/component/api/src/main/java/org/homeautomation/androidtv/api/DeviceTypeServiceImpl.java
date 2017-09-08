@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * WSO2 Inc. licenses this file to you under the Apache License,
 * Version 2.0 (the "License"); you may not use this file except
@@ -23,10 +23,11 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.homeautomation.androidtv.api.constants.AndroidTVConstants;
+import org.homeautomation.androidtv.api.dto.EdgeDevice;
+import org.homeautomation.androidtv.api.exception.AndroidTVException;
 import org.homeautomation.androidtv.api.util.APIUtil;
-import org.homeautomation.androidtv.api.util.AndroidConfiguration;
+import org.homeautomation.androidtv.api.util.AndroidTVConfiguration;
 import org.homeautomation.androidtv.api.util.SensorRecord;
-import org.homeautomation.androidtv.plugin.dto.EdgeDevice;
 import org.json.JSONObject;
 import org.wso2.carbon.analytics.dataservice.commons.SortByField;
 import org.wso2.carbon.analytics.dataservice.commons.SortType;
@@ -43,8 +44,15 @@ import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 import org.wso2.carbon.device.mgt.common.operation.mgt.OperationManagementException;
 import org.wso2.carbon.device.mgt.core.operation.mgt.CommandOperation;
 
-
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
@@ -338,13 +346,13 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             edgeDevice.setEdgeDeviceSerial(serial);
             edgeDevice.setGatewayId(deviceId);
             edgeDevice.setEdgeDeviceName(name);
-            APIUtil.getDeviceTypeManagementService().addEdgeDevice(edgeDevice);
+            APIUtil.getAndroidTVManagementService().addEdgeDevice(edgeDevice);
             return Response.ok().build();
         } catch (InvalidDeviceException e) {
             String msg = "Invalid Device Identifiers found.";
             log.error(msg, e);
             return Response.status(Response.Status.BAD_REQUEST).build();
-        } catch (DeviceAccessAuthorizationException | DeviceManagementException e) {
+        } catch (DeviceAccessAuthorizationException | AndroidTVException e) {
             log.error(e.getClass().getSimpleName(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } catch (OperationManagementException e) {
@@ -445,13 +453,13 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                                                               deviceIdentifiers);
             EdgeDevice edgeDevice = new EdgeDevice();
             edgeDevice.setEdgeDeviceSerial(serial);
-            APIUtil.getDeviceTypeManagementService().removeEdgeDevice(serial);
+            APIUtil.getAndroidTVManagementService().removeEdgeDevice(serial);
             return Response.ok().build();
         } catch (InvalidDeviceException e) {
             String msg = "Invalid Device Identifiers found.";
             log.error(msg, e);
             return Response.status(Response.Status.BAD_REQUEST).build();
-        } catch (DeviceAccessAuthorizationException | DeviceManagementException e) {
+        } catch (DeviceAccessAuthorizationException | AndroidTVException e) {
             log.error(e.getClass().getSimpleName(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         } catch (OperationManagementException e) {
@@ -473,12 +481,12 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
                                       DeviceGroupConstants.Permissions.DEFAULT_OPERATOR_PERMISSIONS)) {
                 return Response.status(Response.Status.UNAUTHORIZED.getStatusCode()).build();
             }
-            List<EdgeDevice> edgeDevices = APIUtil.getDeviceTypeManagementService().getAllEdgeDevices(deviceId);
+            List<EdgeDevice> edgeDevices = APIUtil.getAndroidTVManagementService().getAllEdgeDevices(deviceId);
             Gson gson = new Gson();
             Type listType = new TypeToken<List<EdgeDevice>>() {}.getType();
             String jsonString = gson.toJson(edgeDevices, listType);
             return Response.ok().entity(jsonString).build();
-        } catch (DeviceAccessAuthorizationException | DeviceManagementException e) {
+        } catch (DeviceAccessAuthorizationException | AndroidTVException e) {
             log.error(e.getClass().getSimpleName(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
         }
@@ -493,7 +501,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
         deviceIdentifier.setType(AndroidTVConstants.DEVICE_TYPE);
         try {
             if (APIUtil.getDeviceManagementService().isEnrolled(deviceIdentifier)) {
-                AndroidConfiguration androidConfiguration = new AndroidConfiguration();
+                AndroidTVConfiguration androidConfiguration = new AndroidTVConfiguration();
                 androidConfiguration.setTenantDomain(APIUtil.getAuthenticatedUserTenantDomain());
                 androidConfiguration.setMqttEndpoint(APIUtil.getMqttEndpoint());
                 return Response.status(Response.Status.ACCEPTED.getStatusCode()).entity(androidConfiguration.toString())
@@ -512,7 +520,7 @@ public class DeviceTypeServiceImpl implements DeviceTypeService {
             device.setEnrolmentInfo(enrolmentInfo);
             boolean added = APIUtil.getDeviceManagementService().enrollDevice(device);
             if (added) {
-                AndroidConfiguration androidConfiguration = new AndroidConfiguration();
+                AndroidTVConfiguration androidConfiguration = new AndroidTVConfiguration();
                 androidConfiguration.setTenantDomain(APIUtil.getAuthenticatedUserTenantDomain());
                 androidConfiguration.setMqttEndpoint(APIUtil.getMqttEndpoint());
                 return Response.ok(androidConfiguration.toString()).build();

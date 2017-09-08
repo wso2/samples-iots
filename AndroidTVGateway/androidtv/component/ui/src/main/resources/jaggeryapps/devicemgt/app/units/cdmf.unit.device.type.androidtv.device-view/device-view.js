@@ -47,7 +47,7 @@ function onRequest(context) {
 			var websocketToken= {'name':'websocket-token','value': token, 'path':'/', "maxAge":18000};
 			response.addCookie(websocketToken);
 		}
-		var websocketendpoint = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.at_response/1.0.0?deviceId=" + deviceId + "&deviceType=" + deviceType;
+		var websocketendpoint = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.at_response/1.0.0?deviceId=" + deviceId + "&deviceType=" + deviceType + "&websocketToken=" + token;;
 
 		if (device && device.status != "error") {
 			return {

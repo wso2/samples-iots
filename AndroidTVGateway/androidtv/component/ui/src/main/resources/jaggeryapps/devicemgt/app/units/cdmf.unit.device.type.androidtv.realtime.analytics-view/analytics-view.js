@@ -38,11 +38,11 @@ function onRequest(context) {
     		var websocketToken= {'name':'websocket-token','value': token, 'path':'/', "maxAge":18000};
     		response.addCookie(websocketToken);
     	}
-    	var websocketEndpointForStream1 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.TEMP/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
-    	var websocketEndpointForStream2 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.HUMIDITY/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
-    	var websocketEndpointForStream3 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.AC/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
-        var websocketEndpointForStream4 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.DOOR/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
-        var websocketEndpointForStream5 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.WINDOW/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+    	var websocketEndpointForStream1 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.TEMP/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;;
+    	var websocketEndpointForStream2 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.HUMIDITY/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;;
+    	var websocketEndpointForStream3 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.AC/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;;
+        var websocketEndpointForStream4 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.DOOR/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;;
+        var websocketEndpointForStream5 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.WINDOW/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type + "&websocketToken=" + token;;
     	return {
     		"device": device,
     		"websocketEndpointForStream1": websocketEndpointForStream1,

@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -16,7 +16,8 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.wso2</groupId>
@@ -26,7 +27,6 @@
 
     <modules>
         <module>androidtv</module>
-	
     </modules>
 
     <modelVersion>4.0.0</modelVersion>
@@ -34,7 +34,7 @@
     <artifactId>iot-devicetype-samples</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
-    <name>Install AndroidTV Device Types - IoT Core</name>
+    <name>Creating custom distribution</name>
     <url>http://wso2.org</url>
 
     <build>
@@ -57,7 +57,13 @@
                             <publishArtifactRepository>true</publishArtifactRepository>
                             <featureArtifacts>
                                 <featureArtifactDef>
-                                    org.homeautomation:org.homeautomation.androidtv.feature:${org.homeautomation.version}
+                                    org.homeautomation:org.homeautomation.androidtv.backend.feature:1.0.0
+                                </featureArtifactDef>
+                                <featureArtifactDef>
+                                    org.homeautomation:org.homeautomation.androidtv.analytics.feature:1.0.0
+                                </featureArtifactDef>
+                                <featureArtifactDef>
+                                    org.homeautomation:org.homeautomation.androidtv.ui.feature:1.0.0
                                 </featureArtifactDef>
                             </featureArtifacts>
                         </configuration>
@@ -75,10 +81,76 @@
                             <destination>${basedir}/../wso2/components</destination>
                             <deleteOldProfileFiles>false</deleteOldProfileFiles>
                             <features>
-                                <!-- Android TV Features -->
                                 <feature>
-                                    <id>org.homeautomation.androidtv.feature.group</id>
-                                    <version>${org.homeautomation.version}</version>
+                                    <id>org.homeautomation.androidtv.backend.feature.group</id>
+                                    <version>1.0.0</version>
+                                </feature>
+                                <feature>
+                                    <id>org.homeautomation.androidtv.analytics.feature.group</id>
+                                    <version>1.0.0</version>
+                                </feature>
+                            </features>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>manager-feature-install</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-profile-gen</goal>
+                        </goals>
+                        <configuration>
+                            <profile>device-manager</profile>
+                            <metadataRepository>file:${basedir}/target/p2-repo</metadataRepository>
+                            <artifactRepository>file:${basedir}/target/p2-repo</artifactRepository>
+                            <destination>${basedir}/../wso2/components</destination>
+                            <deleteOldProfileFiles>false</deleteOldProfileFiles>
+                            <features>
+                                <!-- UI Features -->
+                                <feature>
+                                    <id>org.homeautomation.androidtv.ui.feature.group</id>
+                                    <version>1.0.0</version>
+                                </feature>
+                            </features>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>backend-feature-install</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-profile-gen</goal>
+                        </goals>
+                        <configuration>
+                            <profile>device-backend</profile>
+                            <metadataRepository>file:${basedir}/target/p2-repo</metadataRepository>
+                            <artifactRepository>file:${basedir}/target/p2-repo</artifactRepository>
+                            <destination>${basedir}/../wso2/components</destination>
+                            <deleteOldProfileFiles>false</deleteOldProfileFiles>
+                            <features>
+                                <!-- BE Features -->
+                                <feature>
+                                    <id>org.homeautomation.androidtv.backend.feature.group</id>
+                                    <version>1.0.0</version>
+                                </feature>
+                            </features>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>analytics-feature-install</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-profile-gen</goal>
+                        </goals>
+                        <configuration>
+                            <profile>analytics-default</profile>
+                            <metadataRepository>file:${project.basedir}/target/p2-repo</metadataRepository>
+                            <artifactRepository>file:${project.basedir}/target/p2-repo</artifactRepository>
+                            <destination>${project.basedir}/../wso2/components</destination>
+                            <deleteOldProfileFiles>false</deleteOldProfileFiles>
+                            <features>
+                                <!-- Analytics Features -->
+                                <feature>
+                                    <id>org.homeautomation.androidtv.analytics.feature.group</id>
+                                    <version>1.0.0</version>
                                 </feature>
                             </features>
                         </configuration>
@@ -95,7 +167,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <!--<replace token="false" value="true"
+                                <replace token="false" value="true"
                                          dir="../wso2/components/default/configuration/org.eclipse.equinox.simpleconfigurator">
                                     <include name="**/bundles.info"/>
                                 </replace>
@@ -106,22 +178,8 @@
                                 <replace token="false" value="true"
                                          dir="../wso2/components/device-backend/configuration/org.eclipse.equinox.simpleconfigurator">
                                     <include name="**/bundles.info"/>
-                                </replace>-->
-
-
-				<replace token="false" value="true"
-                                         dir="../wso2/components/default/configuration/org.eclipse.equinox.simpleconfigurator">
-                                    <include name="**/bundles.info"/>
                                 </replace>
-                                <copy todir="../wso2/analytics/repository/deployment/server/carbonapps">
-                                    <fileset dir="../repository/deployment/server/carbonapps">
-                                        <include name="*.car"/>
-                                    </fileset>
-				</copy>			
-
                             </tasks>
-
-			 	
                         </configuration>
                         <goals>
                             <goal>run</goal>
@@ -208,7 +266,7 @@
         </repository>
     </repositories>
     <properties>
-        <carbon.device.mgt.plugin.version>4.0.16</carbon.device.mgt.plugin.version>
-        <org.homeautomation.version>1.0.0</org.homeautomation.version>
+        <carbon.device.mgt.plugin.version>4.0.34</carbon.device.mgt.plugin.version>
+        <org.wso2.iot.version>1.0.0-SNAPSHOT</org.wso2.iot.version>
     </properties>
 </project>
