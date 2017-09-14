@@ -1,6 +1,6 @@
-READ ME
+README
 
-Sample MQTT clients for Creating device type via API (WSO2 IOTS 3.1)
+Sample MQTT clients for Creating device type via API (WSO2 IOTS 3.1.0 / 3.1.1)
 
 Docs :- https://docs.wso2.com/display/IoTS310/Creating+a+Fire+Alarm+Device+Type+via+the+Console
 
@@ -12,6 +12,4 @@ If client maintains the connection continously, It will continue to be connected
 SampleClient2 :- 
 Take new access token each time it begins the execution. 
 So token expiration not be an issue
-
-Replace your config file with config.json file inside the Configuration folder
 

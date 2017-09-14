@@ -31,3 +31,4 @@ def import_or_install(package):
 
 def installMissingPackages():
     os.system('pip install -Iv paho-mqtt==1.2.3')
+
