@@ -16,9 +16,6 @@
  * under the License.
 '''
 
-import importer
-
-importer.installMissingPackages()
 import base64
 import subprocess
 import json
@@ -38,7 +35,7 @@ print('----------------------------------------------------')
 try:
     config = json.loads(open('Configuration/config.json').read())
 except:
-    print "Cannot read the configuration file"
+    print ("Cannot read the configuration file")
     sys.exit(0)
 
 DEVICE_ID = config['deviceId']
@@ -53,22 +50,26 @@ MQTT_PORT = int(MQTT_GATEWAY[2])
     Since we are generating access token each time, no need of a refresh token 
 '''
 
-CLIENT_ID = config['clientId']
-CLIENT_SECRET = config['clientSecret']
 
-encodedCredentials = base64.b64encode(CLIENT_ID + ':' + CLIENT_SECRET)
+def getNewAccessToken():
+    CLIENT_ID = config['clientId']
+    CLIENT_SECRET = config['clientSecret']
 
-bash_com = 'curl -k -d "grant_type=password&username=admin&password=admin&scope=perm:admin:device-type perm:device-types:events perm:device-types:events:view perm:device-types:types perm:devices:operations" -H "Authorization: Basic ' + \
-           encodedCredentials + '" -H "Content-Type: application/x-www-form-urlencoded" https://' + MQTT_IP + ':8243/token'
-subprocess.Popen(bash_com, shell=True)
-output = subprocess.check_output(['bash', '-c', bash_com])
-output = json.loads(output)
+    encodedCredentials = base64.b64encode(CLIENT_ID + ':' + CLIENT_SECRET)
 
-print("New access token : " + output['access_token'])
-print("New refresh token : " + output['refresh_token'])
+    bash_com = 'curl -k -d "grant_type=password&username=admin&password=admin&scope=perm:admin:device-type perm:device-types:events perm:device-types:events:view perm:device-types:types perm:devices:operations" -H "Authorization: Basic ' + \
+               encodedCredentials + '" -H "Content-Type: application/x-www-form-urlencoded" https://' + MQTT_IP + ':8243/token'
+    subprocess.Popen(bash_com, shell=True)
+    output = subprocess.check_output(['bash', '-c', bash_com])
+    output = json.loads(output)
 
-# Updating access token
-ACCESS_TOKEN = output['access_token']
+    print("New access token : " + output['access_token'])
+    print("New refresh token : " + output['refresh_token'])
+
+    # Updating access token
+    global ACCESS_TOKEN
+    ACCESS_TOKEN = output['access_token']
+
 
 # Change this appropiately
 SENSOR_NAME = "temperature"
@@ -83,6 +84,10 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(subscribeTopic)
     # If connection successful start publishing data
     if rc == 0:
+        publishTempData()
+    elif rc == 4:
+        getNewAccessToken()
+        createMQTTConnection()
         publishTempData()
 
 
@@ -103,11 +108,16 @@ def publishTempData():
     threading.Timer(5.0, publishTempData).start()
 
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.username_pw_set(ACCESS_TOKEN, password="")
-client.connect(MQTT_IP, MQTT_PORT, 60, bind_address="")
-Client = client
-client.loop_forever()
+def createMQTTConnection():
+    client = mqtt.Client(DEVICE_ID)
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.username_pw_set(ACCESS_TOKEN, password="")
+    client.connect(MQTT_IP, MQTT_PORT, 60, bind_address="")
+    global Client
+    Client = client
+    Client.loop_forever()
 
+
+getNewAccessToken()
+createMQTTConnection()
