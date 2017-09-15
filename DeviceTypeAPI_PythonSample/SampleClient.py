@@ -16,10 +16,6 @@
  * under the License.
 '''
 
-import importer
-
-importer.installMissingPackages()
-
 import json
 import threading
 import random
@@ -80,11 +76,10 @@ def publishTempData():
     threading.Timer(5.0, publishTempData).start()
 
 
-client = mqtt.Client()
+client = mqtt.Client(DEVICE_ID)
 client.on_connect = on_connect
 client.on_message = on_message
 client.username_pw_set(ACCESS_TOKEN, password="")
 client.connect(MQTT_IP, MQTT_PORT, 60, bind_address="")
 Client = client
 client.loop_forever()
-
