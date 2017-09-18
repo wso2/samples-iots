@@ -1,4 +1,8 @@
-Sample for IOTS 3.0 which has an Arduino agent to measure temperature values using a DHT11 sensor and swich on/off LED light according to the commands given by the server.
+README
+
+SenseMe - sample device type for IOTS 3.0
+
+SenseMe has an Arduino agent to measure temperature values using a DHT11 sensor and swich on/off LED light according to the commands given by the server.
 
 Purpose of the sample is to illustrate connecting devices to the IOTS via MQTT 
 
