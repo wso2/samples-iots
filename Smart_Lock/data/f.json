@@ -1,0 +1,11 @@
+{
+    "type": "doorLock",
+    "deviceId": "3323213443987763",
+    "clientId": "6eLgYwP8XGa3fzuYKcR8Fs8RypYa",
+    "clientSecret": "bGBo6ffQPIEsxzbfsEgQ8drEZSIa",
+    "accessToken": "1f56b8c0-1951-324b-92d5-6f372bb5c1d9",
+    "refreshToken": "21754b6b-3cfb-3ea7-8cb9-63a075b7d929",
+    "mqttGateway": "tcp://localhost:1886",
+    "httpsGateway": "https://localhost:8243",
+    "httpGateway": "http://localhost:8280"
+}
