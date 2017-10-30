@@ -1,6 +1,0 @@
-/home/nuwan/Desktop/IoT/Repos/iots-build-repos/wso2iot-3.1.1-SNAPSHOT/samples/connectedcup/component/agent/src/main/java/org/coffeeking/agent/datasense/PushTemperature.java
-/home/nuwan/Desktop/IoT/Repos/iots-build-repos/wso2iot-3.1.1-SNAPSHOT/samples/connectedcup/component/agent/src/main/java/org/coffeeking/agent/transport/mqtt/MQTTTransportHandler.java
-/home/nuwan/Desktop/IoT/Repos/iots-build-repos/wso2iot-3.1.1-SNAPSHOT/samples/connectedcup/component/agent/src/main/java/org/coffeeking/agent/transport/TransportHandler.java
-/home/nuwan/Desktop/IoT/Repos/iots-build-repos/wso2iot-3.1.1-SNAPSHOT/samples/connectedcup/component/agent/src/main/java/org/coffeeking/agent/datasense/PushLevel.java
-/home/nuwan/Desktop/IoT/Repos/iots-build-repos/wso2iot-3.1.1-SNAPSHOT/samples/connectedcup/component/agent/src/main/java/org/coffeeking/agent/transport/TransportHandlerException.java
-/home/nuwan/Desktop/IoT/Repos/iots-build-repos/wso2iot-3.1.1-SNAPSHOT/samples/connectedcup/component/agent/src/main/java/org/coffeeking/agent/transport/mqtt/ConnectedCupMQttTransportHandler.java
