@@ -4,6 +4,10 @@
          version="2.5">
     <display-name>ConnectedCup-Webapp</display-name>
 
+    <welcome-file-list>
+        <welcome-file>login.jsp</welcome-file>
+    </welcome-file-list>
+
     <servlet>
         <servlet-name>PushTemperature</servlet-name>
         <servlet-class>org.coffeeking.agent.datasense.PushTemperature</servlet-class>
