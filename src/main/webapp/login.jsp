@@ -23,7 +23,7 @@
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-                <a class="navbar-brand" style="font-family: '';"><h4>SmartLocker</h4></a>
+            <a class="navbar-brand" style="font-family: '';"><h4>SmartLocker</h4></a>
         </div>
     </div>
 </nav>
@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
                     <div class="card card-signup">
-                        <form class="form" method="" action="">
+                        <form class="form" method="post" action="/login">
                             <div class="header header-primary text-center">
                                 <h5>Web Portal</h5>
                                 <div class="social-line">
@@ -52,8 +52,8 @@
 										</span>
                                     <%--<input type="text" class="form-control" placeholder="Email...">--%>
                                     <div class="form-group label-floating">
-                                        <label class="control-label">Email</label>
-                                        <input type="email" class="form-control">
+                                        <label class="control-label">Username</label>
+                                        <input type="text" name="inputEmail" class="form-control">
                                     </div>
                                 </div>
 
@@ -64,12 +64,12 @@
                                     <%--<input type="password" placeholder="Password..." class="form-control" />--%>
                                     <div class="form-group label-floating">
                                         <label class="control-label">Password</label>
-                                        <input type="password" class="form-control">
+                                        <input type="password" name="inputPassword" class="form-control">
                                     </div>
                                 </div>
                             </div>
                             <div class="footer text-center">
-                                <a href="#pablo" class="btn btn-simple btn-primary btn-lg">Login</a>
+                                <input type="submit" class="btn btn-simple btn-primary btn-lg" value="Login" />
                             </div>
                         </form>
                     </div>
@@ -108,11 +108,11 @@
 
 </div>
 </body>
-    <script src="js/jquery.min.js" type="text/javascript"></script>
-    <script src="js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="js/material.min.js" type="text/javascript"></script>
-    <script src="js/nouislider.min.js" type="text/javascript"></script>
-    <script src="js/bootstrap-datepicker.js" type="text/javascript"></script>
-    <script src="js/material-kit.js" type="text/javascript"></script>
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script src="js/bootstrap.min.js" type="text/javascript"></script>
+<script src="js/material.min.js" type="text/javascript"></script>
+<script src="js/nouislider.min.js" type="text/javascript"></script>
+<script src="js/bootstrap-datepicker.js" type="text/javascript"></script>
+<script src="js/material-kit.js" type="text/javascript"></script>
 
 </html>
