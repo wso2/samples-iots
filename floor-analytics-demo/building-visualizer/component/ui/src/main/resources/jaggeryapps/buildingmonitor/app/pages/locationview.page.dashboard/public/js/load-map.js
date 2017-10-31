@@ -44,10 +44,6 @@ function showPopup() {
     $(modalPopup).modal('show');
 }
 
-function showPopupLocation() {
-    $(modalPopup).modal('show');
-}
-
 /*
  * hide popup function.
  */
@@ -109,18 +105,38 @@ function loadLeafletMap() {
     }).addTo(map);
 
     setTimeout(function () {
-        map.invalidateSize()
+        map.invalidateSize();
     }, 400);
 
-    //TODo : When loading the map, call to backend and get all the buildings available and show them on the map.
+    preLoadDevices();
     preLoadBuildings();
+}
+
+function preLoadDevices() {
+    var getDevicesApi = "/senseme/building/0/0/devices";
+    invokerUtil.get(getDevicesApi, function (data, textStatus, jqXHR) {
+        if (jqXHR.status == 200) {
+            var devices = JSON.parse(data);
+            for(var j = 0; j < devices.length; j++) {
+                var deviceObj = devices[j];
+                var cord = {"lat": deviceObj.xCord, "lng": deviceObj.yCord};
+                var location = {
+                    deviceId: deviceObj.deviceId,
+                    longitude: deviceObj.xCord,
+                    latitude: deviceObj.yCord
+                };
+                addingMarkerLocation(cord, location);
+            }
+        }
+    }, function (jqXHR) {
+        console.log(jqXHR.responseText);
+    }, "application/json");
 }
 
 function preLoadBuildings() {
     var getBuildingDevicesApi = "/senseme/building/devices";
     var devices = {};
     invokerUtil.get(getBuildingDevicesApi, function (data, textStatus, jqXHR) {
-        console.log("here");
         var status = jqXHR.status;
         console.log("status "  +status);
         if (status >= 200 && status < 300) {
@@ -159,9 +175,8 @@ function preLoadBuildings() {
                                     var buildingdevice = {"active" : 0,
                                         "inactive" : 0,
                                         "fault":0, "total":0, "alerts" : 0};
+
                                     for(var j = 0; j < devices.length; j++) {
-
-
                                         if (devices[j].id == obj.buildingId) {
                                             var deviceobj = devices[j];
                                             //[{"id":"9","activeDevices":0,"faultDevices":0,"inactiveDevices":4,"totalDevices":4}]
@@ -178,8 +193,6 @@ function preLoadBuildings() {
                                     }
                                     addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i], buildingdevice);
                                     //printBuildingData(obj);
-
-
                                 }
 
                             },
@@ -221,7 +234,7 @@ function onAddMarker() {
 }
 
 function onAddMarkerLocation() {
-    map.once('click', addLocation);
+    map.once('click', addDevice);
     $('body.fixed ').addClass('marker-cursor-location');
     $('#device-location').addClass('marker-cursor-location');
 }
@@ -271,28 +284,25 @@ function saveBuilding() {
 }
 
 function saveLocation() {
-    var buildingName = document.getElementsByName('locationName')[0].value;
-    var noOffloors = 1;
+    var deviceIdValue = document.getElementsByName('deviceId')[0].value;
     var lat = document.getElementsByName('lat')[0].value;
     var long = document.getElementsByName('long')[0].value;
-    var addBuildingApi = "/senseme/building";
-    var buildingdata = {buildingName: buildingName, longitude: lat, latitude: long, numFloors: noOffloors};
+    var deviceData = {deviceId:deviceIdValue, xCord:lat, yCord:long };
+    var addDeviceApi = "/senseme/device/enroll?deviceType=senseme";
 
-    invokerUtil.post(addBuildingApi, buildingdata, function (data, textStatus, jqXHR) {
-        if (jqXHR.status == 200 && data) {
+    invokerUtil.post(addDeviceApi, deviceData, function (data, textStatus, jqXHR) {
+        if (jqXHR.status == 200) {
             var cord = {"lat": lat, "lng": long};
-            var building = {
-                buildingName: buildingName,
+            var location = {
+                deviceId: deviceIdValue,
                 longitude: lat,
-                latitude: long,
-                numFloors: noOffloors,
-                buildingId: data
+                latitude: long
             };
-            addingMarkerLocation(cord, buildingName, data, building);
+            addingMarkerLocation(cord, location);
         }
     }, function (jqXHR) {
         if (jqXHR.status == 400) {
-            console.log("error")
+            console.log("error");
         } else {
             var response = JSON.parse(jqXHR.responseText).message;
 
@@ -313,15 +323,15 @@ function addBuilding(e) {
     showPopup();
 }
 
-function addLocation(e) {
+function addDevice(e) {
     //save building here.
     tmpEventStore = e;
     var cord = e.latlng;
-    var content = $("#building-response-template-location");
+    var content = $("#device-response-template");
     content.find("#lat").attr('value', cord.lat);
     content.find("#long").attr('value', cord.lng);
     $(modalPopupContent).html(content.html());
-    showPopupLocation();
+    showPopup();
 }
 
 function onMarkerDragged(event) {
@@ -461,61 +471,40 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
     });
 }
 
-
-
-
-
-
-
-
-
-
-function addingMarkerLocation(cord, locationName, buildingId, building, buildingdevice) {
-    var markerId,
-        popup;
+function addingMarkerLocation(cord, location) {
+    var markerId, popup;
 
     $('body.fixed ').removeClass('marker-cursor-location');
     $('#device-location').removeClass('marker-cursor-location');
 
-    var content = $("#device-popup-template").clone();
-    var sidebar = $("#sidebar-messages");
-    content.attr("id","device-building-" + buildingId);
+    console.log(location);
 
-    console.log(buildingdevice);
-    if (buildingdevice && buildingdevice != undefined) {
-        content.find("#building-active").text(buildingdevice.active);
-        content.find("#building-inactive").text(buildingdevice.inactive);
-        content.find("#building-fault").text(buildingdevice.fault);
-        content.find("#building-alerts").text(buildingdevice.alerts);
-    } else {
-        content.find("#building-active").text("0");
-        content.find("#building-inactive").text("0");
-        content.find("#building-fault").text("0");
-        content.find("#building-alerts").text("0");
-    }
-    content.find("#building-content").text(locationName);
-    content.find("#building-content-div").attr("data-buildingid", buildingId);
-    content.find("#building-content-div").attr("data-markerid", markerId);
-    content.find("#building-content-div").attr("id","building-content-" + buildingId);
-    content.find("#building-location").attr("href","/buildingmonitor/buildings?buildingId=" + buildingId);
+    var content = $("#device-location-popup-template").clone();
+    content.attr("id","device-" + location.deviceId);
+
+    content.find("#location-content").text(location.deviceId);
+    content.find("#location-view").attr("href","/buildingmonitor/senseme?id=" + location.deviceId);
+
+    var deviceIcon = L.icon({
+                                iconUrl: '/buildingmonitor/public/cdmf.unit.lib.leaflet/js/images/device.png',
+                                shadowUrl: '/buildingmonitor/public/cdmf.unit.lib.leaflet/js/images/marker-shadow.png',
+                                iconSize: [40, 40], // size of the icon
+                                shadowSize: [40, 40], // size of the shadow
+                                iconAnchor: [20, 40], // point of the icon which will correspond to marker's location
+                                shadowAnchor: [20, 40],  // the same for the shadow
+                                popupAnchor: [-3, -40] // point from which the popup should open relative to the iconAnchor
+                            });
 
     popup = L.popup({
-        autoPan: true,
-        keepInView: true
-    })
-        .setContent(content.html());
+                        autoPan: true,
+                        keepInView: true
+                    }).setContent(content.html());
 
     //variable for marker
-    var marker;
-
-    //markers info JSON array
-    var markerInfo = {
-        info: []
-    };
-
-    marker = new L.marker(cord, {
-        title: locationName,
-        alt: locationName,
+    var marker = new L.marker(cord, {
+        icon: deviceIcon,
+        title: location.deviceId,
+        alt: location.deviceId,
         riseOnHover: true,
         draggable: true
     }).bindPopup(popup);
@@ -524,63 +513,10 @@ function addingMarkerLocation(cord, locationName, buildingId, building, building
 
     marker.on('click', onMarkerClick);
 
-    marker.on('dragend', onMarkerDragged);
-
-    //marker.on("popupopen", onPopupOpen);
     marker.addTo(map);
     markerId = marker._leaflet_id;
-
-    if (building != null) {
-        buildingsMap[markerId] = building;
-    }
-
     markers[markerId] = marker;
-    addBuildingMenu(buildingId,locationName, markerId, buildingdevice);
-
-    // Remove Marker
-    $('.remove').on("click", function () {
-        // Remove the marker
-        map.removeLayer(markers[$(this).attr('id')]);
-
-        var idNo = $(this).attr('id');
-        // Remove the link
-        $(this).parent('div').remove();
-
-        $('#home').find('#' + idNo).remove();
-
-        if(window.localStorage.getItem(KEY_NAME) !== null){
-            $.each(objectJSON.metaData, function(i, values){
-                if(values.id == idNo){
-                    objectJSON.metaData.splice(i, 1);
-                    var result = JSON.stringify(objectJSON);
-                    window.localStorage.setItem(KEY_NAME, result);
-                }
-            });
-        }
-    });
-
-
-    $('.item').on("mouseover", function (e) {
-        $('div').removeClass('active-marker');
-        $('#' + $(this).attr('id') + ' .panel-default > .panel-heading').addClass('active-marker');
-        for (var mark in markers) {
-            markers[mark].setIcon(smallIcon);
-        }
-        markerFunction($(this).attr('id'));
-        markers[$(this).attr('id')].setIcon(bigIcon);
-        var mid = $(this).attr('id');
-        var LatLng = markers[mid].getLatLng();
-        var offset = baseMap.panTo(LatLng);
-        baseMap.panBy(offset);
-    });
 }
-
-
-
-
-
-
-
 
 function addBuildingMenu(buildingId, buildingName, markerId, buildingdevice) {
     var content = $("#device-building-template").clone();

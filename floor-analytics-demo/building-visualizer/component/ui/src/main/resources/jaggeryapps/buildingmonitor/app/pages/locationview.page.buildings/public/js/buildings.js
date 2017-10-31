@@ -14,6 +14,19 @@ var numOfFloors;
 var isLive = true;
 var isPause = false;
 
+var tempGraph=[];
+var motionGraph=[];
+var humidityGraph=[];
+var lightGraph=[];
+
+var tempChartData = [];
+var motionChartData = [];
+var humidityChartData = [];
+var lightChartData = [];
+
+
+var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
+
 /**
  * To show received data
  * @param sliderVal value of slider.
@@ -43,9 +56,9 @@ function displyaData(floorId,data) {
     var light;
     var motion;
     if(data.light<500){
-        light = "ON";
+        light = "OFF";
     }else if (data.light>500){
-        light="OFF";
+        light="ON";
     }
 
     if (data.motion>0.5){
@@ -84,12 +97,32 @@ function createDataArrays(val) {
 }
 
 /**
+ * Initialize floor graph instances
+ * @param numOfFloors number of floors.
+ */
+function createGraphs(numOfFloors){
+
+    for (var i = 0; i < numOfFloors; i++) {
+        tempChartData[i] = [];
+        motionChartData[i] = [];
+        humidityChartData[i] = [];
+        lightChartData[i] = [];
+
+        tempGraph[i] = {graph:{}};
+        motionGraph[i] ={graph:{}};
+        humidityGraph[i] ={graph:{}};
+        lightGraph[i] ={graph:{}};
+    }
+
+}
+
+/**
  * Initialize the web-sockets to get the real-time data.
  */
 function createWebSocket(host) {
 
     if (!("WebSocket" in window)) {
-        console.log("browser doens't support");
+        console.log("browser doesn't support");
         //add meaningful message
     } else {
         //The user has WebSockets
@@ -137,12 +170,143 @@ function handleRealTimeData(data) {
         } else {
             floorData[fId].push(data);
         }
-
         if(isLive){
             rangeSlider.bootstrapSlider('setValue', sliderPointMax);
             displyaData(floorId, data);
         }
+        updateGraphs(floorId, data);
     }
+}
+
+function updateGraphs(floorId, data) {
+    var fId = parseInt(floorId) - 1;
+    console.log("-------------------------------")
+    console.log(data);
+
+    tempChartData[fId].push({
+        x: parseInt(data.time)/1000,
+        y: parseFloat(data.temperature)
+    });
+
+    tempChartData[fId].shift();
+    tempGraph[fId].graph.update();
+
+    motionChartData[fId].push({
+        x: parseInt(data.time)/1000,
+        y: parseFloat(data.motion)
+    });
+    motionChartData[fId].shift();
+    motionGraph[fId].graph.update();
+
+    humidityChartData[fId].push({
+        x: parseInt(data.time)/1000,
+        y: parseFloat(data.humidity)
+    });
+    humidityChartData[fId].shift();
+    humidityGraph[fId].graph.update();
+
+    lightChartData[fId].push({
+        x: parseInt(data.time)/1000,
+        y: parseFloat(data.light)
+    });
+    lightChartData[fId].shift();
+    lightGraph[fId].graph.update();
+
+}
+
+/* passing the data to draw graphs according to floor number */
+
+function processCharts(numOfFloors){
+    for (var k = 0; k < numOfFloors; k++) {
+        processChartContext(k);
+    }
+}
+
+/* passing the data to draw graphs  */
+
+function processChartContext(fId){
+    var floorId = fId + 1;
+    var tempChartName=["Temperature" + floorId];
+    processMultiChart(("div-chart-temp-"+floorId),("chart_temp_"+floorId),tempChartData[fId],tempChartName,tempGraph[fId],("y_axis_temp_"+floorId),("legend_temp_"+floorId));
+    var motionChartName=["Motion" + floorId];
+    processMultiChart(( "div-chart-motion-"+floorId),("chart_motion_"+floorId),motionChartData[fId],motionChartName,motionGraph[fId],("y_axis_motion_"+floorId),("legend_motion_"+floorId));
+    var humidityChartName=["Humidity" + floorId];
+    processMultiChart(("div-chart-humidity-"+floorId),("chart_humidity_"+floorId),humidityChartData[fId],humidityChartName,humidityGraph[fId],("y_axis_humidity_"+floorId),("legend_humidity_"+floorId));
+    var lightChartName=["Light level" + floorId];
+    processMultiChart(("div-chart-light-"+floorId),("chart_light_"+floorId),lightChartData[fId],lightChartName,lightGraph[fId],("y_axis_light_"+floorId),("legend_light_"+floorId));
+
+}
+/*
+    Creating a graph */
+
+function processMultiChart(outerDiv,chartDiv,chartData,name,graph,yAxis,legend) {
+
+    var tNow = new Date().getTime() / 1000;
+
+        for (var i = 0; i < 30; i++) {
+            chartData.push({
+                x: tNow - (30 - i) * 15,
+                y: parseFloat(0)
+            });
+        }
+
+
+    series=[];
+        obj = {
+            'color':palette.color(),
+            'data':chartData,
+            'name': name
+        }
+        series.push(obj);
+
+
+    graph.graph = new Rickshaw.Graph({
+        element: document.getElementById(chartDiv),
+        width: $("#"+outerDiv).width() - 50,
+        height: 300,
+        stack: false,
+        padding: {top: 0.2, left: 0.0, right: 0.0, bottom: 0.2},
+        renderer: "area",
+        interpolation: "linear",
+        padding: {top: 0.2, left: 0.0, right: 0.0, bottom: 0.2},
+        xScale: d3.time.scale(),
+        series: series
+    });
+
+    graph.graph.render();
+
+    var xAxis = new Rickshaw.Graph.Axis.Time({
+        graph: graph.graph
+    });
+
+    xAxis.render();
+
+    new Rickshaw.Graph.Axis.Y({
+        graph: graph.graph,
+        orientation: 'left',
+        height: 300,
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        element: document.getElementById(yAxis)
+    });
+
+    new Rickshaw.Graph.HoverDetail({
+        graph: graph.graph,
+        formatter: function (series, x, y) {
+            var date = '<span class="date">' + moment(x * 1000).format('Do MMM YYYY h:mm:ss a') + '</span>';
+            var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
+            return swatch + series.name + ": " + parseInt(y) + '<br>' + date;
+        }
+    });
+
+    var legendObj = new Rickshaw.Graph.Legend( {
+        graph: graph.graph,
+        element: document.getElementById(legend)
+    } );
+
+    var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
+        graph: graph.graph,
+        legend: legendObj
+    });
 }
 
 /**
@@ -295,9 +459,26 @@ function getHistoricaldata(numOfFloors, date) {
         , date.getDate()
         , 23, 59, 59);
 
-    historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_PERFLOOR_SENSORSTREAM", date.getTime(), end.getTime(), 0, 25,
-        "DESC", buildingId, numOfFloors, "getBuildingData");
-    return historicalData;
+    var currentDate = new Date();
+    var difInHr = (currentDate - date)/3600000;
+
+    if(difInHr < 6){
+        historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED6HR_PERFLOOR_SENSORSTREAM", date.getTime(), end.getTime(), 0, 25,
+                "DESC", buildingId, numOfFloors, "getBuildingData");
+        return historicalData;
+    }else if (difInHr < 24){
+        historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED_PERFLOOR_SENSORSTREAM", date.getTime(), end.getTime(), 0, 25,
+            "DESC", buildingId, numOfFloors, "getBuildingData");
+        return historicalData;
+    }else if (difInHr < 168){
+        historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED1HR_PERFLOOR_SENSORSTREAM", date.getTime(), end.getTime(), 0, 25,
+            "DESC", buildingId, numOfFloors, "getBuildingData");
+        return historicalData;
+    }else{
+        historicalData = getProviderData("ORG_WSO2_FLOOR_SUMMARIZED3HR_PERFLOOR_SENSORSTREAM", date.getTime(), end.getTime(), 0, 25,
+             "DESC", buildingId, numOfFloors, "getBuildingData");
+        return historicalData;
+    }
 
 }
 
@@ -472,6 +653,8 @@ $(document).ready(function () {
 
     createWebSocket(url);
     createDataArrays(numOfFloors);
+    createGraphs(numOfFloors);
+    processCharts(numOfFloors);
     getRecentPastdata(numOfFloors);
     updateAlertCount();
 
@@ -526,3 +709,5 @@ $(document).on( "click", ".view-analytics", function(e) {
     e.stopPropagation();
 
 });
+
+

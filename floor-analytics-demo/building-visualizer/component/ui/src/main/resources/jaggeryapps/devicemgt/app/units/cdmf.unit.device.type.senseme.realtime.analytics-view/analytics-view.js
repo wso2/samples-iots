@@ -38,11 +38,15 @@ function onRequest(context) {
 		var websocketToken= {'name':'websocket-token','value': token, 'path':'/', "maxAge":18000};
 		response.addCookie(websocketToken);
 	}
-	var websocketEndpointForStream1 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.PIR/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
-	var websocketEndpointForStream2 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.ULTRASONIC/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
-	return {
+	var websocketEndpointForStream1 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.humidity/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+	var websocketEndpointForStream2 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.light/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+    var websocketEndpointForStream3 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.motion/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+    var websocketEndpointForStream4 = websocketEndpoint + "/secured-websocket/org.wso2.iot.devices.temperature/1.0.0?deviceId=" + device.deviceIdentifier + "&deviceType=" + device.type;
+    return {
 		"device": device,
 		"websocketEndpointForStream1": websocketEndpointForStream1,
-		"websocketEndpointForStream2": websocketEndpointForStream2
+		"websocketEndpointForStream2": websocketEndpointForStream2,
+        "websocketEndpointForStream3": websocketEndpointForStream3,
+        "websocketEndpointForStream4": websocketEndpointForStream4
 	};
 }

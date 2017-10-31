@@ -18,11 +18,18 @@
 
 var wsConnection1;
 var wsConnection2;
+var wsConnection3;
+var wsConnection4;
 var graphForSensorType1;
 var graphForSensorType2;
+var graphForSensorType3;
+var graphForSensorType4;
 var chartDataSensorType1 = [];
 var chartDataSensorType2 = [];
-var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
+var chartDataSensorType3 = [];
+var chartDataSensorType4 = [];
+var palette = new Rickshaw.Color.Palette({scheme: "munin"});
+
 function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
     var tNow = new Date().getTime() / 1000;
     for (var i = 0; i < 30; i++) {
@@ -80,12 +87,18 @@ $(window).load(function () {
         , graphForSensorType1);
     drawGraph(wsConnection2, "#div-chart-sensorType2", "yAxisSensorType2", "chartSensorType2", chartDataSensorType2
         , graphForSensorType2);
+    drawGraph(wsConnection3, "#div-chart-sensorType3", "yAxisSensorType3", "chartSensorType3", chartDataSensorType3
+        , graphForSensorType3);
+    drawGraph(wsConnection4, "#div-chart-sensorType4", "yAxisSensorType4", "chartSensorType4", chartDataSensorType4
+        , graphForSensorType4);
 });
 
-$(window).unload(function () {
+window.onbeforeunload = function() {
     disconnect(wsConnection1);
     disconnect(wsConnection2);
-});
+    disconnect(wsConnection3);
+    disconnect(wsConnection4);
+};
 
 //websocket connection
 function connect(wsConnection, target, chartData, graph) {

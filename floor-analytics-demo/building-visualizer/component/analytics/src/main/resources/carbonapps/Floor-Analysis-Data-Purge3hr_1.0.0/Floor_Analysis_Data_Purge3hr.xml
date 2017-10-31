@@ -1,0 +1,8 @@
+<analytics-data-purging>
+    <cron-expression>0 0 0 * * ?</cron-expression>
+    <purge-include-tables>
+        <table>org.wso2.floor.summarized1hr.perFloor.SensorStream</table>
+    </purge-include-tables>
+    <data-retention-days>30</data-retention-days>
+
+</analytics-data-purging>

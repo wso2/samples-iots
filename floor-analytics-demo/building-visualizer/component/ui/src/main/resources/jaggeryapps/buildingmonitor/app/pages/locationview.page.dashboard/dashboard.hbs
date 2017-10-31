@@ -38,8 +38,10 @@
     {{#if permissions.ADD_BUILDING}}
         <li>
             <!--suppress HtmlUnknownTarget -->
-            <a href="/buildingmonitor/devices" class="cu-btn" onclick="onAddMarker()">
-            <span class="icon fw-apple fw-2x">
+            <a href="/buildingmonitor/devices" class="cu-btn">
+            <span class="icon fw-stack">
+                <i class="fw fw-hardware fw-stack-1x"></i>
+                <i class="fw fw-circle-outline fw-stack-2x"></i>
             </span>
                 Devices
             </a>
@@ -51,7 +53,7 @@
                 <i class="fw fw-add fw-stack-1x"></i>
                 <i class="fw fw-circle-outline fw-stack-2x"></i>
             </span>
-                Add Building asdjfkjdsa
+                Add Building
             </a>
         </li>
         <li>
@@ -63,17 +65,6 @@
                 Add Location
             </a>
         </li>
-        <li>
-            <!--suppress HtmlUnknownTarget -->
-            <a href="#" class="cu-btn" onclick="onAddMarker()">
-            <span class="icon fw-stack">
-                <i class="fw fw-add fw-stack-1x"></i>
-                <i class="fw fw-circle-outline fw-stack-2x"></i>
-            </span>
-                Add Location
-            </a>
-        </li>
-
     {{/if}}
 {{/zone}}
 
@@ -104,8 +95,8 @@
                                    placeholder="e.g.: Number of floors">
                         </div>
                         <div class="form-group">
-                            <input type="hidden" class="form-control required" name="lat" id="lat" name="floors">
-                            <input type="hidden" class="form-control required" name="long" id="long" name="floors">
+                            <input type="hidden" class="form-control required" name="lat" id="lat">
+                            <input type="hidden" class="form-control required" name="long" id="long">
                         </div>
                         <div id="building-button" class="form-group">
                             <button id="buttonme" type="button" class="btn btn-primary" data-toggle="update-data"
@@ -117,23 +108,22 @@
             </div>
         </div>
 
-        <div id="building-response-template-location" style="display: none">
+        <div id="device-response-template" style="display: none">
             <div class="row">
                 <div class="col-lg-5 col-md-6 col-centered">
                     <form action="" method="post" id="register-form-'+ markerId +'" novalidate="novalidate">
                         <h3>Add Location</h3>
                         <div class="form-group">
-                            <label for="locationName">Location Name *</label>
-                            <input type="text" class="form-control" id="locationName" name="locationName"
-                                   placeholder="e.g.: Home">
+                            <input type="hidden" class="form-control required" name="lat" id="lat">
+                            <input type="hidden" class="form-control required" name="long" id="long">
                         </div>
                         <div class="form-group">
-                            <input type="hidden" class="form-control required" name="lat" id="lat" name="floors">
-                            <input type="hidden" class="form-control required" name="long" id="long" name="floors">
+                            <label for="deviceId">Device Claim Id *</label>
+                            <input type="text" class="form-control" id="deviceId" name="deviceId" >
                         </div>
-                        <div id="building-button" class="form-group">
-                            <button id="buttonme" type="button" class="btn btn-primary" data-toggle="update-data"
-                                    onclick="saveLocation()">Save
+                        <div id="device-button" class="form-group">
+                            <button id="enrolldevice" type="button" class="btn btn-primary" onclick="saveLocation()"
+                                    data-toggle="update-data">Add Device
                             </button>
                         </div>
                     </form>
@@ -244,10 +234,7 @@
                                     <span class="wr-stats-board-sidebar-text">TRIGGERED ALERTS</span>
                                 </div>
                             </div>
-
-
                         </a>
-
                     </li>
                 </div>
                 <div id="device-popup-template">
@@ -283,9 +270,20 @@
                                 </div>
                             </div>
                             </p>
-
                         </div>
                         <a id="building-location">
+                    <span class="fw-stack">
+                        <i class="fw fw-circle-outline fw-stack-2x"></i>
+                        <i class="fw fw-view fw-stack-1x"></i>
+                    </span>
+                            View
+                        </a>
+                    </div>
+                </div>
+                <div id="device-location-popup-template">
+                    <div id="location-content-div">
+                        <h4><a id="location-content"></a></h4>
+                        <a id="location-view">
                     <span class="fw-stack">
                         <i class="fw fw-circle-outline fw-stack-2x"></i>
                         <i class="fw fw-view fw-stack-1x"></i>
@@ -297,8 +295,6 @@
             </div>
         {{/if}}
     {{/zone}}
-
-
 
     {{#zone "bottomJs"}}
         {{js "js/load-map.js"}}

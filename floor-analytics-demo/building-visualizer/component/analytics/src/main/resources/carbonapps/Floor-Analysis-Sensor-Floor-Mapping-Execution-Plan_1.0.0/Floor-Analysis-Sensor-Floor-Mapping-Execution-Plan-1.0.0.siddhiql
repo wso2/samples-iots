@@ -14,6 +14,18 @@ double, avgLight double, timeStamp long);
 define stream summarizedDataIn (deviceId string, temperature double, motion double, humidity double, airQuality double,
 light double, timeStamp long);
 
+@Import('org.wso2.floor.summarized1hr.SensorStream:1.0.0')
+define stream summarizedDataIn1 (deviceId string, temperature1 double, motion1 double, humidity1 double, airQuality1 double,
+light1 double, timeStamp long);
+
+@Import('org.wso2.floor.summarized3hr.SensorStream:1.0.0')
+define stream summarizedDataIn3 (deviceId string, temperature3 double, motion3 double, humidity3 double, airQuality3 double,
+light3 double, timeStamp long);
+
+@Import('org.wso2.floor.summarized6hr.SensorStream:1.0.0')
+define stream summarizedDataIn6 (deviceId string, temperature6 double, motion6 double, humidity6 double, airQuality6 double,
+light6 double, timeStamp long);
+
 @Export('org.wso2.floor.device.SensorStream:1.0.0')
 define stream dataOut (deviceId string, temperature double, motion double, humidity double, airQuality
 double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
@@ -35,6 +47,18 @@ temperature double);
 define stream summarizedDataOut (deviceId string, temperature double, motion double, humidity double, airQuality
 double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
 
+@Export('org.wso2.floor.summarized1hr.device.floor.SensorStream:1.0.0')
+define stream summarizedDataOut1 (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@Export('org.wso2.floor.summarized3hr.device.floor.SensorStream:1.0.0')
+define stream summarizedDataOut3 (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@Export('org.wso2.floor.summarized6hr.device.floor.SensorStream:1.0.0')
+define stream summarizedDataOut6 (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
 @from(eventtable = 'rdbms' , datasource.name = 'WSO2_FLOOR_ANALYTICS' , table.name = 'device')
 define table deviceLocationTable (deviceId string, buildingId string, floorId string, xCoordinate int, yCoordinate int, lastKnown long);
 
@@ -47,6 +71,21 @@ from summarizedDataIn as d join deviceLocationTable as l on d.deviceId == l.devi
 select d.deviceId as deviceId, d.temperature as temperature, d.motion as motion, d.humidity as humidity, d
 .airQuality as  airQuality, d.light as light, d.timeStamp as timeStamp, l.buildingId as buildingId,
 l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into summarizedDataOut;
+
+from summarizedDataIn1 as e join deviceLocationTable as l on e.deviceId == l.deviceId
+select e.deviceId as deviceId, e.temperature1 as temperature, e.motion1 as motion, e.humidity1 as humidity, e
+.airQuality1 as  airQuality, e.light1 as light, e.timeStamp as timeStamp, l.buildingId as buildingId,
+l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into summarizedDataOut1;
+
+from summarizedDataIn3 as f join deviceLocationTable as l on f.deviceId == l.deviceId
+select f.deviceId as deviceId, f.temperature3 as temperature, f.motion3 as motion, f.humidity3 as humidity, f
+.airQuality3 as  airQuality, f.light3 as light, f.timeStamp as timeStamp, l.buildingId as buildingId,
+l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into summarizedDataOut3;
+
+from summarizedDataIn6 as g join deviceLocationTable as l on g.deviceId == l.deviceId
+select g.deviceId as deviceId, g.temperature6 as temperature, g.motion6 as motion, g.humidity6 as humidity, g
+.airQuality6 as  airQuality, g.light6 as light, g.timeStamp as timeStamp, l.buildingId as buildingId,
+l.floorId as floorId, l.xCoordinate as xCoordinate, l.yCoordinate as yCoordinate insert into summarizedDataOut6;
 
 from dataIn
 select "owner" as meta_owner, "senseme" as meta_deviceType, deviceId as meta_deviceId, time:timestampInMilliseconds() as meta_time,

@@ -20,6 +20,7 @@ package org.wso2.iot.senseme.api.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPI;
 import org.wso2.carbon.analytics.api.AnalyticsDataAPIUtil;
 import org.wso2.carbon.analytics.dataservice.commons.AnalyticsDataResponse;
@@ -31,16 +32,24 @@ import org.wso2.carbon.apimgt.application.extension.APIManagementProviderService
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.device.mgt.common.authorization.DeviceAccessAuthorizationService;
+import org.wso2.carbon.device.mgt.common.group.mgt.DeviceGroup;
+import org.wso2.carbon.device.mgt.common.group.mgt.GroupAlreadyExistException;
+import org.wso2.carbon.device.mgt.common.group.mgt.GroupManagementException;
+import org.wso2.carbon.device.mgt.common.group.mgt.RoleDoesNotExistException;
 import org.wso2.carbon.device.mgt.core.service.DeviceManagementProviderService;
 import org.wso2.carbon.device.mgt.core.service.GroupManagementProviderService;
 import org.wso2.carbon.identity.jwt.client.extension.service.JWTClientManagerService;
 import org.wso2.carbon.user.api.AuthorizationManager;
+import org.wso2.carbon.user.api.Permission;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.iot.senseme.api.constants.DeviceTypeConstants;
 import org.wso2.iot.senseme.api.dto.SensorRecord;
+import org.wso2.iot.senseme.api.exception.DeviceTypeException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -231,5 +240,60 @@ public class APIUtil {
             throw new IllegalStateException(msg);
         }
         return authorizationManager;
+    }
+
+    /**
+     * Create user role for building and floors.
+     *
+     * @param role : Role that need to be created
+     * @throws UserStoreException User Store Exception
+     */
+    public static void addRolesForBuildingsAndFloors(String role) throws UserStoreException {
+        Permission realTimeAnalytics = new Permission(DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION,
+                                                      CarbonConstants.UI_PERMISSION_ACTION);
+
+        UserStoreManager userStoreManager = APIUtil.getUserStoreManager();
+        if (userStoreManager != null) {
+            if (!userStoreManager.isExistingRole(role)) {
+                userStoreManager.addRole(role, null, new Permission[] { realTimeAnalytics });
+            }
+        } else {
+            log.error("User Store Manager cannot found.");
+        }
+    }
+
+    /**
+     * Create device groups for building and floor and assign the given list of devices.
+     *
+     * @param groupName:  The name of the group
+     * @param role        : The role associated with the group
+     * @param description : The description for the group
+     * @throws DeviceTypeException Device Type Exception
+     */
+    public static void createAndAddGroups(String groupName, String role, String description) throws DeviceTypeException {
+        try {
+            DeviceGroup buildingFloorGroup;
+            GroupManagementProviderService groupManagementProviderService = APIUtil.getGroupManagementProviderService();
+
+            if (groupManagementProviderService.getGroup(groupName) != null) {
+                return;
+            }
+
+            buildingFloorGroup = new DeviceGroup();
+            buildingFloorGroup.setOwner(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername());
+            buildingFloorGroup.setName(groupName);
+            buildingFloorGroup.setDescription(description);
+            groupManagementProviderService.createGroup(buildingFloorGroup, role,
+                                                       new String[] { DeviceTypeConstants.REALTIME_ANALYTICS_PERMISSION });
+            buildingFloorGroup = groupManagementProviderService.getGroup(groupName);
+            groupManagementProviderService
+                    .manageGroupSharing(buildingFloorGroup.getGroupId(), new ArrayList<>(Arrays.asList(role)));
+        } catch (GroupManagementException e) {
+            throw new DeviceTypeException("Error occurred while creting group with the name " + groupName, e);
+        } catch (GroupAlreadyExistException e) {
+            throw new DeviceTypeException("A group with the name " + groupName + " already exists.", e);
+        } catch (RoleDoesNotExistException e) {
+            throw new DeviceTypeException("A role with the name " + role + " does not exist", e);
+        }
     }
 }

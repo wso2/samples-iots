@@ -63,9 +63,27 @@
                     serverRole="DataAnalyticsServer" />
         <dependency artifact="org.wso2.floor.summarized.SensorStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized1hr.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized3hr.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized6hr.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
         <dependency artifact="org.wso2.floor.summarized.device.floor.SensorStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized1hr.device.floor.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized3hr.device.floor.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized6hr.device.floor.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
         <dependency artifact="org.wso2.floor.summarized.perFloor.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized1hr.perFloor.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized3hr.perFloor.SensorStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="org.wso2.floor.summarized6hr.perFloor.SensorStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
         <dependency artifact="motion_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer" />
         <dependency artifact="temperature_stream" version="1.0.0" include="true" serverRole="DataAnalyticsServer" />
@@ -79,7 +97,14 @@
                     serverRole="DataAnalyticsServer" />
         <dependency artifact="motion_spark_script" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
+
         <dependency artifact="temperature_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="device_sum1hr_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="device_sum3hr_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="device_sum6hr_store" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
         <dependency artifact="motion_store" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
@@ -87,6 +112,17 @@
                     serverRole="DataAnalyticsServer" />
         <dependency artifact="light_store" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer" />
+        <dependency artifact="perFloor_summarized1hr_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="perFloor_summarized3hr_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="perFloor_summarized6hr_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+
+
+        <dependency artifact="Floor-Analysis-Data-Purge" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="Floor-Analysis-Data-Purge1hr" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
+        <dependency artifact="Floor-Analysis-Data-Purge3hr" version="1.0.0" include="true" serverRole="DataAnalyticsServer"/>
 
 
     </artifact>

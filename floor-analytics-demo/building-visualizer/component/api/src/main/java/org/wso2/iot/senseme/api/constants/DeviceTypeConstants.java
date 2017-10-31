@@ -28,7 +28,6 @@ import java.io.File;
 public class DeviceTypeConstants {
     public final static String DEVICE_TYPE = "senseme";
     public final static String BUILDING_GROUP_NAME = "BUILDING-%s";
-    public final static String LOCATION_GROUP_NAME = "LOCATION-%s";
     public final static String FLOOR_GROUP_NAME = "BUILDING-%s-FLOOR-%s";
     public final static String BUILDING_ID = "buildingId";
     public final static String FLOOR_ID = "floorId";
@@ -48,9 +47,15 @@ public class DeviceTypeConstants {
     public final static String SENSOR_TYPE_HUMIDITY = "humidity";
 
     public static final String BUILDING_ROLE = "building-%s";
-    public static final String LOCATION_ROLE = "location-%s";
     public static final String FLOOR_ROLE = "building-%s-floor-%s";
     public static final String REALTIME_ANALYTICS_PERMISSION = "/permission/admin/device-mgt/realtime_analytics";
+
+    public static final String FLOOR_DEVICE_TABLE = "0RG_WSO2_FLOOR_DEVICE_SENSORSTREAM";
+    public static final String FLOOR_SUMMARIZED_DEVICE_TABLE = "0RG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM";
+    public static final String FLOOR_SUMMARIZED1HR_DEVICE_TABLE = "0RG_WSO2_FLOOR_SUMMARIZED1HR_DEVICE_FLOOR_SENSORSTREAM";
+    public static final String FLOOR_SUMMARIZED3HR_DEVICE_TABLE = "0RG_WSO2_FLOOR_SUMMARIZED3HR_DEVICE_FLOOR_SENSORSTREAM";
+    public static final String FLOOR_SUMMARIZED6HR_DEVICE_TABLE = "0RG_WSO2_FLOOR_SUMMARIZED6HR_DEVICE_FLOOR_SENSORSTREAM";
+
 
 }
 

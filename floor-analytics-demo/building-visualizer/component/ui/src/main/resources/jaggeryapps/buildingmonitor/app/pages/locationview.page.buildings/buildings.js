@@ -64,6 +64,7 @@ function onRequest(context) {
 		floor.total = 0;
 		floor.num = i;
 		floor.suffix = ordinal_suffix_of(i);
+		floor.buildingId = request.getParameter("buildingId");
 		floors[i] = floor;
 	}
 

@@ -28,6 +28,7 @@ var chartDataSensorType1 = [];
 var chartDataSensorType2 = [];
 var chartDataSensorType3 = [];
 var chartDataSensorType4 = [];
+var deviceId;
 var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
 function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
     var tNow = new Date().getTime() / 1000;
@@ -81,6 +82,8 @@ function drawGraph(wsConnection, placeHolder, yAxis, chat, chartData, graph) {
 }
 
 $(window).load(function () {
+    deviceId = $("#deviceid").data("deviceid");
+    console.log(deviceId);
     drawGraph(wsConnection1, "#div-chart-sensorType1", "yAxisSensorType1", "chartSensorType1", chartDataSensorType1
         , graphForSensorType1);
     drawGraph(wsConnection2, "#div-chart-sensorType2", "yAxisSensorType2", "chartSensorType2", chartDataSensorType2
@@ -91,12 +94,12 @@ $(window).load(function () {
         , graphForSensorType4);
 });
 
-$(window).unload(function () {
+window.onbeforeunload = function() {
     disconnect(wsConnection1);
     disconnect(wsConnection2);
     disconnect(wsConnection3);
     disconnect(wsConnection4);
-});
+};
 
 //websocket connection
 function connect(wsConnection, target, chartData, graph) {
@@ -135,4 +138,10 @@ function disconnect(wsConnection) {
         wsConnection.close();
         wsConnection = null;
     }
+}
+
+function sendCommand() {
+    invokerUtil.post("/senseme/device/1.0.0/"+deviceId+"/test", null, function (message) {
+        console.log("called");
+    });
 }

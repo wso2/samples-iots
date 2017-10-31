@@ -47,18 +47,24 @@
             <td style="padding:10px 15px;">{{device.viewModel.phoneNumber}}</td>
         </tr>
     {{/if}}
+    {{#if device.buildingName}}
     <tr role="row" class="even">
         <td class="sorting_1" style="padding:10px 15px;">Building Name</td>
         <td style="padding:10px 15px;">{{device.buildingName}}</td>
     </tr>
-    <tr role="row" class="even">
-        <td class="sorting_1" style="padding:10px 15px;">Building ID</td>
-        <td style="padding:10px 15px;">{{device.buildingId}}</td>
-    </tr>
-    <tr role="row" class="even">
-        <td class="sorting_1" style="padding:10px 15px;">Floor ID</td>
-        <td style="padding:10px 15px;">{{device.floorId}}</td>
-    </tr>
+    {{/if}}
+    {{#if device.buildingId}}
+        <tr role="row" class="even">
+            <td class="sorting_1" style="padding:10px 15px;">Building ID</td>
+            <td style="padding:10px 15px;">{{device.buildingId}}</td>
+        </tr>
+    {{/if}}
+    {{#if device.floorId}}
+        <tr role="row" class="even">
+            <td class="sorting_1" style="padding:10px 15px;">Floor ID</td>
+            <td style="padding:10px 15px;">{{device.floorId}}</td>
+        </tr>
+    {{/if}}
     <tr role="row" class="even">
         <td class="sorting_1" style="padding:10px 15px;">Location (x,y)</td>
         <td style="padding:10px 15px;">{{device.coordinates}}</td>

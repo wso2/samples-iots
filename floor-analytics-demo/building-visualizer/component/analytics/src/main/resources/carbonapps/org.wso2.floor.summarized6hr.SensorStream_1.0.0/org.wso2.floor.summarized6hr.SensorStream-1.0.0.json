@@ -1,0 +1,36 @@
+{
+  "name": "org.wso2.floor.summarized6hr.SensorStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "deviceId",
+      "type": "STRING"
+    },
+    {
+      "name": "temperature6",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "motion6",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "humidity6",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "airQuality6",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "light6",
+      "type": "DOUBLE"
+    },
+    {
+      "name" : "timeStamp",
+      "type" : "LONG"
+    }
+  ]
+}

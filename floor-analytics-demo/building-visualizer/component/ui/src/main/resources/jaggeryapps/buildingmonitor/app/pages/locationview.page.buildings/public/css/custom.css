@@ -82,3 +82,60 @@
 	line-height: 15px;
 }
 
+
+.no-gutters {
+	margin-right: 0;
+	margin-left: 0;
+}
+
+.no-gutters > .col,
+.no-gutters > [class*="col-"] {
+	padding-right: 0;
+	padding-left: 0;
+}
+
+.details-view-toggle-button {
+	display: inline-block;
+}
+
+.custom_x_axis {
+	position: static;
+}
+
+.custom_y_axis {
+	bottom: 46px;
+}
+
+.rickshaw_legend {
+	color: #000000;
+	background: #FFFFFF;
+	padding: 1px 2px;
+}
+
+.sensor_graph{
+	border:0.5px solid #cecece;
+	margin-bottom: 30px;
+	padding: 20px;
+}
+
+.sensor_graph > h3 {
+	text-transform: capitalize;
+	margin-top: 5px;
+}
+
+.chartWrapper {
+	padding-top: 20px;
+}
+
+.col-md-6 {
+	transition: all 400ms ease;
+	opacity: 1;
+}
+
+.max{
+	width: 100%;
+}
+
+.max_hide{
+	display: none;
+}

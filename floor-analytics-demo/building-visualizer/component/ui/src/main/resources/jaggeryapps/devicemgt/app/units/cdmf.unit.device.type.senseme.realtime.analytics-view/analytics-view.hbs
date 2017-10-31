@@ -2,7 +2,7 @@
 
 <div id="div-chart-sensorType1" data-websocketurlStream="{{websocketEndpointForStream1}}">
     <div class="chartWrapper" id="chartWrapper">
-        <div id="yAxisSensorType1" class="custom_y_axis">PIR</div>
+        <div id="yAxisSensorType1" class="custom_y_axis">Humidity</div>
         <div class="legend_container">
             <div id="smoother" title="Smoothing"></div>
             <div id="legend"></div>
@@ -13,12 +13,34 @@
 </div>
 <div id="div-chart-sensorType2" data-websocketurlStream="{{websocketEndpointForStream2}}">
     <div class="chartWrapper" id="chartWrapper">
-        <div id="yAxisSensorType2" class="custom_y_axis">ULTRASONIC</div>
+        <div id="yAxisSensorType2" class="custom_y_axis">Light</div>
         <div class="legend_container">
             <div id="smootherSensorType2" title="Smoothing"></div>
             <div id="legendSensorType2"></div>
         </div>
         <div id="chartSensorType2" class="custom_rickshaw_graph"></div>
+        <div class="custom_x_axis">Time</div>
+    </div>
+</div>
+<div id="div-chart-sensorType3" data-websocketurlStream="{{websocketEndpointForStream3}}">
+    <div class="chartWrapper" id="chartWrapper">
+        <div id="yAxisSensorType3" class="custom_y_axis">Motion</div>
+        <div class="legend_container">
+            <div id="smoother" title="Smoothing"></div>
+            <div id="legend"></div>
+        </div>
+        <div id="chartSensorType3" class="custom_rickshaw_graph"></div>
+        <div class="custom_x_axis">Time</div>
+    </div>
+</div>
+<div id="div-chart-sensorType4" data-websocketurlStream="{{websocketEndpointForStream4}}">
+    <div class="chartWrapper" id="chartWrapper">
+        <div id="yAxisSensorType4" class="custom_y_axis">Temperature</div>
+        <div class="legend_container">
+            <div id="smoother" title="Smoothing"></div>
+            <div id="legend"></div>
+        </div>
+        <div id="chartSensorType4" class="custom_rickshaw_graph"></div>
         <div class="custom_x_axis">Time</div>
     </div>
 </div>

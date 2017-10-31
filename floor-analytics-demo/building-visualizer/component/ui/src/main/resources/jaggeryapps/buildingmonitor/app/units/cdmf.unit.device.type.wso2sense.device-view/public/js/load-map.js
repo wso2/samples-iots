@@ -24,17 +24,31 @@ function loadLeafletMap() {
         locations = $(deviceLocationID).data("locations"),
         location_lat = $(deviceLocationID).data("lat"),
         location_long = $(deviceLocationID).data("long"),
+        location_place = $(deviceLocationID).data("place"),
         container = "device-location",
         zoomLevel = 13,
         tileSet = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         attribution = "&copy; <a href='https://openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
 
     if (location_long && location_lat) {
-
         map = L.map(container).setView([location_lat, location_long], zoomLevel);
         L.tileLayer(tileSet, {attribution: attribution}).addTo(map);
+        var m;
+        if (location_place) {
+            var deviceIcon = L.icon({
+                                       iconUrl: '/buildingmonitor/public/cdmf.unit.lib.leaflet/js/images/device.png',
+                                       shadowUrl: '/buildingmonitor/public/cdmf.unit.lib.leaflet/js/images/marker-shadow.png',
+                                       iconSize:     [40, 40], // size of the icon
+                                       shadowSize:   [40, 40], // size of the shadow
+                                       iconAnchor:   [20, 40], // point of the icon which will correspond to marker's location
+                                       shadowAnchor: [20, 40],  // the same for the shadow
+                                       popupAnchor:  [-3, -40] // point from which the popup should open relative to the iconAnchor
+                                   });
+            m = L.marker([location_lat, location_long], {icon: deviceIcon}, {"opacity": 0.70}).addTo(map).bindPopup("Your device is here");
+        } else {
+            m = L.marker([location_lat, location_long], {"opacity": 0.70}).addTo(map).bindPopup("Your device is here");
+        }
 
-        var m = L.marker([location_lat, location_long], {"opacity": 0.70}).addTo(map).bindPopup("Your device is here");
         m.on('mouseover', function (e) {
             this.openPopup();
         });
