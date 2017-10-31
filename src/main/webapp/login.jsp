@@ -23,7 +23,7 @@
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <a class="navbar-brand" style="font-family: '';"><h4>SmartLocker</h4></a>
+            <a class="navbar-brand" style="font-family: '';"><h4>SMARTLOCKER</h4></a>
         </div>
     </div>
 </nav>
