@@ -1,4 +1,4 @@
-package org.coffeeking.agent;
+package org.wso2.iot.locker.portal;
 
 public class LoginException extends Exception {
     public LoginException(String message) {

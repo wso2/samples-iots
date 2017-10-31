@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.coffeeking.agent;
+package org.wso2.iot.locker.portal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
