@@ -214,11 +214,11 @@
                             <div class="card-content table-responsive">
                                 <table class="table table-hover">
                                     <thead>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Salary</th>
-                                    <th>Country</th>
-                                    <th>City</th>
+                                    <th>Device ID</th>
+                                    <th>Device Name</th>
+                                    <th>Owner</th>
+                                    <th>Token</th>
+                                    <th>Analytics</th>
                                     </thead>
                                     <tbody>
                                     <tr>
