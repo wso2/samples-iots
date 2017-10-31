@@ -25,22 +25,22 @@
     Tip 2: you can also add an image using data-image tag
 -->
         <div class="logo">
-            <a href="http://www.creative-tim.com" class="simple-text">
+            <a href="#" class="simple-text">
                 SmartLocker
             </a>
         </div>
         <div class="sidebar-wrapper">
             <ul class="nav">
-                <%--<li>--%>
-                    <%--<a href="dashboard.html">--%>
-                        <%--<i class="material-icons">dashboard</i>--%>
-                        <%--<p>Dashboard</p>--%>
-                    <%--</a>--%>
-                <%--</li>--%>
                 <li class="active">
                     <a href="./table.html">
                         <i class="material-icons">content_paste</i>
                         <p>Locker List</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="./icons.html">
+                        <i class="material-icons">bubble_chart</i>
+                        <p>Historical Data</p>
                     </a>
                 </li>
                 <li>
@@ -49,36 +49,6 @@
                         <p>User Profile</p>
                     </a>
                 </li>
-                <%--<li>--%>
-                    <%--<a href="./typography.html">--%>
-                        <%--<i class="material-icons">library_books</i>--%>
-                        <%--<p>Typography</p>--%>
-                    <%--</a>--%>
-                <%--</li>--%>
-                <%--<li>--%>
-                    <%--<a href="./icons.html">--%>
-                        <%--<i class="material-icons">bubble_chart</i>--%>
-                        <%--<p>Icons</p>--%>
-                    <%--</a>--%>
-                <%--</li>--%>
-                <%--<li>--%>
-                    <%--<a href="./maps.html">--%>
-                        <%--<i class="material-icons">location_on</i>--%>
-                        <%--<p>Maps</p>--%>
-                    <%--</a>--%>
-                <%--</li>--%>
-                <%--<li>--%>
-                    <%--<a href="./notifications.html">--%>
-                        <%--<i class="material-icons text-gray">notifications</i>--%>
-                        <%--<p>Notifications</p>--%>
-                    <%--</a>--%>
-                <%--</li>--%>
-                <%--<li class="active-pro">--%>
-                    <%--<a href="upgrade.html">--%>
-                        <%--<i class="material-icons">unarchive</i>--%>
-                        <%--<p>Upgrade to PRO</p>--%>
-                    <%--</a>--%>
-                <%--</li>--%>
             </ul>
         </div>
     </div>
@@ -92,16 +62,11 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#"> Table List </a>
+                    <a class="navbar-brand" href="#"></a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <%--<li>--%>
-                            <%--<a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">--%>
-                                <%--<i class="material-icons">dashboard</i>--%>
-                                <%--<p class="hidden-lg hidden-md">Dashboard</p>--%>
-                            <%--</a>--%>
-                        <%--</li>--%>
+
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="material-icons">person</i>
@@ -115,23 +80,8 @@
                                 <li>
                                     <a href="#">Account Settings</a>
                                 </li>
-                                <%--<li>--%>
-                                    <%--<a href="#">You're now friend with Andrew</a>--%>
-                                <%--</li>--%>
-                                <%--<li>--%>
-                                    <%--<a href="#">Another Notification</a>--%>
-                                <%--</li>--%>
-                                <%--<li>--%>
-                                    <%--<a href="#">Another One</a>--%>
-                                <%--</li>--%>
                             </ul>
                         </li>
-                        <%--<li>--%>
-                            <%--<a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">--%>
-                                <%--<i class="material-icons">person</i>--%>
-                                <%--<p class="hidden-lg hidden-md">Profile</p>--%>
-                            <%--</a>--%>
-                        <%--</li>--%>
                     </ul>
                     <form class="navbar-form navbar-right" role="search">
                         <div class="form-group  is-empty">
@@ -163,50 +113,39 @@
                                     <th>Device Name</th>
                                     <th>Owner</th>
                                     <th>Token</th>
-                                    <th>Analytics</th>
+                                    <th></th>
+                                    <th></th>
                                     </thead>
                                     <tbody>
                                     <tr>
-                                        <td>1</td>
-                                        <td>Dakota Rice</td>
-                                        <td>$36,738</td>
-                                        <td>Niger</td>
-                                        <td>Oud-Turnhout</td>
+                                        <td>l1</td>
+                                        <td>Locker 1</td>
+                                        <td>John</td>
+                                        <td>1234</td>
+                                        <td><button class="btn btn-primary btn-fab btn-fab-mini btn-round">
+                                            <i class="material-icons">refresh</i>
+                                        </button></td>
+                                        <td><button class="btn btn-info">Analytics</button></td>
                                     </tr>
                                     <tr>
-                                        <td>2</td>
-                                        <td>Minerva Hooper</td>
-                                        <td>$23,789</td>
-                                        <td>Curaçao</td>
-                                        <td>Sinaai-Waas</td>
+                                        <td>l2</td>
+                                        <td>Locker 2</td>
+                                        <td>Adam</td>
+                                        <td>4567</td>
+                                        <td><button class="btn btn-primary btn-fab btn-fab-mini btn-round">
+                                            <i class="material-icons">refresh</i>
+                                        </button></td>
+                                        <td><button class="btn btn-info">Analytics</button></td>
                                     </tr>
                                     <tr>
-                                        <td>3</td>
-                                        <td>Sage Rodriguez</td>
-                                        <td>$56,142</td>
-                                        <td>Netherlands</td>
-                                        <td>Baileux</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td>Philip Chaney</td>
-                                        <td>$38,735</td>
-                                        <td>Korea, South</td>
-                                        <td>Overland Park</td>
-                                    </tr>
-                                    <tr>
-                                        <td>5</td>
-                                        <td>Doris Greene</td>
-                                        <td>$63,542</td>
-                                        <td>Malawi</td>
-                                        <td>Feldkirchen in Kärnten</td>
-                                    </tr>
-                                    <tr>
-                                        <td>6</td>
-                                        <td>Mason Porter</td>
-                                        <td>$78,615</td>
-                                        <td>Chile</td>
-                                        <td>Gloucester</td>
+                                        <td>l3</td>
+                                        <td>Locker 3</td>
+                                        <td>Sarah</td>
+                                        <td>8901</td>
+                                        <td><button class="btn btn-primary btn-fab btn-fab-mini btn-round">
+                                            <i class="material-icons">refresh</i>
+                                        </button></td>
+                                        <td><button class="btn btn-info">Analytics</button></td>
                                     </tr>
                                     </tbody>
                                 </table>

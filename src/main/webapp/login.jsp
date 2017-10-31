@@ -99,7 +99,7 @@
                     </ul>
                 </nav>
                 <div class="copyright pull-right">
-                    &copy; 2017, made by IoT Team</a>
+                    &copy; 2017, WSO2 IoT Team</a>
                 </div>
             </div>
         </footer>
