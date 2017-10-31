@@ -5,7 +5,7 @@
     <display-name>ConnectedCup-Webapp</display-name>
 
     <welcome-file-list>
-        <welcome-file>login.jsp</welcome-file>
+        <welcome-file>devices.jsp</welcome-file>
     </welcome-file-list>
 
     <servlet>
