@@ -1,3 +1,11 @@
+<%
+    //Fix for "localhost" JSESSIONID cookie not sent issue
+    //https://stackoverflow.com/questions/7346919/chrome-localhost-cookie-not-being-set
+    if(request.getHeader("Host").startsWith("localhost:")){
+        response.sendRedirect(request.getRequestURL().toString().replace("localhost", "127.0.0.1"));
+        return;
+    }
+%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
