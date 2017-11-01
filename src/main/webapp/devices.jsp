@@ -153,7 +153,7 @@
                                                     <input type="text" value="" placeholder="Device Name" class="form-control" />
                                                 </div>
                                                 <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
-                                                    <input type="text" value="" placeholder="Device Description" class="form-control" />
+                                                    <input type="text" value="" placeholder="Device description" class="form-control" />
                                                 </div>
                                             </form>
                                             <div class="modal-footer">
