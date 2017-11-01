@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
     <link rel="stylesheet" href="css/material-kit.css"/>
 </head>
-<body>
 <body class="signup-page">
 <nav class="navbar navbar-transparent navbar-absolute">
     <div class="container">
@@ -114,5 +113,20 @@
 <script src="js/nouislider.min.js" type="text/javascript"></script>
 <script src="js/bootstrap-datepicker.js" type="text/javascript"></script>
 <script src="js/material-kit.js" type="text/javascript"></script>
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script src="js/bootstrap.min.js" type="text/javascript"></script>
+<script src="js/material.min.js" type="text/javascript"></script>
+<script src="js/nouislider.min.js" type="text/javascript"></script>
+<script src="js/bootstrap-datepicker.js" type="text/javascript"></script>
+<script src="js/material-kit.js" type="text/javascript"></script>
+<script src="js/bootstrap-notify.js" type="text/javascript"></script>
+<script src="js/material-dashboard.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
 
+        // Javascript method's body can be found in assets/js/demos.js
+        demo.initDashboardPageCharts();
+
+    });
+</script>
 </html>

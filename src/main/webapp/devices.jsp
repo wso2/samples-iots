@@ -8,7 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Locker List</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
@@ -31,22 +31,52 @@
         </div>
         <div class="sidebar-wrapper">
             <ul class="nav">
+                <li>
+                    <a href="dashboard.html">
+                        <i class="material-icons">dashboard</i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
                 <li class="active">
+                    <a href="./user.html">
+                        <i class="material-icons">person</i>
+                        <p>Historical Data</p>
+                    </a>
+                </li>
+                <li>
                     <a href="./table.html">
                         <i class="material-icons">content_paste</i>
-                        <p>Locker List</p>
+                        <p>Table List</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="./typography.html">
+                        <i class="material-icons">library_books</i>
+                        <p>Typography</p>
                     </a>
                 </li>
                 <li>
                     <a href="./icons.html">
                         <i class="material-icons">bubble_chart</i>
-                        <p>Historical Data</p>
+                        <p>Icons</p>
                     </a>
                 </li>
                 <li>
-                    <a href="./user.html">
-                        <i class="material-icons">person</i>
-                        <p>User Profile</p>
+                    <a href="./maps.html">
+                        <i class="material-icons">location_on</i>
+                        <p>Maps</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="./notifications.html">
+                        <i class="material-icons text-gray">notifications</i>
+                        <p>Notifications</p>
+                    </a>
+                </li>
+                <li class="active-pro">
+                    <a href="upgrade.html">
+                        <i class="material-icons">unarchive</i>
+                        <p>Upgrade to PRO</p>
                     </a>
                 </li>
             </ul>
@@ -104,7 +134,35 @@
                             <div class="card-header" data-background-color="purple">
                                 <h4 class="title">Lockers enrolled</h4>
                                 <p class="category">Below are the list of lockers enrolled with the server</p>
-                                <button class="btn btn-white">Add Locker</button>
+                                <button class="btn btn-white" data-toggle="modal" data-target="#myModal">Add Locker</button>
+                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                <h4 class="modal-title" id="myModalLabel" style="color:purple;">Enter Locker Details</h4>
+                                            </div>
+                                            <%--<div class="modal-body" style="color:black;">--%>
+                                                <%--Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.--%>
+                                            <%--</div>--%>
+                                            <form>
+                                                <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
+                                                    <input type="text" value="" placeholder="Device ID" class="form-control" />
+                                                </div>
+                                                <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
+                                                    <input type="text" value="" placeholder="Device Name" class="form-control" />
+                                                </div>
+                                                <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
+                                                    <input type="text" value="" placeholder="Device Description" class="form-control" />
+                                                </div>
+                                            </form>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-info btn-simple">Save</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-content table-responsive">
                                 <table class="table table-hover">
