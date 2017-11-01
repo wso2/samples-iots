@@ -136,7 +136,6 @@ public class LoginController extends HttpServlet {
                 session.setAttribute(ATTR_REFRESH_TOKEN, refreshToken);
                 session.setAttribute(ATTR_ENCODED_CLIENT_APP, encodedClientApp);
                 log.debug("Access Token retrieved with scopes: " + scope);
-                resp.setHeader("Set-Cookie", "TEST="+session.getId()+";Path=/");
                 String returnUri = req.getParameter("ret");
                 if (returnUri != null && returnUri.startsWith("/")) {
                     resp.sendRedirect(returnUri);
