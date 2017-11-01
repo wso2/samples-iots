@@ -3,12 +3,12 @@
 <head>
     <title>Login</title>
 
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link href="https://fonts.googleapis.com/css?family=Fjalla+One|Montserrat|Roboto" rel="stylesheet">
     <%--<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />--%>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="css/material-kit.css" />
+    <link rel="stylesheet" href="css/material-kit.css"/>
 </head>
 <body class="signup-page">
 <nav class="navbar navbar-transparent navbar-absolute">
@@ -21,8 +21,7 @@
 </nav>
 
 <div class="wrapper">
-    <div class="header header-filter"
-         style="background-image: url('images/login_bg.jpeg'); background-size: cover; background-position: top center;">
+    <div class="header header-filter" style="background-image: url('images/login_bg2.jpg'); background-size: cover; background-position: top center;">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">

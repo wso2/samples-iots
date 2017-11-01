@@ -12,7 +12,7 @@
 </head>
 <body>
 <div class="wrapper">
-    <div class="sidebar" data-color="purple" data-image="images/login_bg.jpeg">
+    <div class="sidebar" data-color="purple" data-image="images/login_bg2.jpg">
         <!--
     Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 
