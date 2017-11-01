@@ -18,6 +18,16 @@
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>InvokerController</servlet-name>
+        <servlet-class>org.wso2.iot.locker.portal.InvokerController</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>InvokerController</servlet-name>
+        <url-pattern>/invoker/execute</url-pattern>
+    </servlet-mapping>
+
     <context-param>
         <param-name>apiRegistrationEndpoint</param-name>
         <param-value>https://localhost:8243/api-application-registration/register</param-value>

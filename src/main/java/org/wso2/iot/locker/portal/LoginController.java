@@ -47,8 +47,12 @@ import java.util.Base64;
 
 public class LoginController extends HttpServlet {
     private static final Log log = LogFactory.getLog(LoginController.class);
-    private String ADMIN_USERNAME = "admin";
-    private String ADMIN_PASSWORD = "admin";
+    private static final String ADMIN_USERNAME = "admin";
+    private static final  String ADMIN_PASSWORD = "admin";
+
+    public static final String ATTR_ACCESS_TOKEN = "accessToken";
+    public static final String ATTR_REFRESH_TOKEN = "refreshToken";
+    public static final String ATTR_ENCODED_CLIENT_APP = "encodedClientApp";
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -66,7 +70,7 @@ public class LoginController extends HttpServlet {
 
         String clientAppResult = executePost(apiRegEndpoint);
         if (clientAppResult == null) {
-            sendRedirect(req, resp);
+            sendFailureRedirect(req, resp);
         }
 
         //Generate a token
@@ -96,17 +100,17 @@ public class LoginController extends HttpServlet {
                 String accessToken = jTokenResult.get("access_token").toString();
                 String scope = jTokenResult.get("scope").toString();
 
-                req.getSession().setAttribute("accessToken", accessToken);
-                req.getSession().setAttribute("refreshToken", refreshToken);
-                req.getSession().setAttribute("encodedClientApp", encodedClientApp);
+                req.getSession().setAttribute(ATTR_ACCESS_TOKEN, accessToken);
+                req.getSession().setAttribute(ATTR_REFRESH_TOKEN, refreshToken);
+                req.getSession().setAttribute(ATTR_ENCODED_CLIENT_APP, encodedClientApp);
                 log.debug("Access Token retrieved with scopes: " + scope);
             } catch (ParseException e) {
                 log.error(e.getMessage(), e);
-                sendRedirect(req, resp);
+                sendFailureRedirect(req, resp);
             }
         } else {
             log.debug("Client app creation failed");
-            sendRedirect(req, resp);
+            sendFailureRedirect(req, resp);
         }
     }
 
@@ -131,7 +135,7 @@ public class LoginController extends HttpServlet {
         return result.toString();
     }
 
-    private void sendRedirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void sendFailureRedirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String referer = req.getHeader("referer");
         String redirect = (referer == null || referer.isEmpty()) ? req.getRequestURI() : referer;
         resp.sendRedirect(redirect + "?status=fail");
