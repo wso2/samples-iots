@@ -2,9 +2,28 @@
 #include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <PubSubClient.h>
+#include "PubSubClient.h"
+#include <Keypad_I2C.h>
 #include <Keypad.h>
+#include <Wire.h>
 #include <rBase64.h>
+#include <DHT.h>
+
+#define SWITCH D0
+#define IRPIN D4
+#define MDPIN D5
+#define RELAY D6
+
+
+//-------------------------------------------------------------------------------------------
+
+#define DHTPIN D3
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE); 
+
+//-------------------------------------------------------------------------------------------
+
+#define I2CADDR 0x27
 
 const byte ROWS = 4;
 const byte COLS = 3;
@@ -16,35 +35,85 @@ char keys[ROWS][COLS] = {
   {'*','0','#'}
 };
 
-byte colPins[COLS] = {D3, D2, D1};
-byte rowPins[ROWS] = {D7, D6, D5, D4};
+byte rowPins[ROWS] = {0, 1, 2, 3};
+byte colPins[COLS] = {4, 5, 6};
 
-Keypad myKeypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+Keypad_I2C myKeypad = Keypad_I2C(makeKeymap(keys), rowPins, colPins, ROWS, COLS, I2CADDR);
 
-const char* ssid = "Shehan";
-const char* password = "123456789";
+//-------------------------------------------------------------------------------------------
 
-char type[32];
-char deviceId[32];
-char clientId[32];
-char clientSecret[32];
-char accessToken[64];
-char refreshToken[64];
+const char* ssid = "Dialog 4G";
+const char* password = "G8GQ0YBQ822";
 
-const char* mqttserver = "192.168.43.247";
+char* type = "locker";
+char* deviceId = "123456";
+char* clientId = "dp2xTSSQE6zvDgwEQcJQ9LHSccwa";
+char* clientSecret = "KoFbhegtxWdz9xUHrgNZOH9iH9Ya";
+char* accessToken = "e7a14d70-a9f8-3708-820b-d525ec453dff";
+char* refreshToken = "bbd032a9-3996-3cf5-a851-bf2f78b1e22a";
+
+const char* tokenEndpoint = "http://192.168.8.101:8280/token";
+const char* mqttserver = "192.168.8.101";
 const int mqttport = 1886;
 
 char publishTopic[100];
 char subscribeTopic[100];
 char ack[100];
 char input[4];
+float humidity;
+float temperature;
 
 static char masterKey[5];
-static char guestKey[5];
 
 long set = 0;
 int len;
 int r = 0;
+boolean Open = true;
+
+void Dht(){
+  humidity = dht.readHumidity();
+  temperature = dht.readTemperature();
+}
+
+bool IR(){
+  int val = digitalRead(IRPIN);
+  if (val == 1){
+    return false;
+  }
+  else{
+    return true;
+  }
+}
+
+bool MD(){
+  int val = digitalRead(MDPIN);
+  if (val == 1){
+    return false;
+  }
+  else{
+    return true;
+  }
+}
+
+bool SW(){
+  int val = digitalRead(SWITCH);
+  if (val == 1){
+    return false;
+  }
+  else{
+    return true;
+  }
+}
+
+void Unlock(){
+  long t = millis();
+  digitalWrite(RELAY,HIGH);
+  while(millis()-t > 2000){
+    if (millis()-t > 2000){
+      digitalWrite(RELAY,LOW);
+    }
+  }
+}
 
 void topics(){
   snprintf(publishTopic,100,"carbon.super/%s/%s/events",type,deviceId);
@@ -70,74 +139,44 @@ void loadMaster(){
   master.close();
 }
 
-void loadGuest(){
-  File guest = SPIFFS.open("/guest.json", "r");
-  StaticJsonBuffer<200> jsonBuffer;
-  if (!guest) {
-    Serial.println("Guest profile doesn't exist yet. Create it..");
-  } 
-  else {
-    size_t size = guest.size();
-    std::unique_ptr<char[]> buf(new char[size]);
-    guest.readBytes(buf.get(), size);
-    JsonObject& json = jsonBuffer.parseObject(buf.get());
-    strcpy(guestKey,(const char*)json["guestKey"]);
-  }
-  guest.close();
-}
-
-void storeKey(String msg){
-  int index = msg.indexOf('\n');
-  String accountType = msg.substring(0,index);
-  Serial.println(accountType);
-  String key = msg.substring(index+1);
+void storeKey(String key){
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
-  if (accountType == "master"){
-    json["masterKey"] = key;
-    File master = SPIFFS.open("/master.json", "w");
-    json.printTo(master);
-    master.close();
-    loadMaster(); 
-  }
-  else if(accountType == "guest"){
-    json["guestKey"] = key;
-    File guest = SPIFFS.open("/guest.json", "w");
-    json.printTo(guest);
-    guest.close();
-    loadGuest();
-  }
+  json["masterKey"] = key;
+  File master = SPIFFS.open("/master.json", "w");
+  json.printTo(master);
+  master.close();
+  loadMaster(); 
 }
 
 void getConfig(){
   SPIFFS.begin();
-  Serial.println("SPIFFS opened");
-  
-  File f = SPIFFS.open("/f.json", "r");
-  StaticJsonBuffer<200> jsonBuffer;
-  if (!f) {
-    Serial.println("File doesn't exist yet. Create it..");
-  } 
-  else {
-    size_t size = f.size();
-    if (size > 1024) {
-      Serial.println("Config file size is too large");
-    }
-    else{
-      std::unique_ptr<char[]> buf(new char[size]);
-      f.readBytes(buf.get(), size);
-      JsonObject& json = jsonBuffer.parseObject(buf.get());
-      strcpy(type,(const char*)json["type"]);
-      strcpy(deviceId,(const char*)json["deviceId"]);
-      strcpy(clientId,(const char*)json["clientId"]);
-      strcpy(clientSecret,(const char*)json["clientSecret"]);
-      strcpy(accessToken,(const char*)json["accessToken"]);
-      strcpy(refreshToken,(const char*)json["refreshToken"]);
-    }
-  }
-  f.close();
+//  Serial.println("SPIFFS opened");
+//  
+//  File f = SPIFFS.open("/f.json", "r");
+//  StaticJsonBuffer<200> jsonBuffer;
+//  if (!f) {
+//    Serial.println("File doesn't exist yet. Create it..");
+//  } 
+//  else {
+//    size_t size = f.size();
+//    if (size > 1024) {
+//      Serial.println("Config file size is too large");
+//    }
+//    else{
+//      std::unique_ptr<char[]> buf(new char[size]);
+//      f.readBytes(buf.get(), size);
+//      JsonObject& json = jsonBuffer.parseObject(buf.get());
+//      strcpy(type,(const char*)json["type"]);
+//      strcpy(deviceId,(const char*)json["deviceId"]);
+//      strcpy(clientId,(const char*)json["clientId"]);
+//      strcpy(clientSecret,(const char*)json["clientSecret"]);
+//      strcpy(accessToken,(const char*)json["accessToken"]);
+//      strcpy(refreshToken,(const char*)json["refreshToken"]);
+//    }
+//  }
+//  f.close();
   loadMaster();
-  loadGuest();
 }
 
 void loadTokens(){
@@ -160,7 +199,7 @@ void loadTokens(){
 void getTokens(){
   
    HTTPClient http;
-   http.begin("http://192.168.43.247:8280/token");
+   http.begin(tokenEndpoint);
    http.addHeader("Authorization", "Basic "+rbase64.encode(String(clientId)+":"+String(clientSecret)));
    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   
@@ -217,36 +256,52 @@ void Wifi(){
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+void Message(String attempt){
+  char payday[250];
+  Dht();
+  snprintf(payday,250,"{\"temperature\":\"%f\",\"humidity\":\"%f\",\"metal\":\"%b\",\"occupancy\":\"%b\",\"open\":\"%b\",\"attempt\":\"%s\"}",temperature,humidity,MD(),IR(),SW(),attempt.c_str());
+  client.publish(publishTopic,payday);
+}
+
 void callback(char* topic, byte* payload, int length){
   String msg;
   for (int i = 0; i < length; i++){
     msg += (char)payload[i];
   }
   Serial.println(msg);
-  int operationId =  (String(topic).substring(len,len+1)).toInt();
+  String Topic = String(topic);
+  String topicPart = Topic.substring(len,Topic.length());
+  int index = topicPart.indexOf('/');
+  String operationId =  Topic.substring(len,len+index);
+  Serial.println(topicPart);
   Serial.println(topic);
   Serial.println(operationId);
-  switch (operationId){
-    case 2:
-      client.publish(publishTopic,"{\"Temperature\":50,\"Status\":\"Unlock\"}");
-      break;
-    case 3:
-      storeKey(msg);
-      break;
-    default:
-      Serial.println("default");
-      break;
-    
+
+  if (operationId == "lock_released"){
+    Open = !Open;
+  }
+  else if(operationId == "lock_code"){
+    storeKey(msg);
+  }
+  else{
+    Serial.println("default");
   }
 }
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("Starting...");
   delay(10);
   Wifi();
   getConfig();
   loadTokens();
   topics();
+  pinMode(IRPIN,INPUT);
+  pinMode(MDPIN,INPUT);
+  pinMode(SWITCH,INPUT);
+  pinMode(RELAY,OUTPUT);
+  myKeypad.begin();
+  myKeypad.addEventListener(keypadEvent);
   client.setServer(mqttserver,mqttport);
   client.setCallback(callback);
   if (client.connect(deviceId,accessToken,"")) {
@@ -280,15 +335,14 @@ void reconnect() {
 void Check() {
   Serial.println();
   if (input[0]==masterKey[0] && input[1]==masterKey[1] && input[2]==masterKey[2] && input[3]==masterKey[3]){
-    Serial.print("Unlocked by Master Key");
-    Serial.println();
-  }
-  else if (input[0]==guestKey[0] && input[1]==guestKey[1] && input[2]==guestKey[2] && input[3]==guestKey[3]){
-    Serial.print("Unlocked by Guest Key");
+    Serial.print("Unlocked");
+    Unlock();
+    Message("succes");
     Serial.println();
   }
   else{
     Serial.println("Locked");
+    Message("denied");
   }
   r = 0; 
 }
@@ -299,16 +353,31 @@ void loop() {
     reconnect();
     return;
   }
-  char myKey = myKeypad.getKey();
-  if (myKey != NULL){
-    input[r] = myKey;
-    r++;
-    Serial.print(myKey);
-    Serial.print(" ");
-    if (r == 4){
-      Check();    
-    }
-  }
+  char key = myKeypad.getKey();
   client.loop();
+}
+
+void keypadEvent(KeypadEvent key){
+  switch (myKeypad.getState()){
+    case PRESSED:
+      if (Open && r<4 && key != '*' && key != '#'){
+        input[r] = key;
+        r++;
+        Serial.print(key);
+        Serial.print(" ");
+      }
+      if (r == 4){
+        Check();
+      }
+      break;
+      
+    case HOLD:
+      if (key == '*'){
+        r = 0;
+        Serial.println();
+        Serial.println("CLEAR");
+      }
+      break;
+  }
 }
 
