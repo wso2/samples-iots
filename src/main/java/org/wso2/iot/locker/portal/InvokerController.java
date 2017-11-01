@@ -41,6 +41,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -57,11 +58,12 @@ public class InvokerController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Object accessTokenObj = req.getSession().getAttribute(ATTR_ACCESS_TOKEN);
-        if (accessTokenObj == null) {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute(ATTR_ACCESS_TOKEN) == null) {
             resp.sendError(401, "Unauthorized, Access token not found in the session");
             return;
         }
+        Object accessTokenObj = session.getAttribute(ATTR_ACCESS_TOKEN);
         String uri = req.getParameter("uri");
         String method = req.getParameter("method");
         String payload = req.getParameter("payload");
@@ -136,11 +138,13 @@ public class InvokerController extends HttpServlet {
     private void refreshToken(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         log.debug("refreshing the token");
         HttpPost tokenEndpoint = new HttpPost(getServletContext().getInitParameter("tokenEndpoint"));
-
+        HttpSession session = req.getSession(false);
         StringEntity tokenEndpointPayload = new StringEntity(
-                "grant_type=refresh_token&refresh_token=" + req.getSession().getAttribute("refreshToken")
+                "grant_type=refresh_token&refresh_token=" + session.getAttribute("refreshToken")
                         + "&scope=PRODUCTION",
                 ContentType.APPLICATION_FORM_URLENCODED);
+
+        tokenEndpoint.setEntity(tokenEndpointPayload);
 
         String encodedClientApp = req.getSession().getAttribute(ATTR_ENCODED_CLIENT_APP).toString();
         tokenEndpoint.setHeader("Authorization",
@@ -170,8 +174,8 @@ public class InvokerController extends HttpServlet {
                 String refreshToken = jTokenResult.get("refresh_token").toString();
                 String accessToken = jTokenResult.get("access_token").toString();
                 String scope = jTokenResult.get("scope").toString();
-                req.getSession().setAttribute(ATTR_ACCESS_TOKEN, accessToken);
-                req.getSession().setAttribute(ATTR_REFRESH_TOKEN, refreshToken);
+                session.setAttribute(ATTR_ACCESS_TOKEN, accessToken);
+                session.setAttribute(ATTR_REFRESH_TOKEN, refreshToken);
             } catch (ParseException e) {
                 log.error("Error while parsing refresh token response", e);
                 resp.sendError(500, "Internal Server Error");

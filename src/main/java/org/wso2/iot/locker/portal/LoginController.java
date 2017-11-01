@@ -34,12 +34,15 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -48,16 +51,27 @@ import java.util.Base64;
 public class LoginController extends HttpServlet {
     private static final Log log = LogFactory.getLog(LoginController.class);
     private static final String ADMIN_USERNAME = "admin";
-    private static final  String ADMIN_PASSWORD = "admin";
+    private static final String ADMIN_PASSWORD = "admin";
 
     public static final String ATTR_ACCESS_TOKEN = "accessToken";
     public static final String ATTR_REFRESH_TOKEN = "refreshToken";
     public static final String ATTR_ENCODED_CLIENT_APP = "encodedClientApp";
 
+
+    @Override
+    public void init() throws ServletException {
+        getServletContext().getSessionCookieConfig().setPath("/");
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String email = req.getParameter("inputEmail");
         String password = req.getParameter("inputPassword");
+
+        if (email == null || password == null) {
+            sendFailureRedirect(req, resp);
+            return;
+        }
 
         //Generate client App
         HttpPost apiRegEndpoint = new HttpPost(getServletContext().getInitParameter("apiRegistrationEndpoint"));
@@ -68,7 +82,14 @@ public class LoginController extends HttpServlet {
         StringEntity apiRegPayload = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
         apiRegEndpoint.setEntity(apiRegPayload);
 
-        String clientAppResult = executePost(apiRegEndpoint);
+        String clientAppResult = "";
+        try {
+            clientAppResult = executePost(apiRegEndpoint);
+        } catch (ConnectException e) {
+            log.error("Cannot connect to api registration endpoint: " + apiRegEndpoint);
+            resp.sendError(500, "Internal Server Error, Cannot connect to api registration endpoint");
+            return;
+        }
         if (clientAppResult == null) {
             sendFailureRedirect(req, resp);
         }
@@ -81,7 +102,8 @@ public class LoginController extends HttpServlet {
                 JSONObject jClientAppResult = (JSONObject) jsonParser.parse(clientAppResult);
                 String clientId = jClientAppResult.get("client_id").toString();
                 String clientSecret = jClientAppResult.get("client_secret").toString();
-                String encodedClientApp = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
+                String encodedClientApp = Base64.getEncoder().encodeToString(
+                        (clientId + ":" + clientSecret).getBytes());
                 HttpPost tokenEndpoint = new HttpPost(getServletContext().getInitParameter("tokenEndpoint"));
 
                 tokenEndpoint.setHeader("Authorization",
@@ -94,16 +116,33 @@ public class LoginController extends HttpServlet {
                         ContentType.APPLICATION_FORM_URLENCODED);
 
                 tokenEndpoint.setEntity(tokenEPPayload);
-                String tokenResult = executePost(tokenEndpoint);
+                String tokenResult = "";
+                try {
+                    tokenResult = executePost(tokenEndpoint);
+                } catch (ConnectException e) {
+                    log.error("Cannot connect to token endpoint: " + tokenEndpoint);
+                    resp.sendError(500, "Internal Server Error, Cannot connect to token endpoint");
+                    return;
+                }
+
                 JSONObject jTokenResult = (JSONObject) jsonParser.parse(tokenResult);
                 String refreshToken = jTokenResult.get("refresh_token").toString();
                 String accessToken = jTokenResult.get("access_token").toString();
                 String scope = jTokenResult.get("scope").toString();
 
-                req.getSession().setAttribute(ATTR_ACCESS_TOKEN, accessToken);
-                req.getSession().setAttribute(ATTR_REFRESH_TOKEN, refreshToken);
-                req.getSession().setAttribute(ATTR_ENCODED_CLIENT_APP, encodedClientApp);
+                HttpSession session = req.getSession(false);
+                if(session == null)  session = req.getSession(true);
+                session.setAttribute(ATTR_ACCESS_TOKEN, accessToken);
+                session.setAttribute(ATTR_REFRESH_TOKEN, refreshToken);
+                session.setAttribute(ATTR_ENCODED_CLIENT_APP, encodedClientApp);
                 log.debug("Access Token retrieved with scopes: " + scope);
+                resp.setHeader("Set-Cookie", "TEST="+session.getId()+";Path=/");
+                String returnUri = req.getParameter("ret");
+                if (returnUri != null && returnUri.startsWith("/")) {
+                    resp.sendRedirect(returnUri);
+                } else {
+                    resp.sendRedirect("/");
+                }
             } catch (ParseException e) {
                 log.error(e.getMessage(), e);
                 sendFailureRedirect(req, resp);
@@ -127,7 +166,7 @@ public class LoginController extends HttpServlet {
 
         BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String line = "";
         while ((line = rd.readLine()) != null) {
             result.append(line);
@@ -138,7 +177,12 @@ public class LoginController extends HttpServlet {
     private void sendFailureRedirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String referer = req.getHeader("referer");
         String redirect = (referer == null || referer.isEmpty()) ? req.getRequestURI() : referer;
-        resp.sendRedirect(redirect + "?status=fail");
+        if (redirect.contains("?")) {
+            redirect += "&status=fail";
+        } else {
+            redirect += "?status=fail";
+        }
+        resp.sendRedirect(redirect);
     }
 
     private CloseableHttpClient getHTTPClient() throws LoginException {
