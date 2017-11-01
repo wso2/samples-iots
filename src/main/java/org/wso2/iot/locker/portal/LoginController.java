@@ -101,6 +101,7 @@ public class LoginController extends HttpServlet {
                 req.getSession().setAttribute("encodedClientApp", encodedClientApp);
                 log.debug("Access Token retrieved with scopes: " + scope);
             } catch (ParseException e) {
+                log.error(e.getMessage(), e);
                 sendRedirect(req, resp);
             }
         } else {
@@ -145,6 +146,7 @@ public class LoginController extends HttpServlet {
             return HttpClients.custom().setSSLSocketFactory(
                     sslsf).build();
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            log.error(e.getMessage(), e);
             throw new LoginException("Error occurred while retrieving http client", e);
         }
     }
