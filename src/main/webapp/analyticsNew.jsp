@@ -66,7 +66,7 @@
                                 <div class="card-header" data-background-color="purple">
                                     <div class="nav-tabs-navigation">
                                         <div class="nav-tabs-wrapper">
-                                            <span class="nav-tabs-title">Analytics</span>
+                                            <span class="nav-tabs-title">Analytics: </span>
                                             <ul class="nav nav-tabs" data-tabs="tabs">
                                                 <li class="active" id="realtimeTab">
                                                     <a href="#realtime" data-toggle="tab">
@@ -88,13 +88,13 @@
                                     <div class="tab-content">
                                         <div class="tab-pane active" id="realtime">
                                             <div class="card">
-                                                <div class="card-header card-chart" data-background-color="green" style="height: 30%;">
-                                                    <div class="ct-chart" id="dailySalesChart"></div>
+                                                <div class="card-header card-chart" data-background-color="blue" style="height: 30%;">
+                                                    <div class="ct-chart" id="realtimeTemp"></div>
                                                 </div>
                                                 <div class="card-content">
-                                                    <h4 class="title">ON/OFF State</h4>
-                                                    <p class="category">
-                                                        <span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>
+                                                    <h4 class="title">Temperature</h4>
+                                                    <%--<p class="category">--%>
+                                                        <%--<span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>--%>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
@@ -104,12 +104,27 @@
                                             </div>
                                             <div class="card">
                                                 <div class="card-header card-chart" data-background-color="blue" style="height: 30%;">
-                                                    <div class="ct-chart" id="emailsSubscriptionChart"></div>
+                                                    <div class="ct-chart" id="realtimeHumid"></div>
                                                 </div>
                                                 <div class="card-content">
-                                                    <h4 class="title">Temperature</h4>
-                                                    <p class="category">
-                                                        <span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>
+                                                    <h4 class="title">Humidity</h4>
+                                                    <%--<p class="category">--%>
+                                                    <%--<span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>--%>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div class="stats">
+                                                        <i class="material-icons">access_time</i> updated 7 minutes ago
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card">
+                                                <div class="card-header card-chart" data-background-color="blue" style="height: 30%;">
+                                                    <div class="ct-chart" id="realtimeState"></div>
+                                                </div>
+                                                <div class="card-content">
+                                                    <h4 class="title">ON/OFF State</h4>
+                                                    <%--<p class="category">--%>
+                                                        <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
@@ -120,17 +135,47 @@
                                         </div>
                                         <div class="tab-pane" id="historical">
                                             <div class="card">
-                                                <div class="card-header card-chart" data-background-color="red" style="height: 30%;">
-                                                    <div class="ct-chart" id="completedTasksChart"></div>
+                                                <div class="card-header card-chart" data-background-color="purple" style="height: 30%;">
+                                                    <div class="ct-chart" id="historicalTemp"></div>
                                                 </div>
                                                 <div class="card-content">
-                                                    <h4 class="title">Humidity</h4>
-                                                    <p class="category">
-                                                        <span class="text-success"><i class="fa fa-long-arrow-down"></i> 20% </span> decrease in Humidity.</p>
+                                                    <h4 class="title">Temperature</h4>
+                                                    <%--<p class="category">--%>
+                                                    <%--<span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>--%>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
-                                                        <i class="material-icons">access_time</i> updated 10 minutes ago
+                                                        <i class="material-icons">access_time</i> updated 4 minutes ago
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card">
+                                                <div class="card-header card-chart" data-background-color="purple" style="height: 30%;">
+                                                    <div class="ct-chart" id="historicalHumid"></div>
+                                                </div>
+                                                <div class="card-content">
+                                                    <h4 class="title">Humidity</h4>
+                                                    <%--<p class="category">--%>
+                                                    <%--<span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>--%>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div class="stats">
+                                                        <i class="material-icons">access_time</i> updated 7 minutes ago
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card">
+                                                <div class="card-header card-chart" data-background-color="purple" style="height: 30%;">
+                                                    <div class="ct-chart" id="historicalState"></div>
+                                                </div>
+                                                <div class="card-content">
+                                                    <h4 class="title">ON/OFF State</h4>
+                                                    <%--<p class="category">--%>
+                                                    <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div class="stats">
+                                                        <i class="material-icons">access_time</i> updated 4 minutes ago
                                                     </div>
                                                 </div>
                                             </div>
