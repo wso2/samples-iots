@@ -10,6 +10,7 @@
 #include <DHT.h>
 
 #define SWITCH D0
+#define DLED D4
 #define MDPIN D5
 #define RELAY D6
 #define IRPIN D7
@@ -64,11 +65,10 @@ long temperature;
 
 static char masterKey[4];
 
-long set = 0;
-int len;
 int r = 0;
 boolean isAllowOpen = true;
-long old = 0;
+boolean isCodeExpired = false;
+long lastSyncTime = 0;
 int _lastIR, _lastMD, _lastSW;
 char user[45];
 
@@ -110,8 +110,7 @@ void loadMaster() {
   StaticJsonBuffer<200> jsonBuffer;
   if (!master) {
     Serial.println("Master profile doesn't exist yet. Create it..");
-  }
-  else {
+  } else {
     size_t size = master.size();
     std::unique_ptr<char[]> buf(new char[size]);
     master.readBytes(buf.get(), size);
@@ -124,6 +123,7 @@ void loadMaster() {
     strcpy(user, _user.c_str());
   }
   master.close();
+  isCodeExpired = false;
 }
 
 void storeKey(String key) {
@@ -224,7 +224,7 @@ void Message(char* attempt) {
   _lastIR = IR();
   _lastMD = MD();
   _lastSW = SW();
-  snprintf(payload, 250, "{\"temperature\":%ld.0,\"humidity\":%ld.0,\"metal\":%s,\"occupancy\":%s,\"open\":%s,\"attempt\":\"{\\\"attempt\\\":\\\"%s\\\",\\\"user\\\":\\\"%s\\\"}\"}", temperature, humidity, _lastMD == 0 ? "true" : "false", _lastIR == 1 ? "true" : "false", _lastSW == 1 ? "true" : "false", attempt, user);
+  snprintf(payload, 250, "{\"temperature\":%ld.0,\"humidity\":%ld.0,\"metal\":%s,\"occupancy\":%s,\"open\":%s,\"attempt\":\"{\\\"status\\\":\\\"%s\\\",\\\"user\\\":\\\"%s\\\"}\"}", temperature, humidity, _lastMD == 0 ? "true" : "false", _lastIR == 1 ? "true" : "false", _lastSW == 1 ? "true" : "false", attempt, user);
   client.publish(publishTopic, payload);
   Serial.println(payload);
 }
@@ -243,6 +243,9 @@ String getStringPart(String original, int partIndex, char separator) {
     } else {
       break;
     }
+  }
+  if (partIndex > currentPart) {
+    return "";
   }
   return part;
 }
@@ -268,6 +271,7 @@ void callback(char* topic, byte* payload, int length) {
     snprintf(message, 100, "Lock code set for user %s", user);
   } else if (opCode == "allow_open") {
     isAllowOpen = (msg == "true");
+    digitalWrite(DLED, isAllowOpen ? LOW : HIGH);
     status = "COMPLETED";
     snprintf(message, 100, "Lock is configured%s to open with code for user %s", !isAllowOpen ? " not" : "", user);
   } else {
@@ -293,6 +297,8 @@ void setup() {
   pinMode(MDPIN, INPUT);
   pinMode(SWITCH, INPUT);
   pinMode(RELAY, OUTPUT);
+  pinMode(DLED, OUTPUT);
+  digitalWrite(DLED, LOW);
   digitalWrite(RELAY, HIGH);
   myKeypad.begin();
   myKeypad.addEventListener(keypadEvent);
@@ -327,18 +333,31 @@ void reconnect() {
 
 void Check() {
   Serial.println();
-  if (isAllowOpen && input[0] == masterKey[0] && input[1] == masterKey[1] && input[2] == masterKey[2] && input[3] == masterKey[3]) {
+  if (isAllowOpen && !isCodeExpired && input[0] == masterKey[0] && input[1] == masterKey[1] && input[2] == masterKey[2] && input[3] == masterKey[3]) {
+    isCodeExpired = true;
     Serial.println("Unlocking...");
     digitalWrite(RELAY, LOW);
-    Message("Succes");
+    Message("Success");
     delay(5000);
     digitalWrite(RELAY, HIGH);
   } else if (!isAllowOpen) {
     Message("Blocked");
+  } else if (isCodeExpired) {
+    digitalWrite(DLED, HIGH);
+    Message("Expired");
+    delay(1000);
+    digitalWrite(DLED, LOW);
+    delay(1000);
+    digitalWrite(DLED, HIGH);
   } else {
+    digitalWrite(DLED, HIGH);
     Message("Denied");
   }
   r = 0;
+  if (isAllowOpen) {
+    delay(1000);
+    digitalWrite(DLED, LOW);
+  }
 }
 
 void loop() {
@@ -349,9 +368,9 @@ void loop() {
   }
   char key = myKeypad.getKey();
   client.loop();
-  if ((_lastIR != IR() || _lastMD != MD() || _lastSW != SW()) && now - old > 2000 || now - old > 30000) {
+  if ((_lastIR != IR() || _lastMD != MD() || _lastSW != SW()) && now - lastSyncTime > 2000 || now - lastSyncTime > 60000) {
+    lastSyncTime = now;
     Message("None");
-    old = now;
   }
 }
 
