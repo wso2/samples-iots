@@ -4,11 +4,12 @@
 <head>
     <title>Locker List</title>
 
-    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link href="css/material-dashboard.css" rel="stylesheet" />
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet'
+          type='text/css'>
 </head>
 <body>
 <div class="wrapper">
@@ -35,7 +36,7 @@
         </div>
     </div>
     <div class="main-panel">
-        <%@include file="includes/nav-menu.jsp"%>
+        <%@include file="includes/nav-menu.jsp" %>
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -50,23 +51,64 @@
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                                <h4 class="modal-title" id="myModalLabel" style="color:purple;">Enter Locker Details</h4>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-hidden="true">&times;
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel" style="color:purple;">Enter
+                                                                                                                Locker
+                                                                                                                Details</h4>
                                             </div>
-                                            <form>
+                                            <%--<div class="modal-body" style="color:black;">--%>
+                                            <%--Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.--%>
+                                            <%--</div>--%>
+                                            <form id="new-device-form">
                                                 <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
-                                                    <input type="text" value="" placeholder="Device ID" class="form-control" />
+                                                    <input type="text" value="" placeholder="Device ID"
+                                                           class="form-control" />
                                                 </div>
                                                 <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
-                                                    <input type="text" value="" placeholder="Device Name" class="form-control" />
+                                                    <input type="text" value="" placeholder="Device Name"
+                                                           class="form-control" />
                                                 </div>
                                                 <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
-                                                    <input type="text" value="" placeholder="Device description" class="form-control" />
+                                                    <input type="text" value="" placeholder="Device description"
+                                                           class="form-control" />
                                                 </div>
                                             </form>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-info btn-simple">Save</button>
+                                                <button type="button" class="btn btn-default btn-simple"
+                                                        data-dismiss="modal">Close
+                                                </button>
+                                                <button type="button" class="btn btn-info btn-simple"
+                                                        onclick="addNewDevice()">Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="lockCodeModal" tabindex="-1" role="dialog"
+                                     aria-labelledby="lockCodeModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-hidden="true">&times;
+                                                </button>
+                                                <h4 class="modal-title" id="lockCodeModalLabel" style="color:purple;">
+                                                    Generated LockCode
+                                                    Details</h4>
+                                            </div>
+                                            <form id="new-lockcode-form">
+                                                <div class="col-md-4 col-md-offset-4">
+                                                    <input type="text" id="lock-code"
+                                                           style="font-size: 2em;letter-spacing: 30px" value="0"
+                                                           class="form-control">
+                                                </div>
+                                            </form>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default btn-simple"
+                                                        data-dismiss="modal">Close
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -199,55 +241,42 @@
                                 </div>
                             </div>
                             <div class="card-content table-responsive">
-                                <table class="table table-hover">
+                                <table class="table table-hover" id="devices-listing">
                                     <thead>
-                                    <th>Device ID</th>
                                     <th>Device Name</th>
+                                    <th>Status</th>
+                                    <th>Occupancy</th>
                                     <th>Owner</th>
-                                    <th>Token</th>
                                     <th></th>
                                     <th></th>
                                     <th></th>
                                     </thead>
                                     <tbody>
                                     <tr>
-                                        <td>l1</td>
                                         <td>Locker 1</td>
-                                        <td>John</td>
-                                        <td>1234</td>
-                                        <td><button class="btn btn-primary btn-fab btn-fab-mini btn-round">
-                                            <i class="material-icons">refresh</i>
-                                        </button></td>
-                                        <td><button class="btn btn-success btn-fab btn-fab-mini btn-round" data-toggle="modal" data-target="#shareSettingsModal">
-                                            <i class="material-icons">share</i>
-                                        </button></td>
-                                        <td><a href="analyticsNew.jsp"><button class="btn btn-info btn-round">Analytics</button></a></td>
+                                        <td>OPEN</td>
+                                        <td>AVAILABLE</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-fab btn-fab-mini btn-round">
+                                                <i class="material-icons">refresh</i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info">Analytics</button>
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <td>l2</td>
                                         <td>Locker 2</td>
-                                        <td>Adam</td>
-                                        <td>4567</td>
-                                        <td><button class="btn btn-primary btn-fab btn-fab-mini btn-round">
-                                            <i class="material-icons">refresh</i>
-                                        </button></td>
-                                        <td><button class="btn btn-success btn-fab btn-fab-mini btn-round">
-                                            <i class="material-icons">share</i>
-                                        </button></td>
-                                        <td><button class="btn btn-info btn-round">Analytics</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>l3</td>
-                                        <td>Locker 3</td>
-                                        <td>Sarah</td>
-                                        <td>8901</td>
-                                        <td><button class="btn btn-primary btn-fab btn-fab-mini btn-round">
-                                            <i class="material-icons">refresh</i>
-                                        </button></td>
-                                        <td><button class="btn btn-success btn-fab btn-fab-mini btn-round">
-                                            <i class="material-icons">share</i>
-                                        </button></td>
-                                        <td><button class="btn btn-info btn-round">Analytics</button></td>
+                                        <td>CLOSED</td>
+                                        <td>OCCUPIED</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-fab btn-fab-mini btn-round">
+                                                <i class="material-icons">refresh</i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info">Analytics</button>
+                                        </td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -295,12 +324,98 @@
 <script src="js/bootstrap-notify.js" type="text/javascript"></script>
 <script src="js/material-dashboard.js" type="text/javascript"></script>
 <script type="text/javascript">
-    $(document).ready(function() {
-
+    $(document).ready(function () {
         // Javascript method's body can be found in assets/js/demos.js
-        demo.initDashboardPageCharts();
-
+        //demo.initDashboardPageCharts();
+        getAllDevices();
     });
+
+    function generateKey(deviceId) {
+        var lockCode = ("" + Math.random()).substring(2, 6);
+        var success = function (data) {
+            $('#lock-code').val(lockCode);
+            $('#lockCodeModal').modal('show');
+        };
+        var currentUser = "<%=session.getAttribute(LoginController.ATTR_USER_NAME)%>";
+        var lastKnownEP = {
+            "uri": "/devices/locker/operations",
+            "method": "post",
+            "payload": "{'deviceIdentifiers':[" + deviceId
+                       + "],'operation':{'code':'lock_code','type':'PROFILE','status':'PENDING','control':'REPEAT','payLoad':'"
+                       + lockCode + "," + currentUser + "','enabled':true}}"
+        };
+
+        $.ajax({
+                   type: "POST",
+                   url: "/invoker/execute",
+                   data: lastKnownEP,
+                   success: success
+               });
+    }
+
+    function getAllDevices() {
+        var success = function (data) {
+            var devices = JSON.parse(data).devices;
+            var devicesListing = $('#devices-listing');
+            if (devices) {
+                devicesListing.find('tbody').empty();
+                for (var i = 0; i < devices.length; i++) {
+                    var device = devices[i];
+                    var lastKnownEP = {"uri": "/events/last-known/locker/" + device.deviceIdentifier, "method": "get"};
+                    var lastKnownSuccess = function (data) {
+                        var record = JSON.parse(data).records[0];
+                        var time = new Date(record.timestamp);
+                        var isOpen = record.values.open;
+                        var isOccupant = record.values.occupancy;
+                        var myRow = "<tr><a href='#" + device.deviceIdentifier + "'><td>" + device.name + "</td><td>"
+                                    + (isOpen ? "OPEN" : "CLOSED") + "</td><td>" + (isOccupant ? "OCCUPIED" :
+                                                                                    "AVAILABLE") + "</td><td>"
+                                    + device.enrolmentInfo.owner + "</td>" +
+                                    "<td><button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
+                                    + "<i class=\"material-icons\">refresh</i>"
+                                    + "</button>"
+                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey("+device.deviceIdentifier+")'>"
+                                    + "<i class=\"material-icons\">vpn_key</i>"
+                                    + "</button>"
+                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
+                                    + "<i class=\"material-icons\">insert_chart</i>"
+                                    + "</button>"
+                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
+                                    + "<i class=\"material-icons\">remove_red_eye</i>"
+                                    + "</button></td>"
+                                    + "</a></tr>";
+                        devicesListing.find('tbody').append(myRow);
+                    };
+                    $.ajax({
+                               type: "POST",
+                               url: "/invoker/execute",
+                               data: lastKnownEP,
+                               success: lastKnownSuccess
+                           });
+                }
+            }
+        };
+        var data = {"uri": "/devices/?type=locker&requireDeviceInfo=true", "method": "get"};
+        $.ajax({
+                   type: "POST",
+                   url: "/invoker/execute",
+                   data: data,
+                   success: success
+               });
+    }
+
+    function addNewDevice() {
+        var success = function (data) {
+            console.log(data);
+        };
+        var data = {"uri": "/", "method": "post", "payload": ""};
+        $.ajax({
+                   type: "POST",
+                   url: "/invoker/execute",
+                   data: data,
+                   success: success
+               });
+    }
 </script>
 
 </html>

@@ -53,6 +53,7 @@ public class LoginController extends HttpServlet {
     private static final String ADMIN_USERNAME = "admin";
     private static final String ADMIN_PASSWORD = "admin";
 
+    public static final String ATTR_USER_NAME = "userName";
     public static final String ATTR_ACCESS_TOKEN = "accessToken";
     public static final String ATTR_REFRESH_TOKEN = "refreshToken";
     public static final String ATTR_ENCODED_CLIENT_APP = "encodedClientApp";
@@ -78,7 +79,7 @@ public class LoginController extends HttpServlet {
         apiRegEndpoint.setHeader("Authorization",
                                  "Basic " + Base64.getEncoder().encodeToString((email + ":" + password).getBytes()));
         apiRegEndpoint.setHeader("Content-Type", ContentType.APPLICATION_JSON.toString());
-        String jsonStr = "{\"applicationName\" : \"smartLock\", \"tags\" : [\"device_management\"]}";
+        String jsonStr = "{\"applicationName\" : \"smartLock\", \"tags\" : [\"device_management\",\"device_agent\"]}";
         StringEntity apiRegPayload = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
         apiRegEndpoint.setEntity(apiRegPayload);
 
@@ -135,6 +136,7 @@ public class LoginController extends HttpServlet {
                 session.setAttribute(ATTR_ACCESS_TOKEN, accessToken);
                 session.setAttribute(ATTR_REFRESH_TOKEN, refreshToken);
                 session.setAttribute(ATTR_ENCODED_CLIENT_APP, encodedClientApp);
+                session.setAttribute(ATTR_USER_NAME, email);
                 log.debug("Access Token retrieved with scopes: " + scope);
                 String returnUri = req.getParameter("ret");
                 if (returnUri != null && returnUri.startsWith("/")) {

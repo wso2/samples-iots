@@ -67,23 +67,24 @@ public class InvokerController extends HttpServlet {
         String uri = req.getParameter("uri");
         String method = req.getParameter("method");
         String payload = req.getParameter("payload");
-        String contentType = req.getHeader("content-type");
+        String contentType = req.getParameter("content-type");
         if (uri == null || method == null) {
             resp.sendError(400, "Bad Request, uri or method not found");
             return;
         }
         if (contentType == null || contentType.isEmpty()) contentType = ContentType.APPLICATION_JSON.toString();
 
+        uri = getServletContext().getInitParameter("deviceMgtEndpoint") + uri;
         HttpRequestBase executor = null;
         if ("GET".equalsIgnoreCase(method)) {
             executor = new HttpGet(uri);
         } else if ("POST".equalsIgnoreCase(method)) {
             executor = new HttpPost(uri);
-            StringEntity payloadEntity = new StringEntity(payload, contentType);
+            StringEntity payloadEntity = new StringEntity(payload, ContentType.create(contentType));
             ((HttpPost) executor).setEntity(payloadEntity);
         } else if ("PUT".equalsIgnoreCase(method)) {
             executor = new HttpPut(uri);
-            StringEntity payloadEntity = new StringEntity(payload, contentType);
+            StringEntity payloadEntity = new StringEntity(payload, ContentType.create(contentType));
             ((HttpPut) executor).setEntity(payloadEntity);
         } else if ("DELETE".equalsIgnoreCase(method)) {
             executor = new HttpDelete(uri);
