@@ -23,7 +23,7 @@
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <a class="navbar-brand" style="font-family: '';"><h4>SMARTLOCKER</h4></a>
+            <a class="navbar-brand"><h4><strong>SMART</strong>LOCKER</h4></a>
         </div>
     </div>
 </nav>
@@ -38,9 +38,9 @@
                             <div class="header header-primary text-center">
                                 <h5>Web Portal</h5>
                                 <div class="social-line">
-                                    <a href="#pablo" class="btn btn-simple btn-just-icon">
-                                        <i class="fa fa-globe"></i>
-                                    </a>
+                                    <%--<a href="#pablo" class="btn btn-simple btn-just-icon">--%>
+                                        <%--<i class="fa fa-globe"></i>--%>
+                                    <%--</a>--%>
                                 </div>
                             </div>
                             <p class="text-divider">Enter credentials to login</p>

@@ -20,57 +20,15 @@
 -->
         <div class="logo">
             <a href="#" class="simple-text">
-                SmartLocker
+                <strong>Smart</strong>Locker
             </a>
         </div>
         <div class="sidebar-wrapper">
             <ul class="nav">
-                <li>
-                    <a href="dashboard.html">
-                        <i class="material-icons">dashboard</i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
                 <li class="active">
-                    <a href="./user.html">
-                        <i class="material-icons">person</i>
-                        <p>Historical Data</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="./table.html">
-                        <i class="material-icons">content_paste</i>
-                        <p>Table List</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="./typography.html">
-                        <i class="material-icons">library_books</i>
-                        <p>Typography</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="./icons.html">
-                        <i class="material-icons">bubble_chart</i>
-                        <p>Icons</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="./maps.html">
-                        <i class="material-icons">location_on</i>
-                        <p>Maps</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="./notifications.html">
-                        <i class="material-icons text-gray">notifications</i>
-                        <p>Notifications</p>
-                    </a>
-                </li>
-                <li class="active-pro">
-                    <a href="upgrade.html">
-                        <i class="material-icons">unarchive</i>
-                        <p>Upgrade to PRO</p>
+                    <a href="devices.jsp">
+                        <i class="material-icons">list</i>
+                        <p style="font-weight: bold;">Device List</p>
                     </a>
                 </li>
             </ul>
@@ -86,17 +44,15 @@
                             <div class="card-header" data-background-color="purple">
                                 <h4 class="title">Lockers enrolled</h4>
                                 <p class="category">Below are the list of lockers enrolled with the server</p>
-                                <button class="btn btn-white" data-toggle="modal" data-target="#myModal">Add Locker</button>
-                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <button class="btn btn-white" data-toggle="modal" data-target="#newDeviceModal">Add Locker</button>
+                                <%--Popup modal for adding new device--%>
+                                <div class="modal fade" id="newDeviceModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                                                 <h4 class="modal-title" id="myModalLabel" style="color:purple;">Enter Locker Details</h4>
                                             </div>
-                                            <%--<div class="modal-body" style="color:black;">--%>
-                                                <%--Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.--%>
-                                            <%--</div>--%>
                                             <form>
                                                 <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
                                                     <input type="text" value="" placeholder="Device ID" class="form-control" />
@@ -115,6 +71,132 @@
                                         </div>
                                     </div>
                                 </div>
+                                <%--Popup modal for editing share settings--%>
+                                <div class="modal fade" id="shareSettingsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                <h4 class="modal-title" id="myModalLabel2" style="color:purple;">Edit Share Settings</h4>
+                                            </div>
+                                            <%--<div class="modal-body" style="color:black;">--%>
+                                            <%--Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.--%>
+                                            <%--</div>--%>
+                                            <form>
+                                                <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
+                                                    <input type="text" value="" placeholder="User ID" class="form-control" />
+                                                </div>
+                                                <%--<div class="form-group" style="padding-left: 10%; padding-right: 10%;">--%>
+                                                    <%--<input type="text" value="" placeholder="Device Name" class="form-control" />--%>
+                                                <%--</div>--%>
+                                                <%--<div class="form-group" style="padding-left: 10%; padding-right: 10%;">--%>
+                                                    <%--<input type="text" value="" placeholder="Device description" class="form-control" />--%>
+                                                <%--</div>--%>
+                                            </form>
+                                            <div style="margin-right: 10%; margin-left: 10%">
+                                                <table class="table" style="font-size: 15px">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="text-center">#</th>
+                                                        <th>Name</th>
+                                                        <th class="text-left">Actions</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td class="text-center">1</td>
+                                                        <td>Andrew Mike</td>
+                                                        <td class="td-actions text-right">
+                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                                <i class="fa fa-user"></i>
+                                                            </button>
+                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">2</td>
+                                                        <td>John Doe</td>
+                                                        <td class="td-actions text-right">
+                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                                <i class="fa fa-user"></i>
+                                                            </button>
+                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">3</td>
+                                                        <td>Alex Mike</td>
+                                                        <td class="td-actions text-right">
+                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                                <i class="fa fa-user"></i>
+                                                            </button>
+                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">3</td>
+                                                        <td>Alex Mike</td>
+                                                        <td class="td-actions text-right">
+                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                                <i class="fa fa-user"></i>
+                                                            </button>
+                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">3</td>
+                                                        <td>Alex Mike</td>
+                                                        <td class="td-actions text-right">
+                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                                <i class="fa fa-user"></i>
+                                                            </button>
+                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">3</td>
+                                                        <td>Alex Mike</td>
+                                                        <td class="td-actions text-right">
+                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                                <i class="fa fa-user"></i>
+                                                            </button>
+                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">3</td>
+                                                        <td>Alex Mike</td>
+                                                        <td class="td-actions text-right">
+                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                                <i class="fa fa-user"></i>
+                                                            </button>
+                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-info btn-simple">Save</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-content table-responsive">
                                 <table class="table table-hover">
@@ -123,6 +205,7 @@
                                     <th>Device Name</th>
                                     <th>Owner</th>
                                     <th>Token</th>
+                                    <th></th>
                                     <th></th>
                                     <th></th>
                                     </thead>
@@ -135,7 +218,10 @@
                                         <td><button class="btn btn-primary btn-fab btn-fab-mini btn-round">
                                             <i class="material-icons">refresh</i>
                                         </button></td>
-                                        <td><button class="btn btn-info">Analytics</button></td>
+                                        <td><button class="btn btn-success btn-fab btn-fab-mini btn-round" data-toggle="modal" data-target="#shareSettingsModal">
+                                            <i class="material-icons">share</i>
+                                        </button></td>
+                                        <td><a href="analyticsNew.jsp"><button class="btn btn-info btn-round">Analytics</button></a></td>
                                     </tr>
                                     <tr>
                                         <td>l2</td>
@@ -145,7 +231,10 @@
                                         <td><button class="btn btn-primary btn-fab btn-fab-mini btn-round">
                                             <i class="material-icons">refresh</i>
                                         </button></td>
-                                        <td><button class="btn btn-info">Analytics</button></td>
+                                        <td><button class="btn btn-success btn-fab btn-fab-mini btn-round">
+                                            <i class="material-icons">share</i>
+                                        </button></td>
+                                        <td><button class="btn btn-info btn-round">Analytics</button></td>
                                     </tr>
                                     <tr>
                                         <td>l3</td>
@@ -155,7 +244,10 @@
                                         <td><button class="btn btn-primary btn-fab btn-fab-mini btn-round">
                                             <i class="material-icons">refresh</i>
                                         </button></td>
-                                        <td><button class="btn btn-info">Analytics</button></td>
+                                        <td><button class="btn btn-success btn-fab btn-fab-mini btn-round">
+                                            <i class="material-icons">share</i>
+                                        </button></td>
+                                        <td><button class="btn btn-info btn-round">Analytics</button></td>
                                     </tr>
                                     </tbody>
                                 </table>
