@@ -19,6 +19,9 @@ define stream attempt (meta_deviceId string, status string, user string);
 define stream last_minute_attempt (meta_deviceId string, status string, user string, attempt_count long);
 define stream deny_attempt (meta_deviceId string, user string);
 
+define stream door_anomaly (meta_deviceId string, event_count long);
+define stream all_data (meta_deviceId string, temperature double, humidity double, metal bool, occupancy bool, open bool, event_count long, user string);
+
 from dataIn [json:getProperty(attempt, 'status') != 'None']
 select meta_deviceId, json:getProperty(attempt, 'status') as status, json:getProperty(attempt, 'user') as user
 insert into attempt;
@@ -39,10 +42,10 @@ from attempt [status == 'Expired']
 select meta_deviceId, 'Info' as level, 'Unlocking fail as code is expiered. Regenerate a new code.' as message, user
 insert into alert;
 
-from last_minute_attempt#log("Logging Denied attempt: ")
+from all_data#log("Logging all_data: ")
 insert into bar;
 
-partition with (meta_deviceId of attempt)
+partition with (meta_deviceId of dataIn)
 begin
 	from attempt#window.time(60000)
 	select meta_deviceId, status, user, count(meta_deviceId) as attempt_count
@@ -56,4 +59,32 @@ begin
 	from deny_attempt
     select meta_deviceId as meta_deviceIdentifier, 'allow_open' as code, 'PROFILE' as type, true as isEnabled, 'false' as payLoad
 	insert into operation;
+
+	from dataIn#window.time(120000)
+	select meta_deviceId, avg(temperature) as temperature, avg(humidity) as humidity, metal, occupancy, open, count(meta_deviceId) as event_count, json:getProperty(attempt, 'user') as user
+	insert into all_data;
+
+	from all_data[open == true]#window.time(120000)
+	select meta_deviceId, count(meta_deviceId) as event_count
+	insert into door_anomaly;
+
+	from door_anomaly#window.length(1) as errorStream unidirectional join all_data#window.length(1) as allStream on errorStream.event_count == allStream.event_count
+	select allStream.meta_deviceId, 'Warn' as level, 'Locker is open for more than two minutes.' as message, allStream.user
+	insert into alert;
+
+	from every e1=all_data, e2=all_data[e1.temperature < temperature and temperature > 50]
+	select e1.meta_deviceId, 'Warn' as level, str:concat('Temperature has increased above normal. Current: ', convert(e2.temperature, 'string')) as message, e2.user
+	insert into alert;
+
+	from every e1=all_data, e2=all_data[e1.humidity < humidity and humidity > 80]
+	select e1.meta_deviceId, 'Warn' as level, str:concat('Humidity has increased above normal. Current: ', convert(e2.humidity, 'string')) as message, e2.user
+	insert into alert;
+
+	from every e1=all_data[temperature > 50], e2=all_data[e1.temperature >= temperature and temperature < 50]
+	select e1.meta_deviceId, 'Info' as level, 'Temperature back to normal.' as message, e2.user
+	insert into alert;
+
+	from every e1=all_data[humidity > 80], e2=all_data[e1.humidity >= humidity and humidity < 80]
+	select e1.meta_deviceId, 'Info' as level, 'Humidity back to normal.' as message, e2.user
+	insert into alert;
 end;
