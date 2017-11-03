@@ -198,11 +198,6 @@
                         </li>
                         <li>
                             <a href="#">
-                                Portfolio
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
                                 Blog
                             </a>
                         </li>
@@ -213,7 +208,7 @@
                     <script>
                         document.write(new Date().getFullYear())
                     </script>
-                    <a href="http://www.creative-tim.com">Creative Tim</a>, made with love for a better web
+                    <a href="http://www.wso2.com">WSO2</a> IoT Team
                 </p>
             </div>
         </footer>
