@@ -193,7 +193,7 @@
                     <ul>
                         <li>
                             <a href="#">
-                                Home
+                                About
                             </a>
                         </li>
                         <li>
