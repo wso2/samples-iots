@@ -9,24 +9,26 @@
 @Import('iot.per.device.stream.carbon.super.locker:1.0.0')
 define stream dataIn (meta_deviceId string, temperature float, humidity float, metal bool, occupancy bool, open bool, attempt string);
 
-@Export('org.wso2.iot.operation:1.0.0')
+@Export('org.wso2.iot.locker.operation:1.0.0')
 define stream operation (meta_deviceIdentifier string, code string, type string, isEnabled bool, payLoad string);
 
 @Export('org.wso2.iot.alert:1.0.0')
 define stream alert (meta_deviceId string, level string, message string, user string);
 
 define stream attempt (meta_deviceId string, status string, user string);
+define stream last_minute_attempt (meta_deviceId string, status string, user string, attempt_count long);
+define stream deny_attempt (meta_deviceId string, user string);
 
 from dataIn [json:getProperty(attempt, 'status') != 'None']
 select meta_deviceId, json:getProperty(attempt, 'status') as status, json:getProperty(attempt, 'user') as user
 insert into attempt;
 
 from attempt [status == 'Success']
-select meta_deviceId, 'Warn' as level, str:concat('Unlocked the locker by user ', user) as message, user
+select meta_deviceId, 'Info' as level, str:concat('Unlocked the locker by user ', user) as message, user
 insert into alert;
 
 from attempt [status == 'Denied']
-select meta_deviceId, 'Info' as level, 'Unlocking attempt denied due to incorrect code.' as message, user
+select meta_deviceId, 'Warn' as level, 'Unlocking attempt denied due to incorrect code.' as message, user
 insert into alert;
 
 from attempt [status == 'Blocked']
@@ -37,9 +39,21 @@ from attempt [status == 'Expired']
 select meta_deviceId, 'Info' as level, 'Unlocking fail as code is expiered. Regenerate a new code.' as message, user
 insert into alert;
 
+from last_minute_attempt#log("Logging Denied attempt: ")
+insert into bar;
+
 partition with (meta_deviceId of attempt)
 begin
-    from every e1=attempt, e2=attempt[e1.status == status], e3=attempt[e2.status == status and status == 'Denied']
-    select e1.meta_deviceId as meta_deviceIdentifier, 'allow_open' as code, 'profile' as type, true as isEnabled, 'false' as payLoad
+	from attempt#window.time(60000)
+	select meta_deviceId, status, user, count(meta_deviceId) as attempt_count
+	insert into last_minute_attempt;
+
+    from every e1=last_minute_attempt, e2=last_minute_attempt[e1.status == status], e3=last_minute_attempt[e2.status == status and status == 'Denied' and attempt_count >= 3]
+	select e1.meta_deviceId, e1.user
+	insert into deny_attempt;
+
+	/* Blocking device*/
+	from deny_attempt
+    select meta_deviceId as meta_deviceIdentifier, 'allow_open' as code, 'PROFILE' as type, true as isEnabled, 'false' as payLoad
 	insert into operation;
 end;
