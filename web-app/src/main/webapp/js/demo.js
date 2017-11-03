@@ -79,39 +79,80 @@ demo = {
 
 
         /* ----------==========     Realtime State Chart initialization    ==========---------- */
-        var dataRealtimeStateChart = {
-            labels: ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m'],
+        dataRealtimeStateChart = {
+            labels: ['0s', '1s', '2s', '3s', '4s', '5s', '6s','7s', '8s', '9s', '10s'],
             series: [
-                [0, 1, 1, 0, 1, 0, 0, 1]
-
+                [0, 1, 1, 0, 1, 0, 0, 1, 0, 1]
             ]
         };
-        var optionsRealtimeStateChart = {
-            axisX: {
-                showGrid: false
-            },
+
+        optionsRealtimeStateChart = {
+            lineSmooth: Chartist.Interpolation.step(),
+            showArea: true,
             low: 0,
-            high: 2,
+            high: 2, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
-                right: 5,
+                right: 0,
                 bottom: 0,
                 left: 0
-            }
-        };
-        var responsiveOptions = [
-            ['screen and (max-width: 640px)', {
-                seriesBarDistance: 5,
-                axisX: {
-                    labelInterpolationFnc: function(value) {
-                        return value[0];
-                    }
-                }
-            }]
-        ];
-        var realtimeStateChart = Chartist.Bar('#realtimeState', dataRealtimeStateChart, optionsRealtimeStateChart, responsiveOptions);
-        md.startAnimationForBarChart(realtimeStateChart);
+            },
+        }
 
+        var realtimeState = new Chartist.Line('#realtimeState', dataRealtimeStateChart, optionsRealtimeStateChart);
+        md.startAnimationForLineChart(realtimeState);
+
+
+
+        /* ----------==========     Realtime Occupancy Chart initialization    ==========---------- */
+        dataRealtimeOccupancyChart = {
+            labels: ['0s', '1s', '2s', '3s', '4s', '5s', '6s','7s', '8s', '9s', '10s'],
+            series: [
+                [0, 1, 1, 0, 1, 1, 0, 1, 0, 0]
+            ]
+        };
+
+        optionsRealtimeOccupancyChart = {
+            lineSmooth: Chartist.Interpolation.step(),
+            showArea: true,
+            low: 0,
+            high: 2, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            chartPadding: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
+            },
+        }
+
+        var realtimeOccupancy = new Chartist.Line('#realtimeOccupancy', dataRealtimeOccupancyChart, optionsRealtimeOccupancyChart);
+        md.startAnimationForLineChart(realtimeOccupancy);
+
+
+
+        /* ----------==========     Realtime Metal Chart initialization    ==========---------- */
+        dataRealtimeMetalChart = {
+            labels: ['0s', '1s', '2s', '3s', '4s', '5s', '6s','7s', '8s', '9s', '10s'],
+            series: [
+                [0, 1, 1, 0, 1, 1, 0, 1, 0, 0]
+            ]
+        };
+
+        optionsRealtimeMetalChart = {
+            lineSmooth: Chartist.Interpolation.step(),
+            showArea: true,
+            low: 0,
+            high: 2, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            chartPadding: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
+            },
+        }
+
+        var realtimeMetal = new Chartist.Line('#realtimeMetal', dataRealtimeMetalChart, optionsRealtimeMetalChart);
+        md.startAnimationForLineChart(realtimeMetal);
 
 
         /* ----------==========     Historical Temperature Chart initialization    ==========---------- */
@@ -169,40 +210,81 @@ demo = {
 
 
 
-        /* ----------==========     Historical State Chart initialization    ==========---------- */
-        var dataHistoricalStateChart = {
-            labels: ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m'],
-            series: [
-                [0, 1, 1, 0, 1, 0, 0, 1]
 
+        /* ----------==========     Historical State Chart initialization    ==========---------- */
+        dataHistoricalStateChart = {
+            labels: ['0s', '1s', '2s', '3s', '4s', '5s', '6s','7s', '8s', '9s', '10s'],
+            series: [
+                [0, 1, 1, 0, 1, 0, 0, 1, 0, 1]
             ]
         };
-        var optionsHistoricalStateChart = {
-            axisX: {
-                showGrid: false
-            },
+
+        optionsHistoricalStateChart = {
+            lineSmooth: Chartist.Interpolation.step(),
+            showArea: true,
             low: 0,
-            high: 2,
+            high: 2, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
-                right: 5,
+                right: 0,
                 bottom: 0,
                 left: 0
-            }
-        };
-        var responsiveOptions = [
-            ['screen and (max-width: 640px)', {
-                seriesBarDistance: 5,
-                axisX: {
-                    labelInterpolationFnc: function(value) {
-                        return value[0];
-                    }
-                }
-            }]
-        ];
-        var historicalStateChart = Chartist.Bar('#historicalState', dataHistoricalStateChart, optionsHistoricalStateChart, responsiveOptions);
-        md.startAnimationForBarChart(historicalStateChart);
+            },
+        }
 
+        var historicalState = new Chartist.Line('#historicalState', dataHistoricalStateChart, optionsHistoricalStateChart);
+        md.startAnimationForLineChart(historicalState);
+
+
+        /* ----------==========     Historical Occupancy Chart initialization    ==========---------- */
+        dataHistoricalOccupancyChart = {
+            labels: ['0s', '1s', '2s', '3s', '4s', '5s', '6s','7s', '8s', '9s', '10s'],
+            series: [
+                [0, 1, 1, 0, 1, 1, 0, 1, 0, 0]
+            ]
+        };
+
+        optionsHistoricalOccupancyChart = {
+            lineSmooth: Chartist.Interpolation.step(),
+            showArea: true,
+            low: 0,
+            high: 2, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            chartPadding: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
+            },
+        }
+
+        var historicalOccupancy = new Chartist.Line('#historicalOccupancy', dataHistoricalOccupancyChart, optionsHistoricalOccupancyChart);
+        md.startAnimationForLineChart(historicalOccupancy);
+
+
+
+        /* ----------==========     Historical Metal Chart initialization    ==========---------- */
+        dataHistoricalMetalChart = {
+            labels: ['0s', '1s', '2s', '3s', '4s', '5s', '6s','7s', '8s', '9s', '10s'],
+            series: [
+                [0, 1, 1, 0, 1, 1, 0, 1, 0, 0]
+            ]
+        };
+
+        optionsHistoricalMetalChart = {
+            lineSmooth: Chartist.Interpolation.step(),
+            showArea: true,
+            low: 0,
+            high: 2, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            chartPadding: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
+            },
+        }
+
+        var historicalMetal = new Chartist.Line('#historicalMetal', dataHistoricalMetalChart, optionsHistoricalMetalChart);
+        md.startAnimationForLineChart(historicalMetal);
 
     },
 

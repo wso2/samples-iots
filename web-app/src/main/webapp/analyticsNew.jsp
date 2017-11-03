@@ -143,6 +143,21 @@
                                                 </table>
                                             </div>
                                             <div class="card">
+                                                <div class="card-header card-chart" data-background-color="red" style="height: 30%;">
+                                                    <div class="ct-chart" id="realtimeState"></div>
+                                                </div>
+                                                <div class="card-content">
+                                                    <h4 class="title">OPEN/CLOSE State</h4><p>1 for open, 0 for close</p>
+                                                    <%--<p class="category">--%>
+                                                    <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div class="stats">
+                                                        <i class="material-icons">access_time</i> updated 4 minutes ago
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card">
                                                 <div class="card-header card-chart" data-background-color="blue" style="height: 30%;">
                                                     <div class="ct-chart" id="realtimeTemp"></div>
                                                 </div>
@@ -174,16 +189,31 @@
                                             </div>
                                             <div class="card">
                                                 <div class="card-header card-chart" data-background-color="blue" style="height: 30%;">
-                                                    <div class="ct-chart" id="realtimeState"></div>
+                                                    <div class="ct-chart" id="realtimeOccupancy"></div>
                                                 </div>
                                                 <div class="card-content">
-                                                    <h4 class="title">ON/OFF State</h4>
+                                                    <h4 class="title">Occupancy</h4><p>1 for occupied, 0 for free</p>
                                                     <%--<p class="category">--%>
-                                                        <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
+                                                    <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
-                                                        <i class="material-icons">access_time</i> updated 4 minutes ago
+                                                        <i class="material-icons">access_time</i> updated 9 minutes ago
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card">
+                                                <div class="card-header card-chart" data-background-color="blue" style="height: 30%;">
+                                                    <div class="ct-chart" id="realtimeMetal"></div>
+                                                </div>
+                                                <div class="card-content">
+                                                    <h4 class="title">Metal Presence</h4><p>1 for present, 0 for absent</p>
+                                                    <%--<p class="category">--%>
+                                                    <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div class="stats">
+                                                        <i class="material-icons">access_time</i> updated 5 minutes ago
                                                     </div>
                                                 </div>
                                             </div>
@@ -271,13 +301,28 @@
                                                 </table>
                                             </div>
                                             <div class="card">
+                                                <div class="card-header card-chart" data-background-color="red" style="height: 30%;">
+                                                    <div class="ct-chart" id="historicalState"></div>
+                                                </div>
+                                                <div class="card-content">
+                                                    <h4 class="title">OPEN/CLOSE State</h4><p>1 for open, 0 for close</p>
+                                                    <p class="category">
+                                                        <span class="text-success"><i class="fa fa-bolt"></i> 1.5hr </span> active time.</p>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div class="stats">
+                                                        <i class="material-icons">access_time</i> updated 4 minutes ago
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card">
                                                 <div class="card-header card-chart" data-background-color="purple" style="height: 30%;">
                                                     <div class="ct-chart" id="historicalTemp"></div>
                                                 </div>
                                                 <div class="card-content">
                                                     <h4 class="title">Temperature</h4>
                                                     <p class="category">
-                                                    <span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>
+                                                        <span class="text-success"><i class="fa fa-long-arrow-down"></i> 10% </span> decrease in Temperature.</p>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
@@ -292,7 +337,7 @@
                                                 <div class="card-content">
                                                     <h4 class="title">Humidity</h4>
                                                     <p class="category">
-                                                    <span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>
+                                                        <span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
@@ -302,16 +347,31 @@
                                             </div>
                                             <div class="card">
                                                 <div class="card-header card-chart" data-background-color="purple" style="height: 30%;">
-                                                    <div class="ct-chart" id="historicalState"></div>
+                                                    <div class="ct-chart" id="historicalOccupancy"></div>
                                                 </div>
                                                 <div class="card-content">
-                                                    <h4 class="title">ON/OFF State</h4>
+                                                    <h4 class="title">Occupancy</h4><p>1 for occupied, 0 for free</p>
                                                     <p class="category">
-                                                    <span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>
+                                                    <span class="text-success"><i class="fa fa-group"></i> 4 </span> people occupied locker.</p>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
-                                                        <i class="material-icons">access_time</i> updated 4 minutes ago
+                                                        <i class="material-icons">access_time</i> updated 9 minutes ago
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card">
+                                                <div class="card-header card-chart" data-background-color="purple" style="height: 30%;">
+                                                    <div class="ct-chart" id="historicalMetal"></div>
+                                                </div>
+                                                <div class="card-content">
+                                                    <h4 class="title">Metal Presence</h4><p>1 for present, 0 for absent</p>
+                                                    <p class="category">
+                                                    <span class="text-success"><i class="fa fa-cubes"></i> 10 </span> metal presence detected</p>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div class="stats">
+                                                        <i class="material-icons">access_time</i> updated 5 minutes ago
                                                     </div>
                                                 </div>
                                             </div>
