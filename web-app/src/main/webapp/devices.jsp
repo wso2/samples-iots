@@ -360,11 +360,17 @@
             if (devices) {
                 devicesListing.find('tbody').empty();
                 for (var i = 0; i < devices.length; i++) {
-                    var device = devices[i];
-                    var lastKnownEP = {"uri": "/events/last-known/locker/" + device.deviceIdentifier, "method": "get"};
+                    var lastKnownEP = {"uri": "/events/last-known/locker/" + devices[i].deviceIdentifier, "method": "get"};
                     var lastKnownSuccess = function (data) {
                         var record = JSON.parse(data).records[0];
                         var time = new Date(record.timestamp);
+                        var device;
+                        for (var j = 0; j < devices.length; j++) {
+                            if (record.values.meta_deviceId === devices[j].deviceIdentifier) {
+                                device = devices[j];
+                                break;
+                            }
+                        }
                         var isOpen = record.values.open;
                         var isOccupant = record.values.occupancy;
                         var myRow = "<tr><a href='#" + device.deviceIdentifier + "'><td>" + device.name + "</td><td>"
@@ -374,7 +380,7 @@
                                     "<td><button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
                                     + "<i class=\"material-icons\">refresh</i>"
                                     + "</button>"
-                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey("+device.deviceIdentifier+")'>"
+                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey(\""+device.deviceIdentifier+"\")'>"
                                     + "<i class=\"material-icons\">vpn_key</i>"
                                     + "</button>"
                                     + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
