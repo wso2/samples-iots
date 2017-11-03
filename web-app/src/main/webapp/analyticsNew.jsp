@@ -198,11 +198,6 @@
                         </li>
                         <li>
                             <a href="#">
-                                Company
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
                                 Portfolio
                             </a>
                         </li>
