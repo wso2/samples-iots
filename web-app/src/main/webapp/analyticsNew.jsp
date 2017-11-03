@@ -88,6 +88,58 @@
                                     <div class="tab-content">
                                         <div class="tab-pane active" id="realtime">
                                             <div style="margin-right: 10%; margin-left: 10%; margin-bottom: 5%;">
+                                                <h3>Quicklook Locker stats</h3>
+                                                <div class="row">
+                                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                                                        <div class="card card-stats">
+                                                            <div class="card-header" data-background-color="red">
+                                                                <i class="material-icons">lock_open</i>
+                                                            </div>
+                                                            <div class="card-content">
+                                                                <p class="category">Locker state</p>
+                                                                <h3 class="title">Open</h3>
+                                                            </div>
+                                                            <div class="card-footer">
+                                                                <div class="stats">
+                                                                    <i class="material-icons text-danger">warning</i>
+                                                                    <a href="#">Should be closed after use</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                                                        <div class="card card-stats">
+                                                            <div class="card-header" data-background-color="blue">
+                                                                <i class="material-icons">person</i>
+                                                            </div>
+                                                            <div class="card-content">
+                                                                <p class="category">Occupied</p>
+                                                                <h3 class="title">No</h3>
+                                                            </div>
+                                                            <div class="card-footer">
+                                                                <div class="stats">
+                                                                    <i class="material-icons">date_range</i> Since 3 hrs
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                                                        <div class="card card-stats">
+                                                            <div class="card-header" data-background-color="blue">
+                                                                <i class="material-icons">memory</i>
+                                                            </div>
+                                                            <div class="card-content">
+                                                                <p class="category">Metal Presence</p>
+                                                                <h3 class="title">Present</h3>
+                                                            </div>
+                                                            <div class="card-footer">
+                                                                <div class="stats">
+                                                                    <i class="material-icons">warning</i>Be cautious
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <h3>Realtime Activity Log</h3>
                                                 <table class="table" style="font-size: 15px">
                                                     <thead>
@@ -220,6 +272,13 @@
                                         </div>
                                         <div class="tab-pane" id="historical">
                                             <div style="margin-right: 10%; margin-left: 10%; margin-bottom: 5%;">
+                                                <%--<button class="btn btn-white" id="datepicker" onclick="datepicker()">Change date</button>--%>
+                                                <input class="datepicker form-control" type="text" value="03/12/2016"/>
+                                                <script>
+                                                    $('.datepicker').datepicker({
+                                                    weekStart:1
+                                                    });
+                                                </script>
                                                 <h3>Historical Activity Log</h3>
                                                 <table class="table" style="font-size: 15px">
                                                     <thead>
