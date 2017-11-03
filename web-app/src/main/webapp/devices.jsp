@@ -45,9 +45,12 @@
                             <div class="card-header" data-background-color="purple">
                                 <h4 class="title">Lockers enrolled</h4>
                                 <p class="category">Below are the list of lockers enrolled with the server</p>
-                                <button class="btn btn-white" data-toggle="modal" data-target="#newDeviceModal">Add Locker</button>
+                                <button class="btn btn-white" data-toggle="modal" data-target="#newDeviceModal">Add
+                                                                                                                Locker
+                                </button>
                                 <%--Popup modal for adding new device--%>
-                                <div class="modal fade" id="newDeviceModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal fade" id="newDeviceModal" tabindex="-1" role="dialog"
+                                     aria-labelledby="myModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -61,16 +64,19 @@
                                             <%--<div class="modal-body" style="color:black;">--%>
                                             <%--Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.--%>
                                             <%--</div>--%>
-                                            <form id="new-device-form">
+                                            <form id="new-device-form" method="post">
                                                 <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
-                                                    <input type="text" value="" placeholder="Device ID"
+                                                    <input type="text" name="deviceId" id="deviceId" value=""
+                                                           placeholder="Device ID"
                                                            class="form-control" />
                                                 </div>
-                                                <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
+                                                <div class="form-group" name="deviceName" id="deviceName"
+                                                     style="padding-left: 10%; padding-right: 10%;">
                                                     <input type="text" value="" placeholder="Device Name"
                                                            class="form-control" />
                                                 </div>
-                                                <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
+                                                <div class="form-group" name="deviceDesc" id="deviceDesc"
+                                                     style="padding-left: 10%; padding-right: 10%;">
                                                     <input type="text" value="" placeholder="Device description"
                                                            class="form-control" />
                                                 </div>
@@ -80,7 +86,7 @@
                                                         data-dismiss="modal">Close
                                                 </button>
                                                 <button type="button" class="btn btn-info btn-simple"
-                                                        onclick="addNewDevice()">Save
+                                                        onclick="addNewDevice()">Add
                                                 </button>
                                             </div>
                                         </div>
@@ -114,25 +120,31 @@
                                     </div>
                                 </div>
                                 <%--Popup modal for editing share settings--%>
-                                <div class="modal fade" id="shareSettingsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal fade" id="shareSettingsModal" tabindex="-1" role="dialog"
+                                     aria-labelledby="myModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                                <h4 class="modal-title" id="myModalLabel2" style="color:purple;">Edit Share Settings</h4>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-hidden="true">&times;
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel2" style="color:purple;">Edit
+                                                                                                                 Share
+                                                                                                                 Settings</h4>
                                             </div>
                                             <%--<div class="modal-body" style="color:black;">--%>
                                             <%--Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.--%>
                                             <%--</div>--%>
                                             <form>
                                                 <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
-                                                    <input type="text" value="" placeholder="User ID" class="form-control" />
+                                                    <input type="text" value="" placeholder="User ID"
+                                                           class="form-control" />
                                                 </div>
                                                 <%--<div class="form-group" style="padding-left: 10%; padding-right: 10%;">--%>
-                                                    <%--<input type="text" value="" placeholder="Device Name" class="form-control" />--%>
+                                                <%--<input type="text" value="" placeholder="Device Name" class="form-control" />--%>
                                                 <%--</div>--%>
                                                 <%--<div class="form-group" style="padding-left: 10%; padding-right: 10%;">--%>
-                                                    <%--<input type="text" value="" placeholder="Device description" class="form-control" />--%>
+                                                <%--<input type="text" value="" placeholder="Device description" class="form-control" />--%>
                                                 <%--</div>--%>
                                             </form>
                                             <div style="margin-right: 10%; margin-left: 10%">
@@ -149,10 +161,12 @@
                                                         <td class="text-center">1</td>
                                                         <td>Andrew Mike</td>
                                                         <td class="td-actions text-right">
-                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="View Profile"
+                                                                    class="btn btn-info btn-simple btn-xs">
                                                                 <i class="fa fa-user"></i>
                                                             </button>
-                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="Remove"
+                                                                    class="btn btn-danger btn-simple btn-xs">
                                                                 <i class="fa fa-times"></i>
                                                             </button>
                                                         </td>
@@ -161,10 +175,12 @@
                                                         <td class="text-center">2</td>
                                                         <td>John Doe</td>
                                                         <td class="td-actions text-right">
-                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="View Profile"
+                                                                    class="btn btn-info btn-simple btn-xs">
                                                                 <i class="fa fa-user"></i>
                                                             </button>
-                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="Remove"
+                                                                    class="btn btn-danger btn-simple btn-xs">
                                                                 <i class="fa fa-times"></i>
                                                             </button>
                                                         </td>
@@ -173,10 +189,12 @@
                                                         <td class="text-center">3</td>
                                                         <td>Alex Mike</td>
                                                         <td class="td-actions text-right">
-                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="View Profile"
+                                                                    class="btn btn-info btn-simple btn-xs">
                                                                 <i class="fa fa-user"></i>
                                                             </button>
-                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="Remove"
+                                                                    class="btn btn-danger btn-simple btn-xs">
                                                                 <i class="fa fa-times"></i>
                                                             </button>
                                                         </td>
@@ -185,10 +203,12 @@
                                                         <td class="text-center">3</td>
                                                         <td>Alex Mike</td>
                                                         <td class="td-actions text-right">
-                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="View Profile"
+                                                                    class="btn btn-info btn-simple btn-xs">
                                                                 <i class="fa fa-user"></i>
                                                             </button>
-                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="Remove"
+                                                                    class="btn btn-danger btn-simple btn-xs">
                                                                 <i class="fa fa-times"></i>
                                                             </button>
                                                         </td>
@@ -197,10 +217,12 @@
                                                         <td class="text-center">3</td>
                                                         <td>Alex Mike</td>
                                                         <td class="td-actions text-right">
-                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="View Profile"
+                                                                    class="btn btn-info btn-simple btn-xs">
                                                                 <i class="fa fa-user"></i>
                                                             </button>
-                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="Remove"
+                                                                    class="btn btn-danger btn-simple btn-xs">
                                                                 <i class="fa fa-times"></i>
                                                             </button>
                                                         </td>
@@ -209,10 +231,12 @@
                                                         <td class="text-center">3</td>
                                                         <td>Alex Mike</td>
                                                         <td class="td-actions text-right">
-                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="View Profile"
+                                                                    class="btn btn-info btn-simple btn-xs">
                                                                 <i class="fa fa-user"></i>
                                                             </button>
-                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="Remove"
+                                                                    class="btn btn-danger btn-simple btn-xs">
                                                                 <i class="fa fa-times"></i>
                                                             </button>
                                                         </td>
@@ -221,10 +245,12 @@
                                                         <td class="text-center">3</td>
                                                         <td>Alex Mike</td>
                                                         <td class="td-actions text-right">
-                                                            <button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="View Profile"
+                                                                    class="btn btn-info btn-simple btn-xs">
                                                                 <i class="fa fa-user"></i>
                                                             </button>
-                                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
+                                                            <button type="button" rel="tooltip" title="Remove"
+                                                                    class="btn btn-danger btn-simple btn-xs">
                                                                 <i class="fa fa-times"></i>
                                                             </button>
                                                         </td>
@@ -233,7 +259,9 @@
                                                 </table>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-default btn-simple" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-default btn-simple"
+                                                        data-dismiss="modal">Close
+                                                </button>
                                                 <button type="button" class="btn btn-info btn-simple">Save</button>
                                             </div>
                                         </div>
@@ -337,18 +365,13 @@
             $('#lockCodeModal').modal('show');
         };
         var currentUser = "<%=session.getAttribute(LoginController.ATTR_USER_NAME)%>";
-        var lastKnownEP = {
-            "uri": "/devices/locker/operations",
-            "method": "post",
-            "payload": "{'deviceIdentifiers':[" + deviceId
-                       + "],'operation':{'code':'lock_code','type':'PROFILE','status':'PENDING','control':'REPEAT','payLoad':'"
-                       + lockCode + "," + currentUser + "','enabled':true}}"
-        };
-
+        var payload = "{'deviceIdentifiers':[" + deviceId
+                      + "],'operation':{'code':'lock_code','type':'PROFILE','status':'PENDING','control':'REPEAT','payLoad':'"
+                      + lockCode + "," + currentUser + "','enabled':true}}";
         $.ajax({
                    type: "POST",
                    url: "/invoker/execute",
-                   data: lastKnownEP,
+                   data: {"uri": "/devices/locker/operations", "method": "post", "payload": payload},
                    success: success
                });
     }
@@ -361,7 +384,6 @@
                 devicesListing.find('tbody').empty();
                 for (var i = 0; i < devices.length; i++) {
                     var device = devices[i];
-                    var lastKnownEP = {"uri": "/events/last-known/locker/" + device.deviceIdentifier, "method": "get"};
                     var lastKnownSuccess = function (data) {
                         var record = JSON.parse(data).records[0];
                         var time = new Date(record.timestamp);
@@ -374,7 +396,8 @@
                                     "<td><button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
                                     + "<i class=\"material-icons\">refresh</i>"
                                     + "</button>"
-                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey("+device.deviceIdentifier+")'>"
+                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey("
+                                    + device.deviceIdentifier + ")'>"
                                     + "<i class=\"material-icons\">vpn_key</i>"
                                     + "</button>"
                                     + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
@@ -389,30 +412,60 @@
                     $.ajax({
                                type: "POST",
                                url: "/invoker/execute",
-                               data: lastKnownEP,
+                               data: {"uri": "/events/last-known/locker/" + device.deviceIdentifier, "method": "get"},
                                success: lastKnownSuccess
                            });
                 }
             }
         };
-        var data = {"uri": "/devices/?type=locker&requireDeviceInfo=true", "method": "get"};
         $.ajax({
                    type: "POST",
                    url: "/invoker/execute",
-                   data: data,
+                   data: {"uri": "/devices/?type=locker&requireDeviceInfo=true", "method": "get"},
                    success: success
                });
     }
 
     function addNewDevice() {
+        var deviceId = $("#deviceId").val();
+        var deviceName = $("#deviceName").val();
+        var deviceDesc = $("#deviceDesc").val();
+
         var success = function (data) {
-            console.log(data);
+            var config = {};
+            config.type = type;
+            config.deviceId = deviceId;
+            $.ajax({
+                       type: "GET",
+                       url: "/devices/agent/locker/" + deviceId + "/config",
+                       success: function (data, status, xhr) {
+                           var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
+                               JSON.stringify(data, null, 4));
+                           var dlAnchorElem = document.getElementById('downloadAnchorElem');
+                           dlAnchorElem.setAttribute("href", dataStr);
+                           dlAnchorElem.setAttribute("download", deviceId + ".json");
+                           dlAnchorElem.click();
+//                           $("#modalDevice").modal('show');
+                       },
+                       error: function (xhr, status, error) {
+//                           $(errorMsg).text("Device Created, But failed to download the agent configuration.");
+//                           $(errorMsgWrapper).removeClass("hidden");
+                       }
+                   });
         };
-        var data = {"uri": "/", "method": "post", "payload": ""};
+
+        var payload = "{\n"
+                      + "\"name\": deviceName,\n"
+                      + "\"deviceIdentifier\": deviceId,\n"
+                      + "\"description\": deviceDesc,\n"
+                      + "\"type\": \"locker\",\n"
+                      + "\"enrolmentInfo\": {\"status\": \"ACTIVE\", \"ownership\": \"BYOD\"},\n"
+                      + "\"properties\": []\n"
+                      + "}";
         $.ajax({
                    type: "POST",
                    url: "/invoker/execute",
-                   data: data,
+                   data: {"uri": "/device/agent/enroll", "method": "post", "payload": payload},
                    success: success
                });
     }
