@@ -377,16 +377,16 @@
                                     + (isOpen ? "OPEN" : "CLOSED") + "</td><td>" + (isOccupant ? "OCCUPIED" :
                                                                                     "AVAILABLE") + "</td><td>"
                                     + device.enrolmentInfo.owner + "</td>" +
-                                    "<td><button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
+                                    "<td><button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='getAllDevices()'>"
                                     + "<i class=\"material-icons\">refresh</i>"
                                     + "</button>"
                                     + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey(\""+device.deviceIdentifier+"\")'>"
                                     + "<i class=\"material-icons\">vpn_key</i>"
                                     + "</button>"
-                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
+                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='/analytics.jsp'\">"
                                     + "<i class=\"material-icons\">insert_chart</i>"
                                     + "</button>"
-                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\">"
+                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='/realtime_analytics.jsp'\">"
                                     + "<i class=\"material-icons\">remove_red_eye</i>"
                                     + "</button></td>"
                                     + "</a></tr>";
