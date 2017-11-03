@@ -87,6 +87,61 @@
                                 <div class="card-content">
                                     <div class="tab-content">
                                         <div class="tab-pane active" id="realtime">
+                                            <div style="margin-right: 10%; margin-left: 10%; margin-bottom: 5%;">
+                                                <h3>Realtime Activity Log</h3>
+                                                <table class="table" style="font-size: 15px">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="text-center">#</th>
+                                                        <th>Info</th>
+                                                        <th>Actions</th>
+                                                        <th class="text-left"></th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td class="text-center">1</td>
+                                                        <td>Locker was accessed</td>
+                                                        <td>Granted</td>
+                                                        <td class="td-actions text-right">
+                                                            <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
+                                                            <%--<i class="fa fa-user"></i>--%>
+                                                            <%--</button>--%>
+                                                            <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">2</td>
+                                                        <td>Object placed inside locker</td>
+                                                        <td>Neutral</td>
+                                                        <td class="td-actions text-right">
+                                                            <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
+                                                            <%--<i class="fa fa-user"></i>--%>
+                                                            <%--</button>--%>
+                                                            <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">3</td>
+                                                        <td>Access requested to locker</td>
+                                                        <td>Denied</td>
+                                                        <td class="td-actions text-right">
+                                                            <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
+                                                            <%--<i class="fa fa-user"></i>--%>
+                                                            <%--</button>--%>
+                                                            <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                             <div class="card">
                                                 <div class="card-header card-chart" data-background-color="blue" style="height: 30%;">
                                                     <div class="ct-chart" id="realtimeTemp"></div>
@@ -134,14 +189,95 @@
                                             </div>
                                         </div>
                                         <div class="tab-pane" id="historical">
+                                            <div style="margin-right: 10%; margin-left: 10%; margin-bottom: 5%;">
+                                                <h3>Historical Activity Log</h3>
+                                                <table class="table" style="font-size: 15px">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Time</th>
+                                                            <th>Info</th>
+                                                            <th>Actions</th>
+                                                            <th class="text-left"></th>
+                                                        </tr>
+                                                    </thead>
+                                                        <tbody>
+                                                        <tr>
+                                                            <td class="text-center">02/01/17 01:00</td>
+                                                            <td>Locker was accessed</td>
+                                                            <td>Granted</td>
+                                                            <td class="td-actions text-right">
+                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
+                                                                <%--<i class="fa fa-user"></i>--%>
+                                                                <%--</button>--%>
+                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">02/01/17 02:50</td>
+                                                            <td>Object placed inside locker</td>
+                                                            <td>Neutral</td>
+                                                            <td class="td-actions text-right">
+                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
+                                                                <%--<i class="fa fa-user"></i>--%>
+                                                                <%--</button>--%>
+                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">02/01/17 04:50</td>
+                                                            <td>Access requested to locker</td>
+                                                            <td>Denied</td>
+                                                            <td class="td-actions text-right">
+                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
+                                                                <%--<i class="fa fa-user"></i>--%>
+                                                                <%--</button>--%>
+                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">02/01/17 07:50</td>
+                                                            <td>Access requested to locker</td>
+                                                            <td>Granted</td>
+                                                            <td class="td-actions text-right">
+                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
+                                                                <%--<i class="fa fa-user"></i>--%>
+                                                                <%--</button>--%>
+                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">02/01/17 08:40</td>
+                                                            <td>Object placed in locker</td>
+                                                            <td>Neutral</td>
+                                                            <td class="td-actions text-right">
+                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
+                                                                <%--<i class="fa fa-user"></i>--%>
+                                                                <%--</button>--%>
+                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                </table>
+                                            </div>
                                             <div class="card">
                                                 <div class="card-header card-chart" data-background-color="purple" style="height: 30%;">
                                                     <div class="ct-chart" id="historicalTemp"></div>
                                                 </div>
                                                 <div class="card-content">
                                                     <h4 class="title">Temperature</h4>
-                                                    <%--<p class="category">--%>
-                                                    <%--<span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>--%>
+                                                    <p class="category">
+                                                    <span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
@@ -155,8 +291,8 @@
                                                 </div>
                                                 <div class="card-content">
                                                     <h4 class="title">Humidity</h4>
-                                                    <%--<p class="category">--%>
-                                                    <%--<span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>--%>
+                                                    <p class="category">
+                                                    <span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
@@ -170,8 +306,8 @@
                                                 </div>
                                                 <div class="card-content">
                                                     <h4 class="title">ON/OFF State</h4>
-                                                    <%--<p class="category">--%>
-                                                    <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
+                                                    <p class="category">
+                                                    <span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>
                                                 </div>
                                                 <div class="card-footer">
                                                     <div class="stats">
