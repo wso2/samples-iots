@@ -18,6 +18,7 @@ define stream alert (meta_deviceId string, level string, message string, user st
 define stream attempt (meta_deviceId string, status string, user string);
 define stream last_minute_attempt (meta_deviceId string, status string, user string, attempt_count long);
 define stream deny_attempt (meta_deviceId string, user string);
+define stream allow_open (meta_deviceId string, user string);
 
 define stream door_anomaly (meta_deviceId string, event_count long);
 define stream all_data (meta_deviceId string, temperature double, humidity double, metal bool, occupancy bool, open bool, event_count long, user string);
@@ -59,6 +60,18 @@ begin
 	from deny_attempt
     select meta_deviceId as meta_deviceIdentifier, 'allow_open' as code, 'PROFILE' as type, true as isEnabled, 'false' as payLoad
 	insert into operation;
+
+	from deny_attempt#window.time(60000)
+	select meta_deviceId, user
+	insert expired events into allow_open;
+
+	from allow_open
+    select meta_deviceId as meta_deviceIdentifier, 'allow_open' as code, 'PROFILE' as type, true as isEnabled, 'true' as payLoad
+	insert into operation;
+
+	from allow_open
+	select meta_deviceId, 'Info' as level, 'Allowing to unlock the locker again.' as message, user
+	insert into alert;
 
 	from dataIn#window.time(120000)
 	select meta_deviceId, avg(temperature) as temperature, avg(humidity) as humidity, metal, occupancy, open, count(meta_deviceId) as event_count, json:getProperty(attempt, 'user') as user
