@@ -68,7 +68,7 @@
     </dependencies>
 
     <build>
-        <finalName>connected-cup-agent</finalName>
+        <finalName>locker-portal</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

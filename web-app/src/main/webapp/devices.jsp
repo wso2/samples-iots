@@ -386,6 +386,7 @@
                     var lastKnownEP = {"uri": "/events/last-known/locker/" + devices[i].deviceIdentifier, "method": "get"};
                     var lastKnownSuccess = function (data) {
                         var record = JSON.parse(data).records[0];
+                        if(!record){return;}
                         var time = new Date(record.timestamp);
                         var device;
                         for (var j = 0; j < devices.length; j++) {
