@@ -1,5 +1,5 @@
 /* Enter a unique ExecutionPlan */
-@Plan:name('LockerAnormallyDetectionExecutionPlan')
+@Plan:name('LockerAnomalyDetectionExecutionPlan')
 
 /* Enter a unique description for ExecutionPlan */
 -- @Plan:description('ExecutionPlan')
@@ -42,9 +42,6 @@ insert into alert;
 from attempt [status == 'Expired']
 select meta_deviceId, 'Info' as level, 'Unlocking fail as code is expiered. Regenerate a new code.' as message, user
 insert into alert;
-
-from all_data#log("Logging all_data: ")
-insert into bar;
 
 partition with (meta_deviceId of dataIn)
 begin
