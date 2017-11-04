@@ -420,7 +420,7 @@
                     $.ajax({
                                type: "POST",
                                url: "/invoker/execute",
-                               data: {"uri": "/events/last-known/locker/" + device.deviceIdentifier, "method": "get"},
+                               data: {"uri": "/events/last-known/locker/" + devices[i].deviceIdentifier, "method": "get"},
                                success: lastKnownSuccess
                            });
                 }
