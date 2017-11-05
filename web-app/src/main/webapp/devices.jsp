@@ -70,14 +70,14 @@
                                                            placeholder="Device ID"
                                                            class="form-control" />
                                                 </div>
-                                                <div class="form-group" name="deviceName" id="deviceName"
-                                                     style="padding-left: 10%; padding-right: 10%;">
+                                                <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
                                                     <input type="text" value="" placeholder="Device Name"
+                                                           name="deviceName" id="deviceName"
                                                            class="form-control" />
                                                 </div>
-                                                <div class="form-group" name="deviceDesc" id="deviceDesc"
-                                                     style="padding-left: 10%; padding-right: 10%;">
+                                                <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
                                                     <input type="text" value="" placeholder="Device description"
+                                                           name="deviceDesc" id="deviceDesc"
                                                            class="form-control" />
                                                 </div>
                                             </form>
@@ -281,30 +281,7 @@
                                     </thead>
                                     <tbody>
                                     <tr>
-                                        <td>Locker 1</td>
-                                        <td>OPEN</td>
-                                        <td>AVAILABLE</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-fab btn-fab-mini btn-round">
-                                                <i class="material-icons">refresh</i>
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-info">Analytics</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Locker 2</td>
-                                        <td>CLOSED</td>
-                                        <td>OCCUPIED</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-fab btn-fab-mini btn-round">
-                                                <i class="material-icons">refresh</i>
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-info">Analytics</button>
-                                        </td>
+                                        <td>Loading...</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -383,10 +360,15 @@
             if (devices) {
                 devicesListing.find('tbody').empty();
                 for (var i = 0; i < devices.length; i++) {
-                    var lastKnownEP = {"uri": "/events/last-known/locker/" + devices[i].deviceIdentifier, "method": "get"};
+                    var lastKnownEP = {
+                        "uri": "/events/last-known/locker/" + devices[i].deviceIdentifier,
+                        "method": "get"
+                    };
                     var lastKnownSuccess = function (data) {
                         var record = JSON.parse(data).records[0];
-                        if(!record){return;}
+                        if (!record) {
+                            return;
+                        }
                         var time = new Date(record.timestamp);
                         var device;
                         for (var j = 0; j < devices.length; j++) {
@@ -420,7 +402,10 @@
                     $.ajax({
                                type: "POST",
                                url: "/invoker/execute",
-                               data: {"uri": "/events/last-known/locker/" + devices[i].deviceIdentifier, "method": "get"},
+                               data: {
+                                   "uri": "/events/last-known/locker/" + devices[i].deviceIdentifier,
+                                   "method": "get"
+                               },
                                success: lastKnownSuccess
                            });
                 }
@@ -441,31 +426,39 @@
 
         var success = function (data) {
             var config = {};
-            config.type = type;
+            config.deviceType = "locker";
+            config.deviceName = deviceName;
             config.deviceId = deviceId;
+
+            var configSuccess = function (data) {
+                var appResult = JSON.parse(data);
+
+                config.clientId = appResult.clientId;
+                config.clientSecret = appResult.clientSecret;
+                config.clientSecret = appResult.clientSecret;
+                config.accessToken = appResult.accessToken;
+                config.refreshToken = appResult.refreshToken;
+                config.scope = appResult.scope;
+
+                var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
+                    JSON.stringify(config, null, 4));
+                var dlAnchorElem = document.createElement('a');
+                dlAnchorElem.setAttribute("href", dataStr);
+                dlAnchorElem.setAttribute("download", deviceId + ".json");
+                dlAnchorElem.click();
+            };
+
             $.ajax({
                        type: "GET",
-                       url: "/devices/agent/locker/" + deviceId + "/config",
-                       success: function (data, status, xhr) {
-                           var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
-                               JSON.stringify(data, null, 4));
-                           var dlAnchorElem = document.getElementById('downloadAnchorElem');
-                           dlAnchorElem.setAttribute("href", dataStr);
-                           dlAnchorElem.setAttribute("download", deviceId + ".json");
-                           dlAnchorElem.click();
-//                           $("#modalDevice").modal('show');
-                       },
-                       error: function (xhr, status, error) {
-//                           $(errorMsg).text("Device Created, But failed to download the agent configuration.");
-//                           $(errorMsgWrapper).removeClass("hidden");
-                       }
+                       url: "/config?deviceId=" + deviceId,
+                       success: configSuccess
                    });
         };
 
         var payload = "{\n"
-                      + "\"name\": deviceName,\n"
-                      + "\"deviceIdentifier\": deviceId,\n"
-                      + "\"description\": deviceDesc,\n"
+                      + "\"name\": " + deviceName + ",\n"
+                      + "\"deviceIdentifier\": " + deviceId + ",\n"
+                      + "\"description\": " + deviceDesc + ",\n"
                       + "\"type\": \"locker\",\n"
                       + "\"enrolmentInfo\": {\"status\": \"ACTIVE\", \"ownership\": \"BYOD\"},\n"
                       + "\"properties\": []\n"

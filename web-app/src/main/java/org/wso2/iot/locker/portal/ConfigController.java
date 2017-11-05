@@ -34,7 +34,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,39 +47,38 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-public class LoginController extends HttpServlet {
-    private static final Log log = LogFactory.getLog(LoginController.class);
-    static final String ADMIN_USERNAME = "admin";
-    static final String ADMIN_PASSWORD = "admin";
+import static org.wso2.iot.locker.portal.LoginController.ADMIN_PASSWORD;
+import static org.wso2.iot.locker.portal.LoginController.ADMIN_USERNAME;
 
-    public static final String ATTR_USER_NAME = "userName";
+public class ConfigController extends HttpServlet {
+    private static final Log log = LogFactory.getLog(ConfigController.class);
+
     public static final String ATTR_ACCESS_TOKEN = "accessToken";
-    public static final String ATTR_REFRESH_TOKEN = "refreshToken";
     public static final String ATTR_ENCODED_CLIENT_APP = "encodedClientApp";
-    public static final String ATTR_WEB_APP_SCOPES_LIST = "webappScopesList";
 
-
-    @Override
-    public void init() throws ServletException {
-        getServletContext().getSessionCookieConfig().setPath("/");
-    }
+    public static final String ATTR_AGENT_APP_SCOPES_LIST = "webappScopesList";
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String email = req.getParameter("inputEmail");
-        String password = req.getParameter("inputPassword");
-
-        if (email == null || password == null) {
-            sendFailureRedirect(req, resp);
-            return;
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute(ATTR_ENCODED_CLIENT_APP) == null) {
+            resp.sendError(401, "Unauthorized, no logged in user found");
+        }
+        String deviceId = req.getParameter("deviceId");
+        if(deviceId == null){
+            resp.sendError(400, "Bad Request, device id not found");
         }
 
         //Generate client App
-        HttpPost apiRegEndpoint = new HttpPost(getServletContext().getInitParameter("apiRegistrationEndpoint"));
+        HttpPost apiRegEndpoint = new HttpPost(getServletContext().getInitParameter("apiRegistrationEndpoint") +
+                                                       "/tenants?tenantDomain=carbon" +
+                                                       ".super&applicationName=locker_carbon.super");
         apiRegEndpoint.setHeader("Authorization",
-                                 "Basic " + Base64.getEncoder().encodeToString((email + ":" + password).getBytes()));
+                                 "Bearer " + session.getAttribute(ATTR_ACCESS_TOKEN));
         apiRegEndpoint.setHeader("Content-Type", ContentType.APPLICATION_JSON.toString());
-        String jsonStr = "{\"applicationName\" : \"smartLock\", \"tags\" : [\"device_management\",\"device_agent\"]}";
+        String jsonStr =
+                "{\"applicationName\" : \"locker_carbon.super\", \"tags\" : [\"device_agent\"], " +
+                        "isAllowedToAllDomains: false, validityPeriod: 3600}";
         StringEntity apiRegPayload = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
         apiRegEndpoint.setEntity(apiRegPayload);
 
@@ -114,7 +112,7 @@ public class LoginController extends HttpServlet {
 
                 StringEntity tokenEPPayload = new StringEntity(
                         "grant_type=password&username=" + ADMIN_USERNAME + "&password=" + ADMIN_PASSWORD +
-                                "&scope=" + getServletContext().getInitParameter(ATTR_WEB_APP_SCOPES_LIST),
+                                "&scope=" + "device_locker_" + deviceId + " " + getServletContext().getInitParameter(ATTR_AGENT_APP_SCOPES_LIST),
                         ContentType.APPLICATION_FORM_URLENCODED);
 
                 tokenEndpoint.setEntity(tokenEPPayload);
@@ -132,26 +130,21 @@ public class LoginController extends HttpServlet {
                 String accessToken = jTokenResult.get("access_token").toString();
                 String scope = jTokenResult.get("scope").toString();
 
-                HttpSession session = req.getSession(false);
-                if(session == null)  session = req.getSession(true);
-                session.setAttribute(ATTR_ACCESS_TOKEN, accessToken);
-                session.setAttribute(ATTR_REFRESH_TOKEN, refreshToken);
-                session.setAttribute(ATTR_ENCODED_CLIENT_APP, encodedClientApp);
-                session.setAttribute(ATTR_USER_NAME, email);
-                log.debug("Access Token retrieved with scopes: " + scope);
-                String returnUri = req.getParameter("ret");
-                if (returnUri != null && returnUri.startsWith("/")) {
-                    resp.sendRedirect(returnUri);
-                } else {
-                    resp.sendRedirect("/");
-                }
+                String jsonResponse = "{" +
+                        "\"clientId\" : \"" + clientId + "\"," +
+                        "\"clientSecret\" : \"" + clientSecret + "\"," +
+                        "\"accessToken\" : \"" + accessToken + "\"," +
+                        "\"refreshToken\" : \"" + refreshToken + "\"," +
+                        "\"scope\" : \"" + scope + "\"" +
+                        "}";
+                resp.getWriter().write(jsonResponse);
             } catch (ParseException e) {
                 log.error(e.getMessage(), e);
-                sendFailureRedirect(req, resp);
+                resp.sendError(500, "Internal Server Error");
             }
         } else {
             log.debug("Client app creation failed");
-            sendFailureRedirect(req, resp);
+            resp.sendError(500, "Internal Server Error");
         }
     }
 
