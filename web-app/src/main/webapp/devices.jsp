@@ -281,7 +281,7 @@
                                     </thead>
                                     <tbody>
                                     <tr>
-                                        <td>Loading...</td>
+                                        <td colspan="6">Loading...</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -360,52 +360,48 @@
             if (devices) {
                 devicesListing.find('tbody').empty();
                 for (var i = 0; i < devices.length; i++) {
-                    var lastKnownEP = {
-                        "uri": "/events/last-known/locker/" + devices[i].deviceIdentifier,
-                        "method": "get"
-                    };
-                    var lastKnownSuccess = function (data) {
-                        var record = JSON.parse(data).records[0];
-                        if (!record) {
-                            return;
-                        }
-                        var time = new Date(record.timestamp);
-                        var device;
-                        for (var j = 0; j < devices.length; j++) {
-                            if (record.values.meta_deviceId === devices[j].deviceIdentifier) {
-                                device = devices[j];
-                                break;
+                    (function (dev) {
+                        var lastKnownSuccess = function (data) {
+                            var record = JSON.parse(data).records[0];
+                            var isOpen = "N/A";
+                            var isOccupant = "N/A";
+                            if (record) {
+                                var time = new Date(record.timestamp);
+                                isOpen = record.values.open;
+                                isOccupant = record.values.occupancy;
                             }
-                        }
-                        var isOpen = record.values.open;
-                        var isOccupant = record.values.occupancy;
-                        var myRow = "<tr><a href='#" + device.deviceIdentifier + "'><td>" + device.name + "</td><td>"
-                                    + (isOpen ? "OPEN" : "CLOSED") + "</td><td>" + (isOccupant ? "OCCUPIED" :
-                                                                                    "AVAILABLE") + "</td><td>"
-                                    + device.enrolmentInfo.owner + "</td>" +
-                                    "<td><button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='getAllDevices()'>"
-                                    + "<i class=\"material-icons\">refresh</i>"
-                                    + "</button>"
-                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey(\""
-                                    + device.deviceIdentifier + "\")'>"
-                                    + "<i class=\"material-icons\">vpn_key</i>"
-                                    + "</button>"
-                                    + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='/details.jsp'\">"
-                                    + "<i class=\"material-icons\">remove_red_eye</i>"
-                                    + "</button></td>"
-                                    + "</a></tr>";
-                        devicesListing.find('tbody').append(myRow);
-                    };
-                    $.ajax({
-                               type: "POST",
-                               url: "/invoker/execute",
-                               data: {
-                                   "uri": "/events/last-known/locker/" + devices[i].deviceIdentifier,
-                                   "method": "get"
-                               },
-                               success: lastKnownSuccess
-                           });
+                            var myRow = "<tr><a href='#" + dev.deviceIdentifier + "'><td>" + dev.name
+                                        + "</td><td>"
+                                        + (isOpen ? "OPEN" : "CLOSED") + "</td><td>" + (isOccupant ? "OCCUPIED" :
+                                                                                        "AVAILABLE") + "</td><td>"
+                                        + dev.enrolmentInfo.owner + "</td>" +
+                                        "<td><button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='getAllDevices()'>"
+                                        + "<i class=\"material-icons\">refresh</i>"
+                                        + "</button>"
+                                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey(\""
+                                        + dev.deviceIdentifier + "\")'>"
+                                        + "<i class=\"material-icons\">vpn_key</i>"
+                                        + "</button>"
+                                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='/details.jsp'\">"
+                                        + "<i class=\"material-icons\">remove_red_eye</i>"
+                                        + "</button></td>"
+                                        + "</a></tr>";
+                            devicesListing.find('tbody').append(myRow);
+                        };
+                        $.ajax({
+                                   type: "POST",
+                                   url: "/invoker/execute",
+                                   data: {
+                                       "uri": "/events/last-known/locker/" + devices[i].deviceIdentifier,
+                                       "method": "get"
+                                   },
+                                   success: lastKnownSuccess
+                               });
+                    })(devices[i]);
                 }
+            } else {
+                var myRow = "<tr><td colspan=\"6\">No Devices Found</td></tr>";
+                devicesListing.find('tbody').append(myRow);
             }
         };
         $.ajax({
