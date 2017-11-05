@@ -140,56 +140,34 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <h3>Realtime Activity Log</h3>
+                                                <h3>Device Activity Log</h3>
                                                 <table class="table" style="font-size: 15px">
                                                     <thead>
                                                     <tr>
-                                                        <th class="text-center">#</th>
-                                                        <th>Info</th>
-                                                        <th>Actions</th>
-                                                        <th class="text-left"></th>
+                                                        <th>Time</th>
+                                                        <th>Message</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr>
-                                                        <td class="text-center">1</td>
-                                                        <td>Locker was accessed</td>
-                                                        <td>Granted</td>
-                                                        <td class="td-actions text-right">
-                                                            <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
-                                                            <%--<i class="fa fa-user"></i>--%>
-                                                            <%--</button>--%>
-                                                            <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
-                                                                <i class="fa fa-times"></i>
-                                                            </button>
-                                                        </td>
+                                                    <tr style="background-color: #faffd7">
+                                                        <td>2017-11-01 15:00:32 IST</td>
+                                                        <td>Locker is open for more than two minutes.</td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="text-center">2</td>
-                                                        <td>Object placed inside locker</td>
-                                                        <td>Neutral</td>
-                                                        <td class="td-actions text-right">
-                                                            <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
-                                                            <%--<i class="fa fa-user"></i>--%>
-                                                            <%--</button>--%>
-                                                            <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
-                                                                <i class="fa fa-times"></i>
-                                                            </button>
-                                                        </td>
+                                                        <td>2017-11-01 14:58:32 IST</td>
+                                                        <td>Unlocked the locker by user admin.</td>
+                                                    </tr>
+                                                    <tr style="background-color: #faffd7">
+                                                        <td>2017-11-01 14:56:32 IST</td>
+                                                        <td>Unlocking attempt denied due to incorrect code.</td>
+                                                    </tr>
+                                                    <tr style="background-color: #faffd7">
+                                                        <td>2017-11-01 14:56:15 IST</td>
+                                                        <td>Unlocking attempt denied due to incorrect code.</td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="text-center">3</td>
-                                                        <td>Access requested to locker</td>
-                                                        <td>Denied</td>
-                                                        <td class="td-actions text-right">
-                                                            <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
-                                                            <%--<i class="fa fa-user"></i>--%>
-                                                            <%--</button>--%>
-                                                            <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
-                                                                <i class="fa fa-times"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                        <td>2017-11-01 14:58:32 IST</td>
+                                                        <td>Temperature back to normal.</td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
@@ -279,84 +257,36 @@
                                                     weekStart:1
                                                     });
                                                 </script>
-                                                <h3>Historical Activity Log</h3>
+                                                <h3>Activity Log</h3>
                                                 <table class="table" style="font-size: 15px">
                                                     <thead>
-                                                        <tr>
-                                                            <th class="text-center">Time</th>
-                                                            <th>Info</th>
-                                                            <th>Actions</th>
-                                                            <th class="text-left"></th>
-                                                        </tr>
+                                                    <tr>
+                                                        <th>Time</th>
+                                                        <th>Message</th>
+                                                    </tr>
                                                     </thead>
-                                                        <tbody>
-                                                        <tr>
-                                                            <td class="text-center">02/01/17 01:00</td>
-                                                            <td>Locker was accessed</td>
-                                                            <td>Granted</td>
-                                                            <td class="td-actions text-right">
-                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
-                                                                <%--<i class="fa fa-user"></i>--%>
-                                                                <%--</button>--%>
-                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
-                                                                    <i class="fa fa-times"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center">02/01/17 02:50</td>
-                                                            <td>Object placed inside locker</td>
-                                                            <td>Neutral</td>
-                                                            <td class="td-actions text-right">
-                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
-                                                                <%--<i class="fa fa-user"></i>--%>
-                                                                <%--</button>--%>
-                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
-                                                                    <i class="fa fa-times"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center">02/01/17 04:50</td>
-                                                            <td>Access requested to locker</td>
-                                                            <td>Denied</td>
-                                                            <td class="td-actions text-right">
-                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
-                                                                <%--<i class="fa fa-user"></i>--%>
-                                                                <%--</button>--%>
-                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
-                                                                    <i class="fa fa-times"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center">02/01/17 07:50</td>
-                                                            <td>Access requested to locker</td>
-                                                            <td>Granted</td>
-                                                            <td class="td-actions text-right">
-                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
-                                                                <%--<i class="fa fa-user"></i>--%>
-                                                                <%--</button>--%>
-                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
-                                                                    <i class="fa fa-times"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center">02/01/17 08:40</td>
-                                                            <td>Object placed in locker</td>
-                                                            <td>Neutral</td>
-                                                            <td class="td-actions text-right">
-                                                                <%--<button type="button" rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">--%>
-                                                                <%--<i class="fa fa-user"></i>--%>
-                                                                <%--</button>--%>
-                                                                <button type="button" rel="tooltip" title="Dismiss" class="btn btn-danger btn-simple btn-xs">
-                                                                    <i class="fa fa-times"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
+                                                    <tbody>
+                                                    <tr style="background-color: #faffd7">
+                                                        <td>2017-11-01 15:00:32 IST</td>
+                                                        <td>Locker is open for more than two minutes.</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2017-11-01 14:58:32 IST</td>
+                                                        <td>Unlocked the locker by user admin.</td>
+                                                    </tr>
+                                                    <tr style="background-color: #faffd7">
+                                                        <td>2017-11-01 14:56:32 IST</td>
+                                                        <td>Unlocking attempt denied due to incorrect code.</td>
+                                                    </tr>
+                                                    <tr style="background-color: #faffd7">
+                                                        <td>2017-11-01 14:56:15 IST</td>
+                                                        <td>Unlocking attempt denied due to incorrect code.</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2017-11-01 14:58:32 IST</td>
+                                                        <td>Temperature back to normal.</td>
+                                                    </tr>
+                                                    </tbody>
                                                 </table>
                                             </div>
                                             <div class="card">
