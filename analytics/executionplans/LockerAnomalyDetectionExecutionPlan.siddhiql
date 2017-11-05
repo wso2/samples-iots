@@ -40,7 +40,7 @@ select meta_deviceId, 'Warn' as level, 'Unlocking attempt prevented as locker is
 insert into alert;
 
 from attempt [status == 'Expired']
-select meta_deviceId, 'Info' as level, 'Unlocking fail as code is expiered. Regenerate a new code.' as message, user
+select meta_deviceId, 'Info' as level, 'Unlocking fail as code is expired. Regenerate a new code.' as message, user
 insert into alert;
 
 partition with (meta_deviceId of dataIn)
