@@ -291,7 +291,7 @@
                 </div>
             </div>
         </div>
-        <footer class="footer">
+        <footer class="footer" style="bottom: 0; position: fixed; width: 86%;">
             <div class="container-fluid">
                 <nav class="pull-left">
                     <ul>
@@ -400,8 +400,8 @@
                     })(devices[i]);
                 }
             } else {
-                var myRow = "<tr><td colspan=\"6\">No Devices Found</td></tr>";
-                devicesListing.find('tbody').append(myRow);
+                var myRow = "<tr><td colspan=\"6\" style=\"padding-top: 30px;\"><strong>No Devices Found</strong></td></tr>";
+                devicesListing.find('tbody').replaceWith(myRow);
             }
         };
         $.ajax({
