@@ -1,4 +1,4 @@
-history = {
+analyticsHistory = {
     initDashboardPageCharts: function() {
         /* ----------==========     Historical Temperature Chart initialization    ==========---------- */
         dataHistoricalTempChart = {

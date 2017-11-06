@@ -83,7 +83,7 @@
                                                         data-dismiss="modal">Close
                                                 </button>
                                                 <button type="button" class="btn btn-info btn-simple"
-                                                        onclick="addNewDevice()" data-dismiss="modal">Add
+                                                        onclick="addNewDevice()">Add
                                                 </button>
                                             </div>
                                         </div>
