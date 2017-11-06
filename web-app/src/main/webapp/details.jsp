@@ -1,8 +1,54 @@
+<%@page import="org.apache.http.HttpResponse" %>
+<%@page import="org.apache.http.client.methods.HttpPost" %>
+<%@ page import="org.apache.http.conn.ssl.SSLConnectionSocketFactory" %>
+<%@ page import="org.apache.http.conn.ssl.SSLContextBuilder" %>
+<%@ page import="org.apache.http.conn.ssl.TrustSelfSignedStrategy" %>
+<%@ page import="org.apache.http.entity.ContentType" %>
+<%@ page import="org.apache.http.entity.StringEntity" %>
+<%@ page import="org.apache.http.impl.client.CloseableHttpClient" %>
+<%@ page import="org.apache.http.impl.client.HttpClients" %>
+<%@ page import="java.io.BufferedReader" %>
+<%@ page import="java.io.InputStreamReader" %>
+<%@ page import="java.net.URL" %>
+<%@ page import="java.net.URI" %>
+<%@ page import="org.json.JSONObject" %>
+<%@ page import="java.util.Date" %>
 <%@include file="includes/authenticate.jsp" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String cookie = request.getHeader("Cookie");
+
+    URI invokerURI = new URL(request.getScheme(),
+                             request.getServerName(),
+                             request.getServerPort(), "/invoker/execute").toURI();
+    HttpPost invokerEndpoint = new HttpPost(invokerURI);
+    invokerEndpoint.setHeader("Cookie", cookie);
+
+    StringEntity entity = new StringEntity("uri=/devices/locker/" + request.getParameter("id") + "&method=get", ContentType.APPLICATION_FORM_URLENCODED);
+    invokerEndpoint.setEntity(entity);
+
+    CloseableHttpClient client = null;
+    SSLContextBuilder builder = new SSLContextBuilder();
+    builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+    SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
+    client = HttpClients.custom().setSSLSocketFactory(
+            sslsf).build();
+    HttpResponse invokerResponse = client.execute(invokerEndpoint);
+
+    BufferedReader rd = new BufferedReader(new InputStreamReader(invokerResponse.getEntity().getContent()));
+
+    StringBuilder result = new StringBuilder();
+    String line = "";
+    while ((line = rd.readLine()) != null) {
+        result.append(line);
+    }
+    System.out.println(result);
+    JSONObject device = new JSONObject(result.toString());
+    JSONObject enrolmentInfo = device.getJSONObject("enrolmentInfo");
+%>
 <html>
 <head>
-    <title>Analytics2</title>
+    <title>Device Details</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
@@ -54,10 +100,12 @@
                                 </a>
                             </div>
                             <div class="content">
-                                <h6 class="category text-gray">ID: LK1234</h6>
-                                <h4 class="card-title">LOCKER 1</h4>
+                                <h6 class="category text-gray">ID: <%=device.getString("deviceIdentifier")%></h6>
+                                <h4 class="card-title"><%=device.getString("name")%></h4>
                                 <p class="card-content">
-                                    Owned by John. Installed on July 27th 2017. Device is updated with latest Software
+                                    Owned by <%=enrolmentInfo.getString("owner")%>.
+                                    Installed on <%=new Date(enrolmentInfo.getLong("dateOfEnrolment")).toString()%>.
+                                    <%=device.getString("description")%>
                                 </p>
                             </div>
                         </div>
@@ -442,7 +490,6 @@
             sURLVariables = sPageURL.split('&'),
             sParameterName,
             i;
-
         for (i = 0; i < sURLVariables.length; i++) {
             sParameterName = sURLVariables[i].split('=');
 
