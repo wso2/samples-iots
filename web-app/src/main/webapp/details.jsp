@@ -322,7 +322,7 @@
                                     <div class="tab-pane" id="historical">
                                         <div style="margin-right: 10%; margin-left: 10%; margin-bottom: 5%;">
                                             <%--<button class="btn btn-white" id="datepicker" onclick="datepicker()">Change date</button>--%>
-                                            <input class="datepicker form-control" type="text" value="03/12/2016" />
+                                            <input class="datepicker form-control" type="text" value="06/11/2017" />
                                             <h3>Activity Log</h3>
                                             <table class="table" style="font-size: 15px">
                                                 <thead>
@@ -468,6 +468,7 @@
 </body>
 <script src="js/jquery-3.2.1.min.js" type="text/javascript"></script>
 <script src="js/bootstrap.min.js" type="text/javascript"></script>
+<script src="js/bootstrap-datepicker.js" type="text/javascript"></script>
 <script src="js/material.min.js" type="text/javascript"></script>
 <!--  Charts Plugin -->
 <script src="js/chartist.min.js"></script>
@@ -603,7 +604,7 @@
 </script>
 <script>
     $('.datepicker').datepicker({
-                                    weekStart: 1
-                                });
+        weekStart: 1
+    });
 </script>
 </html>
