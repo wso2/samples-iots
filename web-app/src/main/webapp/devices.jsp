@@ -435,7 +435,7 @@
         };
 
         var payload = "{\n"
-                      + "\"name\": " + deviceName + ",\n"
+                      + "\"name\": \"" + deviceName + "\",\n"
                       + "\"deviceIdentifier\": " + deviceId + ",\n"
                       + "\"description\": " + deviceDesc + ",\n"
                       + "\"type\": \"locker\",\n"
