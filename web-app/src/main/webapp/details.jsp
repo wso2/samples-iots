@@ -154,17 +154,16 @@
                                                 <div class="col-lg-4 col-md-6 col-sm-6">
                                                     <div class="card card-stats">
                                                         <div id="lock_status_color" class="card-header"
-                                                             data-background-color="red">
-                                                            <i class="material-icons">lock_open</i>
+                                                             data-background-color="grey">
+                                                            <i class="material-icons">help_outline</i>
                                                         </div>
                                                         <div class="card-content">
                                                             <p class="category">Locker state</p>
-                                                            <h3 class="title" id="lock_status">Open</h3>
+                                                            <h3 class="title" id="lock_status">Unknown</h3>
                                                         </div>
                                                         <div class="card-footer">
                                                             <div class="stats" id="lock_status_alert">
-                                                                <i class="material-icons text-danger">warning</i>
-                                                                <a href="#">Should be closed after use</a>
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -172,16 +171,16 @@
                                                 <div class="col-lg-4 col-md-6 col-sm-6">
                                                     <div class="card card-stats">
                                                         <div id="occupant_status_color" class="card-header"
-                                                             data-background-color="blue">
-                                                            <i class="material-icons">person</i>
+                                                             data-background-color="grey">
+                                                            <i class="material-icons">help_outline</i>
                                                         </div>
                                                         <div class="card-content">
                                                             <p class="category">Occupied</p>
-                                                            <h3 class="title" id="occupied_status">No</h3>
+                                                            <h3 class="title" id="occupied_status">Unknown</h3>
                                                         </div>
                                                         <div class="card-footer">
                                                             <div class="stats" id="occupied_alert">
-                                                                <i class="material-icons">date_range</i> Since 3 hrs
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -189,16 +188,16 @@
                                                 <div class="col-lg-4 col-md-6 col-sm-6">
                                                     <div class="card card-stats">
                                                         <div id="metal_status_color" class="card-header"
-                                                             data-background-color="blue">
-                                                            <i class="material-icons">memory</i>
+                                                             data-background-color="grey">
+                                                            <i class="material-icons">help_outline</i>
                                                         </div>
                                                         <div class="card-content">
                                                             <p class="category">Metal Presence</p>
-                                                            <h3 class="title" id="metal_status">Present</h3>
+                                                            <h3 class="title" id="metal_status">Unknown</h3>
                                                         </div>
                                                         <div class="card-footer">
                                                             <div class="stats" id="metal_status_alert">
-                                                                <i class="material-icons">warning</i>Be cautious
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -525,7 +524,7 @@
     $(document).ready(function () {
         // Javascript method's body can be found in assets/js/demos.js
         // demo.initDashboardPageCharts();
-        var wsEndpoint = "wss://localhost:9445/secured-websocket/iot.per.device.stream.carbon.super.locker/1.0.0?"
+        var wsEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/iot.per.device.stream.carbon.super.locker/1.0.0?"
                          + "deviceId=<%=id%>&deviceType=locker&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
         realtimeGraphRefresh(wsEndpoint);
     });
@@ -573,11 +572,15 @@
             //occupied status
             $("#occupied_status").html((isOccupant) ? "Yes" : "No");
             $("#occupied_alert").html("<i class=\"material-icons\">date_range</i> Since " + sinceText);
+            occupantStatusColor.find("i").html("person");
+            occupantStatusColor.attr("data-background-color", "blue");
 
             //metal status
             $("#metal_status").html((isMetalPresent) ? "Present" : "No");
             $("#metal_status_alert").html((isMetalPresent) ? "<i class=\"material-icons\">warning</i>Be cautious" :
                                           "<i class=\"material-icons\">info</i>No metal found");
+            metalStatusColor.find("i").html("memory");
+            metalStatusColor.attr("data-background-color", "blue");
         } else {
             //lock status
             lockStatusColor.attr("data-background-color", "grey");

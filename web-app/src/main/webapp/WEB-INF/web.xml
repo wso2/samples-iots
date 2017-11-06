@@ -51,6 +51,10 @@
         <param-value>https://localhost:8243/token</param-value>
     </context-param>
     <context-param>
+        <param-name>websocketEndpoint</param-name>
+        <param-value>wss://localhost:9445</param-value>
+    </context-param>
+    <context-param>
         <param-name>agentScopesList</param-name>
         <param-value>perm:device:enroll perm:device:disenroll perm:device:modify perm:device:operations perm:device:publish-event</param-value>
     </context-param>
