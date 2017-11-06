@@ -62,6 +62,7 @@
     <link href="css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link href="css/material-dashboard.css" rel="stylesheet" />
+    <link href="css/daterangepicker.css" rel="stylesheet" />
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet'
           type='text/css'>
@@ -321,13 +322,9 @@
                                     </div>
                                     <div class="tab-pane" id="historical">
                                         <div style="margin-right: 10%; margin-left: 10%; margin-bottom: 5%;">
-                                            <%--<button class="btn btn-white" id="datepicker" onclick="datepicker()">Change date</button>--%>
                                             <%--<input class="datepicker form-control" type="text" value="06/11/2017" />--%>
-                                            <div class="input-group input-daterange">
-                                                <input type="text" class="form-control" value="2017-11-01">
-                                                <div class="input-group-addon">to</div>
-                                                <input type="text" class="form-control" value="2017-11-06">
-                                            </div>
+                                            <h4>Select Date-range</h4>
+                                            <input type="text" name="daterange" value="01/01/2017 1:30 PM - 01/01/2017 2:00 PM" class="form-control"/>
                                             <h3>Activity Log</h3>
                                             <table class="table" style="font-size: 15px">
                                                 <thead>
@@ -474,6 +471,8 @@
 <script src="js/jquery-3.2.1.min.js" type="text/javascript"></script>
 <script src="js/bootstrap.min.js" type="text/javascript"></script>
 <script src="js/bootstrap-datepicker.js" type="text/javascript"></script>
+<script src="js/moment.min.js" type="text/javascript"></script>
+<script src="js/daterangepicker.js" type="text/javascript"></script>
 <script src="js/material.min.js" type="text/javascript"></script>
 <!--  Charts Plugin -->
 <script src="js/chartist.min.js"></script>
@@ -608,10 +607,28 @@
            });
 </script>
 <script>
-    $('.input-daterange').datepicker({autoclose:true, format:"yyyy-mm-dd"}).on('changeDate', function(e){
-        if (e.viewMode === 'days') {
-            $(this).datepicker('hide');
-        }
+    $(function() {
+        $('input[name="daterange"]').daterangepicker({
+            timePicker: true,
+            timePickerIncrement: 30,
+            locale: {
+                format: 'MM/DD/YYYY h:mm A'
+            },
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        });
+
+        $(window).scroll(function() {
+            if ($('input[name="daterange"]').length) {
+                $('input[name="daterange"]').daterangepicker("close");
+            }
+        });
     });
 </script>
 </html>
