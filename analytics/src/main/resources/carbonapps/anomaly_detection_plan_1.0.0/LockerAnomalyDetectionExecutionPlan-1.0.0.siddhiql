@@ -67,6 +67,10 @@ begin
     select meta_deviceId as meta_deviceIdentifier, 'allow_open' as code, 'PROFILE' as type, true as isEnabled, 'false' as payLoad
 	insert into operation;
 
+	from deny_attempt
+	select meta_deviceId, 'Info' as level, 'Disallowing unlock, due to 3 failure attempts within a minute.' as message, user
+	insert into alert;
+
 	from deny_attempt#window.time(60000)
 	select meta_deviceId, user
 	insert expired events into allow_open;
