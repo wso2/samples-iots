@@ -322,7 +322,12 @@
                                     <div class="tab-pane" id="historical">
                                         <div style="margin-right: 10%; margin-left: 10%; margin-bottom: 5%;">
                                             <%--<button class="btn btn-white" id="datepicker" onclick="datepicker()">Change date</button>--%>
-                                            <input class="datepicker form-control" type="text" value="06/11/2017" />
+                                            <%--<input class="datepicker form-control" type="text" value="06/11/2017" />--%>
+                                            <div class="input-group input-daterange">
+                                                <input type="text" class="form-control" value="2017-11-01">
+                                                <div class="input-group-addon">to</div>
+                                                <input type="text" class="form-control" value="2017-11-06">
+                                            </div>
                                             <h3>Activity Log</h3>
                                             <table class="table" style="font-size: 15px">
                                                 <thead>
@@ -603,8 +608,10 @@
            });
 </script>
 <script>
-    $('.datepicker').datepicker({
-        weekStart: 1
+    $('.input-daterange').datepicker({autoclose:true, format:"yyyy-mm-dd"}).on('changeDate', function(e){
+        if (e.viewMode === 'days') {
+            $(this).datepicker('hide');
+        }
     });
 </script>
 </html>
