@@ -474,8 +474,7 @@
 <script src="js/bootstrap-notify.js"></script>
 <!-- Material Dashboard javascript methods -->
 <script src="js/material-dashboard.js?v=1.2.0"></script>
-<!-- Material Dashboard DEMO methods, don't include it in your project! -->
-<script src="js/demo.js"></script>
+<script src="js/history.js"></script>
 <script type="text/javascript">
     function timeDifference(current, previous) {
 
@@ -514,17 +513,17 @@
 
     $(document).ready(function () {
         // Javascript method's body can be found in assets/js/demos.js
-        demo.initDashboardPageCharts();
+        // demo.initDashboardPageCharts();
     });
-    document.getElementById("realtimeTab").addEventListener("click", graphRefresh);
-    document.getElementById("historicalTab").addEventListener("click", graphRefresh);
+    document.getElementById("realtimeTab").addEventListener("click", realtimeGraphRefresh);
+    document.getElementById("historicalTab").addEventListener("click", historyGraphRefresh);
 
-    function graphRefresh() {
-        demo.initDashboardPageCharts();
+    function realtimeGraphRefresh() {
+        // demo.initDashboardPageCharts();
     }
 
-    function getDevice() {
-
+    function historyGraphRefresh() {
+        // demo.initDashboardPageCharts();
     }
 
     var lastKnownSuccess = function (data) {
