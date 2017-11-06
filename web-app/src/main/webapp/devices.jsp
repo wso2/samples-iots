@@ -436,8 +436,8 @@
 
         var payload = "{\n"
                       + "\"name\": \"" + deviceName + "\",\n"
-                      + "\"deviceIdentifier\": " + deviceId + ",\n"
-                      + "\"description\": " + deviceDesc + ",\n"
+                      + "\"deviceIdentifier\": \"" + deviceId + "\",\n"
+                      + "\"description\": \"" + deviceDesc + "\",\n"
                       + "\"type\": \"locker\",\n"
                       + "\"enrolmentInfo\": {\"status\": \"ACTIVE\", \"ownership\": \"BYOD\"},\n"
                       + "\"properties\": []\n"
