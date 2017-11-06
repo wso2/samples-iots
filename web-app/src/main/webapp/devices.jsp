@@ -382,7 +382,7 @@
                                         + dev.deviceIdentifier + "\")'>"
                                         + "<i class=\"material-icons\">vpn_key</i>"
                                         + "</button>"
-                                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='/details.jsp'\">"
+                                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='/details.jsp?id="+dev.deviceIdentifier+"'\">"
                                         + "<i class=\"material-icons\">remove_red_eye</i>"
                                         + "</button></td>"
                                         + "</a></tr>";
