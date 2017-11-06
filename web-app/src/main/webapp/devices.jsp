@@ -293,26 +293,12 @@
         </div>
         <footer class="footer" style="bottom: 0; position: fixed; width: 86%;">
             <div class="container-fluid">
-                <nav class="pull-left">
-                    <ul>
-                        <li>
-                            <a href="#">
-                                About
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                Blog
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
                 <p class="copyright pull-right">
                     &copy;
                     <script>
                         document.write(new Date().getFullYear())
                     </script>
-                    <a href="https://wso2.com/iot">WSO2 IoT Team</a>
+                    <a href="https://wso2.com/iot">WSO2 Inc.</a>
                 </p>
             </div>
         </footer>
