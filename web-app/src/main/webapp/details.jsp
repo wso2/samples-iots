@@ -16,6 +16,12 @@
 <%@include file="includes/authenticate.jsp" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
+    String id = request.getParameter("id");
+    if (id == null) {
+        response.sendRedirect("/devices.jsp");
+        return;
+    }
+
     String cookie = request.getHeader("Cookie");
 
     URI invokerURI = new URL(request.getScheme(),
@@ -24,16 +30,19 @@
     HttpPost invokerEndpoint = new HttpPost(invokerURI);
     invokerEndpoint.setHeader("Cookie", cookie);
 
-    StringEntity entity = new StringEntity("uri=/devices/locker/" + request.getParameter("id") + "&method=get", ContentType.APPLICATION_FORM_URLENCODED);
+    StringEntity entity = new StringEntity("uri=/devices/locker/" + id + "&method=get", ContentType.APPLICATION_FORM_URLENCODED);
     invokerEndpoint.setEntity(entity);
 
-    CloseableHttpClient client = null;
     SSLContextBuilder builder = new SSLContextBuilder();
     builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
     SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
-    client = HttpClients.custom().setSSLSocketFactory(
+    CloseableHttpClient client = HttpClients.custom().setSSLSocketFactory(
             sslsf).build();
     HttpResponse invokerResponse = client.execute(invokerEndpoint);
+
+    if(invokerResponse.getStatusLine().getStatusCode() == 401) {
+        return;
+    }
 
     BufferedReader rd = new BufferedReader(new InputStreamReader(invokerResponse.getEntity().getContent()));
 
@@ -42,7 +51,6 @@
     while ((line = rd.readLine()) != null) {
         result.append(line);
     }
-    System.out.println(result);
     JSONObject device = new JSONObject(result.toString());
     JSONObject enrolmentInfo = device.getJSONObject("enrolmentInfo");
 %>
@@ -441,26 +449,12 @@
         </div>
         <footer class="footer">
             <div class="container-fluid">
-                <nav class="pull-left">
-                    <ul>
-                        <li>
-                            <a href="#">
-                                About
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                Blog
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
                 <p class="copyright pull-right">
                     &copy;
                     <script>
                         document.write(new Date().getFullYear())
                     </script>
-                    <a href="http://www.wso2.com">WSO2</a> IoT Team
+                    <a href="http://www.wso2.com">WSO2</a> Inc.
                 </p>
             </div>
         </footer>
@@ -478,27 +472,11 @@
 <script src="js/perfect-scrollbar.jquery.min.js"></script>
 <!--  Notifications Plugin    -->
 <script src="js/bootstrap-notify.js"></script>
-<!--  Google Maps Plugin    -->
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
 <!-- Material Dashboard javascript methods -->
 <script src="js/material-dashboard.js?v=1.2.0"></script>
 <!-- Material Dashboard DEMO methods, don't include it in your project! -->
 <script src="js/demo.js"></script>
 <script type="text/javascript">
-    var getUrlParameter = function getUrlParameter(sParam) {
-        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-            sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
-        for (i = 0; i < sURLVariables.length; i++) {
-            sParameterName = sURLVariables[i].split('=');
-
-            if (sParameterName[0] === sParam) {
-                return sParameterName[1] === undefined ? true : sParameterName[1];
-            }
-        }
-    };
-
     function timeDifference(current, previous) {
 
         var msPerMinute = 60 * 1000;
@@ -589,7 +567,7 @@
                type: "POST",
                url: "/invoker/execute",
                data: {
-                   "uri": "/events/last-known/locker/" + getUrlParameter('id'),
+                   "uri": "/events/last-known/locker/<%=id%>",
                    "method": "get"
                },
                success: lastKnownSuccess
