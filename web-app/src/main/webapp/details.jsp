@@ -486,8 +486,7 @@
 <script src="js/history.js"></script>
 <script src="js/realtime-analytics.js"></script>
 <script type="text/javascript">
-    function timeDifference(current, previous) {
-
+    function timeDifference(current, previous, isShort) {
         var msPerMinute = 60 * 1000;
         var msPerHour = msPerMinute * 60;
         var msPerDay = msPerHour * 24;
@@ -497,27 +496,17 @@
         var elapsed = current - previous;
 
         if (elapsed < msPerMinute) {
-            return Math.round(elapsed / 1000) + ' seconds ago';
-        }
-
-        else if (elapsed < msPerHour) {
-            return Math.round(elapsed / msPerMinute) + ' minutes ago';
-        }
-
-        else if (elapsed < msPerDay) {
-            return Math.round(elapsed / msPerHour) + ' hours ago';
-        }
-
-        else if (elapsed < msPerMonth) {
-            return 'approximately ' + Math.round(elapsed / msPerDay) + ' days ago';
-        }
-
-        else if (elapsed < msPerYear) {
-            return 'approximately ' + Math.round(elapsed / msPerMonth) + ' months ago';
-        }
-
-        else {
-            return 'approximately ' + Math.round(elapsed / msPerYear) + ' years ago';
+            return Math.round(elapsed / 1000) + ((isShort) ? 's' : ' seconds');
+        } else if (elapsed < msPerHour) {
+            return Math.round(elapsed / msPerMinute) + ((isShort) ? 'm' : ' minutes');
+        } else if (elapsed < msPerDay) {
+            return Math.round(elapsed / msPerHour) + ((isShort) ? 'h' : ' hours');
+        } else if (elapsed < msPerMonth) {
+            return 'approximately ' + Math.round(elapsed / msPerDay) + ((isShort) ? 'd' : ' days');
+        } else if (elapsed < msPerYear) {
+            return 'approximately ' + Math.round(elapsed / msPerMonth) + ((isShort) ? 'mnth' : ' months');
+        } else {
+            return 'approximately ' + Math.round(elapsed / msPerYear) + ((isShort) ? 'y' : ' years');
         }
     }
 
@@ -539,49 +528,55 @@
         analyticsHistory.initDashboardPageCharts();
     }
 
-    var lastKnown = {};
-    var lastKnownSuccess = function (data) {
-        var record = JSON.parse(data).records[0];
-
+    function updateStatusCards(sinceText, isOpen, isOccupant, isMetalPresent) {
+        //lock status
         var lockStatusColor = $("#lock_status_color");
         var occupantStatusColor = $("#occupant_status_color");
         var metalStatusColor = $("#metal_status_color");
 
+        lockStatusColor.attr("data-background-color", (isOpen) ? "red" : "green");
+        lockStatusColor.find("i").html((isOpen) ? "lock_open" : "lock");
+        $("#lock_status").html((isOpen) ? "Open" : "Closed");
+
+        var lockerStatusAlert = "";
+        if (isOpen && !isOccupant) {
+            lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Should be closed after use";
+        } else if (isOpen && isOccupant) {
+            lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is not locked";
+        } else if (!isOpen && !isOccupant) {
+            lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is empty";
+        }
+        $("#lock_status_alert").html(lockerStatusAlert);
+
+        //occupied status
+        $("#occupied_status").html((isOccupant) ? "Yes" : "No");
+        $("#occupied_alert").html("<i class=\"material-icons\">date_range</i> Since " + sinceText);
+        occupantStatusColor.find("i").html("person");
+        occupantStatusColor.attr("data-background-color", "blue");
+
+        //metal status
+        $("#metal_status").html((isMetalPresent) ? "Present" : "No");
+        $("#metal_status_alert").html((isMetalPresent) ? "<i class=\"material-icons\">warning</i>Be cautious" :
+                                      "<i class=\"material-icons\">info</i>No metal found");
+        metalStatusColor.find("i").html("memory");
+        metalStatusColor.attr("data-background-color", "blue");
+    }
+
+    var lastKnown = {};
+    var lastKnownSuccess = function (data) {
+        var record = JSON.parse(data).records[0];
+
         if (record) {
             lastKnown = record;
-            var sinceText = timeDifference(new Date(), new Date(record.timestamp));
+            var sinceText = timeDifference(new Date(), new Date(record.timestamp), false) + " ago";
             var isOpen = record.values.open;
             var isOccupant = record.values.occupancy;
             var isMetalPresent = record.values.metal;
-
-            //lock status
-            lockStatusColor.attr("data-background-color", (isOpen) ? "red" : "green");
-            lockStatusColor.find("i").html((isOpen) ? "lock_open" : "lock");
-            $("#lock_status").html((isOpen) ? "Open" : "Closed");
-
-            var lockerStatusAlert = "";
-            if (isOpen && !isOccupant) {
-                lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Should be closed after use";
-            } else if (isOpen && isOccupant) {
-                lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is not locked";
-            } else if (!isOpen && !isOccupant) {
-                lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is empty";
-            }
-            $("#lock_status_alert").html(lockerStatusAlert);
-
-            //occupied status
-            $("#occupied_status").html((isOccupant) ? "Yes" : "No");
-            $("#occupied_alert").html("<i class=\"material-icons\">date_range</i> Since " + sinceText);
-            occupantStatusColor.find("i").html("person");
-            occupantStatusColor.attr("data-background-color", "blue");
-
-            //metal status
-            $("#metal_status").html((isMetalPresent) ? "Present" : "No");
-            $("#metal_status_alert").html((isMetalPresent) ? "<i class=\"material-icons\">warning</i>Be cautious" :
-                                          "<i class=\"material-icons\">info</i>No metal found");
-            metalStatusColor.find("i").html("memory");
-            metalStatusColor.attr("data-background-color", "blue");
+            updateStatusCards(sinceText, isOpen, isOccupant, isMetalPresent);
         } else {
+            var lockStatusColor = $("#lock_status_color");
+            var occupantStatusColor = $("#occupant_status_color");
+            var metalStatusColor = $("#metal_status_color");
             //lock status
             lockStatusColor.attr("data-background-color", "grey");
             lockStatusColor.find("i").html("help_outline");
