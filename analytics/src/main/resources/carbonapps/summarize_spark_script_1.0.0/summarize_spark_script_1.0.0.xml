@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<Analytics>
+  <Name>summarize_spark_script</Name>
+  <Script>
+      CREATE TEMPORARY TABLE ORG_WSO2_IOT_LOCKER_ATTEMPT USING CarbonAnalytics
+      OPTIONS(tableName "ORG_WSO2_IOT_LOCKER_ATTEMPT",
+      incrementalParams "ORG_WSO2_IOT_LOCKER_ATTEMPT, HOUR");
+
+      CREATE TEMPORARY TABLE Locker_Attempts_Per_Hour USING CarbonAnalytics
+      OPTIONS (tableName "Locker_Attempts_Per_Hour",
+      schema "deviceId STRING, status STRING, user STRING, noOfAttempts INT -i, year INT -i, month INT -i, day INT -i, hour INT -i, _timestamp LONG -i",
+      primaryKeys "deviceId, status, user, year, month, day, hour",
+      mergeSchema "false", incrementalParams "Locker_Attempts_Per_Hour, DAY");
+
+      INSERT INTO TABLE Locker_Attempts_Per_Hour
+      SELECT meta_deviceId as deviceId, status, user, count(*) as noOfAttempts, year, month, day, hour, getHourStartingTime(year, month, day, hour) as _timestamp
+      FROM ORG_WSO2_IOT_LOCKER_ATTEMPT
+      GROUP BY year, month, day, hour, meta_deviceId, status, user;
+
+      INCREMENTAL_TABLE_COMMIT ORG_WSO2_LOCKER_ATTEMPTS;
+  </Script>
+  <CronExpression>0 */30 * ? * *</CronExpression>
+</Analytics>

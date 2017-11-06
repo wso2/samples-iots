@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<artifact name="alert_store" version="1.0.0" type="event/eventstore" serverRole="DataAnalyticsServer">
+	<file>org_wso2_iot_alert_1.0.0.xml</file>
+</artifact>

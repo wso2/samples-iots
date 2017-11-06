@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<artifacts>
+    <artifact name="org.wso2.iot.locker.analysis" version="1.0.0" type="carbon/application">
+        <dependency artifact="alert_publisher" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="alert_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="alert_stream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="anomaly_detection_plan" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="attempt_store" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="attempt_stream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="operation_publisher" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="operation_stream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+        <dependency artifact="summarize_spark_script" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer" />
+    </artifact>
+</artifacts>
