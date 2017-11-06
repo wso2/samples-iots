@@ -43,6 +43,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
+import java.net.URLDecoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -141,7 +142,8 @@ public class LoginController extends HttpServlet {
                 log.debug("Access Token retrieved with scopes: " + scope);
                 String returnUri = req.getParameter("ret");
                 if (returnUri != null && returnUri.startsWith("/")) {
-                    resp.sendRedirect(returnUri);
+                    String queryStr = req.getParameter("q");
+                    resp.sendRedirect((queryStr != null) ? returnUri + "?" + URLDecoder.decode(queryStr, "UTF-8") : returnUri);
                 } else {
                     resp.sendRedirect("/");
                 }

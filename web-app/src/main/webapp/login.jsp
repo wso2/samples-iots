@@ -77,6 +77,9 @@
                                 <% if (request.getParameter("ret") != null) { %>
                                 <input type="hidden" name="ret" value="<%=request.getParameter("ret")%>" />
                                 <% } %>
+                                <% if (request.getParameter("q") != null) { %>
+                                <input type="hidden" name="q" value="<%=request.getParameter("q")%>" />
+                                <% } %>
                             </div>
                             <div class="footer text-center">
                                 <input type="submit" class="btn btn-simple btn-primary btn-lg" value="Login" />
