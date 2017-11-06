@@ -7,11 +7,11 @@
 <%@ page import="org.apache.http.entity.StringEntity" %>
 <%@ page import="org.apache.http.impl.client.CloseableHttpClient" %>
 <%@ page import="org.apache.http.impl.client.HttpClients" %>
+<%@ page import="org.json.JSONObject" %>
 <%@ page import="java.io.BufferedReader" %>
 <%@ page import="java.io.InputStreamReader" %>
-<%@ page import="java.net.URL" %>
 <%@ page import="java.net.URI" %>
-<%@ page import="org.json.JSONObject" %>
+<%@ page import="java.net.URL" %>
 <%@ page import="java.util.Date" %>
 <%@include file="includes/authenticate.jsp" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -30,7 +30,8 @@
     HttpPost invokerEndpoint = new HttpPost(invokerURI);
     invokerEndpoint.setHeader("Cookie", cookie);
 
-    StringEntity entity = new StringEntity("uri=/devices/locker/" + id + "&method=get", ContentType.APPLICATION_FORM_URLENCODED);
+    StringEntity entity = new StringEntity("uri=/devices/locker/" + id + "&method=get",
+                                           ContentType.APPLICATION_FORM_URLENCODED);
     invokerEndpoint.setEntity(entity);
 
     SSLContextBuilder builder = new SSLContextBuilder();
@@ -40,7 +41,7 @@
             sslsf).build();
     HttpResponse invokerResponse = client.execute(invokerEndpoint);
 
-    if(invokerResponse.getStatusLine().getStatusCode() == 401) {
+    if (invokerResponse.getStatusLine().getStatusCode() == 401) {
         return;
     }
 
@@ -108,8 +109,10 @@
                                 </a>
                             </div>
                             <div class="content">
-                                <h6 class="category text-gray">ID: <%=device.getString("deviceIdentifier")%></h6>
-                                <h4 class="card-title"><%=device.getString("name")%></h4>
+                                <h6 class="category text-gray">ID: <%=device.getString("deviceIdentifier")%>
+                                </h6>
+                                <h4 class="card-title"><%=device.getString("name")%>
+                                </h4>
                                 <p class="card-content">
                                     Owned by <%=enrolmentInfo.getString("owner")%>.
                                     Installed on <%=new Date(enrolmentInfo.getLong("dateOfEnrolment")).toString()%>.
@@ -167,7 +170,8 @@
                                                 </div>
                                                 <div class="col-lg-4 col-md-6 col-sm-6">
                                                     <div class="card card-stats">
-                                                        <div class="card-header" data-background-color="blue">
+                                                        <div id="occupant_status_color" class="card-header"
+                                                             data-background-color="blue">
                                                             <i class="material-icons">person</i>
                                                         </div>
                                                         <div class="card-content">
@@ -183,7 +187,8 @@
                                                 </div>
                                                 <div class="col-lg-4 col-md-6 col-sm-6">
                                                     <div class="card card-stats">
-                                                        <div class="card-header" data-background-color="blue">
+                                                        <div id="metal_status_color" class="card-header"
+                                                             data-background-color="blue">
                                                             <i class="material-icons">memory</i>
                                                         </div>
                                                         <div class="card-content">
@@ -487,27 +492,27 @@
         var elapsed = current - previous;
 
         if (elapsed < msPerMinute) {
-            return Math.round(elapsed/1000) + ' seconds ago';
+            return Math.round(elapsed / 1000) + ' seconds ago';
         }
 
         else if (elapsed < msPerHour) {
-            return Math.round(elapsed/msPerMinute) + ' minutes ago';
+            return Math.round(elapsed / msPerMinute) + ' minutes ago';
         }
 
-        else if (elapsed < msPerDay ) {
-            return Math.round(elapsed/msPerHour ) + ' hours ago';
+        else if (elapsed < msPerDay) {
+            return Math.round(elapsed / msPerHour) + ' hours ago';
         }
 
         else if (elapsed < msPerMonth) {
-            return 'approximately ' + Math.round(elapsed/msPerDay) + ' days ago';
+            return 'approximately ' + Math.round(elapsed / msPerDay) + ' days ago';
         }
 
         else if (elapsed < msPerYear) {
-            return 'approximately ' + Math.round(elapsed/msPerMonth) + ' months ago';
+            return 'approximately ' + Math.round(elapsed / msPerMonth) + ' months ago';
         }
 
         else {
-            return 'approximately ' + Math.round(elapsed/msPerYear ) + ' years ago';
+            return 'approximately ' + Math.round(elapsed / msPerYear) + ' years ago';
         }
     }
 
@@ -532,35 +537,59 @@
         var isOccupant = "N/A";
         var sinceText = "N/A";
         var isMetalPresent = "N/A";
+
+        var lockStatusColor = $("#lock_status_color");
+        var occupantStatusColor = $("#occupant_status_color");
+        var metalStatusColor = $("#metal_status_color");
+
         if (record) {
             sinceText = timeDifference(new Date(), new Date(record.timestamp));
             isOpen = record.values.open;
             isOccupant = record.values.occupancy;
             isMetalPresent = record.values.metal;
+
+            //lock status
+            lockStatusColor.attr("data-background-color", (isOpen) ? "red" : "green");
+            lockStatusColor.find("i").html((isOpen) ? "lock_open" : "lock");
+            $("#lock_status").html((isOpen) ? "Open" : "Closed");
+
+            var lockerStatusAlert = "";
+            if (isOpen && !isOccupant) {
+                lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Should be closed after use";
+            } else if (isOpen && isOccupant) {
+                lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is not locked";
+            } else if (!isOpen && !isOccupant) {
+                lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is empty";
+            }
+            $("#lock_status_alert").html(lockerStatusAlert);
+
+            //occupied status
+            $("#occupied_status").html((isOccupant) ? "Yes" : "No");
+            $("#occupied_alert").html("<i class=\"material-icons\">date_range</i> Since " + sinceText);
+
+            //metal status
+            $("#metal_status").html((isMetalPresent) ? "Present" : "No");
+            $("#metal_status_alert").html((isMetalPresent) ? "<i class=\"material-icons\">warning</i>Be cautious" :
+                                          "<i class=\"material-icons\">info</i>No metal found");
+        } else {
+            //lock status
+            lockStatusColor.attr("data-background-color", "grey");
+            lockStatusColor.find("i").html("help_outline");
+            $("#lock_status").html("Unknown");
+            $("#lock_status_alert").parent().remove();
+
+            //occupied status
+            occupantStatusColor.attr("data-background-color", "grey");
+            occupantStatusColor.find("i").html("help_outline");
+            $("#occupied_status").html("Unknown");
+            $("#occupied_alert").parent().remove();
+
+            //metal status
+            metalStatusColor.attr("data-background-color", "grey");
+            metalStatusColor.find("i").html("help_outline");
+            $("#metal_status").html("Unknown");
+            $("#metal_status_alert").parent().remove();
         }
-
-        var lockStatusColor = $("#lock_status_color");
-        lockStatusColor.attr("data-background-color", (isOpen) ? "red" : "green");
-        lockStatusColor.find("i").html((isOpen) ? "lock_open" : "lock");
-        $("#lock_status").html((isOpen) ? "Open" : "Closed");
-
-        var lockerStatusAlert = "";
-        if(isOpen && !isOccupant){
-            lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Should be closed after use";
-        } else if(isOpen && isOccupant){
-            lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is not locked";
-        } else if(!isOpen && !isOccupant){
-            lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is empty";
-        }
-        $("#lock_status_alert").html(lockerStatusAlert);
-
-        $("#occupied_status").html((isOccupant) ? "Yes" : "No");
-        $("#occupied_alert").html("<i class=\"material-icons\">date_range</i> Since " + sinceText);
-
-        $("#metal_status").html((isMetalPresent) ? "Present" : "No");
-        $("#metal_status_alert").html((isMetalPresent) ? "<i class=\"material-icons\">warning</i>Be cautious" : "<i class=\"material-icons\">info</i>No metal found");
-
-//            $("#lock_status_alert").
     };
     $.ajax({
                type: "POST",
