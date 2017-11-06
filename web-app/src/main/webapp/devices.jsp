@@ -61,9 +61,6 @@
                                                                                                                 Locker
                                                                                                                 Details</h4>
                                             </div>
-                                            <%--<div class="modal-body" style="color:black;">--%>
-                                            <%--Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth. Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.--%>
-                                            <%--</div>--%>
                                             <form id="new-device-form" method="post">
                                                 <div class="form-group" style="padding-left: 10%; padding-right: 10%;">
                                                     <input type="text" name="deviceId" id="deviceId" value=""
@@ -86,7 +83,7 @@
                                                         data-dismiss="modal">Close
                                                 </button>
                                                 <button type="button" class="btn btn-info btn-simple"
-                                                        onclick="addNewDevice()">Add
+                                                        onclick="addNewDevice()" data-dismiss="modal">Add
                                                 </button>
                                             </div>
                                         </div>
