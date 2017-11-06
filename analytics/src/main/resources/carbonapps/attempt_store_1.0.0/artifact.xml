@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<artifact name="attempt_store" version="1.0.0" type="event/eventstore" serverRole="DataAnalyticsServer">
-	<file>org_wso2_iot_locker_attempt_1.0.0.xml</file>
+<artifact name="attempt_store" version="1.0.0" type="analytics/eventstore" serverRole="DataAnalyticsServer">
+	<file>org_wso2_iot_locker_attempt.xml</file>
 </artifact>

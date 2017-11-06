@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <artifact name="anomaly_detection_plan" version="1.0.0" type="event/execution-plan" serverRole="DataAnalyticsServer">
-    <file>LockerAnomalyDetectionExecutionPlan_1.0.0.siddhiql</file>
+    <file>LockerAnomalyDetectionExecutionPlan-1.0.0.siddhiql</file>
 </artifact>

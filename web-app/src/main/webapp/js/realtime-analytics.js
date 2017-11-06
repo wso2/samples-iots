@@ -186,8 +186,9 @@ realtimeAnalytics = {
             }
             if (ws) {
                 ws.onmessage = function (event) {
-                    console.log(JSON.parse(event.data));
-                    var dataPoint = JSON.parse(event.data).event.payloadData;
+                    var data = event.data;
+                    console.log(data);
+                    var dataPoint = JSON.parse(data);
 
                     var open = dataPoint.open;
                     var occupancy = dataPoint.occupancy;

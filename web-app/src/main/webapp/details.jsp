@@ -524,7 +524,7 @@
     $(document).ready(function () {
         // Javascript method's body can be found in assets/js/demos.js
         // demo.initDashboardPageCharts();
-        var wsEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/iot.per.device.stream.carbon.super.locker/1.0.0?"
+        var wsEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/org.wso2.iot.locker.stat/1.0.0?"
                          + "deviceId=<%=id%>&deviceType=locker&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
         realtimeGraphRefresh(wsEndpoint);
     });

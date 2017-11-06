@@ -17,8 +17,6 @@
       SELECT meta_deviceId as deviceId, status, user, count(*) as noOfAttempts, year, month, day, hour, getHourStartingTime(year, month, day, hour) as _timestamp
       FROM ORG_WSO2_IOT_LOCKER_ATTEMPT
       GROUP BY year, month, day, hour, meta_deviceId, status, user;
-
-      INCREMENTAL_TABLE_COMMIT ORG_WSO2_LOCKER_ATTEMPTS;
   </Script>
   <CronExpression>0 */30 * ? * *</CronExpression>
 </Analytics>
