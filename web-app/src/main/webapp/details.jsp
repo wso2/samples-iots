@@ -248,7 +248,7 @@
                                                 <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="stats">
+                                                <div class="stats" id="realtimeStateLastUpdated">
                                                     <i class="material-icons">access_time</i> updated 4 minutes ago
                                                 </div>
                                             </div>
@@ -264,7 +264,7 @@
                                                 <%--<span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>--%>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="stats">
+                                                <div class="stats" id="realtimeTempLastUpdated">
                                                     <i class="material-icons">access_time</i> updated 4 minutes ago
                                                 </div>
                                             </div>
@@ -280,7 +280,7 @@
                                                 <%--<span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>--%>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="stats">
+                                                <div class="stats"  id="realtimeHumidLastUpdated">
                                                     <i class="material-icons">access_time</i> updated 7 minutes ago
                                                 </div>
                                             </div>
@@ -297,7 +297,7 @@
                                                 <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="stats">
+                                                <div class="stats"  id="realtimeOccupancyLastUpdated">
                                                     <i class="material-icons">access_time</i> updated 9 minutes ago
                                                 </div>
                                             </div>
@@ -314,7 +314,7 @@
                                                 <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="stats">
+                                                <div class="stats"  id="realtimeMetalLastUpdated">
                                                     <i class="material-icons">access_time</i> updated 5 minutes ago
                                                 </div>
                                             </div>
@@ -485,6 +485,7 @@
 <!-- Material Dashboard javascript methods -->
 <script src="js/material-dashboard.js?v=1.2.0"></script>
 <script src="js/history.js"></script>
+<script src="js/realtime-analytics.js"></script>
 <script type="text/javascript">
     function timeDifference(current, previous) {
 
@@ -524,34 +525,35 @@
     $(document).ready(function () {
         // Javascript method's body can be found in assets/js/demos.js
         // demo.initDashboardPageCharts();
+        var wsEndpoint = "wss://localhost:9445/secured-websocket/iot.per.device.stream.carbon.super.locker/1.0.0?"
+                         + "deviceId=<%=id%>&deviceType=locker&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
+        realtimeGraphRefresh(wsEndpoint);
     });
     document.getElementById("realtimeTab").addEventListener("click", realtimeGraphRefresh);
     document.getElementById("historicalTab").addEventListener("click", historyGraphRefresh);
 
-    function realtimeGraphRefresh() {
-        // demo.initDashboardPageCharts();
+    function realtimeGraphRefresh(wsEndpoint) {
+        realtimeAnalytics.initDashboardPageCharts(wsEndpoint);
     }
 
     function historyGraphRefresh() {
-        // demo.initDashboardPageCharts();
+        analyticsHistory.initDashboardPageCharts();
     }
 
+    var lastKnown = {};
     var lastKnownSuccess = function (data) {
         var record = JSON.parse(data).records[0];
-        var isOpen = "N/A";
-        var isOccupant = "N/A";
-        var sinceText = "N/A";
-        var isMetalPresent = "N/A";
 
         var lockStatusColor = $("#lock_status_color");
         var occupantStatusColor = $("#occupant_status_color");
         var metalStatusColor = $("#metal_status_color");
 
         if (record) {
-            sinceText = timeDifference(new Date(), new Date(record.timestamp));
-            isOpen = record.values.open;
-            isOccupant = record.values.occupancy;
-            isMetalPresent = record.values.metal;
+            lastKnown = record;
+            var sinceText = timeDifference(new Date(), new Date(record.timestamp));
+            var isOpen = record.values.open;
+            var isOccupant = record.values.occupancy;
+            var isMetalPresent = record.values.metal;
 
             //lock status
             lockStatusColor.attr("data-background-color", (isOpen) ? "red" : "green");
