@@ -661,7 +661,7 @@
 
             $.ajax({
                        type: "POST",
-                       url: "/invoker/execute",
+                       url: "invoker/execute",
                        data: {
                            "uri": "/events/locker/<%=id%>?offset=" + index + "&limit=" + length + "&from=" + new Date(
                                start.format('YYYY-MM-DD H:mm:ss')).getTime() + "&to=" + new Date(
