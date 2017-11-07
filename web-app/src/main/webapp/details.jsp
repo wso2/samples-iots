@@ -441,6 +441,55 @@
 <script src="js/historical-analytics.js"></script>
 <script src="js/realtime-analytics.js"></script>
 <script type="text/javascript">
+    function datePickerCallback(startD, endD) {
+        var eventsSuccess = function (data) {
+            var records = JSON.parse(data);
+            analyticsHistory.redrawGraphs(records);
+        };
+
+        var index = 0;
+        var length = 100;
+
+        $.ajax({
+                   type: "POST",
+                   url: "invoker/execute",
+                   data: {
+                       "uri": "/events/locker/<%=id%>?offset=" + index + "&limit=" + length + "&from=" + new Date(
+                           startD.format('YYYY-MM-DD H:mm:ss')).getTime() + "&to=" + new Date(
+                           endD.format('YYYY-MM-DD H:mm:ss')).getTime(),
+                       "method": "get"
+                   },
+                   success: eventsSuccess
+               });
+    };
+
+    $(function () {
+        $('#daterange').daterangepicker({
+                                            timePicker: true,
+                                            timePickerIncrement: 30,
+                                            locale: {
+                                                format: 'MM/DD/YYYY h:mm A'
+                                            },
+                                            ranges: {
+                                                'Today': [moment(), moment()],
+                                                'Yesterday': [moment().subtract(1, 'days'),
+                                                              moment().subtract(1, 'days')],
+                                                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                                                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                                                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                                                'Last Month': [moment().subtract(1, 'month').startOf('month'),
+                                                               moment().subtract(1, 'month').endOf('month')]
+                                            }
+                                        }, datePickerCallback);
+
+        $(window).scroll(function () {
+            if ($('#daterange').length) {
+                $('#daterange').daterangepicker("close");
+            }
+        })
+    });
+</script>
+<script type="text/javascript">
     var alerts = [];
     function timeDifference(current, previous, isShort) {
         var msPerMinute = 60 * 1000;
@@ -534,6 +583,9 @@
 
     function historyGraphRefresh() {
         analyticsHistory.initDashboardPageCharts();
+        var start = moment().subtract(1, 'days');
+        var end = moment();
+        datePickerCallback(start, end);
     }
 
     function updateStatusCards(sinceText, isOpen, isOccupant, isMetalPresent) {
@@ -613,59 +665,5 @@
                },
                success: lastKnownSuccess
            });
-</script>
-<script type="text/javascript">
-    $(function () {
-        var start = moment().subtract(1, 'days');
-        var end = moment();
-
-        function datePickerCallback(start, end) {
-            var eventsSuccess = function (data) {
-                var records = JSON.parse(data);
-                analyticsHistory.redrawGraphs(records);
-            };
-
-            var index = 0;
-            var length = 100;
-
-            $.ajax({
-                       type: "POST",
-                       url: "invoker/execute",
-                       data: {
-                           "uri": "/events/locker/<%=id%>?offset=" + index + "&limit=" + length + "&from=" + new Date(
-                               start.format('YYYY-MM-DD H:mm:ss')).getTime() + "&to=" + new Date(
-                               end.format('YYYY-MM-DD H:mm:ss')).getTime(),
-                           "method": "get"
-                       },
-                       success: eventsSuccess
-                   });
-        };
-
-        $('#daterange').daterangepicker({
-                                            startDate: start,
-                                            endDate: end,
-                                            timePicker: true,
-                                            timePickerIncrement: 30,
-                                            locale: {
-                                                format: 'MM/DD/YYYY h:mm A'
-                                            },
-                                            ranges: {
-                                                'Today': [moment(), moment()],
-                                                'Yesterday': [moment().subtract(1, 'days'),
-                                                              moment().subtract(1, 'days')],
-                                                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                                                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                                                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                                                'Last Month': [moment().subtract(1, 'month').startOf('month'),
-                                                               moment().subtract(1, 'month').endOf('month')]
-                                            }
-                                        }, datePickerCallback);
-
-        $(window).scroll(function () {
-            if ($('#daterange').length) {
-                $('#daterange').daterangepicker("close");
-            }
-        })
-    });
 </script>
 </html>
