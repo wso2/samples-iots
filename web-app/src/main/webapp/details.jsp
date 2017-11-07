@@ -310,37 +310,6 @@
                                             <input type="text" name="daterange" id="daterange"
                                                    value="01/01/2017 1:30 PM - 01/01/2017 2:00 PM"
                                                    class="form-control" />
-                                            <h3>Activity Log</h3>
-                                            <table class="table" style="font-size: 15px">
-                                                <thead>
-                                                <tr>
-                                                    <th>Time</th>
-                                                    <th>Message</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <tr style="background-color: #faffd7">
-                                                    <td>2017-11-01 15:00:32 IST</td>
-                                                    <td>Locker is open for more than two minutes.</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2017-11-01 14:58:32 IST</td>
-                                                    <td>Unlocked the locker by user admin.</td>
-                                                </tr>
-                                                <tr style="background-color: #faffd7">
-                                                    <td>2017-11-01 14:56:32 IST</td>
-                                                    <td>Unlocking attempt denied due to incorrect code.</td>
-                                                </tr>
-                                                <tr style="background-color: #faffd7">
-                                                    <td>2017-11-01 14:56:15 IST</td>
-                                                    <td>Unlocking attempt denied due to incorrect code.</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2017-11-01 14:58:32 IST</td>
-                                                    <td>Temperature back to normal.</td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
                                         </div>
                                         <div class="card">
                                             <div class="card-header card-chart" data-background-color="red"
@@ -506,7 +475,7 @@
                               + "deviceId=<%=id%>&deviceType=locker&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
         displayAlerts(wsAlertEndpoint);
     });
-    document.getElementById("realtimeTab").addEventListener("click", realtimeGraphRefresh);
+    document.getElementById("realtimeTab").addEventListener("click", realtimeGraphRefresh());
     document.getElementById("historicalTab").addEventListener("click", historyGraphRefresh);
 
     function realtimeGraphRefresh(wsEndpoint) {

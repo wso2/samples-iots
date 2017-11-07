@@ -166,7 +166,11 @@ realtimeAnalytics = {
         var realtimeMetal = new Chartist.Line('#realtimeMetal', dataRealtimeMetalChart, optionsRealtimeMetalChart);
         md.startAnimationForLineChart(realtimeMetal);
 
-        connect(wsEndpoint);
+        if (wsEndpoint) {
+            connect(wsEndpoint);
+        } else {
+            updateGraphs();
+        }
         var ws;
 
         // close websocket when page is about to be unloaded
@@ -207,38 +211,43 @@ realtimeAnalytics = {
                     realtimeTempLabelRef.push(currentTime);
                     realtimeAnalytics.calcTimeDiff(realtimeTempLabel, realtimeTempLabelRef);
                     realtimeTempSeries.push(temperature);
-                    realtimeTemp.update();
                     $("#realtimeTempLastUpdated").html(lastUpdatedText);
 
                     realtimeHumidLabel.push('0s');
                     realtimeHumidLabelRef.push(currentTime);
                     realtimeAnalytics.calcTimeDiff(realtimeHumidLabel, realtimeHumidLabelRef);
                     realtimeHumidSeries.push(humidity);
-                    realtimeHumid.update();
                     $("#realtimeHumidLastUpdated").html(lastUpdatedText);
 
                     realtimeStateLabel.push('0s');
                     realtimeStateLabelRef.push(currentTime);
                     realtimeAnalytics.calcTimeDiff(realtimeStateLabel, realtimeStateLabelRef);
                     realtimeStateSeries.push((open)? 1 : 0);
-                    realtimeState.update();
                     $("#realtimeStateLastUpdated").html(lastUpdatedText);
 
                     realtimeOccupancyLabel.push('0s');
                     realtimeOccupancyLabelRef.push(currentTime);
                     realtimeAnalytics.calcTimeDiff(realtimeOccupancyLabel, realtimeOccupancyLabelRef);
                     realtimeOccupancySeries.push((occupancy)? 1 : 0);
-                    realtimeOccupancy.update();
                     $("#realtimeOccupancyLastUpdated").html(lastUpdatedText);
 
                     realtimeMetalLabel.push('0s');
                     realtimeMetalLabelRef.push(currentTime);
                     realtimeAnalytics.calcTimeDiff(realtimeMetalLabel, realtimeMetalLabelRef);
                     realtimeMetalSeries.push((metal)? 1 : 0);
-                    realtimeMetal.update();
                     $("#realtimeMetalLastUpdated").html(lastUpdatedText);
+
+                    updateGraphs();
                 };
             }
+        }
+        
+        function updateGraphs(){
+            realtimeTemp.update();
+            realtimeHumid.update();
+            realtimeState.update();
+            realtimeOccupancy.update();
+            realtimeMetal.update();
         }
 
         function disconnect() {
