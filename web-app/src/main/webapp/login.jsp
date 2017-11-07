@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
                     <div class="card card-signup">
-                        <form class="form" method="post" action="/login">
+                        <form class="form" method="post" action="login">
                             <div class="header header-primary text-center">
                                 <h5>Web Portal</h5>
                                 <div class="social-line">
@@ -120,12 +120,4 @@
 <script src="js/material-kit.js" type="text/javascript"></script>
 <script src="js/bootstrap-notify.js" type="text/javascript"></script>
 <script src="js/material-dashboard.js" type="text/javascript"></script>
-<script type="text/javascript">
-    $(document).ready(function () {
-
-        // Javascript method's body can be found in assets/js/demos.js
-        demo.initDashboardPageCharts();
-
-    });
-</script>
 </html>

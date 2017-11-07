@@ -18,7 +18,7 @@
 <%
     String id = request.getParameter("id");
     if (id == null) {
-        response.sendRedirect("/devices.jsp");
+        response.sendRedirect("devices.jsp");
         return;
     }
 
@@ -26,7 +26,7 @@
 
     URI invokerURI = new URL(request.getScheme(),
                              request.getServerName(),
-                             request.getServerPort(), "/invoker/execute").toURI();
+                             request.getServerPort(), request.getContextPath() + "/invoker/execute").toURI();
     HttpPost invokerEndpoint = new HttpPost(invokerURI);
     invokerEndpoint.setHeader("Cookie", cookie);
 
@@ -635,7 +635,7 @@
     };
     $.ajax({
                type: "POST",
-               url: "/invoker/execute",
+               url: "invoker/execute",
                data: {
                    "uri": "/events/last-known/locker/<%=id%>",
                    "method": "get"

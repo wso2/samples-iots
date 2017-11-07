@@ -20,10 +20,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="/logout.jsp">Logout</a>
-                        </li>
-                        <li>
-                            <a href="#">Account Settings</a>
+                            <a href="logout.jsp">Logout</a>
                         </li>
                     </ul>
                 </li>

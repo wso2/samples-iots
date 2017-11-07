@@ -330,7 +330,7 @@
                       + lockCode + "," + currentUser + "','enabled':true}}";
         $.ajax({
                    type: "POST",
-                   url: "/invoker/execute",
+                   url: "invoker/execute",
                    data: {"uri": "/devices/locker/operations", "method": "post", "payload": payload},
                    success: success
                });
@@ -365,7 +365,7 @@
                                         + dev.deviceIdentifier + "\")'>"
                                         + "<i class=\"material-icons\">vpn_key</i>"
                                         + "</button>"
-                                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='/details.jsp?id="+dev.deviceIdentifier+"'\">"
+                                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='details.jsp?id="+dev.deviceIdentifier+"'\">"
                                         + "<i class=\"material-icons\">remove_red_eye</i>"
                                         + "</button></td>"
                                         + "</a></tr>";
@@ -373,7 +373,7 @@
                         };
                         $.ajax({
                                    type: "POST",
-                                   url: "/invoker/execute",
+                                   url: "invoker/execute",
                                    data: {
                                        "uri": "/events/last-known/locker/" + devices[i].deviceIdentifier,
                                        "method": "get"
@@ -389,7 +389,7 @@
         };
         $.ajax({
                    type: "POST",
-                   url: "/invoker/execute",
+                   url: "invoker/execute",
                    data: {"uri": "/devices/?type=locker&requireDeviceInfo=true", "method": "get"},
                    success: success
                });
@@ -426,7 +426,7 @@
 
             $.ajax({
                        type: "GET",
-                       url: "/config?deviceId=" + deviceId,
+                       url: "config?deviceId=" + deviceId,
                        success: configSuccess
                    });
         };
@@ -441,7 +441,7 @@
                       + "}";
         $.ajax({
                    type: "POST",
-                   url: "/invoker/execute",
+                   url: "invoker/execute",
                    data: {"uri": "/device/agent/enroll", "method": "post", "payload": payload},
                    success: success
                });

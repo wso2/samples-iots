@@ -34,7 +34,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,7 +62,7 @@ public class LoginController extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        getServletContext().getSessionCookieConfig().setPath("/");
+        getServletContext().getSessionCookieConfig().setPath(getServletContext().getContextPath());
     }
 
     @Override
@@ -141,11 +140,11 @@ public class LoginController extends HttpServlet {
                 session.setAttribute(ATTR_USER_NAME, email);
                 log.debug("Access Token retrieved with scopes: " + scope);
                 String returnUri = req.getParameter("ret");
-                if (returnUri != null && returnUri.startsWith("/")) {
+                if (returnUri != null) {
                     String queryStr = req.getParameter("q");
                     resp.sendRedirect((queryStr != null) ? returnUri + "?" + URLDecoder.decode(queryStr, "UTF-8") : returnUri);
                 } else {
-                    resp.sendRedirect("/");
+                    resp.sendRedirect(req.getContextPath());
                 }
             } catch (ParseException e) {
                 log.error(e.getMessage(), e);
