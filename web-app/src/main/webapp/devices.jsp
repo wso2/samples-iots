@@ -312,6 +312,9 @@
 <script src="js/bootstrap-notify.js" type="text/javascript"></script>
 <script src="js/material-dashboard.js" type="text/javascript"></script>
 <script type="text/javascript">
+
+    var devices = [];
+
     $(document).ready(function () {
         // Javascript method's body can be found in assets/js/demos.js
         //demo.initDashboardPageCharts();
@@ -336,52 +339,56 @@
                });
     }
 
+    function getDevice(dev, index) {
+        var devicesListing = $('#devices-listing');
+        var lastKnownSuccess = function (data) {
+            var record = JSON.parse(data).records[0];
+            var isOpen = "N/A";
+            var isOccupant = "N/A";
+            if (record) {
+                isOpen = record.values.open;
+                isOccupant = record.values.occupancy;
+            }
+            var myRow = "<tr><a href='#" + dev.deviceIdentifier + "'><td>" + dev.name
+                        + "</td><td>"
+                        + (isOpen ? "OPEN" : "CLOSED") + "</td><td>" + (isOccupant ? "OCCUPIED" :
+                                                                        "AVAILABLE") + "</td><td>"
+                        + dev.enrolmentInfo.owner + "</td>" +
+                        "<td><button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='getAllDevices()'>"
+                        + "<i class=\"material-icons\">refresh</i>"
+                        + "</button>"
+                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey(\""
+                        + dev.deviceIdentifier + "\")'>"
+                        + "<i class=\"material-icons\">vpn_key</i>"
+                        + "</button>"
+                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='details.jsp?id="+dev.deviceIdentifier+"'\">"
+                        + "<i class=\"material-icons\">remove_red_eye</i>"
+                        + "</button></td>"
+                        + "</a></tr>";
+            devicesListing.find('tbody').append(myRow);
+            var newIndex = index + 1;
+            if (devices.length > newIndex) {
+                getDevice(devices[newIndex], newIndex);
+            }
+        };
+        $.ajax({
+                   type: "POST",
+                   url: "invoker/execute",
+                   data: {
+                       "uri": "/events/last-known/locker/" + devices[index].deviceIdentifier,
+                       "method": "get"
+                   },
+                   success: lastKnownSuccess
+               });
+    }
+
     function getAllDevices() {
         var success = function (data) {
-            var devices = JSON.parse(data).devices;
+            devices = JSON.parse(data).devices;
             var devicesListing = $('#devices-listing');
-            if (devices) {
+            if (devices && devices.length > 0) {
                 devicesListing.find('tbody').empty();
-                for (var i = 0; i < devices.length; i++) {
-                    (function (dev) {
-                        var lastKnownSuccess = function (data) {
-                            var record = JSON.parse(data).records[0];
-                            var isOpen = "N/A";
-                            var isOccupant = "N/A";
-                            if (record) {
-                                var time = new Date(record.timestamp);
-                                isOpen = record.values.open;
-                                isOccupant = record.values.occupancy;
-                            }
-                            var myRow = "<tr><a href='#" + dev.deviceIdentifier + "'><td>" + dev.name
-                                        + "</td><td>"
-                                        + (isOpen ? "OPEN" : "CLOSED") + "</td><td>" + (isOccupant ? "OCCUPIED" :
-                                                                                        "AVAILABLE") + "</td><td>"
-                                        + dev.enrolmentInfo.owner + "</td>" +
-                                        "<td><button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='getAllDevices()'>"
-                                        + "<i class=\"material-icons\">refresh</i>"
-                                        + "</button>"
-                                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick='generateKey(\""
-                                        + dev.deviceIdentifier + "\")'>"
-                                        + "<i class=\"material-icons\">vpn_key</i>"
-                                        + "</button>"
-                                        + "<button class=\"btn btn-primary btn-fab btn-fab-mini btn-round\" onclick=\"window.location.href='details.jsp?id="+dev.deviceIdentifier+"'\">"
-                                        + "<i class=\"material-icons\">remove_red_eye</i>"
-                                        + "</button></td>"
-                                        + "</a></tr>";
-                            devicesListing.find('tbody').append(myRow);
-                        };
-                        $.ajax({
-                                   type: "POST",
-                                   url: "invoker/execute",
-                                   data: {
-                                       "uri": "/events/last-known/locker/" + devices[i].deviceIdentifier,
-                                       "method": "get"
-                                   },
-                                   success: lastKnownSuccess
-                               });
-                    })(devices[i]);
-                }
+                getDevice(devices[0], 0);
             } else {
                 var myRow = "<tr><td colspan=\"6\" style=\"padding-top: 30px;\"><strong>No Devices Found</strong></td></tr>";
                 devicesListing.find('tbody').replaceWith(myRow);
