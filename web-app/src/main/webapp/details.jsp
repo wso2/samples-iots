@@ -263,7 +263,7 @@
                                                 <%--<span class="text-success"><i class="fa fa-bolt"></i> 10hr </span> active time.</p>--%>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="stats"  id="realtimeHumidLastUpdated">
+                                                <div class="stats" id="realtimeHumidLastUpdated">
                                                     <i class="material-icons">access_time</i> updated 7 minutes ago
                                                 </div>
                                             </div>
@@ -280,7 +280,7 @@
                                                 <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="stats"  id="realtimeOccupancyLastUpdated">
+                                                <div class="stats" id="realtimeOccupancyLastUpdated">
                                                     <i class="material-icons">access_time</i> updated 9 minutes ago
                                                 </div>
                                             </div>
@@ -297,7 +297,7 @@
                                                 <%--<span class="text-success"><i class="fa fa-long-arrow-up"></i> 5% </span> increase in Temperature.</p>--%>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="stats"  id="realtimeMetalLastUpdated">
+                                                <div class="stats" id="realtimeMetalLastUpdated">
                                                     <i class="material-icons">access_time</i> updated 5 minutes ago
                                                 </div>
                                             </div>
@@ -307,7 +307,9 @@
                                         <div style="margin-right: 10%; margin-left: 10%; margin-bottom: 5%;">
                                             <%--<input class="datepicker form-control" type="text" value="06/11/2017" />--%>
                                             <h4>Select Date-range</h4>
-                                            <input type="text" name="daterange" value="01/01/2017 1:30 PM - 01/01/2017 2:00 PM" class="form-control"/>
+                                            <input type="text" name="daterange" id="daterange"
+                                                   value="01/01/2017 1:30 PM - 01/01/2017 2:00 PM"
+                                                   class="form-control" />
                                             <h3>Activity Log</h3>
                                             <table class="table" style="font-size: 15px">
                                                 <thead>
@@ -349,7 +351,7 @@
                                                 <h4 class="title">OPEN/CLOSE State</h4>
                                                 <p>1 for open, 0 for close</p>
                                                 <p class="category">
-                                                    <span class="text-success"><i class="fa fa-bolt"></i> 1.5hr </span>
+                                                    <span class="text-success" id="historicalStateAlert"><i class="fa fa-bolt"></i> 1.5hr </span>
                                                     active time.</p>
                                             </div>
                                             <div class="card-footer">
@@ -365,7 +367,7 @@
                                             </div>
                                             <div class="card-content">
                                                 <h4 class="title">Temperature</h4>
-                                                <p class="category">
+                                                <p class="category" id="historicalTempAlert">
                                                     <span class="text-success"><i class="fa fa-long-arrow-down"></i> 10% </span>
                                                     decrease in Temperature.</p>
                                             </div>
@@ -382,7 +384,7 @@
                                             </div>
                                             <div class="card-content">
                                                 <h4 class="title">Humidity</h4>
-                                                <p class="category">
+                                                <p class="category"  id="historicalHumidAlert">
                                                     <span class="text-success"><i
                                                             class="fa fa-long-arrow-up"></i> 5% </span> increase in
                                                                                                         Temperature.</p>
@@ -401,8 +403,8 @@
                                             <div class="card-content">
                                                 <h4 class="title">Occupancy</h4>
                                                 <p>1 for occupied, 0 for free</p>
-                                                <p class="category">
-                                                    <span class="text-success"><i class="fa fa-group"></i> 4 </span>
+                                                <p class="category" id="historicalOccupancyAlert">
+                                                    <span class="text-success" ><i class="fa fa-group"></i> 4 </span>
                                                     people occupied locker.</p>
                                             </div>
                                             <div class="card-footer">
@@ -419,7 +421,7 @@
                                             <div class="card-content">
                                                 <h4 class="title">Metal Presence</h4>
                                                 <p>1 for present, 0 for absent</p>
-                                                <p class="category">
+                                                <p class="category" id="historicalMetalAlert">
                                                     <span class="text-success"><i class="fa fa-cubes"></i> 10 </span>
                                                     metal presence detected</p>
                                             </div>
@@ -467,7 +469,7 @@
 <script src="js/bootstrap-notify.js"></script>
 <!-- Material Dashboard javascript methods -->
 <script src="js/material-dashboard.js?v=1.2.0"></script>
-<script src="js/history.js"></script>
+<script src="js/historical-analytics.js"></script>
 <script src="js/realtime-analytics.js"></script>
 <script type="text/javascript">
     var alerts = [];
@@ -481,17 +483,17 @@
         var elapsed = current - previous;
 
         if (elapsed < msPerMinute) {
-            return Math.round(elapsed / 1000) + ((isShort) ? 's' : ' seconds');
+            return Math.round(elapsed / 1000) + ' seconds ago';
         } else if (elapsed < msPerHour) {
-            return Math.round(elapsed / msPerMinute) + ((isShort) ? 'm' : ' minutes');
+            return Math.round(elapsed / msPerMinute) + ' minutes ago';
         } else if (elapsed < msPerDay) {
-            return Math.round(elapsed / msPerHour) + ((isShort) ? 'h' : ' hours');
+            return Math.round(elapsed / msPerHour) + ' hours ago';
         } else if (elapsed < msPerMonth) {
-            return 'approximately ' + Math.round(elapsed / msPerDay) + ((isShort) ? 'd' : ' days');
+            return 'approximately ' + Math.round(elapsed / msPerDay) + ' days ago';
         } else if (elapsed < msPerYear) {
-            return 'approximately ' + Math.round(elapsed / msPerMonth) + ((isShort) ? 'mnth' : ' months');
+            return 'approximately ' + Math.round(elapsed / msPerMonth) + ' months ago';
         } else {
-            return 'approximately ' + Math.round(elapsed / msPerYear) + ((isShort) ? 'y' : ' years');
+            return 'approximately ' + Math.round(elapsed / msPerYear) + ' years ago';
         }
     }
 
@@ -643,29 +645,58 @@
                success: lastKnownSuccess
            });
 </script>
-<script>
-    $(function() {
-        $('input[name="daterange"]').daterangepicker({
-            timePicker: true,
-            timePickerIncrement: 30,
-            locale: {
-                format: 'MM/DD/YYYY h:mm A'
-            },
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
-        });
+<script type="text/javascript">
+    $(function () {
+        var start = moment().subtract(1, 'days');
+        var end = moment();
 
-        $(window).scroll(function() {
-            if ($('input[name="daterange"]').length) {
-                $('input[name="daterange"]').daterangepicker("close");
+        function datePickerCallback(start, end) {
+            var eventsSuccess = function (data) {
+                var records = JSON.parse(data);
+                analyticsHistory.redrawGraphs(records);
+            };
+
+            var index = 0;
+            var length = 100;
+
+            $.ajax({
+                       type: "POST",
+                       url: "/invoker/execute",
+                       data: {
+                           "uri": "/events/locker/<%=id%>?offset=" + index + "&limit=" + length + "&from=" + new Date(
+                               start.format('YYYY-MM-DD H:mm:ss')).getTime() + "&to=" + new Date(
+                               end.format('YYYY-MM-DD H:mm:ss')).getTime(),
+                           "method": "get"
+                       },
+                       success: eventsSuccess
+                   });
+        };
+
+        $('#daterange').daterangepicker({
+                                            startDate: start,
+                                            endDate: end,
+                                            timePicker: true,
+                                            timePickerIncrement: 30,
+                                            locale: {
+                                                format: 'MM/DD/YYYY h:mm A'
+                                            },
+                                            ranges: {
+                                                'Today': [moment(), moment()],
+                                                'Yesterday': [moment().subtract(1, 'days'),
+                                                              moment().subtract(1, 'days')],
+                                                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                                                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                                                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                                                'Last Month': [moment().subtract(1, 'month').startOf('month'),
+                                                               moment().subtract(1, 'month').endOf('month')]
+                                            }
+                                        }, datePickerCallback);
+
+        $(window).scroll(function () {
+            if ($('#daterange').length) {
+                $('#daterange').daterangepicker("close");
             }
-        });
+        })
     });
 </script>
 </html>
