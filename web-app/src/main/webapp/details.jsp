@@ -367,7 +367,7 @@
                                                 <h4 class="title">OPEN/CLOSE State</h4>
                                                 <p>1 for open, 0 for close</p>
                                                 <p class="category">
-                                                    <span class="text-success"><i class="fa fa-bolt"></i> 1.5hr </span>
+                                                    <span class="text-success" id="historicalStateAlert"><i class="fa fa-bolt"></i> 1.5hr </span>
                                                     active time.</p>
                                             </div>
                                             <div class="card-footer">
@@ -383,7 +383,7 @@
                                             </div>
                                             <div class="card-content">
                                                 <h4 class="title">Temperature</h4>
-                                                <p class="category">
+                                                <p class="category" id="historicalTempAlert">
                                                     <span class="text-success"><i class="fa fa-long-arrow-down"></i> 10% </span>
                                                     decrease in Temperature.</p>
                                             </div>
@@ -400,7 +400,7 @@
                                             </div>
                                             <div class="card-content">
                                                 <h4 class="title">Humidity</h4>
-                                                <p class="category">
+                                                <p class="category"  id="historicalHumidAlert">
                                                     <span class="text-success"><i
                                                             class="fa fa-long-arrow-up"></i> 5% </span> increase in
                                                                                                         Temperature.</p>
@@ -419,8 +419,8 @@
                                             <div class="card-content">
                                                 <h4 class="title">Occupancy</h4>
                                                 <p>1 for occupied, 0 for free</p>
-                                                <p class="category">
-                                                    <span class="text-success"><i class="fa fa-group"></i> 4 </span>
+                                                <p class="category" id="historicalOccupancyAlert">
+                                                    <span class="text-success" ><i class="fa fa-group"></i> 4 </span>
                                                     people occupied locker.</p>
                                             </div>
                                             <div class="card-footer">
@@ -437,7 +437,7 @@
                                             <div class="card-content">
                                                 <h4 class="title">Metal Presence</h4>
                                                 <p>1 for present, 0 for absent</p>
-                                                <p class="category">
+                                                <p class="category" id="historicalMetalAlert">
                                                     <span class="text-success"><i class="fa fa-cubes"></i> 10 </span>
                                                     metal presence detected</p>
                                             </div>

@@ -177,6 +177,11 @@ analyticsHistory = {
     },
 
     redrawGraphs: function (events) {
+        var sumTemp = 0;
+        var sumHumid = 0;
+        var occupantCount = 0;
+        var openCount = 0;
+        var metalPresenceCount = 0;
         if (events.count > 0) {
             var currentTime = new Date();
             analyticsHistory.historicalTempLabel.length = 0;
@@ -197,6 +202,37 @@ analyticsHistory = {
                 var isMetalPresent = record.values.metal;
                 var temperature = record.values.temperature;
                 var humidity = record.values.humidity;
+
+                if (isOpen) {
+                    openCount++;
+                }
+
+                if (isMetalPresent) {
+                    metalPresenceCount++;
+                }
+
+                if (isOccupant) {
+                    occupantCount++;
+                }
+
+                if (temperature) {
+                    sumTemp += temperature;
+                }
+
+                if (humidity) {
+                    sumHumid += humidity;
+                }
+
+                if (i === events.records.length - 1) {
+                    var avgHumid = sumHumid / events.records.length;
+                    var avgTemp = sumTemp / events.records.length;
+                    $("#historicalStateAlert").html("<span class=\"text-success\"><i class=\"fa fa-bolt\"></i> " + openCount + " </span>times open.");
+                    $("#historicalTempAlert").html("<span class=\"text-success\"><i class=\"fa fa-bolt\"></i> " + avgTemp.toFixed(2) + " </span>average Temperature.");
+                    $("#historicalHumidAlert").html("<span class=\"text-success\"><i class=\"fa fa-bolt\"></i> " + avgHumid.toFixed(2) + " </span> average Humidity.");
+                    $("#historicalOccupancyAlert").html("<span class=\"text-success\"><i class=\"fa fa-group\"></i> " + occupantCount + " </span> people occupied locker.");
+                    $("#historicalMetalAlert").html("<span class=\"text-success\"><i class=\"fa fa-cubes\"></i> " + metalPresenceCount + " </span> metal presence detected");
+                }
+
                 analyticsHistory.historicalTempLabel.push(sinceText);
                 analyticsHistory.historicalTempSeries.push(temperature);
 
