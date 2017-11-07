@@ -186,19 +186,22 @@ realtimeAnalytics = {
             }
             if (ws) {
                 ws.onmessage = function (event) {
-                    console.log(JSON.parse(event.data));
-                    var dataPoint = JSON.parse(event.data).event.payloadData;
+                    var data = event.data;
+                    console.log(data);
+                    var dataPoint = JSON.parse(data);
 
                     var open = dataPoint.open;
                     var occupancy = dataPoint.occupancy;
                     var temperature = dataPoint.temperature;
                     var metal = dataPoint.metal;
-                    var attempt = dataPoint.attempt;
                     var humidity = dataPoint.humidity;
 
                     var currentTime = new Date();
+                    var sinceText = timeDifference(currentTime, new Date(dataPoint.timeStamp), false) + " ago";
+                    updateStatusCards(sinceText, open, occupancy, metal);
+
                     var lastUpdatedTime = realtimeTempLabelRef[realtimeTempLabelRef.length - 1];
-                    var lastUpdatedText = "<i class=\"material-icons\">access_time</i> updated "+realtimeAnalytics.timeDifference(currentTime, lastUpdatedTime)+" ago";
+                    var lastUpdatedText = "<i class=\"material-icons\">access_time</i> updated "+timeDifference(currentTime, lastUpdatedTime)+" ago";
 
                     realtimeTempLabel.push('0s');
                     realtimeTempLabelRef.push(currentTime);
@@ -258,31 +261,7 @@ realtimeAnalytics = {
     calcTimeDiff: function (arr, arrRef) {
         var now = new Date();
         for (var i = 0; i < arr.length; i++) {
-            arr[i] = realtimeAnalytics.timeDifference(now, arrRef[i], true);
-        }
-    },
-
-    timeDifference: function (current, previous, isShort) {
-        var msPerMinute = 60 * 1000;
-        var msPerHour = msPerMinute * 60;
-        var msPerDay = msPerHour * 24;
-        var msPerMonth = msPerDay * 30;
-        var msPerYear = msPerDay * 365;
-
-        var elapsed = current - previous;
-
-        if (elapsed < msPerMinute) {
-            return Math.round(elapsed / 1000) + ((isShort) ? 's' : ' seconds');
-        } else if (elapsed < msPerHour) {
-            return Math.round(elapsed / msPerMinute) + ((isShort) ? 'm' : ' minutes');
-        } else if (elapsed < msPerDay) {
-            return Math.round(elapsed / msPerHour) + ((isShort) ? 'h' : ' hours');
-        } else if (elapsed < msPerMonth) {
-            return 'approximately ' + Math.round(elapsed / msPerDay) + ((isShort) ? 'd' : ' days');
-        } else if (elapsed < msPerYear) {
-            return 'approximately ' + Math.round(elapsed / msPerMonth) + ((isShort) ? 'mnth' : ' months');
-        } else {
-            return 'approximately ' + Math.round(elapsed / msPerYear) + ((isShort) ? 'y' : ' years');
+            arr[i] = timeDifference(now, arrRef[i], true);
         }
     }
 };

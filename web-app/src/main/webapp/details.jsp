@@ -204,7 +204,7 @@
                                                 </div>
                                             </div>
                                             <h3>Device Activity Log</h3>
-                                            <table class="table" style="font-size: 15px">
+                                            <table id="realtime_alerts" class="table" style="font-size: 15px">
                                                 <thead>
                                                 <tr>
                                                     <th>Time</th>
@@ -212,25 +212,9 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr style="background-color: #faffd7">
-                                                    <td>2017-11-01 15:00:32 IST</td>
-                                                    <td>Locker is open for more than two minutes.</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2017-11-01 14:58:32 IST</td>
-                                                    <td>Unlocked the locker by user admin.</td>
-                                                </tr>
-                                                <tr style="background-color: #faffd7">
-                                                    <td>2017-11-01 14:56:32 IST</td>
-                                                    <td>Unlocking attempt denied due to incorrect code.</td>
-                                                </tr>
-                                                <tr style="background-color: #faffd7">
-                                                    <td>2017-11-01 14:56:15 IST</td>
-                                                    <td>Unlocking attempt denied due to incorrect code.</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2017-11-01 14:58:32 IST</td>
-                                                    <td>Temperature back to normal.</td>
+                                                <tr style="background-color: #dfffd3">
+                                                    <td></td>
+                                                    <td>No new alerts to display.</td>
                                                 </tr>
                                                 </tbody>
                                             </table>
@@ -488,8 +472,8 @@
 <script src="js/historical-analytics.js"></script>
 <script src="js/realtime-analytics.js"></script>
 <script type="text/javascript">
-    function timeDifference(current, previous) {
-
+    var alerts = [];
+    function timeDifference(current, previous, isShort) {
         var msPerMinute = 60 * 1000;
         var msPerHour = msPerMinute * 60;
         var msPerDay = msPerHour * 24;
@@ -514,11 +498,13 @@
     }
 
     $(document).ready(function () {
-        // Javascript method's body can be found in assets/js/demos.js
-        // demo.initDashboardPageCharts();
-        var wsEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/iot.per.device.stream.carbon.super.locker/1.0.0?"
-                         + "deviceId=<%=id%>&deviceType=locker&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
-        realtimeGraphRefresh(wsEndpoint);
+        var wsStatsEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/org.wso2.iot.locker.stat/1.0.0?"
+                              + "deviceId=<%=id%>&deviceType=locker&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
+        realtimeGraphRefresh(wsStatsEndpoint);
+
+        var wsAlertEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/org.wso2.iot.locker.alert/1.0.0?"
+                              + "deviceId=<%=id%>&deviceType=locker&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
+        displayAlerts(wsAlertEndpoint);
     });
     document.getElementById("realtimeTab").addEventListener("click", realtimeGraphRefresh);
     document.getElementById("historicalTab").addEventListener("click", historyGraphRefresh);
@@ -527,51 +513,109 @@
         realtimeAnalytics.initDashboardPageCharts(wsEndpoint);
     }
 
+    function displayAlerts(wsEndpoint) {
+        connect(wsEndpoint);
+        var ws;
+
+        // close websocket when page is about to be unloaded
+        // fixes broken pipe issue
+        window.onbeforeunload = function () {
+            disconnect();
+        };
+
+        //websocket connection
+        function connect(target) {
+            if ('WebSocket' in window) {
+                ws = new WebSocket(target);
+            } else if ('MozWebSocket' in window) {
+                ws = new MozWebSocket(target);
+            } else {
+                console.log('WebSocket is not supported by this browser.');
+            }
+            if (ws) {
+                ws.onmessage = function (event) {
+                    var data = event.data;
+                    console.log(data);
+                    //{"event":{"metaData":{"deviceId":"vtd2"},"payloadData":{"level":"Info","message":"Unlocking fail as code is expired. Regenerate a new code.","user":"admin"}}}
+                    var alert = JSON.parse(data).event.payloadData;
+                    alerts.unshift(alert);
+                    if (alerts.length > 5) {
+                        alerts = alerts.slice(0, -1);
+                    }
+                    var realtimeAlerts = $('#realtime_alerts');
+                    realtimeAlerts.find('tbody').empty();
+                    for (var i = 0; i < alerts.length; i++) {
+                        var row = '<tr ' + (alerts[i].level === 'Warn' ? 'style="background-color: #faffd7">' : '>') +
+                                '<td>' + new Date().toLocaleString() + '</td>' +
+                                '<td>'+alerts[i].message+'</td>' +
+                                '</tr>';
+                        realtimeAlerts.find('tbody').append(row);
+                    }
+                };
+            }
+        }
+
+        function disconnect() {
+            if (ws != null) {
+                ws.close();
+                ws = null;
+            }
+        }
+    }
+
     function historyGraphRefresh() {
         analyticsHistory.initDashboardPageCharts();
     }
 
-    var lastKnownSuccess = function (data) {
-        var record = JSON.parse(data).records[0];
-
+    function updateStatusCards(sinceText, isOpen, isOccupant, isMetalPresent) {
+        //lock status
         var lockStatusColor = $("#lock_status_color");
         var occupantStatusColor = $("#occupant_status_color");
         var metalStatusColor = $("#metal_status_color");
 
+        lockStatusColor.attr("data-background-color", (isOpen) ? "red" : "green");
+        lockStatusColor.find("i").html((isOpen) ? "lock_open" : "lock");
+        $("#lock_status").html((isOpen) ? "Open" : "Closed");
+
+        var lockerStatusAlert = "";
+        if (isOpen && !isOccupant) {
+            lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Should be closed after use";
+        } else if (isOpen && isOccupant) {
+            lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is not locked";
+        } else if (!isOpen && !isOccupant) {
+            lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is empty";
+        }
+        $("#lock_status_alert").html(lockerStatusAlert);
+
+        //occupied status
+        $("#occupied_status").html((isOccupant) ? "Yes" : "No");
+        $("#occupied_alert").html("<i class=\"material-icons\">date_range</i> Since " + sinceText);
+        occupantStatusColor.find("i").html("person");
+        occupantStatusColor.attr("data-background-color", "blue");
+
+        //metal status
+        $("#metal_status").html((isMetalPresent) ? "Present" : "No");
+        $("#metal_status_alert").html((isMetalPresent) ? "<i class=\"material-icons\">warning</i>Be cautious" :
+                                      "<i class=\"material-icons\">info</i>No metal found");
+        metalStatusColor.find("i").html("memory");
+        metalStatusColor.attr("data-background-color", "blue");
+    }
+
+    var lastKnown = {};
+    var lastKnownSuccess = function (data) {
+        var record = JSON.parse(data).records[0];
+
         if (record) {
-            var sinceText = timeDifference(new Date(), new Date(record.timestamp));
+            lastKnown = record;
+            var sinceText = timeDifference(new Date(), new Date(record.timestamp), false) + " ago";
             var isOpen = record.values.open;
             var isOccupant = record.values.occupancy;
             var isMetalPresent = record.values.metal;
-
-            //lock status
-            lockStatusColor.attr("data-background-color", (isOpen) ? "red" : "green");
-            lockStatusColor.find("i").html((isOpen) ? "lock_open" : "lock");
-            $("#lock_status").html((isOpen) ? "Open" : "Closed");
-
-            var lockerStatusAlert = "";
-            if (isOpen && !isOccupant) {
-                lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Should be closed after use";
-            } else if (isOpen && isOccupant) {
-                lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is not locked";
-            } else if (!isOpen && !isOccupant) {
-                lockerStatusAlert = "<i class=\"material-icons text-danger\">warning</i>Locker is empty";
-            }
-            $("#lock_status_alert").html(lockerStatusAlert);
-
-            //occupied status
-            $("#occupied_status").html((isOccupant) ? "Yes" : "No");
-            $("#occupied_alert").html("<i class=\"material-icons\">date_range</i> Since " + sinceText);
-            occupantStatusColor.find("i").html("person");
-            occupantStatusColor.attr("data-background-color", "blue");
-
-            //metal status
-            $("#metal_status").html((isMetalPresent) ? "Present" : "No");
-            $("#metal_status_alert").html((isMetalPresent) ? "<i class=\"material-icons\">warning</i>Be cautious" :
-                                          "<i class=\"material-icons\">info</i>No metal found");
-            metalStatusColor.find("i").html("memory");
-            metalStatusColor.attr("data-background-color", "blue");
+            updateStatusCards(sinceText, isOpen, isOccupant, isMetalPresent);
         } else {
+            var lockStatusColor = $("#lock_status_color");
+            var occupantStatusColor = $("#occupant_status_color");
+            var metalStatusColor = $("#metal_status_color");
             //lock status
             lockStatusColor.attr("data-background-color", "grey");
             lockStatusColor.find("i").html("help_outline");

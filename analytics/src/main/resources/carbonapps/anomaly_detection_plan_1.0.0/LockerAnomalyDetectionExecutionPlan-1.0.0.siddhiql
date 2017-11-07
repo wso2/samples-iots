@@ -9,13 +9,16 @@
 @Import('iot.per.device.stream.carbon.super.locker:1.0.0')
 define stream dataIn (meta_deviceId string, temperature float, humidity float, metal bool, occupancy bool, open bool, attempt string);
 
+@Export('org.wso2.iot.locker.stat:1.0.0')
+define stream stat (meta_deviceId string, meta_timeStamp long, temperature float, humidity float, metal bool, occupancy bool, open bool);
+
 @Export('org.wso2.iot.locker.attempt:1.0.0')
 define stream attempt (meta_deviceId string, status string, user string, year int, month int, day int, hour int);
 
 @Export('org.wso2.iot.locker.operation:1.0.0')
 define stream operation (meta_deviceIdentifier string, code string, type string, isEnabled bool, payLoad string);
 
-@Export('org.wso2.iot.alert:1.0.0')
+@Export('org.wso2.iot.locker.alert:1.0.0')
 define stream alert (meta_deviceId string, level string, message string, user string);
 
 define stream last_minute_attempt (meta_deviceId string, status string, user string, attempt_count long);
@@ -24,6 +27,10 @@ define stream allow_open (meta_deviceId string, user string);
 
 define stream door_anomaly (meta_deviceId string, event_count long);
 define stream all_data (meta_deviceId string, temperature double, humidity double, metal bool, occupancy bool, open bool, event_count long, user string);
+
+from dataIn
+select meta_deviceId, time:timestampInMilliseconds() as meta_timeStamp, temperature, humidity, metal, occupancy, open
+insert into stat;
 
 from dataIn [json:getProperty(attempt, 'status') != 'None']
 select meta_deviceId, json:getProperty(attempt, 'status') as status, json:getProperty(attempt, 'user') as user, time:extract(time:timestampInMilliseconds(), 'year') as year, time:extract(time:timestampInMilliseconds(), 'month') as month, time:extract(time:timestampInMilliseconds(), 'day') as day, time:extract(time:timestampInMilliseconds(), 'hour') as hour
@@ -59,6 +66,10 @@ begin
 	from deny_attempt
     select meta_deviceId as meta_deviceIdentifier, 'allow_open' as code, 'PROFILE' as type, true as isEnabled, 'false' as payLoad
 	insert into operation;
+
+	from deny_attempt
+	select meta_deviceId, 'Info' as level, 'Disallowing unlock, due to 3 failure attempts within a minute.' as message, user
+	insert into alert;
 
 	from deny_attempt#window.time(60000)
 	select meta_deviceId, user
