@@ -5,11 +5,9 @@
     <title>Locker List</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link href="css/material-icons.css" rel="stylesheet" />
     <link href="css/material-dashboard.css" rel="stylesheet" />
-    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet'
-          type='text/css'>
+    <link href="css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="wrapper">
