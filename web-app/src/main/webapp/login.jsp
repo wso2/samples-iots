@@ -12,10 +12,8 @@
     <title>Login</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-    <link href="https://fonts.googleapis.com/css?family=Fjalla+One|Montserrat|Roboto" rel="stylesheet">
-    <%--<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />--%>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+    <link href="css/material-icons.css" rel="stylesheet" />
+    <link href="css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/material-kit.css"/>
 </head>
 <body class="signup-page">
