@@ -62,7 +62,6 @@ utility = function () {
     };
 
     publicMethods.getDeviceTypeConfig = function (deviceType) {
-        new Log().info("Device Type "  +deviceType);
         var unitName = publicMethods.getTenantedDeviceUnitName(deviceType, "type-view");
 
         if (deviceType in deviceTypeConfigMap) {
@@ -70,7 +69,6 @@ utility = function () {
         }
         var deviceTypeConfig;
         var deviceTypeConfigFile = new File("/app/units/" + unitName + "/private/config.json");
-        new Log().info(unitName + " " + deviceTypeConfigFile.isExists());
         if (deviceTypeConfigFile.isExists()) {
             try {
                 deviceTypeConfigFile.open("r");
@@ -113,17 +111,14 @@ utility = function () {
     publicMethods.getTenantedDeviceUnitName = function (deviceType, unitPostfix) {
         var user = session.get(constants.USER_SESSION_KEY);
         if (!user) {
-
             log.error("User object was not found in the session");
             throw constants.ERRORS.USER_NOT_FOUND;
         }
         var unitName = user.domain + ".cdmf.unit.device.type." + deviceType + "." + unitPostfix;
-        new Log().info(unitName);
         if (new File("/app/units/" + unitName).isExists()) {
             return unitName;
         }
         unitName = "cdmf.unit.device.type." + deviceType + "." + unitPostfix;
-        new Log().info("###" + unitName);
         if (new File("/app/units/" + unitName).isExists()) {
             return unitName;
         }

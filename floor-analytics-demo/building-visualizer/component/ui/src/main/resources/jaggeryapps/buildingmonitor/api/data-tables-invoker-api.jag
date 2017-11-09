@@ -26,8 +26,6 @@ var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
 var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
 var utility = require("/app/modules/utility.js")["utility"];
 
-
-new Log().info("adasasas");
 function appendQueryParam (url, queryParam , value) {
     if (url.indexOf("?") > 0) {
         return url + "&" + queryParam + "=" + value;

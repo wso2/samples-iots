@@ -20,15 +20,17 @@ function onRequest (context) {
     var device = context.unit.params.device;
     var serviceInvokers = require("/app/modules/oauth/token-protected-service-invokers.js")["invokers"];
     var devicemgtProps = require("/app/modules/conf-reader/main.js")["conf"];
-    var url = devicemgtProps["httpsURL"] + "/senseme/building/" + device.buildingId;
 
-    serviceInvokers.XMLHttp.get(
-        url,
-        // response callback
-        function (backendResponse) {
-            device.buildingName =   JSON.parse(backendResponse["responseText"]).buildingName;
-        }
-    );
+    if (device.buildingId) {
+        var url = devicemgtProps["httpsURL"] + "/senseme/building/" + device.buildingId;
 
+        serviceInvokers.XMLHttp.get(
+                url,
+                // response callback
+                function (backendResponse) {
+                    device.buildingName = JSON.parse(backendResponse["responseText"]).buildingName;
+                }
+        );
+    }
     return {"device" : device};
 }

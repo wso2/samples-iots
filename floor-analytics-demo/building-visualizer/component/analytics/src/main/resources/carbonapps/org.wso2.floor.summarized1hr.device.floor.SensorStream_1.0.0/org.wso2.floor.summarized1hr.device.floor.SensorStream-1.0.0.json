@@ -1,0 +1,52 @@
+{
+  "name": "org.wso2.floor.summarized1hr.device.floor.SensorStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "deviceId",
+      "type": "STRING"
+    },
+    {
+      "name": "temperature",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "motion",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "humidity",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "airQuality",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "light",
+      "type": "DOUBLE"
+    },
+    {
+      "name" : "timeStamp",
+      "type" : "LONG"
+    },
+    {
+      "name" : "buildingId",
+      "type" : "STRING"
+    },
+    {
+      "name" : "floorId",
+      "type" : "STRING"
+    },
+    {
+      "name" : "xCoordinate",
+      "type" : "INT"
+    },
+    {
+      "name" : "yCoordinate",
+      "type" : "INT"
+    }
+  ]
+}

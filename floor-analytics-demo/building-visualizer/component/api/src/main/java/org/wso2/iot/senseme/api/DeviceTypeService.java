@@ -128,6 +128,26 @@ public interface DeviceTypeService {
     Response partialEnrollment(SenseMe senseMe, @QueryParam("deviceType") String deviceType);
 
 
+
+    @Path("/{deviceId}/test")
+    @POST
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            httpMethod = "POST",
+            value = "Test device",
+            notes = "",
+            response = Response.class,
+            tags = "senseme",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:senseme:enroll")
+                    })
+            }
+    )
+    Response test(@PathParam("deviceId") String deviceId,
+                  @Context HttpServletResponse response);
+
+
     /**
      * To download device type agent source code as zip file
      *

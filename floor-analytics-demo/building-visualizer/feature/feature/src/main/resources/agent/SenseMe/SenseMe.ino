@@ -26,7 +26,7 @@
 #include <ESP8266WiFiSTA.h>
 #include <ESP8266WiFiType.h>
 #include <ESP8266HTTPClient.h>
-//#include <ESP8266wifi.h>
+#include <ESP8266wifi.h>
 #include <ESP8266WiFi.h>
 #include <ESP.h>
 #include <WiFiClient.h>

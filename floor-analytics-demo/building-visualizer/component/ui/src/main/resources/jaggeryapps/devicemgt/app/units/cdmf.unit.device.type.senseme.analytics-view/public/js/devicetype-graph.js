@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,11 +16,15 @@
  * under the License.
  */
 
-var palette = new Rickshaw.Color.Palette({scheme: "classic9"});
-var sensorType1 = "PIR";
-var sensorType2 = "ULTRASONIC";
+var palette = new Rickshaw.Color.Palette({scheme: "munin"});
+var sensorType1 = "humidity";
+var sensorType2 = "light";
+var sensorType3 = "motion";
+var sensorType4 = "temperature";
 var sensorType1Graph;
 var sensorType2Graph;
+var sensorType3Graph;
+var sensorType4Graph;
 
 function drawGraph_senseme(from, to)
 {
@@ -30,6 +34,8 @@ function drawGraph_senseme(from, to)
     var graphWidth = $(chartWrapperElmId).width() - 50;
     var graphConfigSensorType1 = getGraphConfig("chartSensorType1");
     var graphConfigSensorType2 = getGraphConfig("chartSensorType2");
+    var graphConfigSensorType3 = getGraphConfig("chartSensorType3");
+    var graphConfigSensorType4 = getGraphConfig("chartSensorType4");
 
     function getGraphConfig(placeHolder) {
         return {
@@ -45,7 +51,7 @@ function drawGraph_senseme(from, to)
             padding: {top: 0.2, left: 0.02, right: 0.02, bottom: 0.2},
             series: []
         }
-    };
+    }
 
     if (devices) {
         for (var i = 0; i < devices.length; i++) {
@@ -60,6 +66,25 @@ function drawGraph_senseme(from, to)
                 });
 
             graphConfigSensorType2['series'].push(
+                {
+                    'color': palette.color(),
+                    'data': [{
+                        x: parseInt(new Date().getTime() / 1000),
+                        y: 0
+                    }],
+                    'name': devices[i].name
+                });
+            graphConfigSensorType3['series'].push(
+                {
+                    'color': palette.color(),
+                    'data': [{
+                        x: parseInt(new Date().getTime() / 1000),
+                        y: 0
+                    }],
+                    'name': devices[i].name
+                });
+
+            graphConfigSensorType4['series'].push(
                 {
                     'color': palette.color(),
                     'data': [{
@@ -88,17 +113,41 @@ function drawGraph_senseme(from, to)
                 }],
                 'name': sensorType2
             });
+        graphConfigSensorType3['series'].push(
+            {
+                'color': palette.color(),
+                'data': [{
+                    x: parseInt(new Date().getTime() / 1000),
+                    y: 0
+                }],
+                'name': sensorType3
+            });
+        graphConfigSensorType4['series'].push(
+            {
+                'color': palette.color(),
+                'data': [{
+                    x: parseInt(new Date().getTime() / 1000),
+                    y: 0
+                }],
+                'name': sensorType4
+            });
     }
 
     sensorType1Graph = new Rickshaw.Graph(graphConfigSensorType1);
     sensorType2Graph = new Rickshaw.Graph(graphConfigSensorType2);
+    sensorType3Graph = new Rickshaw.Graph(graphConfigSensorType3);
+    sensorType4Graph = new Rickshaw.Graph(graphConfigSensorType4);
+
     drawGraph(sensorType1Graph, "sensorType1yAxis", "sensorType1Slider", "sensorType1Legend", sensorType1
         , graphConfigSensorType1, "chartSensorType1");
     drawGraph(sensorType2Graph, "sensorType2yAxis", "sensorType2Slider", "sensorType2Legend", sensorType2
         , graphConfigSensorType2, "chartSensorType2");
+    drawGraph(sensorType3Graph, "sensorType3yAxis", "sensorType3Slider", "sensorType3Legend", sensorType3
+        , graphConfigSensorType3, "chartSensorType3");
+    drawGraph(sensorType4Graph, "sensorType4yAxis", "sensorType4Slider", "sensorType4Legend", sensorType4
+        , graphConfigSensorType4, "chartSensorType4");
 
     function drawGraph(graph, yAxis, slider, legend, sensorType, graphConfig, chart) {
-        graph.render();
         var xAxis = new Rickshaw.Graph.Axis.Time({
             graph: graph
         });
@@ -141,6 +190,9 @@ function drawGraph_senseme(from, to)
             graph: graph,
             legend: legend
         });
+
+        graph.render();
+
         var deviceIndex = 0;
         if (devices) {
             getData(chat, deviceIndex, sensorType);
@@ -156,6 +208,7 @@ function drawGraph_senseme(from, to)
                 console.log(message);
             });
         }
+
     }
 
     function getData(placeHolder, deviceIndex, sensorType, graphConfig, graph) {

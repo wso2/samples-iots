@@ -49,6 +49,11 @@ function onRequest(context) {
 						device.content["floorId"] = floorId;
                     }
                 );
+            } else {
+                device.content["location"] = {};
+                device.content["location"]["latitude"] = device.content.initialDeviceInfo.xCoordinate;
+                device.content["location"]["longitude"] = device.content.initialDeviceInfo.yCoordinate;
+                device.content["location"]["place"] = true;
             }
 			return {"device": device.content, "autoCompleteParams" : autoCompleteParams, "encodedFeaturePayloads": ""};
 		} else {

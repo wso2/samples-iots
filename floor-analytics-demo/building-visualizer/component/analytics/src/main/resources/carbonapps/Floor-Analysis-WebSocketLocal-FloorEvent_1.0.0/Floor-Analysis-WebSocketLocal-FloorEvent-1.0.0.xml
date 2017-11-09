@@ -10,7 +10,8 @@
             "motion" : {{motion}},
             "humidity" : {{humidity}},
             "airQuality" : {{airQuality}},
-            "light" : {{light}}
+            "light" : {{light}},
+            "time" :{{timeStamp}}
             }</inline>
     </mapping>
     <to eventAdapterType="websocket-local"/>

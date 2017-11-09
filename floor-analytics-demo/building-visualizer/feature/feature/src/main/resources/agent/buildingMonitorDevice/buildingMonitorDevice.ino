@@ -48,8 +48,9 @@ long startDelay = millis();
 //const char* mqtt_server = "192.168.1.103";
 
 
-const char* ssid = "....";
-const char* password = "...";
+
+const char* ssid = "AndroidAP";
+const char* password = "cxyz4920";
 
 const char* gateway = "http://192.168.43.178:8280";
 const char* mqtt_server = "192.168.43.178";

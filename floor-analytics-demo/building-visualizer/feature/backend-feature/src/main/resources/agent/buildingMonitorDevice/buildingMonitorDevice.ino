@@ -29,19 +29,17 @@
 #include "PubSubClient.h"
 #include "FS.h"
 
-#define GAS  5           //D1
-#define BUZZER     4     //D2
-#define DHT11_PIN  0       //D3
-#define PIR_OUT    14     //D5
-#define LED        16         //D0
-#define LDR_PIN    A0
+#define GAS  5 //D1
+#define LIGHT     4 //D2
+#define DHT11_PIN 0 //D3
+#define PIR_OUT  14 //D5
 
 #define DHTTYPE DHT11
 
 DHT dht(DHT11_PIN, DHTTYPE, 30); 
 
 unsigned long previousMillis = 0;        // will store last temp was read
-const long interval = 500;              // interval at which to read sensor
+const long interval = 2000;              // interval at which to read sensor
 long startDelay = millis();
 // Update these with values suitable for your network.
 //const char* ssid = "linksys";
@@ -50,17 +48,11 @@ long startDelay = millis();
 //const char* mqtt_server = "192.168.1.103";
 
 
-//const char* ssid = "WSO2-Restricted";
-//const char* password = "LKvene8xIOT";
+const char* ssid = "...";
+const char* password = "....";
 
-const char* ssid = "Dialog 4G";
-const char* password = "GJ8EDM5FNF6";
-
-//const char* ssid = "AndroidAP";
-//const char* password = "cxyz4920";
-
-const char* gateway = "http://192.168.8.102:8280";
-const char* mqtt_server = "192.168.8.102";
+const char* gateway = "http://192.168.57.100:8280";
+const char* mqtt_server = "192.168.57.100";
 const int mqtt_port = 1886;
 const char* tenant_domain = "carbon.super";
 char device_id[100] ;
@@ -91,11 +83,7 @@ void setup_wifi() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print("Trying to connectto : ");
-    Serial.println(ssid);  
   }
-  Serial.print("Connected to : ");
-  Serial.println(ssid);  
   Serial.println(WiFi.localIP());
 }
 
@@ -154,7 +142,8 @@ boolean registerme() {
         Serial.println("test");
         Serial.println(apiKey);
         Serial.println(accessToken);
-        Serial.println(refreshToken);      
+        Serial.println(refreshToken);
+      
         return true;
       }else{
         Serial.println("\nUsing hardcoded access token");
@@ -231,19 +220,14 @@ WiFiClient espClient;
 PubSubClient client(mqtt_server, mqtt_port, callback, espClient);
 
 void setup() {
-
   dht.begin();
-  pinMode(GAS, INPUT);
-  pinMode(PIR_OUT, INPUT);
-  pinMode(LED, OUTPUT);
-  pinMode(BUZZER, OUTPUT);
-
-  Serial.begin(115200);
-
-//  /
-  
   setup_wifi();
   snprintf (device_id, 100, "%i", ESP.getChipId());
+  pinMode(GAS, INPUT);
+  pinMode(LIGHT, INPUT);
+  pinMode(PIR_OUT, INPUT);
+
+  Serial.begin(115200);
 
   Serial.print("device id :");
   Serial.println(device_id);
@@ -283,13 +267,9 @@ void loop() {
      } else {
         Serial.print("\nConnecting MQTT client using access token: ");
         Serial.println(accessToken);
-        snprintf (subscribedTopic, 100, "%s/senseme/%s/command", tenant_domain, device_id);
         if (!mqttConnected) {
           if (client.connect(device_id, accessToken, "")) {
-            client.subscribe(subscribedTopic);
             Serial.println("MQTT Client Connected");
-            Serial.print("Subscriped topic : ");
-            Serial.println(subscribedTopic);
             mqttConnected = true;
           } else {
             Serial.println("Error while connecting with MQTT server.");
@@ -314,21 +294,16 @@ void loop() {
     float temperature = dht.readTemperature();
     float humidity = dht.readHumidity();
     int airQuality = 0;//digitalRead(GAS);
-    int light = analogRead(LDR_PIN);
+    int light = analogRead(A0);
     
     snprintf (msg, 150, "{\"event\":{\"payloadData\":{\"deviceId\":\"%s\", \"temperature\":%d.0 , \"motion\":%ld.0, \"humidity\":%d.0  , \"airQuality\":%ld.0, \"light\":%ld.0}}}"
     , device_id, (int)temperature, isMoving, (int)humidity, airQuality, light);
     snprintf (publishTopic, 100, "%s/senseme/%s", tenant_domain, device_id);
-   // if (temperature <= 100 && humidity <= 100 ) {
+    if (temperature <= 100 && humidity <= 100 ) {
       client.publish(publishTopic, msg);
-      Serial.println(publishTopic);
-      Serial.println(msg);
-      Serial.println();
-      //Serial.println(msg);
-  //  }
+    }
     isMoving = 0;
-    
-    //client.publish("carbon.super/senseme/2940205", "{\"event\":{\"payloadData\":{\"deviceId\":\"2940205\", \"temperature\":27.0 , \"motion\":1.0, \"humidity\":85.0  , \"airQuality\":50.0, \"light\":1024.0}}}");
+    Serial.println(msg);
     
     startDelay = millis();
   }

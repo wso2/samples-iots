@@ -255,15 +255,17 @@ function hidePopup() {
      * @param message Message that need to be passed in the notification.
      * @param status Status level of the message
      * @param timeout Time-out to close this particular alert
-     * @param pos Position to display the alery
+     * @param pos Position to display the alert
      */
     function notifyUser(message, status, timeout, pos) {
-        $.UIkit.notify({
-            message: message,
-            status: status,
-            timeout: timeout,
-            pos: pos
-        });
+        if (status !== "danger") { //Temporally suppress error message
+            $.UIkit.notify({
+                               message: message,
+                               status: status,
+                               timeout: timeout,
+                               pos: pos
+                           });
+        }
     }
 
     /**
@@ -329,9 +331,23 @@ function hidePopup() {
             $("#historical-view").removeClass("hidden");
             selectedDate = e.date;
             var date = new Date(e.date);
+            var currentDate = new Date();
+            var difInHr = (currentDate - date)/3600000 ;
             date.setHours(date.getHours()-1);
-            historicalData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
-            updateHistoricData(historicalData[currentSliderValue]);
+
+            if(difInHr < 6){
+                historicalData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED6HR_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+                updateHistoricData(historicalData[currentSliderValue]);
+            }else if (difInHr < 24){
+                historicalData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+                updateHistoricData(historicalData[currentSliderValue]);
+            }else if (difInHr < 168){
+                historicalData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED1HR_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+                updateHistoricData(historicalData[currentSliderValue]);
+            }else{
+                historicalData = getHistoricalData("getHistoricalData","ORG_WSO2_FLOOR_SUMMARIZED3HR_DEVICE_FLOOR_SENSORSTREAM", date.getTime());
+                updateHistoricData(historicalData[currentSliderValue]);
+            }
         });
 
         var date = new Date();
@@ -658,9 +674,9 @@ function hidePopup() {
  * Add a new device;
  */
 function addDevice () {
-    var deviceIdValue = document.getElementsByName('deviceId')[0].value;;
-    var xCordValue = document.getElementsByName('xCord')[0].value;;
-    var yCordValue = document.getElementsByName('yCord')[0].value;;
+    var deviceIdValue = document.getElementsByName('deviceId')[0].value;
+    var xCordValue = document.getElementsByName('xCord')[0].value;
+    var yCordValue = document.getElementsByName('yCord')[0].value;
     var floorIdValue = $("#image").attr("floorId");
     var buildingIdValue = $("#image").attr("buildingId");
     var deviceType = $("#deviceType").val();
