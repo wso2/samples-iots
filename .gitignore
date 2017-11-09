@@ -21,16 +21,8 @@ cache/
 !AndroidTVGateway/agent/app/src/main/java/org/wso2/androidtv/agent/cache
 # Package Files #
 *.jar
-*.war
-*.ear
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
-.idea/
 
 .gradle
 local.properties
 build/
-captures/
-.externalNativeBuild
+*.zip

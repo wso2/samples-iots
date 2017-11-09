@@ -1,0 +1,38 @@
+{
+  "name": "org.wso2.iot.locker.stat",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "metaData": [
+    {
+      "name": "deviceId",
+      "type": "STRING"
+    },
+    {
+      "name": "timeStamp",
+      "type": "LONG"
+    }
+  ],
+  "payloadData": [
+    {
+      "name": "temperature",
+      "type": "FLOAT"
+    },
+    {
+      "name": "humidity",
+      "type": "FLOAT"
+    },
+    {
+      "name": "metal",
+      "type": "BOOL"
+    },
+    {
+      "name": "occupancy",
+      "type": "BOOL"
+    },
+    {
+      "name": "open",
+      "type": "BOOL"
+    }
+  ]
+}
