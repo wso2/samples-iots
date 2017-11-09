@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<artifact name="summarize_spark_script" version="1.0.0" type="analytics/spark" serverRole="DataAnalyticsServer">
+    <file>summarize_spark_script.xml</file>
+</artifact>
