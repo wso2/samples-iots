@@ -1,0 +1,84 @@
+/* Enter a unique ExecutionPlan */
+@Plan:name('Floor-Analysis-Sensor-Floor-Averaged-Execution-Plan')
+
+/* Enter a unique description for ExecutionPlan */
+@Plan:description('ExecutionPlan for getting average values for floor')
+
+/* define streams/tables and write queries here ... */
+
+@Import('org.wso2.floor.device.SensorStream:1.0.0')
+define stream dataIn (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@Import('org.wso2.floor.summarized.device.floor.SensorStream:1.0.0')
+define stream summarizedDataIn (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@Import('org.wso2.floor.summarized1hr.device.floor.SensorStream:1.0.0')
+define stream summarizedDataIn1 (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@Import('org.wso2.floor.summarized3hr.device.floor.SensorStream:1.0.0')
+define stream summarizedDataIn3 (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@Import('org.wso2.floor.summarized6hr.device.floor.SensorStream:1.0.0')
+define stream summarizedDataIn6 (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long, buildingId string, floorId string, xCoordinate int, yCoordinate int);
+
+@Export('org.wso2.floor.perFloor.SensorStream:1.0.0')
+define stream dataOut (buildingId string, floorId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long);
+
+@Export('org.wso2.floor.summarized.perFloor.SensorStream:1.0.0')
+define stream summarizedDataOut (buildingId string, floorId string, temperature double, motion double, humidity double,
+airQuality double, light double, timeStamp long);
+
+@Export('org.wso2.floor.summarized1hr.perFloor.SensorStream:1.0.0')
+define stream summarizedDataOut1 (buildingId string, floorId string, temperature double, motion double, humidity double,
+airQuality double, light double, timeStamp long);
+
+@Export('org.wso2.floor.summarized3hr.perFloor.SensorStream:1.0.0')
+define stream summarizedDataOut3 (buildingId string, floorId string, temperature double, motion double, humidity double,
+airQuality double, light double, timeStamp long);
+
+@Export('org.wso2.floor.summarized6hr.perFloor.SensorStream:1.0.0')
+define stream summarizedDataOut6 (buildingId string, floorId string, temperature double, motion double, humidity double,
+airQuality double, light double, timeStamp long);
+
+@Export('org.wso2.floor.AlertNotifications:1.0.0')
+define stream alertOut (buildingId string, floorId string, type string, value double, information string, timeStamp long);
+
+from dataIn#window.timeBatch(1 min)
+select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
+(airQuality) as airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
+group by floorId insert into dataOut ;
+
+from summarizedDataIn
+select buildingId, floorId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg
+(airQuality) as airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
+group by floorId insert into summarizedDataOut;
+
+from summarizedDataIn1
+select buildingId, floorId, temperature, motion, humidity, airQuality, light, time:timestampInMilliseconds() as timeStamp
+group by floorId insert into summarizedDataOut1;
+
+from summarizedDataIn3
+select buildingId, floorId, temperature, motion, humidity, airQuality, light, time:timestampInMilliseconds() as timeStamp
+group by floorId insert into summarizedDataOut3;
+
+from summarizedDataIn6
+select buildingId, floorId, temperature, motion, humidity, airQuality, light, time:timestampInMilliseconds() as timeStamp
+group by floorId insert into summarizedDataOut6;
+
+from dataOut[temperature < 23]
+select buildingId, floorId, "Very_Low_Temperature" as type, temperature as value, "Floor seems to be very cold. Please turn OFF AC." as information, timeStamp insert into alertOut ;
+
+from dataOut[motion != 0 and temperature > 27]
+select buildingId, floorId, "High_Temperature_WITH_Motion" as type, temperature as value, "Floor is very hot. Please turn ON AC." as information, timeStamp insert into alertOut;
+
+from dataOut[motion == 0 and light < 500]
+select buildingId, floorId, "Light_ON_WITH_NO_Motion" as type, light as value, "The floor seems to be empty. But lights are switched ON. Please switch off the lights." as information, timeStamp insert into alertOut;
+
+from dataOut[light > 750]
+select buildingId, floorId, "Very_Low_Light" as type, light as value, "Area is too dark. Please turn on lights." as information, timeStamp insert into alertOut;

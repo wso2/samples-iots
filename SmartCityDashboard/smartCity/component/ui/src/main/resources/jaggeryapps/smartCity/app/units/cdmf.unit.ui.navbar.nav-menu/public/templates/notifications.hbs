@@ -1,0 +1,21 @@
+{{#each notifications}}
+    {{#if timeStamp}}
+        <li class="message message-warning" data-type="selectable" >
+            <h4>
+                {{heading}}
+            </h4>
+            <p>{{description}}</p>
+            <p>{{timeStamp}}</p>
+        </li>
+    {{else}}
+        <li class="message message-success" data-type="selectable" >
+            <h4>
+                Building Name - {{buildingName}}
+            </h4>
+            <h4>
+                Building ID - {{buildingId}}
+            </h4>
+            <p>There are {{alertCount}} alerts within 24 hours time</p>
+        </li>
+    {{/if}}
+{{/each}}

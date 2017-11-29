@@ -1,0 +1,32 @@
+{
+  "name": "org.wso2.floor.AlertNotifications",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "buildingId",
+      "type": "STRING"
+    },
+    {
+      "name": "floorId",
+      "type": "STRING"
+    },
+    {
+      "name": "type",
+      "type": "STRING"
+    },
+    {
+      "name": "value",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "information",
+      "type": "STRING"
+    },
+    {
+      "name" : "timeStamp",
+      "type" : "LONG"
+    }
+  ]
+}

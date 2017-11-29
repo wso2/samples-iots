@@ -1,0 +1,61 @@
+/* Enter a unique ExecutionPlan */
+@Plan:name('Floor-Analysis-Averaged-Sensors-Execution-Plan')
+
+/* Enter a unique description for ExecutionPlan */
+@Plan:description('ExecutionPlan for converting the single events into averaged event for certain time')
+
+/* define streams/tables and write queries here ... */
+
+@Import('org.wso2.floor.SensorStream:1.0.0')
+define stream dataIn (deviceId string, temperature double, motion double, humidity double, airQuality double, light double);
+
+@Export('org.wso2.floor.average.SensorStream:1.0.0')
+define stream dataOut (deviceId string, avgTemperature double, avgMotion double, avgHumidity double, avgAirQuality
+double, avgLight double, timeStamp long);
+
+@Export('org.wso2.floor.summarized.SensorStream:1.0.0')
+define stream summarizedDataOut (deviceId string, temperature double, motion double, humidity double, airQuality
+double, light double, timeStamp long);
+
+@Export('org.wso2.floor.summarized1hr.SensorStream:1.0.0')
+define stream summarizedDataOut1hr (deviceId string, temperature1 double, motion1 double, humidity1 double, airQuality1
+double, light1 double, timeStamp long);
+
+@Export('org.wso2.floor.summarized3hr.SensorStream:1.0.0')
+define stream summarizedDataOut3hr (deviceId string, temperature3 double, motion3 double, humidity3 double, airQuality3
+double, light3 double, timeStamp long);
+
+@Export('org.wso2.floor.summarized6hr.SensorStream:1.0.0')
+define stream summarizedDataOut6hr (deviceId string, temperature6 double, motion6 double, humidity6 double, airQuality6
+double, light6 double, timeStamp long);
+
+from dataIn#window.timeBatch(30 sec)
+select deviceId, avg(temperature) as avgTemperature, avg(motion) as avgMotion, avg(humidity) as avgHumidity, avg
+(airQuality) as avgAirQuality, avg(light) as avgLight, time:timestampInMilliseconds() as timeStamp
+group by deviceId
+insert into dataOut;
+
+from dataIn#window.timeBatch(12 min)
+select deviceId, avg(temperature) as temperature, avg(motion) as motion, avg(humidity) as humidity, avg(airQuality) as
+airQuality, avg(light) as light, time:timestampInMilliseconds() as timeStamp
+group by deviceId
+insert into summarizedDataOut;
+
+from dataIn#window.timeBatch(60 min)
+select deviceId, avg(temperature) as temperature1, avg(motion) as motion1, avg(humidity) as humidity1, avg(airQuality) as
+airQuality1, avg(light) as light1, time:timestampInMilliseconds() as timeStamp
+group by deviceId
+insert into summarizedDataOut1hr;
+
+from dataIn#window.timeBatch(180 min)
+select deviceId, avg(temperature) as temperature3, avg(motion) as motion3, avg(humidity) as humidity3, avg(airQuality) as
+airQuality3, avg(light) as light3, time:timestampInMilliseconds() as timeStamp
+group by deviceId
+insert into summarizedDataOut3hr;
+
+from dataIn#window.timeBatch(6 min)
+select deviceId, avg(temperature) as temperature6, avg(motion) as motion6, avg(humidity) as humidity6, avg(airQuality) as
+airQuality6, avg(light) as light6, time:timestampInMilliseconds() as timeStamp
+group by deviceId
+insert into summarizedDataOut6hr;
+
