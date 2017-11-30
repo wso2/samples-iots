@@ -7,12 +7,21 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.wso2.androidtv.agent.MessageActivity;
 import org.wso2.androidtv.agent.constants.TVConstants;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
+import org.wso2.androidtv.agent.h2cache.H2Connection;
+import org.wso2.androidtv.agent.siddhiSources.TextEdgeSource;
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.core.stream.output.StreamCallback;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+//import org.wso2.extension.siddhi.map.text.sourcemapper.TextSourceMapper;
+//import org.wso2.siddhi.extension.input.mapper.text.TextSourceMapper;
 
 public class SiddhiService extends Service {
 
@@ -25,7 +34,7 @@ public class SiddhiService extends Service {
     public static final int MESSAGE_FROM_SIDDHI_SERVICE_AC_QUERY = 5;
     public static final int MESSAGE_FROM_SIDDHI_SERVICE_KEYCARD_QUERY = 6;
     private SiddhiManager siddhiManager;
-    private ExecutionPlanRuntime executionPlanRuntime;
+    private SiddhiAppRuntime siddhiAppRuntime;
     private InputHandler inputHandler;
     private Handler mHandler;
     private IBinder binder = new SiddhiBinder();
@@ -52,97 +61,40 @@ public class SiddhiService extends Service {
     }
 
     private void invokeExecutionPlan(String executionPlan) {
-        if (executionPlanRuntime != null) {
-            executionPlanRuntime.shutdown();
-            executionPlanRuntime = null;
+        if (siddhiAppRuntime != null) {
+            siddhiAppRuntime.shutdown();
+            siddhiAppRuntime = null;
             Log.d(TAG, "Shutting down existing execution plan");
         }
-        executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
-        executionPlanRuntime.start();
-        executionPlanRuntime.addCallback("alertQuery", new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                Log.d(TAG, "Event arrived on alertQuery");
-                if (mHandler != null) {
-                    for (Event e : inEvents) {
-                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_ALERT_QUERY, e).sendToTarget();
-                    }
-                }
-            }
-        });
-        executionPlanRuntime.addCallback("temperatureQuery", new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                Log.d(TAG, "Event arrived on temperatureQuery");
-                if (mHandler != null) {
-                    for (Event e : inEvents) {
-                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_TEMPERATURE_QUERY, e).sendToTarget();
-                    }
-                }
-            }
-        });
-        executionPlanRuntime.addCallback("humidityQuery", new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                Log.d(TAG, "Event arrived on humidityQuery");
-                if (mHandler != null) {
-                    for (Event e : inEvents) {
-                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_HUMIDITY_QUERY, e).sendToTarget();
-                    }
-                }
-            }
-        });
-        executionPlanRuntime.addCallback("acQuery", new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                Log.d(TAG, "Event arrived on acQuery");
-                if (mHandler != null) {
-                    for (Event e : inEvents) {
-                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_AC_QUERY, e).sendToTarget();
-                    }
-                }
-            }
-        });
-        executionPlanRuntime.addCallback("windowQuery", new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                Log.d(TAG, "Event arrived on windowQuery");
-                if (mHandler != null) {
-                    for (Event e : inEvents) {
-                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_WINDOW_QUERY, e).sendToTarget();
-                    }
-                }
-            }
-        });
-        executionPlanRuntime.addCallback("keycardQuery", new QueryCallback() {
-            @Override
-            public void receive(long timeStamp, Event[] inEvents, Event[] removeEvents) {
-                Log.d(TAG, "Event arrived on keycardQuery");
-                if (mHandler != null) {
-                    for (Event e : inEvents) {
-                        mHandler.obtainMessage(MESSAGE_FROM_SIDDHI_SERVICE_KEYCARD_QUERY, e).sendToTarget();
-                    }
-                }
-            }
-        });
+        siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(executionPlan);
+        siddhiAppRuntime.start();
 
-        //Retrieving InputHandler to push events into Siddhi
-        setInputHandler(executionPlanRuntime.getInputHandler("edgeDeviceEventStream"));
+        //method to show alert messages
+        siddhiAppRuntime.addCallback("alertStream", new StreamCallback() {
+            @Override
+            public void receive(Event[] events) {
+                System.out.println("alertEvent :"+events[0].getData(0));
+                String alertMsg = events[0].getData(0).toString();
+                showAlert(MessageActivity.class, alertMsg);
+            }
+        });
         Log.i(TAG, "Starting execution plan.");
+
     }
 
     @Override
     public void onCreate() {
         if (siddhiManager == null){
             siddhiManager = new SiddhiManager();
+            siddhiManager.setExtension("source:textEdge",TextEdgeSource.class);
             Log.i(TAG, "Siddhi Service created.");
         }
     }
 
     @Override
     public void onDestroy() {
-        if (siddhiManager != null && executionPlanRuntime != null) {
-            executionPlanRuntime.shutdown();
+        if (siddhiManager != null && siddhiAppRuntime != null) {
+            siddhiAppRuntime.shutdown();
             Log.i(TAG, "Shutting down execution plan.");
         }
     }
@@ -163,5 +115,12 @@ public class SiddhiService extends Service {
         SiddhiService getService() {
             return SiddhiService.this;
         }
+    }
+
+    private void showAlert(Class<?> cls, String extra) {
+        Intent intent = new Intent(this, cls);
+        intent.putExtra(TVConstants.MESSAGE, extra);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }

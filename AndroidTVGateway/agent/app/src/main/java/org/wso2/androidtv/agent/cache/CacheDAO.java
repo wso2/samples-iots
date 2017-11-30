@@ -41,6 +41,7 @@ public class CacheDAO {
         if(db != null){
             db.beginTransaction();
         }
+
     }
 
     public void close() {

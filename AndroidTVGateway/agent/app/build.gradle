@@ -1,14 +1,16 @@
 apply plugin: 'com.android.application'
+apply plugin: 'me.champeau.gradle.antlr4'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
     defaultConfig {
-        applicationId "org.wso2.androidtv.agent"
+        applicationId "agent.androidtv.wso2.org.agent2"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -16,39 +18,88 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    android {
-        packagingOptions {
-            exclude 'META-INF/DEPENDENCIES.txt'
-            exclude 'META-INF/LICENSE.txt'
-            exclude 'META-INF/NOTICE.txt'
-            exclude 'META-INF/NOTICE'
-            exclude 'META-INF/LICENSE'
-            exclude 'META-INF/DEPENDENCIES'
-            exclude 'META-INF/notice.txt'
-            exclude 'META-INF/license.txt'
-            exclude 'META-INF/dependencies.txt'
-            exclude 'META-INF/LGPL2.1'
-        }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        merge 'META-INF/DEPENDENCIES'
+        merge 'META-INF/annotations/org.wso2.siddhi.annotation.Extension'
+        merge'org/eclipse/paho/client/mqttv3/internal/nls/'
+        merge 'org/eclipse/paho/client/mqttv3/logging/jsr47min.properties'
+        merge 'javax/xml/bind/util/Messages.properties'
+        merge 'javax/xml/bind/Messages.properties'
+        merge 'javax/xml/bind/helpers/Messages.properties'
+    }
+
+
+}
+
+antlr4 {
+    extraArgs = ['-package', 'org.wso2.siddhi.query.compiler']
+    output = project.file("src/main/java/org/wso2/siddhi/query/compiler")
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile files('libs/antlr4-runtime-4.5.1.jar')
-    compile files('libs/disruptor-3.3.2.wso2v2.jar')
-    compile files('libs/guava-14.0.1.jar')
-    compile files('libs/log4j-1.2.17.wso2v1.jar')
-    compile files('libs/siddhi-core-3.0.4-SNAPSHOT.jar')
-    compile files('libs/siddhi-query-api-3.0.4-SNAPSHOT.jar')
-    compile files('libs/siddhi-query-compiler-3.0.4-SNAPSHOT.jar')
-    compile 'com.android.support:leanback-v17:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'commons-codec:commons-codec:1.10'
-    compile 'com.netflix.feign:feign-jaxrs:8.16.0'
-    compile 'com.netflix.feign:feign-jackson:8.16.0'
-    compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
-    compile 'com.github.felHR85:UsbSerial:4.5'
-    compile 'com.google.code.gson:gson:2.7'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:leanback-v17:26.0.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:appcompat-v7:26.0.1'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.0'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.0'
+
+    implementation('org.wso2.siddhi:siddhi-core:4.0.0-beta3') {
+        transitive = false;
+    }
+    annotationProcessor('org.wso2.siddhi:siddhi-annotations:4.0.0-beta3') {
+        transitive = false
+    }
+    implementation('org.wso2.siddhi:siddhi-annotations:4.0.0-beta3') {
+        transitive = false
+    }
+    implementation('org.wso2.siddhi:siddhi-query-api:4.0.0-beta3') {
+        transitive = false
+    }
+    implementation('org.wso2.siddhi:siddhi-query-compiler:4.0.0-beta3') {
+        transitive = false
+    }
+
+    implementation('org.wso2.extension.siddhi.map.text:siddhi-map-text:1.0.9') {
+        transitive = false
+    }
+
+    implementation('org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2') {
+        transitive = false
+    }
+    implementation('org.wso2.extension.siddhi.map.xml:siddhi-map-xml:4.0.8'){
+        transitive = false
+    }
+    implementation('org.wso2.extension.siddhi.map.json:siddhi-map-json:4.0.12'){
+        transitive = false
+    }
+    implementation 'commons-codec:commons-codec:1.10'
+    implementation 'com.github.felHR85:UsbSerial:4.5'
+    implementation 'com.netflix.feign:feign-jaxrs:8.16.0'
+    implementation ('com.netflix.feign:feign-jackson:8.16.0'){
+
+    }
+    implementation "com.google.guava:guava:19.0"
+    implementation("org.apache.log4j.wso2:log4j:1.2.17.wso2v1") {
+        transitive = false
+    }
+    implementation "org.osgi:org.osgi.core:6.0.0"
+    implementation "org.eclipse.osgi:org.eclipse.osgi.services:3.3.100.v20120522-1822"
+    implementation 'com.android.support:multidex:1.0.0'
+    implementation 'com.android.support:design:26.0.1'
+    annotationProcessor("org.atteo.classindex:classindex:3.4") {}
+    implementation "org.wso2.orbit.com.lmax:disruptor:3.3.2.wso2v2"
+    implementation "org.antlr:antlr4-runtime:4.5.1"
+    implementation "com.h2database:h2:1.4.196"
+    implementation "io.dropwizard.metrics:metrics-core:3.1.0"
+
 }
