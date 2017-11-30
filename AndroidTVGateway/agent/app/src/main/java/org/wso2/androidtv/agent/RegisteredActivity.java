@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import org.wso2.androidtv.agent.constants.TVConstants;
 import org.wso2.androidtv.agent.services.DeviceManagementService;
 import org.wso2.androidtv.agent.util.LocalRegistry;
 
@@ -86,5 +87,7 @@ public class RegisteredActivity extends Activity {
         finish();
         return true;
     }
+
+
 
 }

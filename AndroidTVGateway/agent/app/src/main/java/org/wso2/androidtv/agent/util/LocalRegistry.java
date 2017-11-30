@@ -91,6 +91,14 @@ public class LocalRegistry {
         return LocalRegistry.username;
     }
 
+    public static String getOwnerNameSiddhi(){
+        String ownername = "";
+        if(LocalRegistry.username!=null){
+            ownername=LocalRegistry.username;
+        }
+        return ownername;
+    }
+
     public static void removeUsername(Context context) {
         SharedPreferences sharedpreferences = context.getSharedPreferences(SENSE_SHARED_PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
@@ -106,6 +114,14 @@ public class LocalRegistry {
         editor.putString(DEVICE_ID_KEY, deviceId);
         editor.apply();
         LocalRegistry.deviceId = deviceId;
+    }
+
+    public static String getDeviceIDSiddhi(){
+        String deviceId="";
+        if(LocalRegistry.deviceId!=null){
+            deviceId=LocalRegistry.deviceId;
+        }
+        return deviceId;
     }
 
     public static void removeDeviceId(Context context) {
@@ -173,6 +189,14 @@ public class LocalRegistry {
             LocalRegistry.accessToken = sharedpreferences.getString(ACCESS_TOKEN_KEY, "");
         }
         return LocalRegistry.accessToken;
+    }
+
+    public static synchronized String getAccessTokenSidhhi(){
+        String token ="";
+        if(LocalRegistry.accessToken != null){
+            token = LocalRegistry.accessToken;
+        }
+        return token;
     }
 
     public static synchronized void addRefreshToken(Context context, String refreshToken) {
@@ -273,6 +297,14 @@ public class LocalRegistry {
             LocalRegistry.mqttEndpoint = sharedpreferences.getString(MQTT_ENDPOINT_KEY, "");
         }
         return LocalRegistry.mqttEndpoint;
+    }
+
+    public static String getMqttEndpointSiddhi(){
+        String url= null;
+        if(LocalRegistry.mqttEndpoint!=null){
+            url=LocalRegistry.mqttEndpoint;
+        }
+        return  url;
     }
 
     public static void setEnrolled(Context context, boolean enrolled) {

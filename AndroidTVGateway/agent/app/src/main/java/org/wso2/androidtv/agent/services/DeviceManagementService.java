@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -44,20 +45,21 @@ import org.wso2.androidtv.agent.MessageActivity;
 import org.wso2.androidtv.agent.R;
 import org.wso2.androidtv.agent.VideoActivity;
 import org.wso2.androidtv.agent.constants.TVConstants;
+import org.wso2.androidtv.agent.h2cache.H2Connection;
 import org.wso2.androidtv.agent.mqtt.AndroidTVMQTTHandler;
 import org.wso2.androidtv.agent.mqtt.MessageReceivedCallback;
 import org.wso2.androidtv.agent.cache.CacheEntry;
 import org.wso2.androidtv.agent.mqtt.transport.TransportHandlerException;
+import org.wso2.androidtv.agent.subscribers.EdgeSourceSubscriber;
 import org.wso2.androidtv.agent.util.AndroidTVUtils;
 import org.wso2.androidtv.agent.util.LocalRegistry;
-import org.wso2.siddhi.core.event.Event;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
-import java.util.Calendar;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -68,11 +70,10 @@ public class DeviceManagementService extends Service {
 
     private static final String TAG = UsbService.class.getSimpleName();
 
-    private AndroidTVMQTTHandler androidTVMQTTHandler;
+    private static AndroidTVMQTTHandler androidTVMQTTHandler;
     private UsbService usbService;
     private SiddhiService siddhiService;
     private UsbServiceHandler usbServiceHandler;
-    private SiddhiServiceHandler siddhiServiceHandler;
     private boolean hasPendingConfigDownload = false;
     private long downloadId = -1;
     private CacheManagementService cacheManagementService;
@@ -83,9 +84,13 @@ public class DeviceManagementService extends Service {
     private static volatile boolean isInCriticalPath = false;
     private static volatile String serialOfCurrentEdgeDevice = "";
     private static volatile String incomingMessage = "";
+    private static volatile String sendingMessage = "";
     private static volatile boolean isCacheEnabled = false;
+    private static ArrayList<EdgeSourceSubscriber> sourceSubscribers = new ArrayList<>();
+
 
     private DownloadManager downloadManager;
+
 
     private final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
@@ -108,7 +113,6 @@ public class DeviceManagementService extends Service {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             siddhiService = ((SiddhiService.SiddhiBinder) iBinder).getService();
-            siddhiService.setHandler(siddhiServiceHandler);
         }
 
         @Override
@@ -180,6 +184,7 @@ public class DeviceManagementService extends Service {
         }
     };
 
+
     private void installConfigurations(final String fileName) {
         Runnable installConfigThread = new Runnable() {
             @Override
@@ -244,10 +249,6 @@ public class DeviceManagementService extends Service {
         }
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -256,46 +257,108 @@ public class DeviceManagementService extends Service {
 
     @Override
     public void onCreate() {
-        androidTVMQTTHandler = new AndroidTVMQTTHandler(this, new MessageReceivedCallback() {
+       androidTVMQTTHandler = new AndroidTVMQTTHandler(this, new MessageReceivedCallback() {
             @Override
             public void onMessageReceived(JSONObject message) throws JSONException {
                 performAction(message.getString("action"), message.getString("payload"));
             }
         });
-        androidTVMQTTHandler.connect();
+       androidTVMQTTHandler.connect();
+
+       H2Connection h2Connection = new H2Connection(this);
+        try {
+            h2Connection.initializeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
 
         usbServiceHandler = new UsbServiceHandler(this);
-        // Start UsbService(if it was not started before) and Bind it
+        /*Start UsbService(if it was not started before) and Bind it*/
         startService(UsbService.class, usbConnection, null);
-
-        siddhiServiceHandler = new SiddhiServiceHandler(this);
         Bundle extras = new Bundle();
-        String executionPlan = "@Plan:name('edgeAnalytics') " +
+
+        String executionPlan = "@app:name('edgeAnalytics') " +
+                "@source(type='textEdge', @map(type='text', fail.on.missing.attribute = 'true' ," +
+                " regex" +
+                ".T=\"\"\"\"t\":(\\w+)\"\"\", regex"+".H=\"\"\"\"h\":(\\w+)\"\"\", " +
+                "regex"+".A=\"\"\"\"a\":(\\w+)\"\"\", regex"+".W=\"\"\"\"w\":(\\w+)\"\"\", " +
+                "regex"+".K=\"\"\"\"k\":(\\w+)\"\"\", regex"+".L=\"\"\"\"l\":(\\w+)\"\"\", " +
+                "@attributes(temperature = 'T', humidity = 'H', ac = 'A', window = 'W', " +
+                "keycard = 'K', light = 'L')))"+
                 "define stream edgeDeviceEventStream " +
-                "(ac int, window int, light int, temperature float, humidity float, keycard int); " +
-                "@info(name = 'alertQuery') " +
-                "from edgeDeviceEventStream[(1 == ac or 1 == window or 1 == light) and 0 == keycard] " +
-                "select ac, window, light insert into alertOutputStream; " +
-                "@info(name = 'temperatureQuery') " +
-                "from every te1=edgeDeviceEventStream, te2=edgeDeviceEventStream[te1.temperature != temperature ] " +
-                "select te2.temperature insert into temperatureOutputStream; " +
-                "@info(name = 'humidityQuery') " +
-                "from every he1=edgeDeviceEventStream, he2=edgeDeviceEventStream[he1.humidity != humidity ] " +
-                "select he2.humidity insert into humidityOutputStream; " +
-                "@info(name = 'acQuery') " +
+                "(ac Float, window float, light float, temperature float, humidity float," +
+                " keycard float); " +
+                "@source(type='textEdge',@map(type='text', fail.on.missing.attribute= 'true'," +
+                "regex" +
+                ".L='(LON)'," +
+                "@attributes(lightOn = 'L')))" +
+                "define stream lightOnStream (lightOn String);"+
+
+                "@source(type='textEdge',@map(type='text', fail.on.missing.attribute= 'true'," +
+                "regex" +
+                ".L='(LOFF)'," +
+                "@attributes(lightOff = 'L')))" +
+                "define stream lightOffStream (lightOff String);"+
+
+                "@sink(type='edgeGateway'," +
+                "topic='AC'," +
+                "@map(type='json'))"+"define stream acOutputStream (AC Float);"+
+                "@sink(type='edgeGateway'," +
+                "topic='HUMIDITY'," +
+                "@map(type='json'))"+"define stream humidityOutputStream (HUMIDITY Float);"+
+                "@sink(type='edgeGateway'," +
+                "topic='TEMP'," +
+                "@map(type='json'))"+"define stream temperatureOutputStream (TEMP Float);"+
+                "@sink(type='edgeGateway'," +
+                "topic='WINDOW'," +
+                "@map(type='json'))"+"define stream windowOutputStream (WINDOW Float);"+
+
+                "@sink(type='edgeResponse',topic='at_response',@map(type='json'))" +
+                "define stream lightOnOutputStream (lightOnOutput String);"+
+
+                "@sink(type='edgeResponse',topic='at_response',@map(type='json'))" +
+                "define stream lightOffOutputStream (lightOffOutput String);"+
+
+                "@config(async = 'true') define stream alertStream (alertMessage String);"+
+
                 "from every ae1=edgeDeviceEventStream, ae2=edgeDeviceEventStream[ae1.ac != ac ] " +
-                "select ae2.ac insert into acOutputStream; " +
-                "@info(name = 'windowQuery') " +
-                "from every we1=edgeDeviceEventStream, we2=edgeDeviceEventStream[we1.window != window ] " +
-                "select we2.window insert into windowOutputStream; " +
-                "@info(name = 'keycardQuery') " +
-                "from every ke1=edgeDeviceEventStream, ke2=edgeDeviceEventStream[ke1.keycard != keycard ] " +
-                "select ke2.keycard insert into keycardOutputStream;";
+                "select ae2.ac as AC insert into acOutputStream; "+
+
+                "from every he1=edgeDeviceEventStream," +
+                " he2=edgeDeviceEventStream[he1.humidity != humidity ] " +
+                "select he2.humidity as HUMIDITY insert into humidityOutputStream; "+
+
+                "from every te1=edgeDeviceEventStream, " +
+                "te2=edgeDeviceEventStream[te1.temperature != temperature ] " +
+                "select te2.temperature as TEMP insert into temperatureOutputStream;"+
+
+                "from every we1=edgeDeviceEventStream, " +
+                "we2=edgeDeviceEventStream[we1.window != window ] " +
+                "select we2.window as WINDOW insert into windowOutputStream; "+
+
+                "from edgeDeviceEventStream[(1 == ac and 0 == window and 0 == light) " +
+                "and 0 == keycard] " +
+                "select 'AC is on' as alertMessage insert into alertStream; "+
+
+                "from edgeDeviceEventStream[(0 == ac and 0 == window and 1 == light) " +
+                "and 0 == keycard] " +
+                "select 'Light is on' as alertMessage insert into alertStream; " +
+
+                "from lightOnStream select 'Light On' as lightOnOutput insert into " +
+                "lightOnOutputStream;"+
+
+                "from lightOffStream select 'Light Off' as lightOffOutput insert into " +
+                "lightOffOutputStream;";
+
+
+
         extras.putString(TVConstants.EXECUTION_PLAN_EXTRA, executionPlan);
         startService(SiddhiService.class, siddhiConnection, extras);
 
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        runCacheManagementService();
     }
 
     @Override
@@ -313,6 +376,12 @@ public class DeviceManagementService extends Service {
         if (cacheManagementService != null) {
             cacheManagementService.removeAllCacheEntries();
         }
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     private void performAction(String action, String payload) {
@@ -393,6 +462,7 @@ public class DeviceManagementService extends Service {
             message = incomingMessage;
             incomingMessage = "";
             processXBeeMessage(message.replace("\r", ""));
+
         }
     }
 
@@ -401,127 +471,14 @@ public class DeviceManagementService extends Service {
             waitFlag = false;
         } else {
             Log.i(TAG, "Message> " + message);
-            System.out.println("sendmessage : "+(message));
-            try {
-                JSONObject incomingMsg = new JSONObject(message);
-                switch (incomingMsg.getString("a")) {
-                    case "LON":
-                        sendATResponse("Light ON");
-                        break;
-                    case "LOFF":
-                        sendATResponse("Light OFF");
-                        break;
-                    case "DOPEN":
-                        sendATResponse("Door lock opened");
-                        break;
-                    case "DCLOSE":
-                        sendATResponse("Door lock closed");
-                        break;
-                    case "CIN":
-                        sendATResponse("Access card inserted");
-                        break;
-                    case "CO":
-                        sendATResponse("Access card removed");
-                        break;
-                    case "DATA":
-                        JSONObject payload = incomingMsg.getJSONObject("p");
-                        float temp = payload.getInt("t");
-                        float humidity = payload.getInt("h");
-                        int ac = payload.getInt("a");
-                        int window = payload.getInt("w");
-                        int light = payload.getInt("l");
-                        int keyCard = payload.getInt("k");
-                        siddhiService.getInputHandler().send(new Object[]{ac, window, light, temp, humidity, keyCard});
-                        break;
-                }
-            } catch (JSONException e) {
-                Log.e(TAG, "Incomplete incoming message. Ignored", e);
-            } catch (InterruptedException e) {
-                Log.e(TAG, e.getClass().getSimpleName(), e);
+
+            /*the recieving message is published into the Siddhi Sources
+            * via the source subscribers*/
+            for (EdgeSourceSubscriber sourceSubscriber : sourceSubscribers) {
+                sourceSubscriber.recieveEvent(message, null);
             }
         }
-    }
 
-    private void sendATResponse(String message) {
-        try {
-            JSONObject jsonEvent = new JSONObject();
-            JSONObject jsonMetaData = new JSONObject();
-            jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
-            jsonMetaData.put("deviceId", getDeviceId());
-            jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
-            jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
-            jsonEvent.put("metaData", jsonMetaData);
-
-            JSONObject payload = new JSONObject();
-            payload.put("serial", serialOfCurrentEdgeDevice);
-            payload.put("at_response", message);
-            jsonEvent.put("payloadData", payload);
-
-            JSONObject wrapper = new JSONObject();
-            wrapper.put("event", jsonEvent);
-            if (androidTVMQTTHandler.isConnected()) {
-                androidTVMQTTHandler.publishDeviceData(wrapper.toString());
-            } else {
-                Log.i("SendATResponse", "Connection not available, hence entry is added to cache");
-                cacheManagementService.addCacheEntry(androidTVMQTTHandler.getDefaultPublishTopic(),
-                        wrapper.toString());
-                isCacheEnabled = true;
-            }
-        } catch (TransportHandlerException | JSONException e) {
-            Log.e(TAG, e.getClass().getSimpleName(), e);
-        }
-    }
-
-    private void publishStats(String topic, String key, float value) {
-        try {
-            JSONObject jsonEvent = new JSONObject();
-            JSONObject jsonMetaData = new JSONObject();
-            jsonMetaData.put("owner", LocalRegistry.getUsername(getApplicationContext()));
-            jsonMetaData.put("deviceId", getDeviceId());
-            jsonMetaData.put("deviceType", TVConstants.DEVICE_TYPE);
-            jsonMetaData.put("time", Calendar.getInstance().getTime().getTime());
-            jsonEvent.put("metaData", jsonMetaData);
-
-            JSONObject payload = new JSONObject();
-            payload.put(key, value);
-            jsonEvent.put("payloadData", payload);
-
-            JSONObject wrapper = new JSONObject();
-            wrapper.put("event", jsonEvent);
-            if (androidTVMQTTHandler.isConnected()) {
-                androidTVMQTTHandler.publishDeviceData(wrapper.toString(), topic);
-            } else {
-                Log.i("PublishStats", "Connection not available, hence entry is added to cache");
-                cacheManagementService.addCacheEntry(topic, wrapper.toString());
-                isCacheEnabled = true;
-            }
-        } catch (TransportHandlerException | JSONException e) {
-            Log.e(TAG, e.getClass().getSimpleName(), e);
-        }
-    }
-
-    public void displayAlert(boolean ac, boolean window, boolean light){
-        String alertMsg = "Please ";
-        if (window) {
-            alertMsg += "close the window ";
-        }
-        if (ac || light) {
-            if (window) {
-                alertMsg += "and ";
-            }
-            alertMsg += "turn off ";
-            if (ac) {
-                alertMsg += "AC ";
-            }
-            if (ac && light) {
-                alertMsg += "and ";
-            }
-            if (light) {
-                alertMsg += "Light ";
-            }
-        }
-        alertMsg += "before leaving the room.";
-        startActivity(MessageActivity.class, alertMsg);
     }
 
     private String getDeviceId() {
@@ -529,15 +486,16 @@ public class DeviceManagementService extends Service {
     }
 
     private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
-        Intent startService = new Intent(this, service);
+        Intent startServiceIntent = new Intent(this, service);
+
         if (extras != null && !extras.isEmpty()) {
             Set<String> keys = extras.keySet();
             for (String key : keys) {
                 String extra = extras.getString(key);
-                startService.putExtra(key, extra);
+                startServiceIntent.putExtra(key, extra);
             }
         }
-        startService(startService);
+        startService(startServiceIntent);
         Intent bindingIntent = new Intent(this, service);
         bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -578,43 +536,6 @@ public class DeviceManagementService extends Service {
         }
     }
 
-    // This handler will be passed to SiddhiService. Data received from SiddhiQuery is displayed through this handler
-    private static class SiddhiServiceHandler extends Handler {
-        private final WeakReference<DeviceManagementService> mService;
-        private static  String publishTopic;
-
-        SiddhiServiceHandler(DeviceManagementService service) {
-            mService = new WeakReference<>(service);
-            publishTopic = LocalRegistry.getTenantDomain(mService.get())+ "/" + TVConstants.DEVICE_TYPE + "/" +
-                    LocalRegistry.getDeviceId(mService.get());
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            Event data = (Event) msg.obj;
-            Log.d(TAG, "Edge data received: " + data.toString());
-            switch (msg.what) {
-                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_ALERT_QUERY:
-                    mService.get().displayAlert((Integer) data.getData(0) == 1, (Integer) data.getData(1) == 1, (Integer) data.getData(2) == 1);
-                    break;
-                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_TEMPERATURE_QUERY:
-                    mService.get().publishStats(publishTopic + "/TEMP", "TEMP", (Float) data.getData(0));
-                    break;
-                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_HUMIDITY_QUERY:
-                    mService.get().publishStats(publishTopic + "/HUMIDITY", "HUMIDITY", (Float) data.getData(0));
-                    break;
-                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_AC_QUERY:
-                    mService.get().publishStats(publishTopic + "/AC", "AC", (Integer) data.getData(0));
-                    break;
-                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_WINDOW_QUERY:
-                    mService.get().publishStats(publishTopic + "/WINDOW", "WINDOW", (Integer) data.getData(0));
-                    break;
-                case SiddhiService.MESSAGE_FROM_SIDDHI_SERVICE_KEYCARD_QUERY:
-                    mService.get().publishStats(publishTopic + "/DOOR", "DOOR", (Integer) data.getData(0));
-                    break;
-            }
-        }
-    }
 
     private void runCacheManagementService() {
         cacheManagementService = new CacheManagementService(getApplicationContext());
@@ -641,7 +562,7 @@ public class DeviceManagementService extends Service {
                             }
                         } else {
                             Log.d("CacheManagerService", "Unable to connect to the MQTT server, " +
-                                    "hence retry in " + (threadWaitingTime )/1000 + " seconds");
+                                    "hence retry in " + (threadWaitingTime) / 1000 + " seconds");
                         }
                     }
                     try {
@@ -663,7 +584,7 @@ public class DeviceManagementService extends Service {
                 Log.d("PublishCacheData", "Publishing cache entry: " + entry.getId());
                 androidTVMQTTHandler.publishDeviceData(entry.getMessage(), entry.getTopic());
                 cacheManagementService.removeCacheEntry(entry.getId());
-            }else {
+            } else {
                 break;
             }
         }
@@ -673,4 +594,25 @@ public class DeviceManagementService extends Service {
             isCacheEnabled = false;
         }
     }
+
+
+    public static void connectToSource(EdgeSourceSubscriber sourceSubscriber) {
+        sourceSubscribers.add(sourceSubscriber);
+    }
+
+    public static void disConnectToSource(EdgeSourceSubscriber sourceSubscriber) {
+        sourceSubscribers.remove(sourceSubscriber);
+    }
+
+    public static AndroidTVMQTTHandler getAndroidTVMQTTHandler(){
+        return androidTVMQTTHandler;
+    }
+
+    public static String getSerialOfCurrentEdgeDevice(){
+        return serialOfCurrentEdgeDevice;
+    }
+
+
+
+
 }

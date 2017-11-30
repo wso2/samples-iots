@@ -18,6 +18,7 @@
 package org.wso2.androidtv.agent.mqtt;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -29,6 +30,8 @@ import org.wso2.androidtv.agent.mqtt.transport.MQTTTransportHandler;
 import org.wso2.androidtv.agent.mqtt.transport.TransportHandlerException;
 import org.wso2.androidtv.agent.util.AndroidTVClient;
 import org.wso2.androidtv.agent.util.LocalRegistry;
+
+import static android.support.v4.content.ContextCompat.startActivity;
 
 /**
  * This is an example for the use of the MQTT capabilities provided by the IoT-Server. This example depicts the use
@@ -49,6 +52,7 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
 
     private MessageReceivedCallback messageReceivedCallback;
     private String publishTopic;
+    private String topicPrefix;
     private Context context;
 
     /**
@@ -60,6 +64,8 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
         this.messageReceivedCallback = messageReceivedCallback;
         this.publishTopic = LocalRegistry.getTenantDomain(context)+ "/" + TVConstants.DEVICE_TYPE + "/" +
                 LocalRegistry.getDeviceId(context) + "/at_response";
+        this.topicPrefix =  LocalRegistry.getTenantDomain(context)+ "/" + TVConstants.DEVICE_TYPE + "/" +
+                LocalRegistry.getDeviceId(context)+"/";
     }
 
     /**
@@ -69,6 +75,7 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
      */
     @Override
     public void connect() {
+
         Runnable connector = new Runnable() {
             public void run() {
                 AndroidTVClient client = new AndroidTVClient(context);
@@ -100,6 +107,8 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
         connectorThread.start();
     }
 
+
+
     /**
      * {@inheritDoc}
      * AndroidSense device-type specific implementation to process incoming messages. This is the specific
@@ -127,7 +136,8 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
             }
         } else {
             String errorMsg =
-                    "MQTT message [" + mqttMessage.toString() + "] was received without the topic information.";
+                    "MQTT message [" + mqttMessage.toString() + "] was received without the" +
+                            " topic information.";
             Log.w(TAG, errorMsg);
         }
     }
@@ -147,8 +157,6 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
         }
         if (publishData.length == 2) {
             publishToQueue(publishData[1], publishData[0]);
-        } else {
-            publishToQueue(publishTopic, publishData[0]);
         }
     }
 
@@ -165,14 +173,16 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
                     try {
                         closeConnection();
                     } catch (MqttException e) {
-                        Log.w(TAG, "Unable to 'STOP' MQTT connection at broker at: " + mqttBrokerEndPoint
+                        Log.w(TAG, "Unable to 'STOP' MQTT connection at broker at: "
+                                + mqttBrokerEndPoint
                                 + " for device-type - " + TVConstants.DEVICE_TYPE, e);
 
                         try {
                             Thread.sleep(timeoutInterval);
                         } catch (InterruptedException e1) {
                             Thread.currentThread().interrupt();
-                            Log.e(TAG, "MQTT-Terminator: Thread Sleep Interrupt Exception at device-type - " +
+                            Log.e(TAG, "MQTT-Terminator: Thread Sleep Interrupt Exception " +
+                                    "at device-type - " +
                                     TVConstants.DEVICE_TYPE, e1);
                         }
                     }
@@ -211,7 +221,12 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
     }
 
     public String getDefaultPublishTopic() {
+
         return publishTopic;
+    }
+
+    public String getTopicPrefix(){
+        return topicPrefix;
     }
 
 }
