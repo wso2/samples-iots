@@ -31,7 +31,7 @@ public class H2Connection implements CacheManager{
         File directory = contextWrapper.getFilesDir();
         System.out.println("h2 db direcotry :"+directory);
         String url = "jdbc:h2:/data/data/" +
-                "agent.androidtv.wso2.org.agent2" +
+                "org.wso2.androidtv.agent" +
                 "/data/edgeTVGateway" +
                 ";FILE_LOCK=FS" +
                 ";PAGE_SIZE=1024" +

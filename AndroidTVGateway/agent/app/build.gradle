@@ -5,7 +5,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
     defaultConfig {
-        applicationId "agent.androidtv.wso2.org.agent2"
+        applicationId "org.wso2.androidtv.agent"
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1

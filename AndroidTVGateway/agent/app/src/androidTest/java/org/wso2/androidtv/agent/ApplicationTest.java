@@ -1,4 +1,4 @@
-package agent.androidtv.wso2.org.agent2;
+package org.wso2.androidtv.agent;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
