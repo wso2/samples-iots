@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">MQTT Sample</string>
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Register Device</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="sessionId">sessionId</string>
+    <string name="error_invalid_username">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="https_localhost_8243">Server endpoint (Ex: https://192.168.1.1:8243)</string>
+    <string name="hostname">hostname</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="welcome_msg">Welcome to WSO2 Android MQTT Sample</string>
+</resources>
