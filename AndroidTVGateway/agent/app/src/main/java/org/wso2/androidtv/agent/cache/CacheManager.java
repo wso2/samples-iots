@@ -28,7 +28,6 @@ public interface CacheManager {
      * @param message MQTT Message
      */
     void addCacheEntry(String topic, String message);
-
     /**
      * This method is used to retrieve a cache entry.
      *

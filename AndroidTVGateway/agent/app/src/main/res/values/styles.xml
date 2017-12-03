@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:colorPrimary">@color/colorPrimary</item>
         <!--   darker variant for the status bar and contextual app bars -->
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -16,7 +16,7 @@
         <item name="android:textColorPrimary">@color/colorPrimary</item>
     </style>
 
-    <style name="FullscreenTheme" parent="Theme.Leanback">
+    <style name="FullscreenTheme" >
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:windowBackground">@null</item>
