@@ -14,21 +14,41 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/top_banner"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_marginTop="14dp"
         android:gravity="center"
         android:text="@string/welcome_msg"
         android:textColor="@color/colorPrimary"
         android:textSize="20sp" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnDisconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/disconnect"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="98dp" />
+        android:layout_marginBottom="24dp"
+        android:text="@string/disconnect" />
+
+    <EditText
+        android:id="@+id/editTextPayload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/btnPublish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextPayload"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:text="@string/action_publish" />
 </RelativeLayout>

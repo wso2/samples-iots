@@ -19,15 +19,38 @@
 package org.wso2.iot.mqttsample;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
+import org.wso2.iot.mqttsample.mqtt.transport.TransportHandlerException;
 import org.wso2.iot.mqttsample.services.DeviceManagementService;
 import org.wso2.iot.mqttsample.util.LocalRegistry;
 
 public class RegisteredActivity extends Activity {
+
+    private DeviceManagementService deviceManagementService;
+    private boolean isBound = false;
+
+    private ServiceConnection deviceManagementServiceConnection = new ServiceConnection() {
+
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            DeviceManagementService.LocalBinder binder = (DeviceManagementService.LocalBinder) service;
+            deviceManagementService = binder.getService();
+            isBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName arg0) {
+            isBound = false;
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +60,26 @@ public class RegisteredActivity extends Activity {
         Intent serviceIntent = new Intent(this, DeviceManagementService.class);
         startService(serviceIntent);
 
-        final Button unregisterBtn = (Button) findViewById(R.id.button);
-        unregisterBtn.setOnClickListener(new View.OnClickListener() {
+        final Button btnDisconnect = findViewById(R.id.btnDisconnect);
+        btnDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 unregister();
+            }
+        });
+
+        final EditText txtPayload = findViewById(R.id.editTextPayload);
+        final Button btnPublish = findViewById(R.id.btnPublish);
+        btnPublish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isBound) {
+                    try {
+                        deviceManagementService.publishMessage(txtPayload.getText().toString());
+                    } catch (TransportHandlerException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
     }
@@ -49,11 +87,16 @@ public class RegisteredActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+        Intent intent = new Intent(this, DeviceManagementService.class);
+        bindService(intent, deviceManagementServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        if (isBound) {
+            unbindService(deviceManagementServiceConnection);
+        }
     }
 
     @Override
@@ -61,7 +104,7 @@ public class RegisteredActivity extends Activity {
         super.onDestroy();
     }
 
-    private boolean unregister() {
+    private void unregister() {
         if (!LocalRegistry.isExist(getApplicationContext())) {
             Intent activity = new Intent(getApplicationContext(), RegisterActivity.class);
             startActivity(activity);
@@ -82,6 +125,5 @@ public class RegisteredActivity extends Activity {
         registerActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(registerActivity);
         finish();
-        return true;
     }
 }

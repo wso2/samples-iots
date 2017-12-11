@@ -20,6 +20,7 @@ package org.wso2.iot.mqttsample.services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
@@ -31,6 +32,8 @@ import org.wso2.iot.mqttsample.util.dto.Operation;
 
 public class DeviceManagementService extends Service {
 
+    private final IBinder myBinder = new LocalBinder();
+
     private MQTTHandler mqttHandler;
 
     @Override
@@ -40,13 +43,13 @@ public class DeviceManagementService extends Service {
 
     @Override
     public void onCreate() {
-       mqttHandler = new MQTTHandler(this, new MessageReceivedCallback() {
+        mqttHandler = new MQTTHandler(this, new MessageReceivedCallback() {
             @Override
             public void onMessageReceived(Operation operation) throws JSONException {
                 //TODO: Handle incoming operations here
             }
         });
-       mqttHandler.connect();
+        mqttHandler.connect();
     }
 
     @Override
@@ -60,13 +63,18 @@ public class DeviceManagementService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return myBinder;
     }
 
-    //TODO: Use thhis method to publish events
-    private void publishMessage(String payload) throws TransportHandlerException {
+    public void publishMessage(String payload) throws TransportHandlerException {
         String topic = mqttHandler.getPublishTopic();
-        mqttHandler.publishDeviceData(topic, payload);
+        mqttHandler.publishDeviceData(payload, topic);
+    }
+
+    public class LocalBinder extends Binder {
+        public DeviceManagementService getService() {
+            return DeviceManagementService.this;
+        }
     }
 
 }
