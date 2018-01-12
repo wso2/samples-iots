@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">PoS Client Mobile</string>
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Register Device</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="sessionId">sessionId</string>
+    <string name="error_invalid_username">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="https_localhost_8243">Server endpoint (Ex: https://192.168.1.1:8243)</string>
+    <string name="hostname">hostname</string>
+    <string name="btn_txt_disconnect">Disconnect</string>
+    <string name="welcome_msg">Welcome to WSO2 Android MQTT Sample</string>
+    <string name="txt_select_items_title">Select items to checkout</string>
+    <string name="btn_txt_checkout">Checkout</string>
+    <string name="btn_txt_scan">Scan QR</string>
+    <string name="txt_pos_device_id">PoS Device:</string>
+    <string name="btn_txt_confirm">Confirm</string>
+    <string name="btn_txt_cancel">Cancel</string>
+</resources>
