@@ -1,0 +1,55 @@
+{{!
+  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+
+  WSO2 Inc. licenses this file to you under the Apache License,
+  Version 2.0 (the "License"); you may not use this file except
+  in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+}}
+
+{{#zone "topCss"}}
+    {{css "css/styles.css"}}
+
+{{/zone}}
+
+<span id="laptop-details" data-websocketurl="{{socketEndpoint}}"></span>
+
+
+<div class="col-lg-12 main">
+
+        {{#each sensemedevices}}
+            <div class="row" style="outline: 2px solid #CCC; padding:1em;border: 1px solid #999;background-color: #999;" onclick="showRealtimeAnalytics({{deviceIdentifier}})">
+                <p>My mother has <span style="color:blue">blue</span> eyes.</p>
+                <p><strong style="color:#fff">Device name : </strong>{{name}}</p>
+                <p><strong style="color:#fff">Device identifier : </strong>{{deviceIdentifier}}</p>
+                <p><strong style="color:#fff">Status : </strong>{{enrolmentInfo.status}}</p>
+            </div>
+            <br/>
+        {{/each}}
+
+
+</div>
+
+
+
+
+
+{{#zone "bottomJs"}}
+    {{js "js/linuxgroup-graph.js"}}
+    {{js "js/chart.min.js"}}
+    {{js "js/chart-data.js"}}
+    {{js "js/easypiechart.js"}}
+    {{js "js/easypiechart-data.js"}}
+    {{js "js/lumino.glyphs.js"}}
+
+
+{{/zone}}
