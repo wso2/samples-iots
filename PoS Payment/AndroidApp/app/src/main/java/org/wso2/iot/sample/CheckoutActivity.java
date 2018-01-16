@@ -35,7 +35,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.iot.sample.constants.DeviceConstants;
@@ -54,7 +53,6 @@ public class CheckoutActivity extends AppCompatActivity {
     private boolean isBound = false;
     private boolean isPending = false;
     private ProgressDialog dialog;
-    private TextView txtOrderDetails;
     private Operation checkoutOperation;
 
     private BroadcastReceiver operationsReceiver = new BroadcastReceiver() {
@@ -65,7 +63,19 @@ public class CheckoutActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
             checkoutOperation = (Operation) intent.getSerializableExtra(DeviceConstants.CHECKOUT_OPERATION);
-            txtOrderDetails.setText("Bill Total: " + checkoutOperation.getPayload());
+            try {
+                JSONObject jsonObject = new JSONObject(checkoutOperation.getPayload());
+                TextView txtOrderId = findViewById(R.id.txtOrderId);
+                txtOrderId.setText("Order Id: " + jsonObject.getString("bill_id"));
+                TextView txtSubTotal = findViewById(R.id.txtSubTotal);
+                txtSubTotal.setText("Sub Total: " + String.format("%.2f", jsonObject.getDouble("sub_total")));
+                TextView txtTax = findViewById(R.id.txtTax);
+                txtTax.setText("Tac: " + String.format("%.2f", jsonObject.getDouble("tax")));
+                TextView txtTotal = findViewById(R.id.txtTotal);
+                txtTotal.setText("Total: " + String.format("%.2f", jsonObject.getDouble("bill_total")));
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
         }
     };
 
@@ -90,7 +100,19 @@ public class CheckoutActivity extends AppCompatActivity {
         itemModels = (ItemModel[]) getIntent().getSerializableExtra(DeviceConstants.SELECTED_ITEMS);
         posId = getIntent().getStringExtra(DeviceConstants.POS_ID);
 
-        txtOrderDetails = findViewById(R.id.txtOrderDetails);
+        TextView txtPoSId = findViewById(R.id.txtPoSId);
+        txtPoSId.setText("PoS Device: " + posId);
+
+        TextView txtSelectedItems = findViewById(R.id.txtItems);
+        StringBuilder itemsBuilder = new StringBuilder();
+        for (ItemModel itemModel : itemModels) {
+            if (itemModel.isChecked()) {
+                itemsBuilder.append(" - ");
+                itemsBuilder.append(itemModel.getName());
+                itemsBuilder.append('\n');
+            }
+        }
+        txtSelectedItems.setText(itemsBuilder.toString());
 
         dialog = new ProgressDialog(this);
         isPending = true;
@@ -168,13 +190,18 @@ public class CheckoutActivity extends AppCompatActivity {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("pos_id", posId);
-            JSONArray jsonArray = new JSONArray();
+            StringBuilder itemsBuilder = new StringBuilder();
             for (ItemModel itemModel : itemModels) {
                 if (itemModel.isChecked()) {
-                    jsonArray.put(itemModel.getName());
+                    itemsBuilder.append(itemModel.getName());
+                    itemsBuilder.append(',');
                 }
             }
-            jsonObject.put("items", jsonArray);
+            int length = itemsBuilder.length();
+            if (length > 0) {
+                itemsBuilder.deleteCharAt(length - 1);
+            }
+            jsonObject.put("items", itemsBuilder.toString());
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage(), e);
         }
