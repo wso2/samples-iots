@@ -1,0 +1,113 @@
+/* Enter a unique ExecutionPlan */
+@Plan:name('LockerAnomalyDetectionExecutionPlan')
+
+/* Enter a unique description for ExecutionPlan */
+-- @Plan:description('ExecutionPlan')
+
+/* define streams/tables and write queries here ... */
+
+@Import('iot.per.device.stream.carbon.super.locker:1.0.0')
+define stream dataIn (meta_deviceId string, temperature float, humidity float, metal bool, occupancy bool, open bool, attempt string);
+
+@Export('org.wso2.iot.locker.stat:1.0.0')
+define stream stat (meta_deviceId string, meta_timeStamp long, temperature float, humidity float, metal bool, occupancy bool, open bool);
+
+@Export('org.wso2.iot.locker.attempt:1.0.0')
+define stream attempt (meta_deviceId string, status string, user string, year int, month int, day int, hour int);
+
+@Export('org.wso2.iot.locker.operation:1.0.0')
+define stream operation (meta_deviceIdentifier string, code string, type string, isEnabled bool, payLoad string);
+
+@Export('org.wso2.iot.locker.alert:1.0.0')
+define stream alert (meta_deviceId string, level string, message string, user string);
+
+define stream last_minute_attempt (meta_deviceId string, status string, user string, attempt_count long);
+define stream deny_attempt (meta_deviceId string, user string);
+define stream allow_open (meta_deviceId string, user string);
+
+define stream door_anomaly (meta_deviceId string, event_count long);
+define stream all_data (meta_deviceId string, temperature double, humidity double, metal bool, occupancy bool, open bool, event_count long, user string);
+
+from dataIn
+select meta_deviceId, time:timestampInMilliseconds() as meta_timeStamp, temperature, humidity, metal, occupancy, open
+insert into stat;
+
+from dataIn [json:getProperty(attempt, 'status') != 'None']
+select meta_deviceId, json:getProperty(attempt, 'status') as status, json:getProperty(attempt, 'user') as user, time:extract(time:timestampInMilliseconds(), 'year') as year, time:extract(time:timestampInMilliseconds(), 'month') as month, time:extract(time:timestampInMilliseconds(), 'day') as day, time:extract(time:timestampInMilliseconds(), 'hour') as hour
+insert into attempt;
+
+from attempt [status == 'Success']
+select meta_deviceId, 'Info' as level, str:concat('Unlocked the locker by user ', user) as message, user
+insert into alert;
+
+from attempt [status == 'Denied']
+select meta_deviceId, 'Warn' as level, 'Unlocking attempt denied due to incorrect code.' as message, user
+insert into alert;
+
+from attempt [status == 'Blocked']
+select meta_deviceId, 'Warn' as level, 'Unlocking attempt prevented as locker is not allowed to open.' as message, user
+insert into alert;
+
+from attempt [status == 'Expired']
+select meta_deviceId, 'Info' as level, 'Unlocking fail as code is expired. Regenerate a new code.' as message, user
+insert into alert;
+
+partition with (meta_deviceId of dataIn)
+begin
+	from attempt#window.time(60000)
+	select meta_deviceId, status, user, count(meta_deviceId) as attempt_count
+	insert into last_minute_attempt;
+
+    from every e1=last_minute_attempt, e2=last_minute_attempt[e1.status == status], e3=last_minute_attempt[e2.status == status and status == 'Denied' and attempt_count >= 3]
+	select e1.meta_deviceId, e1.user
+	insert into deny_attempt;
+
+	/* Blocking device*/
+	from deny_attempt
+    select meta_deviceId as meta_deviceIdentifier, 'allow_open' as code, 'PROFILE' as type, true as isEnabled, 'false' as payLoad
+	insert into operation;
+
+	from deny_attempt
+	select meta_deviceId, 'Info' as level, 'Disallowing unlock, due to 3 failure attempts within a minute.' as message, user
+	insert into alert;
+
+	from deny_attempt#window.time(60000)
+	select meta_deviceId, user
+	insert expired events into allow_open;
+
+	from allow_open
+    select meta_deviceId as meta_deviceIdentifier, 'allow_open' as code, 'PROFILE' as type, true as isEnabled, 'true' as payLoad
+	insert into operation;
+
+	from allow_open
+	select meta_deviceId, 'Info' as level, 'Allowing to unlock the locker again.' as message, user
+	insert into alert;
+
+	from dataIn#window.time(120000)
+	select meta_deviceId, avg(temperature) as temperature, avg(humidity) as humidity, metal, occupancy, open, count(meta_deviceId) as event_count, json:getProperty(attempt, 'user') as user
+	insert into all_data;
+
+	from all_data[open == true]#window.time(120000)
+	select meta_deviceId, count(meta_deviceId) as event_count
+	insert into door_anomaly;
+
+	from door_anomaly#window.length(1) as errorStream unidirectional join all_data#window.length(1) as allStream on errorStream.event_count == allStream.event_count
+	select allStream.meta_deviceId, 'Warn' as level, 'Locker is open for more than two minutes.' as message, allStream.user
+	insert into alert;
+
+	from every e1=all_data, e2=all_data[e1.temperature < temperature and temperature > 50]
+	select e1.meta_deviceId, 'Warn' as level, str:concat('Temperature has increased above normal. Current: ', convert(e2.temperature, 'string')) as message, e2.user
+	insert into alert;
+
+	from every e1=all_data, e2=all_data[e1.humidity < humidity and humidity > 80]
+	select e1.meta_deviceId, 'Warn' as level, str:concat('Humidity has increased above normal. Current: ', convert(e2.humidity, 'string')) as message, e2.user
+	insert into alert;
+
+	from every e1=all_data[temperature > 50], e2=all_data[e1.temperature >= temperature and temperature < 50]
+	select e1.meta_deviceId, 'Info' as level, 'Temperature back to normal.' as message, e2.user
+	insert into alert;
+
+	from every e1=all_data[humidity > 80], e2=all_data[e1.humidity >= humidity and humidity < 80]
+	select e1.meta_deviceId, 'Info' as level, 'Humidity back to normal.' as message, e2.user
+	insert into alert;
+end;
