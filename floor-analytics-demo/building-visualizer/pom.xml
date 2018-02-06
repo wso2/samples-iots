@@ -360,7 +360,7 @@
         <carbon.kernel.version>4.4.16</carbon.kernel.version>
 
         <!-- Carbon Device Management -->
-        <carbon.device.mgt.version>3.0.65</carbon.device.mgt.version>
+        <carbon.device.mgt.version>3.0.219</carbon.device.mgt.version>
 
         <project-base-package>${project.groupId}.senseme</project-base-package>
         <project-package>senseme</project-package>
