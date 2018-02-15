@@ -31,6 +31,7 @@ import org.wso2.androidtv.agent.util.LocalRegistry;
 
 import java.nio.charset.StandardCharsets;
 
+
 /**
  * This is an abstract class that implements the "TransportHandler" interface. The interface is an abstraction for
  * the core functionality with regards to device-server communication regardless of the Transport protocol. This
@@ -382,4 +383,12 @@ public abstract class MQTTTransportHandler implements MqttCallback, TransportHan
     public MqttConnectOptions getOptions() {
         return options;
     }
+
+//    public void onConnect(MqttClient mqttc, String userdata, String flags, int result_code){
+//        System.out.println("In on_connect call back");
+//
+//    }
+
+
+
 }
