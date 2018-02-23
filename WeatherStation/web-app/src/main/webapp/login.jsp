@@ -32,21 +32,20 @@
     <link href="css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/material-kit.css"/>
 </head>
-<body class="signup-page">
+<body class="signup-page" background="images/windows_8_simple_background-wallpaper-2560x1600.jpg">
 <nav class="navbar navbar-transparent navbar-absolute">
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <a class="navbar-brand"><h4><strong>WEATHER</strong>STATION</h4></a>
+            <a class="navbar-brand"><h4 style="margin-left: 300px;font-size: 3em"><strong>WEATHER</strong>STATION</h4></a>
         </div>
     </div>
 </nav>
 
 <div class="wrapper">
-    <div class="header header-filter"
-         style="background-size: cover; background: url('images/windows_8_simple_background-wallpaper-2560x1600.jpg') top center;">
+    <div class="header header-filter">
         <div class="container">
-            <div class="row">
+            <div class="row" style="margin-top: 100px">
                 <div class="col-sm-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
                     <div class="card card-signup">
                         <form class="form" method="post" action="login">
@@ -99,19 +98,18 @@
             </div>
 
         </div>
-        <footer class="footer" style="bottom: 0; position: relative; width: 10%;margin-right: 1%;float: right">
-            <p class="copyright pull-right">
-                &copy;
-                <script>
-                    document.write(new Date().getFullYear())
-                </script>
-                <a href="https://wso2.com/iot">WSO2 Inc.</a>
-            </p>
 
-        </footer>
+
     </div>
 
 </div>
+<p class="copyright" style="position: absolute;bottom:20;padding-left: 100px;color: white">
+    &copy;
+    <script>
+        document.write(new Date().getFullYear())
+    </script>
+    <a href="https://wso2.com/iot">WSO2 Inc.</a>
+</p>
 </body>
 <script src="js/jquery.min.js" type="text/javascript"></script>
 <script src="js/bootstrap.min.js" type="text/javascript"></script>

@@ -41,7 +41,7 @@ realtimeAnalytics = {
             showArea: true,
             responsive:false,
             maintainAspectRatio : false,
-            low: 0,
+            low: -50,
             high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
@@ -79,7 +79,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -113,7 +113,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 360, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -124,6 +124,15 @@ realtimeAnalytics = {
 
         var realtimeWindDir = new Chartist.Line('#RealTimeWindDirChart', dataRealtimeWindDirChart, optionsRealtimeWindDirChart);
         md.startAnimationForLineChart(realtimeWindDir);
+        // dataRealtimeWindDirChart={series: [-340]};
+        // optionsRealtimeWindDirChart={
+        //     donut: true,
+        //     donutWidth: 60,
+        //     startAngle: 0,
+        //     total: 360,
+        //     showLabel: true
+        // };
+        // new Chartist.Pie('#RealTimeWindDirChart',dataRealtimeWindDirChart,optionsRealtimeWindDirChart );
 
         /* ----------==========     Realtime dew point forecast Chart initialization    ==========---------- */
         var realtimedewptfLabelRef = [new Date()];
@@ -146,7 +155,7 @@ realtimeAnalytics = {
                 tension: 0
             }),
             showArea: true,
-            low: 0,
+            low: -50,
             high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
@@ -180,7 +189,7 @@ realtimeAnalytics = {
                 tension: 0
             }),
             showArea: true,
-            low: 0,
+            low: -50,
             high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
@@ -215,7 +224,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -249,7 +258,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -283,7 +292,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -317,7 +326,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -351,7 +360,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -385,7 +394,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -420,7 +429,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -454,7 +463,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -488,7 +497,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -521,7 +530,7 @@ realtimeAnalytics = {
                 tension: 0
             }),
             showArea: true,
-            low: 0,
+            low: -50,
             high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
@@ -556,7 +565,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -590,7 +599,7 @@ realtimeAnalytics = {
             }),
             showArea: true,
             low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+            high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
             chartPadding: {
                 top: 0,
                 right: 0,
@@ -601,40 +610,6 @@ realtimeAnalytics = {
 
         var realtimebaromin = new Chartist.Line('#RealTimeBarominChart', dataRealtimebarominChart, optionsRealtimebarominChart);
         md.startAnimationForLineChart(realtimebaromin);
-
-        /* ----------==========     Realtime lowbatt Chart initialization    ==========---------- */
-        var realtimelowbattLabelRef = [new Date()];
-        var realtimelowbattLabel = ['0s'];
-        var realtimelowbattSeries = [0];
-
-        realtimeAnalytics.createLiFo(realtimelowbattLabelRef, 10);
-        realtimeAnalytics.createLiFo(realtimelowbattLabel, 10);
-        realtimeAnalytics.createLiFo(realtimelowbattSeries, 10);
-
-        dataRealtimelowbattChart = {
-            labels: realtimelowbattLabel,
-            series: [
-                realtimelowbattSeries
-            ]
-        };
-
-        optionsRealtimelowbattChart = {
-            lineSmooth: Chartist.Interpolation.cardinal({
-                tension: 0
-            }),
-            showArea: true,
-            low: 0,
-            high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-            chartPadding: {
-                top: 0,
-                right: 0,
-                bottom: 0,
-                left: 0
-            }
-        };
-
-        var realtimelowbatt = new Chartist.Line('#RealTimeLowbatChart', dataRealtimelowbattChart, optionsRealtimelowbattChart);
-        md.startAnimationForLineChart(realtimelowbatt);
 
 
 
@@ -654,7 +629,6 @@ realtimeAnalytics = {
         //websocket connection
         function connect(target) {
             if ('WebSocket' in window) {
-                console.log('realtime socket');
                 ws = new WebSocket(target);
             } else if ('MozWebSocket' in window) {
                 console.log('realtime mozsocket');
@@ -668,10 +642,13 @@ realtimeAnalytics = {
                     var data = event.data;
                     var dataPoint = JSON.parse(data).event.payloadData;
                     var temperature = dataPoint.tempf;
+                    temperature = ((temperature - 32) * 5) / 9;
                     var humidity = dataPoint.humidity;
                     var windDir=dataPoint.winddir;
                     var dewptf=dataPoint.dewptf;
+                    dewptf = ((dewptf - 32) * 5) / 9;
                     var windchillf=dataPoint.windchillf;
+                    windchillf = ((windchillf - 32) * 5) / 9;
                     var windspeedmph=dataPoint.windspeedmph;
                     var windgustmph=dataPoint.windgustmph;
                     var rainin=dataPoint.rainin;
@@ -682,10 +659,9 @@ realtimeAnalytics = {
                     var solarradiation=dataPoint.solarradiation;
                     var UV=dataPoint.UV;
                     var indoortempf=dataPoint.indoortempf;
+                    indoortempf = ((indoortempf - 32) * 5) / 9;
                     var indoorhumidity=dataPoint.indoorhumidity;
                     var baromin=dataPoint.baromin;
-                    var lowbatt=dataPoint.lowbatt;
-
 
                     var currentTime = new Date();
                     var sinceText = timeDifference(currentTime, new Date(dataPoint.timeStamp), false) + " ago";
@@ -796,12 +772,6 @@ realtimeAnalytics = {
                     realtimebarominSeries.push(baromin);
                     $("#realtimebarominLastUpdated").html(lastUpdatedText);
 
-                    realtimelowbattLabel.push('0s');
-                    realtimelowbattLabelRef.push(currentTime);
-                    realtimeAnalytics.calcTimeDiff(realtimelowbattLabel, realtimelowbattLabelRef);
-                    realtimelowbattSeries.push(lowbatt);
-                    $("#realtimelowbattLastUpdated").html(lastUpdatedText);
-
                     realtimewindgustmphLabel.push('0s');
                     realtimewindgustmphLabelRef.push(currentTime);
                     realtimeAnalytics.calcTimeDiff(realtimewindgustmphLabel, realtimewindgustmphLabelRef);
@@ -811,6 +781,16 @@ realtimeAnalytics = {
                 };
 
             }
+
+            //refresh graphs on click on the chart
+            $('.card').click(function() {
+                updateGraphs();
+
+            });
+
+            $("#menu-toggle").click(function () {
+                setTimeout(updateGraphs, 200);
+            });
 
         }
 
@@ -832,8 +812,6 @@ realtimeAnalytics = {
             realtimeindoorTemp.update();
             realtimeindoorHumid.update();
             realtimebaromin.update();
-            realtimelowbatt.update()
-
 
         }
 
@@ -859,6 +837,6 @@ realtimeAnalytics = {
         for (var i = 0; i < arr.length; i++) {
             arr[i] = timeDifference(now, arrRef[i], true);
         }
-    }
+    },
 
 };

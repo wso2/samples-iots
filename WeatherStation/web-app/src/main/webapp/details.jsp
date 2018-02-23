@@ -28,19 +28,17 @@
 <%@ page import="java.io.BufferedReader" %>
 <%@ page import="java.io.InputStreamReader" %>
 <%@ page import="java.net.URI" %>
-<%@ page import="java.net.URL" %>
-<%@ page import="java.util.Date" %>
 <%@ page import="java.net.URISyntaxException" %>
-<%@ page import="java.security.NoSuchAlgorithmException" %>
+<%@ page import="java.net.URL" %>
 <%@ page import="java.security.KeyManagementException" %>
-<%@ page import="org.json.JSONException" %>
 <%@ page import="java.security.KeyStoreException" %>
-<%@ page import="org.wso2.iot.weatherstation.portal.LoginController" %>
+<%@ page import="java.security.NoSuchAlgorithmException" %>
+<%@ page import="java.util.Date" %>
 <%@include file="includes/authenticate.jsp" %>
 <%
     String id = request.getParameter("id");
     if (id == null) {
-        response.sendRedirect("devices.jsp");
+        //  response.sendRedirect("devices.jsp");
         return;
     }
 
@@ -92,13 +90,9 @@
 
     JSONObject device = new JSONObject(result.toString());
     JSONObject enrolmentInfo = device.getJSONObject("enrolmentInfo");
-    try {
+    JSONObject lat = (JSONObject) device.getJSONArray("properties").get(0);
+    JSONObject lon = (JSONObject) device.getJSONArray("properties").get(1);
 
-    } catch (JSONException e) {
-%>
-Error occurred while fetching device info.
-<%
-    }
 %>
 
 <!doctype html>
@@ -120,19 +114,26 @@ Error occurred while fetching device info.
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet'
           type='text/css'>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+          integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+          crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="css/updates.css" rel="stylesheet"/>
+
+    <link href="css/simple-sidebar.css" rel="stylesheet">
 </head>
 
 <body>
-<div class="wrapper">
-    <div class="sidebar" data-color="purple" data-image="images/sidebar-1.jpg">
+<div id="wrapper" class="toggled">
+    <div id="sidebar-wrapper" class="sidebar" data-color="purple" data-image="images/sidebar-1.jpg">
         <!--
     Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 
     Tip 2: you can also add an image using data-image tag
 -->
-        <div class="logo">
-            <a class="simple-text" id="devName">
-                Weather Station
+        <div class="logo list-inline">
+            <a href="./devices.jsp" class="simple-text">
+                <strong>Weather</strong>Portal
             </a>
         </div>
         <div class="sidebar-wrapper">
@@ -149,37 +150,45 @@ Error occurred while fetching device info.
                         <div class="ripple-container"></div>
                     </a>
                 </li>
-                <li >
-                    <a href="Dashboard.jsp">
-                        <i class="material-icons">dashboard</i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
             </ul>
-            <footer>
+
+
+            <div id="mapid" style="width: 100%; height:50%; margin-top: 50px"></div>
+
             <div class="card card-stats " style="margin-bottom: 10px">
                 <div class="card-content">
-                    <h3 class="title" id="devNam">
+                    <h3 class="title" id="devName">
                     </h3>
                     <p class="category" id="devDetails"></p>
                 </div>
             </div>
-            </footer>
-
-
+            <p class="copyright" style="position: absolute;bottom:0;padding-left: 100px">
+                &copy;
+                <script>
+                    document.write(new Date().getFullYear())
+                </script>
+                <a href="https://wso2.com/iot">WSO2 Inc.</a>
+            </p>
         </div>
 
+
     </div>
-    <div class="main-panel">
-        <nav class="navbar navbar-transparent navbar-absolute">
+    <div id="page-content-wrapper" class="main-panel" style="padding-top: 2px;">
+
+        <nav class="navbar navbar-transparent"
+             style="padding-top: 2px;padding-bottom: 2px;text-align: center;line-height: 50px; font-size: 30px;">
             <div class="container-fluid">
                 <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li >
-                            <a href="./devices.jsp">
-                                <p ><i class="material-icons">list</i>Device List</p>
-                            </a>
+                    <ul class="nav navbar-nav navbar-left">
+                        <li>
+                            <a href="#menu-toggle" id="menu-toggle" style="width: 100px"> <i id="icon"
+                                                                                             class="fa fa-angle-double-left"
+                                                                                             style="font-size:36px"></i></a>
                         </li>
+                    </ul>
+                    <strong><%=device.getString("name")%>
+                    </strong> Weather Station Statistics
+                    <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown pull-right">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="material-icons">person</i>
@@ -196,11 +205,21 @@ Error occurred while fetching device info.
                 </div>
             </div>
         </nav>
-        <div class="content">
+        <div class="content" style="padding-top: 2px;">
+            <div id="daterangebar" style="margin-left:35%;margin-top: -4px">
+                <div class="menubutton">
+                    <h4 style="margin-top: -4px"><strong id="dateR" style=" font-size: 20px;">Date-range</strong></h4>
+                </div>
+                <div class="menubutton" style="width: 440px;margin-top: -4px;">
+                    <h4><input type="text" name="dateRange" id="dateRange" style="padding-left: 15px; font-size: 20px;"
+                               value="01/01/2018 1:30 PM - 01/01/2018 2:00 PM"
+                               class="form-control"/></h4></div>
+
+            </div>
             <div class="container-fluid">
                 <div class="tab-content">
                     <div id="realtime" class="tab-pane fade in active">
-                        <div class="row">
+                        <div class="row" id="statusCards">
                             <div class="col-lg-3 col-md-6 col-sm-6">
                                 <div class="card card-stats">
                                     <div class="card-header" data-background-color="orange">
@@ -212,7 +231,7 @@ Error occurred while fetching device info.
                                         </h3>
                                     </div>
                                     <div class="card-footer">
-                                        <div class="stats"  id="temperature_status_alert">
+                                        <div class="stats" id="temperature_status_alert">
                                             <i class="material-icons">update</i> Just Updated
                                         </div>
                                     </div>
@@ -269,12 +288,12 @@ Error occurred while fetching device info.
                         </div>
                         <div class="row">
                             <div class="col-md-4">
-                                <div class="card" id="temp" >
+                                <div class="card" id="temp" onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="red">
-                                        <div class="ct-chart" id="RealTimeTempChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight" id="RealTimeTempChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Temperature</h4>
+                                        <h4 class="title">Temperature&#8451</h4>
                                         <p class="category">
                                     </div>
                                     <div class="card-footer">
@@ -285,12 +304,13 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='humid' >
-                                    <div class="card-header card-chart" data-background-color="blue">
-                                        <div class="ct-chart" id="RealTimeHumidityChart"></div>
+                                <div class="card" id='humid' onclick=redirect(this)>
+                                    <div class="card-header card-chart " data-background-color="blue">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeHumidityChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Humidity</h4>
+                                        <h4 class="title">Humidity<b>%</b></h4>
                                         <p class="category">
 
                                     </div>
@@ -302,46 +322,13 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='winddir' >
-                                    <div class="card-header card-chart" data-background-color="green">
-                                        <div class="ct-chart" id="RealTimeWindDirChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Wind Direction</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimeWindDirLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='windspeed' >
-                                    <div class="card-header card-chart" data-background-color="purple">
-                                        <div class="ct-chart" id="RealTimeWindSpeedChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Wind Speed</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimewindspeedmphLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='indoorTemp' >
+                                <div class="card" id='indoorTemp' onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="orange">
-                                        <div class="ct-chart" id="RealTimeIndoorTempChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeIndoorTempChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Indoor Temperature</h4>
+                                        <h4 class="title">Indoor Temperature&#8451</h4>
                                         <p class="category">
 
                                     </div>
@@ -353,12 +340,32 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='indoorHumid' >
-                                    <div class="card-header card-chart" data-background-color="yellow">
-                                        <div class="ct-chart" id="RealTimeIndoorHumidityChart"></div>
+                                <div class="card" id='dewpoint' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="purple">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeDewPointChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Indoor Humidity</h4>
+                                        <h4 class="title">Dew Point&#8451</h4>
+                                        <p class="category">
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="stats" id="realtimedewptfLastUpdated">
+                                            <i class="material-icons">access_time</i> Yet to be updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="card" id='indoorHumid' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="yellow">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeIndoorHumidityChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Indoor Humidity<b>%</b></h4>
                                         <p class="category">
 
                                     </div>
@@ -369,15 +376,71 @@ Error occurred while fetching device info.
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="card" id='baromin' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="green">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeBarominChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Baromin<b> pascal</b></h4>
+                                        <p class="category">
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="stats" id="realtimebarominLastUpdated">
+                                            <i class="material-icons">access_time</i> Yet to be updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                         <div class="row">
                             <div class="col-md-4">
-                                <div class="card" id='windgust' >
-                                    <div class="card-header card-chart" data-background-color="orange">
-                                        <div class="ct-chart" id="RealTimeWindGustChart"></div>
+                                <div class="card" id='winddir' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="green">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeWindDirChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Wind Gust</h4>
+                                        <h4 class="title">Wind Direction&#176</h4>
+                                        <p class="category">
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="stats" id="realtimeWindDirLastUpdated">
+                                            <i class="material-icons">access_time</i> Yet to be updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card" id='windspeed' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="purple">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeWindSpeedChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Wind Speed <b>mph</b></h4>
+                                        <p class="category">
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="stats" id="realtimewindspeedmphLastUpdated">
+                                            <i class="material-icons">access_time</i> Yet to be updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card" id='windgust' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="orange">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeWindGustChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Wind Gust <b>mph</b></h4>
                                         <p class="category">
 
                                     </div>
@@ -389,29 +452,13 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='dewpoint' >
-                                    <div class="card-header card-chart" data-background-color="purple">
-                                        <div class="ct-chart" id="RealTimeDewPointChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Dew Point</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimedewptfLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='windchill' >
+                                <div class="card" id='windchill' onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="red">
-                                        <div class="ct-chart" id="RealTimeWindChillChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeWindChillChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Wind Chill</h4>
+                                        <h4 class="title">Wind Chill&#8451</h4>
                                         <p class="category">
 
                                     </div>
@@ -423,133 +470,13 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='raining' >
-                                    <div class="card-header card-chart" data-background-color="yellow">
-                                        <div class="ct-chart" id="RealTimeRainingChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Raining</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimerainingLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='baromin' >
-                                    <div class="card-header card-chart" data-background-color="green">
-                                        <div class="ct-chart" id="RealTimeBarominChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Baromin</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimebarominLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='lowbatt' >
-                                    <div class="card-header card-chart" data-background-color="blue">
-                                        <div class="ct-chart" id="RealTimeLowbatChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Lowbatt</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimelowbattLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card" id='dailyraining' >
-                                    <div class="card-header card-chart" data-background-color="green">
-                                        <div class="ct-chart" id="RealTimeDailyRainingChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Daily Raining</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimedailyrainingLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='weeklyraining' >
-                                    <div class="card-header card-chart" data-background-color="yellow">
-                                        <div class="ct-chart" id="RealTimeWeeklyRainingChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Weekly raining</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimeweeklyrainingLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='monthlyraining' >
-                                    <div class="card-header card-chart" data-background-color="orange">
-                                        <div class="ct-chart" id="RealTimeMonthlyRainingChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Monthly Raining</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimemonthlyrainingLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='yearlyraining' >
-                                    <div class="card-header card-chart" data-background-color="purple">
-                                        <div class="ct-chart" id="RealTimeYearlyRainingChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Yearly Raining</h4>
-                                        <p class="category">
-
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="stats" id="realtimeyearlyrainingLastUpdated">
-                                            <i class="material-icons">access_time</i> Yet to be updated
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='solarradiation' >
+                                <div class="card" id='solarradiation' onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="red">
-                                        <div class="ct-chart" id="RealTimeSolarRadiationChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeSolarRadiationChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Solar Radiation</h4>
+                                        <h4 class="title">Solar Radiation <b>watt per square meter</b></h4>
                                         <p class="category">
 
                                     </div>
@@ -561,12 +488,13 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='uv' >
+                                <div class="card" id='uv' onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="blue">
-                                        <div class="ct-chart" id="RealTimeUltraVioletChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeUltraVioletChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Ultra Violet</h4>
+                                        <h4 class="title">Ultra Violet <b>milliwatts per square centimeter</b></h4>
                                         <p class="category">
 
                                     </div>
@@ -578,71 +506,123 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card" id='raining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="yellow">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Raining <b>Mm per Hour</b></h4>
+                                        <p class="category">
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="stats" id="realtimerainingLastUpdated">
+                                            <i class="material-icons">access_time</i> Yet to be updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card" id='dailyraining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="green">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeDailyRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Daily Raining <b>Mm per Day</b></h4>
+                                        <p class="category">
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="stats" id="realtimedailyrainingLastUpdated">
+                                            <i class="material-icons">access_time</i> Yet to be updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card" id='weeklyraining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="yellow">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeWeeklyRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Weekly raining <b>Mm per Week</b></h4>
+                                        <p class="category">
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="stats" id="realtimeweeklyrainingLastUpdated">
+                                            <i class="material-icons">access_time</i> Yet to be updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card" id='monthlyraining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="orange">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeMonthlyRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Monthly Raining <b>Mm per Month</b></h4>
+                                        <p class="category">
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="stats" id="realtimemonthlyrainingLastUpdated">
+                                            <i class="material-icons">access_time</i> Yet to be updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card" id='yearlyraining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="purple">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="RealTimeYearlyRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Yearly Raining <b>Mm per Year</b></h4>
+                                        <p class="category">
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="stats" id="realtimeyearlyrainingLastUpdated">
+                                            <i class="material-icons">access_time</i> Yet to be updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                     <div id="historical" class="tab-pane fade">
-                        <div style="margin-right:70%;margin-left:2%  ">
-                            <h4><strong>Select Date-range</strong> <input type="text" name="dateRange" id="dateRange"
-                                                         value="01/01/2017 1:30 PM - 01/01/2017 2:00 PM"
-                                                         class="form-control"/></h4>
-
-                        </div>
                         <div class="row">
                             <div class="col-md-4">
-                                <div class="card" id='Htemp' >
+                                <div class="card his setHistorical" id='Htemp' onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="red">
-                                        <div class="ct-chart" id="HistoricalTempChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalTempChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Temperature</h4>
+                                        <h4 class="title">Temperature&#8451</h4>
                                         <p class="category" id="historicalTempAlert">
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hhumid' >
-                                    <div class="card-header card-chart" data-background-color="blue">
-                                        <div class="ct-chart" id="HistoricalHumidityChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Humidity</h4>
-                                        <p class="category" id="historicalHumidAlert">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hwinddir' >
-                                    <div class="card-header card-chart" data-background-color="green">
-                                        <div class="ct-chart" id="HistoricalWindDirChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Wind Direction</h4>
-                                        <p class="category" id="historicalWindDirAlert">
-
-                                    </div>
 
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='Hwindspeed' >
-                                    <div class="card-header card-chart" data-background-color="purple">
-                                        <div class="ct-chart" id="HistoricalWindSpeedChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Wind Speed</h4>
-                                        <p class="category" id="historicalwindspeedLastUpdated">
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hitemp' >
+                                <div class="card his setHistorical" id='Hitemp' onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="orange">
-                                        <div class="ct-chart" id="HistoricalIndoorTempChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalIndoorTempChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Indoor Temperature</h4>
+                                        <h4 class="title">Indoor Temperature&#8451</h4>
                                         <p class="category" id="historicalindoortempfLastUpdated">
 
                                     </div>
@@ -650,79 +630,13 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='Hihumid' >
-                                    <div class="card-header card-chart" data-background-color="yellow">
-                                        <div class="ct-chart" id="HistoricalIndoorHumidityChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Indoor Humidity</h4>
-                                        <p class="category" id="historicalindoorhumidityLastUpdated">
-
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card" id='Hwindgust' >
-                                    <div class="card-header card-chart" data-background-color="orange">
-                                        <div class="ct-chart" id="HistoricalWindGustChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Wind Gust</h4>
-                                        <p class="category" id="historicalwindgustLastUpdated">
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hdewpoint' >
-                                    <div class="card-header card-chart" data-background-color="purple">
-                                        <div class="ct-chart" id="HistoricalDewPointChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Dew Point</h4>
-                                        <p class="category" id="historicaldewptfLastUpdated">
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hwindchill' >
-                                    <div class="card-header card-chart" data-background-color="red">
-                                        <div class="ct-chart" id="HistoricalWindChillChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Wind Chill</h4>
-                                        <p class="category" id="historicalwindchillfLastUpdated">
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hraining' >
-                                    <div class="card-header card-chart" data-background-color="yellow">
-                                        <div class="ct-chart" id="HistoricalRainingChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Raining</h4>
-                                        <p class="category" id="historicalrainingLastUpdated">
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hbaromin' >
+                                <div class="card his setHistorical" id='Hbaromin' onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="green">
-                                        <div class="ct-chart" id="HistoricalBarominChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalBarominChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Baromin</h4>
+                                        <h4 class="title">Baromin<b> pascal</b></h4>
                                         <p class="category" id="historicalbarominLastUpdated">
 
                                     </div>
@@ -730,80 +644,111 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='Hlowbatt' >
-                                    <div class="card-header card-chart" data-background-color="blue">
-                                        <div class="ct-chart" id="HistoricalLowbatChart"></div>
+                                <div class="card his setHistorical" id='Hihumid' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="yellow">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalIndoorHumidityChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Lowbatt</h4>
-                                        <p class="category" id="historicallowbattLastUpdated">
+                                        <h4 class="title">Indoor Humidity<b>%</b></h4>
+                                        <p class="category" id="historicalindoorhumidityLastUpdated">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hhumid' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="blue">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalHumidityChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Humidity<b>%</b></h4>
+                                        <p class="category" id="historicalHumidAlert">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hdewpoint' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="purple">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalDewPointChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Dew Point&#8451</h4>
+                                        <p class="category" id="historicaldewptfLastUpdated">
 
                                     </div>
 
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-4">
-                                <div class="card" id='Hdailyraining' >
-                                    <div class="card-header card-chart" data-background-color="green">
-                                        <div class="ct-chart" id="HistoricalDailyRainingChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Daily Raining</h4>
-                                        <p class="category" id="historicaldailyrainingLastUpdated">
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hweeklyraining' >
-                                    <div class="card-header card-chart" data-background-color="yellow">
-                                        <div class="ct-chart" id="HistoricalWeeklyRainingChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Weekly raining</h4>
-                                        <p class="category" id="historicalweeklyrainingLastUpdated">
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hmonthly raining' >
+                                <div class="card his setHistorical" id='Hwindgust'>
                                     <div class="card-header card-chart" data-background-color="orange">
-                                        <div class="ct-chart" id="HistoricalMonthlyRainingChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalWindGustChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Monthly Raining</h4>
-                                        <p class="category" id="historicalmonthlyrainingLastUpdated">
+                                        <h4 class="title">Wind Gust <b>mph</b></h4>
+                                        <p class="category" id="historicalwindgustLastUpdated">
 
                                     </div>
 
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='Hyearlyraining' >
-                                    <div class="card-header card-chart" data-background-color="purple">
-                                        <div class="ct-chart" id="HistoricalYearlyRainingChart"></div>
-                                    </div>
-                                    <div class="card-content">
-                                        <h4 class="title">Yearly Raining</h4>
-                                        <p class="category" id="historicalyearlyrainingLastUpdated">
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card" id='Hsolarradiation' >
+                                <div class="card his setHistorical" id='Hwindchill' onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="red">
-                                        <div class="ct-chart" id="HistoricalSolarRadiationChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalWindChillChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Solar Radiation</h4>
+                                        <h4 class="title">Wind Chill&#8451</h4>
+                                        <p class="category" id="historicalwindchillfLastUpdated">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hwindspeed' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="purple">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalWindSpeedChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Wind Speed <b>mph</b></h4>
+                                        <p class="category" id="historicalwindspeedLastUpdated">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hwinddir' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="purple">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalWindDirChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Wind Direction&#176</h4>
+                                        <p class="category" id="historicalwindDirLastUpdated">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hsolarradiation' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="red">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalSolarRadiationChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Solar Radiation <b>watt per square meter</b></h4>
                                         <p class="category" id="historicalsolarradiationLastUpdated">
 
                                     </div>
@@ -811,18 +756,94 @@ Error occurred while fetching device info.
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card" id='Huv' >
+                                <div class="card his setHistorical" id='Huv' onclick=redirect(this)>
                                     <div class="card-header card-chart" data-background-color="blue">
-                                        <div class="ct-chart" id="HistoricalUltraVioletChart"></div>
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalUltraVioletChart"></div>
                                     </div>
                                     <div class="card-content">
-                                        <h4 class="title">Ultra Violet</h4>
+                                        <h4 class="title">Ultra Violet <b>milliwatts per square centimeter</b></h4>
                                         <p class="category" id="historicaluvLastUpdated">
 
                                     </div>
 
                                 </div>
                             </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hraining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="yellow">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Raining <b>Mm per Hour</b></h4>
+                                        <p class="category" id="historicalrainingLastUpdated">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hdailyraining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="green">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalDailyRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Daily Raining <b>Mm per Day</b></h4>
+                                        <p class="category" id="historicaldailyrainingLastUpdated">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hweeklyraining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="yellow">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalWeeklyRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Weekly raining <b>Mm per Week</b></h4>
+                                        <p class="category" id="historicalweeklyrainingLastUpdated">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hmonthlyraining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="orange">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalMonthlyRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Monthly Raining <b>Mm per Month</b></h4>
+                                        <p class="category" id="historicalmonthlyrainingLastUpdated">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card his setHistorical" id='Hyearlyraining' onclick=redirect(this)>
+                                    <div class="card-header card-chart" data-background-color="purple">
+                                        <div class="ct-chart ct-golden-section setheight"
+                                             id="HistoricalYearlyRainingChart"></div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h4 class="title">Yearly Raining <b>Mm per Year</b></h4>
+                                        <p class="category" id="historicalyearlyrainingLastUpdated">
+
+                                    </div>
+
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -830,15 +851,8 @@ Error occurred while fetching device info.
                 </div>
             </div>
         </div>
-        <footer class="footer">
-            <p class="copyright pull-right">
-                &copy;
-                <script>
-                    document.write(new Date().getFullYear())
-                </script>
-                <a href="https://wso2.com/iot">WSO2 Inc.</a>
-            </p>
-        </footer>
+
+
     </div>
 </div>
 </body>
@@ -856,75 +870,140 @@ Error occurred while fetching device info.
 <script src="js/bootstrap-notify.js"></script>
 <!-- Material Dashboard javascript methods -->
 <script src="js/material-dashboard.js?v=1.2.0"></script>
-<script src="js/historical-analytics.js"></script>
 <script src="js/realtime-analytics.js"></script>
 <script src="js/bootstrap-datepicker.js" type="text/javascript"></script>
 <script src="js/moment.min.js" type="text/javascript"></script>
 <script src="js/daterangepicker.js" type="text/javascript"></script>
+<script src="js/historical-analytics.js"></script>
+<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+        integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+        crossorigin=""></script>
 <script type="text/javascript">
+    //function to expand charts onclick
+    $("#dateR").hide();
+    $('#daterangebar').hide();
+
+    function redirect(ele) {
+        var act = $(".col-md-4").hasClass("resize");
+        if (!act) {
+            $(".his").toggleClass("setHistorical");
+        }
+        $('#' + ele.id).toggleClass('modal');
+            $('div.card-chart').toggleClass('maxHeight');
+            $('div.card').toggleClass('padzero');
+            $('.ct-chart').toggleClass('fillcontent');
+        $('.ct-chart').toggleClass('setheight');
+        analyticsHistory.updateGraphs();
+
+    }
+
+    //menu toggle script
+    $("#menu-toggle").click(function (e) {
+        e.preventDefault();
+        // $(".ct-chart").toggleClass('ct-golden-section');
+        $("#wrapper").toggleClass("toggled");
+        $(".col-md-4").toggleClass("resize");
+        $(".his").toggleClass("setHistorical");
+        toggleDiv("statusCards");
+        $('#icon').toggleClass('fa fa-angle-double-left fa fa-angle-double-right');
+        setTimeout(analyticsHistory.updateGraphs, 250);
+
+    });
+
+    $("#historicalTab").click(function () {
+        $("#dateR").show();
+        $("#daterangebar").show();
+    });
+
+    $("#realtimeTab").click(function () {
+        $("#dateR").hide();
+        $("#daterangebar").hide();
+    });
+
+    //    $("#historicalTab").click(function () {
+    //        $("#menu-toggle").hide();
+    //    });
+    //    $("#realtimeTab").click(function () {
+    //        $("#menu-toggle").show();
+    //    });
+
+
+
+    $.fn.extend({
+        toggleText: function (a, b) {
+            return this.html(this.html() === b ? a : b);
+        }
+    });
+
+    function toggleDiv(divId) {
+        var x = document.getElementById(divId);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+
+
+    //intialising and setting the map
+    var mymap = L.map('mapid').setView([7.9, 80.56274], 7);
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1IjoibGFzaGFuIiwiYSI6ImNqYmc3dGVybTFlZ3UyeXF3cG8yNGxsdzMifQ.n3QEq0-g5tVFmsQxn3JZ-A',
+        maxWidth: 200,
+        maxHeight: 200
+    }).addTo(mymap);
+
+    var marker = L.marker([<%=lat.getString("value")%>, <%=lon.getString("value")%>]).addTo(mymap);
+    marker.bindPopup("<b><%=device.getString("name")%></b>").openPopup();
+
 
     //set device details and send device details to dashboard.jsp
-    localStorage.setItem("deviceId","<%=id%>");
-    localStorage.setItem("deviceName","<%=device.getString("name")%>");
-    localStorage.setItem("owner","<%=enrolmentInfo.getString("owner")%>");
-    localStorage.setItem("date","<%=new Date(enrolmentInfo.getLong("dateOfEnrolment")).toString()%>");
-    document.getElementById("devName").innerHTML="<%=device.getString("name")%>";
-    document.getElementById("devDetails").innerHTML="Owned by "+"<%=enrolmentInfo.getString("owner")%>"+" and enrolled on "+"<%=new Date(enrolmentInfo.getLong("dateOfEnrolment")).toString()%>";
+    document.getElementById("devName").innerHTML = "<%=device.getString("name")%>";
+    document.getElementById("devDetails").innerHTML = "Owned by " + "<%=enrolmentInfo.getString("owner")%>" + " and enrolled on " + "<%=new Date(enrolmentInfo.getLong("dateOfEnrolment")).toString()%>";
 
-    function datePickerCallback(startD, endD) {
-        var eventsSuccess = function (data) {
-            var records = JSON.parse(data);
-            console.log(records);
-            analyticsHistory.redrawGraphs(records);
-
-        };
-
-        var index = 0;
-        var length = 100;
-
-        $.ajax({
-            type: "POST",
-            url: "invoker/execute",
-            data: {
-                "uri": "/events/weatherstation/<%=id%>?offset=" + index + "&limit=" + length + "&from=" + new Date(
-                    startD.format('YYYY-MM-DD H:mm:ss')).getTime() + "&to=" + new Date(
-                    endD.format('YYYY-MM-DD H:mm:ss')).getTime(),
-                "method": "get"
-            },
-            success: eventsSuccess
-        });
-    };
-
-    $(function () {
-        $('#dateRange').daterangepicker({
-            timePicker: true,
-            timePickerIncrement: 30,
-            locale: {
-                format: 'MM/DD/YYYY h:mm A'
-            },
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'),
-                    moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'),
-                    moment().subtract(1, 'month').endOf('month')]
-            }
-        }, datePickerCallback);
-
-        $(window).scroll(function () {
-            if ($('#dateRange').length) {
-                $('#dateRange').daterangepicker("close");
-            }
-        })
-    });
 </script>
 <script type="text/javascript">
     var alerts = [];
+    var lastKnown = {};
 
-    function timeDifference(current, previous, isShort) {
+    //refresh graphs on click
+    document.getElementById("realtimeTab").addEventListener("click", realtimeGraphRefresh());
+    document.getElementById("historicalTab").addEventListener("click", historyGraphRefresh);
+
+    function realtimeGraphRefresh(wsEndpoint) {
+        realtimeAnalytics.initDashboardPageCharts(wsEndpoint);
+    }
+
+    function historyGraphRefresh() {
+        analyticsHistory.initDashboardPageCharts();
+    }
+
+    //fix the issue of charts not rendering in historical tab
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        $(e.currentTarget.hash).find('.ct-chart').each(function (el, tab) {
+            tab.__chartist__.update();
+        });
+    });
+
+    $(document).ready(function () {
+
+
+        $(document).ready(function () {
+            var wsStatsEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/iot.per.device.stream.carbon.super.weatherstation/1.0.0?"
+                + "deviceId=<%=id%>&deviceType=weatherstation&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
+            realtimeGraphRefresh(wsStatsEndpoint);
+
+            var wsAlertEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/iot.per.device.stream.carbon.super.weatherstation.alert/1.0.0?"
+                + "deviceId=<%=id%>&deviceType=weatherstation&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
+            displayAlerts(wsAlertEndpoint);
+        });
+    });
+
+    function timeDifference(current, previous, isshort) {
         var msPerMinute = 60 * 1000;
         var msPerHour = msPerMinute * 60;
         var msPerDay = msPerHour * 24;
@@ -940,33 +1019,14 @@ Error occurred while fetching device info.
         } else if (elapsed < msPerDay) {
             return Math.round(elapsed / msPerHour) + ' hours ago';
         } else if (elapsed < msPerMonth) {
-            return 'approximately ' + Math.round(elapsed / msPerDay) + ' days ago';
+            return Math.round(elapsed / msPerDay) + ' days ago';
         } else if (elapsed < msPerYear) {
-            return 'approximately ' + Math.round(elapsed / msPerMonth) + ' months ago';
+            return Math.round(elapsed / msPerMonth) + ' months ago';
         } else {
-            return 'approximately ' + Math.round(elapsed / msPerYear) + ' years ago';
+            return Math.round(elapsed / msPerYear) + ' years ago';
         }
     }
 
-    $(document).ready(function () {
-        $(document).ready(function () {
-            var wsStatsEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/iot.per.device.stream.carbon.super.weatherstation/1.0.0?"
-                + "deviceId=<%=id%>&deviceType=weatherstation&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
-            realtimeGraphRefresh(wsStatsEndpoint);
-
-            var wsAlertEndpoint = "<%=pageContext.getServletContext().getInitParameter("websocketEndpoint")%>/secured-websocket/iot.per.device.stream.carbon.super.weatherstation.alert/1.0.0?"
-                + "deviceId=<%=id%>&deviceType=weatherstation&websocketToken=<%=request.getSession(false).getAttribute(LoginController.ATTR_ACCESS_TOKEN)%>";
-            displayAlerts(wsAlertEndpoint);
-        });
-    });
-
-    //refresh graphs on click
-    document.getElementById("realtimeTab").addEventListener("click", realtimeGraphRefresh());
-    document.getElementById("historicalTab").addEventListener("click", setTimeout(historyGraphRefresh,1000));
-
-    function realtimeGraphRefresh(wsEndpoint) {
-        realtimeAnalytics.initDashboardPageCharts(wsEndpoint);
-    }
 
     function displayAlerts(wsEndpoint) {
         connect(wsEndpoint);
@@ -989,7 +1049,6 @@ Error occurred while fetching device info.
             if (ws) {
                 ws.onmessage = function (event) {
                     var data = event.data;
-                    console.log(data);
                     var alert = JSON.parse(data).event.payloadData;
                     alerts.unshift(alert);
                     if (alerts.length > 5) {
@@ -1016,32 +1075,67 @@ Error occurred while fetching device info.
         }
     }
 
-    function historyGraphRefresh() {
-        analyticsHistory.initDashboardPageCharts();
-        var start = moment().subtract(1, 'days');
-        var end = moment();
-        datePickerCallback(start, end);
+
+    function datePickerCallback(startD, endD) {
+        var eventsSuccess = function (data) {
+            var records = JSON.parse(data);
+            analyticsHistory.redrawGraphs(records);
+        };
+
+        var index = 0;
+        var length = 100;
+
+        $.ajax({
+            type: "POST",
+            url: "invoker/execute",
+            data: {
+                "uri": "/events/weatherstation/<%=id%>?offset=" + index + "&limit=" + length + "&from=" + new Date(
+                    startD.format('YYYY-MM-DD H:mm:ss')).getTime() + "&to=" + new Date(
+                    endD.format('YYYY-MM-DD H:mm:ss')).getTime(),
+                "method": "get"
+            },
+            success: eventsSuccess
+        });
     }
+
+    $(function () {
+        $('#dateRange').daterangepicker({
+            timePicker: true,
+            timePickerIncrement: 30,
+            locale: {
+                format: 'MM/DD/YYYY h:mm A'
+            },
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'),
+                    moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'),
+                    moment().subtract(1, 'month').endOf('month')]
+            }
+        }, datePickerCallback);
+
+    });
 
     //update the card details
-    function updateStatusCards(sinceText, temperature, humidity, windDir,windSpeed) {
+    function updateStatusCards(sincetext, temperature, humidity, windDir, windSpeed) {
 
         //temperature status
-        $("#temperature").html(temperature);
+        $("#temperature").html(precise_round(temperature, 3) + "&#8451");
 
         //humidity status
-        $("#humidity").html(humidity);
+        $("#humidity").html(humidity + "<b>%</b>");
 
         //wind status
-        $("#wind_status").html(windDir);
+        $("#wind_status").html(windDir + "&#176");
 
         //wind speed
-        console.log(windSpeed);
-        $("#windspeed_status").html(windSpeed);
+        $("#windspeed_status").html(precise_round(windSpeed, 3) + "<b> mph</b>");
 
     }
 
-    var lastKnown = {};
     var lastKnownSuccess = function (data) {
         var record = JSON.parse(data).records[0];
 
@@ -1049,10 +1143,11 @@ Error occurred while fetching device info.
             lastKnown = record;
             var sinceText = timeDifference(new Date(), new Date(record.timestamp), false) + " ago";
             var temperature = record.values.tempf;
+            temperature = ((temperature - 32) * 5) / 9;
             var humidity = record.values.humidity;
             var windDir = record.values.winddir;
-            var windSpeed=record.values.windspeedmph;
-            updateStatusCards(sinceText, temperature, humidity, windDir,windSpeed);
+            var windSpeed = record.values.windspeedmph;
+            updateStatusCards(sinceText, temperature, humidity, windDir, windSpeed);
         } else {
             //temperature status
             $("#temperature").html("Unknown");
@@ -1080,6 +1175,13 @@ Error occurred while fetching device info.
         },
         success: lastKnownSuccess
     });
+
+    function precise_round(num, decimals) {
+        var t = Math.pow(10, decimals);
+        return (Math.round((num * t) + (decimals > 0 ? 1 : 0) * (Math.sign(num) * (10 / Math.pow(100, decimals)))) / t).toFixed(decimals);
+    }
+
+
 </script>
 
 </html>

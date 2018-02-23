@@ -75,6 +75,47 @@
 #inputMapId {
     width: 90%;
     height: 40%;
+    margin-left: 27px;
+    margin-top: 5px;
 }
 
+.leaflet-popup-content{
+    margin: 5px 5px;
+    cursor: pointer;
+    width: -webkit-fill-available;
+}
+.leaflet-popup-tip-container{
+    display: none;
+}
 
+.leaflet-popup-content-wrapper{
+
+    text-align: center;
+}
+.col-md-4.resize{
+    width: 16.66666667%;
+}
+
+.setheight {
+    height: 160px;
+}
+
+.setHistorical {
+    height: 230px;
+}
+
+.menubutton {
+
+    height: 2.5em;
+
+    display: inline-block;
+
+    margin-left: 20px;
+
+}
+
+.ct-chart {
+    cursor: pointer;
+}
+
+td { width: 25%; }
