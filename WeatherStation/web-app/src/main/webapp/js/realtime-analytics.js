@@ -639,6 +639,7 @@ realtimeAnalytics = {
             if (ws) {
 
                 ws.onmessage = function (event) {
+                    console.log('data');
                     var data = event.data;
                     var dataPoint = JSON.parse(data).event.payloadData;
                     var temperature = dataPoint.tempf;

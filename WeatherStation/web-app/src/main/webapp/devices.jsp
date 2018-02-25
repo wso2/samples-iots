@@ -334,6 +334,7 @@
         var devicesListing = $('#devices-listing');
 
         var lastKnownSuccess = function (data) {
+            console.log(data);
             var records = JSON.parse(data);
             var record = JSON.parse(data).records[0];
 

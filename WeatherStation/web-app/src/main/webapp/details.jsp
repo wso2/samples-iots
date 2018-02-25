@@ -1078,12 +1078,13 @@
 
     function datePickerCallback(startD, endD) {
         var eventsSuccess = function (data) {
+            console.log(data);
             var records = JSON.parse(data);
             analyticsHistory.redrawGraphs(records);
         };
 
         var index = 0;
-        var length = 100;
+        var length = 50;
 
         $.ajax({
             type: "POST",

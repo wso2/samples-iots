@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<artifact name="stat_publisher" version="1.0.0" type="event/publisher" serverRole="DataAnalyticsServer">
-	<file>locker_websocket_stat_publisher.xml</file>
-</artifact>

@@ -658,7 +658,6 @@ analyticsHistory= {
             analyticsHistory.historicalBarominLabel.length = 0;
             analyticsHistory.historicalBarominSeries.length = 0;
 
-
             for (var i = 0; i < events.records.length; i++) {
                 var record= events.records[i];
 

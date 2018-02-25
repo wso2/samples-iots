@@ -28,8 +28,6 @@
     
   
     <modules>
-        <module>agent</module>
-        <module>analytics</module>
         <module>web-app</module>
     </modules>
 
