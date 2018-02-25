@@ -207,6 +207,7 @@
 <script type="text/javascript">
 
     var devices = [];
+    var devicesTemp = [];
     var rows = [];
     var deviceCount;
     var temp = [];
@@ -238,12 +239,6 @@
     };
     legend.addTo(mymap);
 
-    //add devices to map as markers
-    function addToMap(lat, long, devName, devId, temp, humidity, windDir) {
-        var marker = L.marker([lat, long]).addTo(mymap);
-        marker.bindPopup("<b id='weatherStation" + devId + "'>Device details</b><br>" + devName + "<br><table><tr><td><i class=\"tiny material-icons\" >wb_sunny</i></td><td>" + temp + "</td></tr><tr><td><i class=\"tiny material-icons\">opacity</i></td><td>" + humidity + "</td></tr><tr><td><i class=\"tiny material-icons\" >call_made</i></td><td>" + windDir + "</td></tr><div style='margin-right:5px '><tr><td><button class=\"btn-primary btn-block\"   onclick=\"window.location.href='details.jsp?id=" + devName + "'\"><i class=\"material-icons\">remove_red_eye</i> </button></td></tr></div></table>", {minWidth: 100});
-
-    }
 
     //add devices to map as popups
     function addToMapPopoup(lat, long, devName, devId, temp, humidity, windDir) {
@@ -291,13 +286,11 @@
 
     // returns value of latitude
     function latValue(lat) {
-        console.log(lat);
         return lat;
     }
 
     // returns value of longitude
     function lngValue(lng) {
-        console.log(lng);
         return lng;
     }
 
@@ -318,23 +311,20 @@
     $("a[href='#tableview']").on('shown.bs.tab', function (e) {
         //show the search bar on table view
         $('#hide').show();
-        //fix the charts not rendering
-        $('.ct-chart').each(function (i, e) {
-            e.__chartist__.update();
-        });
     });
 
 </script>
 <script type="text/javascript">
+
     $(document).ready(function () {
-        getAllDevices();
+        getDevices(0, 10);//load first page
+        getAllDevices();//add all devices to map
     });
 
     function getDevice(dev, index, lat, long) {
         var devicesListing = $('#devices-listing');
 
         var lastKnownSuccess = function (data) {
-            console.log(data);
             var records = JSON.parse(data);
             var record = JSON.parse(data).records[0];
 
@@ -348,8 +338,6 @@
                 temperature = ((temperature - 32) * 5) / 9;
                 humidity = record.values.humidity;
                 windDir = record.values.winddir;
-
-
             }
 
             var myRow;
@@ -359,7 +347,6 @@
                     + "<div class=\"card\"><div class=\"card-header card-chart\" data-background-color=\"red\" style=\"height: 90px;min-height: unset;\"><div class=\"ct-chart\" id=\"HistoricalTempChart" + dev.deviceIdentifier + "\"></div></div><div class=\"card-content\"><h4 class=\"title\">N/A</h4><p class=\"category\" id=\"historicalTempAlert" + dev.deviceIdentifier + "\"></div></div>\n</td><td><div class=\"card\"><div class=\"card-header card-chart\" data-background-color=\"orange\" style=\"height: 90px;min-height: unset;\"><div class=\"ct-chart\" id=\"HistoricalHumidityChart" + dev.deviceIdentifier + "\"></div></div><div class=\"card-content\"><h4 class=\"title\">N/A</h4><p class=\"category\" id=\"historicalHumidAlert" + dev.deviceIdentifier + "\"></div></div>\n</td><td>"
                     + "<div class=\"card\"><div class=\"card-header card-chart\" data-background-color=\"green\" style=\"height: 90px;min-height: unset;\"><div class=\"ct-chart\" id=\"HistoricalWindDirChart" + dev.deviceIdentifier + "\"></div></div><div class=\"card-content\"><h4 class=\"title\">N/A</h4><p class=\"category\" id=\"historicalWindDirAlert" + dev.deviceIdentifier + "\"></div></div>\n</td>"
                     + "</a></tr>";
-
             }
             else {
                 myRow = "<tr onclick=\"window.location.href='details.jsp?id=" + dev.deviceIdentifier + "'\" style='cursor: pointer'><a href='#" + dev.deviceIdentifier + "'><td><div class=\"card card-stats\" style='width: 75%'> <div class=\"card-header\" data-background-color=\"purple\"> <i class=\"material-icons\">beach_access</i> </div> <div class=\"card-content\"> <p class=\"category\">Station</p> <h3 class=\"title\" >" + dev.name + "</h3> </div> </div>\n"
@@ -374,31 +361,14 @@
             initDashboardPageCharts(dev.deviceIdentifier);
             redrawGraphs(records, dev.deviceIdentifier);
 
-            //to fix the issue of showing more than 10 rows when the page loads initially
-            $('#devices-listing tbody tr').slice(10, rows.length + 1).hide();
-
-            //To fix the issue of adding devices with null or undefined location values to map
-            if ((lat == null || lat === "undefined" ) || (long == null || lat === "undefined")) {
-                console.log('undefined lat' + lat + ' long ' + long);
-            }
-            else {
-                addToMapPopoup(lat, long, dev.deviceIdentifier, dev.id, temperature, humidity, windDir);
-            }
-
             var newIndex = index + 1;
-            if (devices.length > newIndex) {
-                getDevice(devices[newIndex], newIndex, devices[newIndex].properties[0].value, devices[newIndex].properties[1].value);
+            if (devicesTemp.length > newIndex) {
+                getDevice(devicesTemp[newIndex], newIndex, devicesTemp[newIndex].properties[0].value, devicesTemp[newIndex].properties[1].value);
             }
 
             //function to implement the regex search bar
             var $rows = $('#devices-listing tbody tr');
             $('#search').keyup(function () {
-                //hide nav bar when search bar is used
-                $('#nav').hide();
-                //render graphs
-//                $('.ct-chart').each(function(i, e) {
-//                    e.__chartist__.update();
-//                });
                 var val = '^(?=.*\\b' + $.trim($(this).val()).split(/\s+/).join('\\b)(?=.*\\b') + ').*$',
                     reg = RegExp(val, 'i'),
                     text;
@@ -406,13 +376,7 @@
                 $rows.show().filter(function () {
                     text = $(this).text().replace(/\s+/g, ' ');
                     return !reg.test(text);
-                    $('#devices-listing tbody tr').slice(10, rows.length + 1).hide();
-
                 }).hide();
-                //check if all the inputs have been erased if so realod the page
-                if (this.value.length === 0) {
-                    location.reload();
-                }
 
             });
         };
@@ -421,7 +385,7 @@
             type: "POST",
             url: "invoker/execute",
             data: {
-                "uri": "/events/last-known/weatherstation/" + devices[index].deviceIdentifier + "?limit=5",
+                "uri": "/events/last-known/weatherstation/" + devicesTemp[index].deviceIdentifier + "?limit=5",
                 "method": "get"
             },
             success: lastKnownSuccess
@@ -431,11 +395,75 @@
     }
 
 
+    function getDevices(offset, limit) {
+        var getsuccess = function (data) {
+            devicesTemp = JSON.parse(data).devices;
+            deviceCount = JSON.parse(data).count;//find the number of devices
+            var devicesListing = $('#devices-listing');
+            if (devicesTemp && devicesTemp.length > 0) {
+                devicesListing.find('tbody').empty();
+                getDevice(devicesTemp[0], 0, devicesTemp[0].properties[0].value, devicesTemp[0].properties[1].value);
+            } else {
+                var myRow = "<tr><td colspan=\"6\" style=\"padding-top: 30px;\"><strong>No Devices Found</strong></td></tr>";
+                devicesListing.find('tbody').replaceWith(myRow);
+            }
+
+        };
+        $.ajax({
+            type: "POST",
+            url: "invoker/execute",
+            data: {
+                "uri": "/devices/?type=weatherstation&requireDeviceInfo=true&offset=" + offset + "&limit=" + limit,
+                "method": "get"
+            },
+            success: getsuccess
+        });
+    }
+
+    function addToMap(dev, index, lat, long) {
+        var KnownSuccess = function (data) {
+            var records = JSON.parse(data);
+            var record = JSON.parse(data).records[0];
+
+            var temperature = null;
+            var humidity = null;
+            var windDir = null;
+
+            if (record) {
+                temperature = record.values.tempf;
+                //converting temperature to celcius
+                temperature = ((temperature - 32) * 5) / 9;
+                humidity = record.values.humidity;
+                windDir = record.values.winddir;
+            }
+
+            //To fix the issue of adding devices with null or undefined location values to map
+            if ((lat == null || lat === "undefined" ) || (long == null || lat === "undefined")) {
+                console.log('undefined lat' + lat + ' long ' + long);
+            }
+            else {
+                addToMapPopoup(lat, long, dev.deviceIdentifier, dev.id, temperature, humidity, windDir);
+            }
+
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "invoker/execute",
+            data: {
+                "uri": "/events/last-known/weatherstation/" + devices[index].deviceIdentifier,
+                "method": "get"
+            },
+            success: KnownSuccess
+
+        });
+
+    }
+
     function getAllDevices() {
         var success = function (data) {
             devices = JSON.parse(data).devices;
             deviceCount = JSON.parse(data).count;//find the number of devices
-
             //used bootpag library to implement the pagination
             $('#nav').bootpag({
                 total: Math.ceil(deviceCount / 10),
@@ -446,20 +474,14 @@
                 next: 'next',
                 prev: null
             }).on('page', function (event, num) {
-                $('#devices-listing tbody tr').hide();
-                $('#devices-listing tbody tr').slice((num - 1) * 10, (num * 10)).show();
-                $('.ct-chart').each(function (i, e) {
-                    e.__chartist__.update();
-                });
+                var offset = (num - 1) * 10;
+                var limit = num * 10;
+                getDevices(offset, limit);
             });
+            var i;
+            for (i = 0; i < devices.length; i++) {
+                addToMap(devices[i], i, devices[i].properties[0].value, devices[i].properties[1].value);
 
-            var devicesListing = $('#devices-listing');
-            if (devices && devices.length > 0) {
-                devicesListing.find('tbody').empty();
-                getDevice(devices[0], 0, devices[0].properties[0].value, devices[0].properties[1].value);
-            } else {
-                var myRow = "<tr><td colspan=\"6\" style=\"padding-top: 30px;\"><strong>No Devices Found</strong></td></tr>";
-                devicesListing.find('tbody').replaceWith(myRow);
             }
         };
         $.ajax({
@@ -511,7 +533,6 @@
                 success: configSuccess
             });
         };
-        console.log('lat' + lat + 'long' + lng);
         var payload = "{\n"
             + "\"name\": \"" + deviceName + "\",\n"
             + "\"deviceIdentifier\": \"" + deviceId + "\",\n"

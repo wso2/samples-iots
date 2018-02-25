@@ -920,20 +920,7 @@
         $("#daterangebar").hide();
     });
 
-    //    $("#historicalTab").click(function () {
-    //        $("#menu-toggle").hide();
-    //    });
-    //    $("#realtimeTab").click(function () {
-    //        $("#menu-toggle").show();
-    //    });
 
-
-
-    $.fn.extend({
-        toggleText: function (a, b) {
-            return this.html(this.html() === b ? a : b);
-        }
-    });
 
     function toggleDiv(divId) {
         var x = document.getElementById(divId);
@@ -1078,7 +1065,6 @@
 
     function datePickerCallback(startD, endD) {
         var eventsSuccess = function (data) {
-            console.log(data);
             var records = JSON.parse(data);
             analyticsHistory.redrawGraphs(records);
         };
