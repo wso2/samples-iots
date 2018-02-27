@@ -58,7 +58,6 @@ public class Application {
 
     @SuppressWarnings("unchecked")
     private Application() {
-
         ApiApplicationKey apiApplicationKey = new ApiApplicationKey();
         AccessTokenInfo accessTokenInfo = new AccessTokenInfo();
         try (BufferedReader bufferedReader = new BufferedReader(
@@ -78,7 +77,8 @@ public class Application {
             log.error("Error occurred when reading device details from json file.", e);
         }
 
-        tokenHandler = new TokenHandler(httpEndpoint + "/token", accessTokenInfo, apiApplicationKey, updatedTokenInfo -> {
+        tokenHandler = new TokenHandler(httpEndpoint + "/token", accessTokenInfo, apiApplicationKey,
+                                        updatedTokenInfo -> {
             configData.put("accessToken", updatedTokenInfo.getAccessToken());
             configData.put("refreshToken", updatedTokenInfo.getRefreshToken());
             try (Writer writer = new BufferedWriter(new OutputStreamWriter(
@@ -90,10 +90,14 @@ public class Application {
             }
         });
         try {
-            mqttHandler = new MQTTHandler(mqttEndpoint, tenantDomain, deviceType, deviceId, tokenHandler, operation -> {
+            mqttHandler = new MQTTHandler(mqttEndpoint, tenantDomain, deviceType, deviceId, tokenHandler,
+                                          operation -> {
                 switch (operation.getCode()) {
                     case "update-config":
                         updateSiddhiQuery(operation);
+                        break;
+                    case "upgrade-firmware":
+                        //TODO: Implement firmware upgrade flow
                         break;
                     default:
                         String message = "Unknown operation code: " + operation.getCode();
