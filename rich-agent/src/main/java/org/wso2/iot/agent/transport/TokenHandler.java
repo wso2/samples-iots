@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.iot.agent;
+package org.wso2.iot.agent.transport;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -29,8 +29,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.wso2.iot.agent.dto.AccessTokenInfo;
-import org.wso2.iot.agent.dto.ApiApplicationKey;
+import org.wso2.iot.agent.transport.dto.AccessTokenInfo;
+import org.wso2.iot.agent.transport.dto.ApiApplicationKey;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,10 +44,10 @@ public class TokenHandler {
     private static final String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     private static final Log log = LogFactory.getLog(TokenHandler.class);
 
-    private String tokenEndpoint;
-    private AccessTokenInfo accessTokenInfo;
-    private ApiApplicationKey apiApplicationKey;
-    private TokenRenewListener tokenRenewListener;
+    private final String tokenEndpoint;
+    private final AccessTokenInfo accessTokenInfo;
+    private final ApiApplicationKey apiApplicationKey;
+    private final TokenRenewListener tokenRenewListener;
 
     public TokenHandler(String tokenEndpoint, AccessTokenInfo accessTokenInfo, ApiApplicationKey apiApplicationKey,
                         TokenRenewListener tokenRenewListener) {
@@ -61,9 +61,6 @@ public class TokenHandler {
         String encodedClientApp = new String(
                 Base64.encodeBase64((apiApplicationKey.getConsumerKey() + ":" + apiApplicationKey.getConsumerSecret())
                                             .getBytes(Charset.forName(UTF_8))), Charset.forName(UTF_8));
-        InputStreamReader inputStreamReader = null;
-        BufferedReader bufferedReader = null;
-        try {
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost httpPost = new HttpPost(this.tokenEndpoint);
             httpPost.setHeader("Authorization", "Basic " + encodedClientApp);
@@ -75,15 +72,20 @@ public class TokenHandler {
             httpPost.setEntity(tokenEPPayload);
             String tokenResult;
 
-            HttpResponse response = client.execute(httpPost);
-            inputStreamReader = new InputStreamReader(response.getEntity().getContent(), Charset.forName(UTF_8));
-            bufferedReader = new BufferedReader(inputStreamReader);
+        HttpResponse response;
+        try {
+            response = client.execute(httpPost);
+        } catch (IOException e) {
+            log.error("Cannot renew tokens due to " + e.getMessage(), e);
+            throw new TokenRenewalException(e);
+        }
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new InputStreamReader(response.getEntity().getContent(), Charset.forName(UTF_8)))){
             StringBuilder result = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 result.append(line);
             }
-            inputStreamReader.close();
             tokenResult = result.toString();
             JSONParser jsonParser = new JSONParser();
             JSONObject jTokenResult = (JSONObject) jsonParser.parse(tokenResult);
@@ -100,21 +102,6 @@ public class TokenHandler {
         } catch (IOException | ParseException e) {
             log.error("Cannot renew tokens due to " + e.getMessage(), e);
             throw new TokenRenewalException(e);
-        } finally {
-            if (inputStreamReader != null) {
-                try {
-                    inputStreamReader.close();
-                } catch (IOException e) {
-                    log.error("Error occurred when closing input stream reader.", e);
-                }
-            }
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    log.error("Error occurred when closing buffered reader.", e);
-                }
-            }
         }
     }
 

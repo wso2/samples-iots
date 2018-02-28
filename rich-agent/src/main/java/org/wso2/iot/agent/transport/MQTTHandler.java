@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.iot.agent;
+package org.wso2.iot.agent.transport;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,8 +28,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.json.JSONObject;
-import org.wso2.iot.agent.dto.AccessTokenInfo;
-import org.wso2.iot.agent.dto.Operation;
+import org.wso2.iot.agent.operation.OperationListener;
+import org.wso2.iot.agent.operation.dto.Operation;
+import org.wso2.iot.agent.transport.dto.AccessTokenInfo;
 
 import java.nio.charset.Charset;
 
@@ -42,13 +43,14 @@ public class MQTTHandler {
     private static final int MQTT_QOS = 1;
 
     private MqttClient mqttClient = null;
-    private OperationListener operationListener;
+    private final OperationListener operationListener;
     private boolean isClientConnected = false;
-    private String tenant;
-    private String type;
-    private String deviceId;
+    private final String tenant;
+    private final String type;
+    private final String deviceId;
 
-    MQTTHandler(String brokerUrl, String tenant, String type, String deviceId, TokenHandler tokenHandler, OperationListener operationListener)
+    public MQTTHandler(String brokerUrl, String tenant, String type, String deviceId, TokenHandler tokenHandler,
+                       OperationListener operationListener)
             throws TransportHandlerException {
         this.tenant = tenant;
         this.type = type;
@@ -84,7 +86,7 @@ public class MQTTHandler {
 
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) {//Called when a outgoing publish is complete
-                log.info("Delivery completed. " + token);
+                log.info("Delivery completed.");
             }
         });
     }
@@ -158,15 +160,18 @@ public class MQTTHandler {
     }
 
     public void publishMessage(String topic, String payload) {
-        MqttMessage mqttMessage = new MqttMessage();
-        mqttMessage.setPayload(payload.getBytes(Charset.forName(UTF_8)));
-        mqttMessage.setQos(MQTT_QOS);
-        mqttMessage.setRetained(false);
-        try {
-            mqttClient.publish(topic, mqttMessage);
-        } catch (MqttException e) {
-            log.error("Error occurred when publishing message.", e);
-        }
-        log.info("Published to topic: " + topic + "\nPayload: " + payload);
+        Runnable messageHandler = () -> {
+            MqttMessage mqttMessage = new MqttMessage();
+            mqttMessage.setPayload(payload.getBytes(Charset.forName(UTF_8)));
+            mqttMessage.setQos(MQTT_QOS);
+            mqttMessage.setRetained(false);
+            try {
+                mqttClient.publish(topic, mqttMessage);
+            } catch (MqttException e) {
+                log.error("Error occurred when publishing message.", e);
+            }
+            log.info("Published to topic: " + topic + "\nPayload: " + payload);
+        };
+        new Thread(messageHandler).start();
     }
 }

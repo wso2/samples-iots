@@ -16,24 +16,11 @@
  * under the License.
  */
 
-package org.wso2.iot.agent;
+package org.wso2.iot.agent.operation;
 
-public class TransportHandlerException extends Exception {
-    public TransportHandlerException(String message) {
-        super(message);
-    }
+import org.wso2.iot.agent.operation.dto.Operation;
 
-    public TransportHandlerException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public interface OperationListener {
 
-    public TransportHandlerException(Throwable cause) {
-        super(cause);
-    }
-
-    public TransportHandlerException(String message, Throwable cause,
-                                     boolean enableSuppression,
-                                     boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+    void onOperationReceived(Operation operation);
 }

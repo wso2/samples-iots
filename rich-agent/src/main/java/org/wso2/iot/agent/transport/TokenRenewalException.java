@@ -16,28 +16,25 @@
  * under the License.
  */
 
-package org.wso2.iot.agent.dto;
+package org.wso2.iot.agent.transport;
 
-/**
- * This holds api application consumer key and secret.
- */
-public class ApiApplicationKey {
-    private String clientId;
-    private String clientSecret;
+public class TokenRenewalException extends Exception {
 
-    public String getConsumerKey() {
-        return this.clientId;
+    public TokenRenewalException(String message) {
+        super(message);
     }
 
-    public void setClientId(String consumerKey) {
-        this.clientId = consumerKey;
+    public TokenRenewalException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public String getConsumerSecret() {
-        return this.clientSecret;
+    public TokenRenewalException(Throwable cause) {
+        super(cause);
     }
 
-    public void setClientSecret(String consumerSecret) {
-        this.clientSecret = consumerSecret;
+    public TokenRenewalException(String message, Throwable cause,
+                                 boolean enableSuppression,
+                                 boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

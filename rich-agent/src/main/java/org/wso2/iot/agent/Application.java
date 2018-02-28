@@ -23,9 +23,18 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.wso2.iot.agent.dto.AccessTokenInfo;
-import org.wso2.iot.agent.dto.ApiApplicationKey;
-import org.wso2.iot.agent.dto.Operation;
+import org.wso2.iot.agent.analytics.SiddhiEngine;
+import org.wso2.iot.agent.operation.dto.Operation;
+import org.wso2.iot.agent.simulation.EventSimulator;
+import org.wso2.iot.agent.transport.MQTTHandler;
+import org.wso2.iot.agent.transport.TokenHandler;
+import org.wso2.iot.agent.transport.TransportHandlerException;
+import org.wso2.iot.agent.transport.dto.AccessTokenInfo;
+import org.wso2.iot.agent.transport.dto.ApiApplicationKey;
+import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.query.output.callback.QueryCallback;
+import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.core.util.EventPrinter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -48,6 +57,7 @@ public class Application {
     private static Application application;
     private MQTTHandler mqttHandler;
     private TokenHandler tokenHandler;
+    private InputHandler inputHandler;
     private SiddhiEngine siddhiEngine;
     private JSONObject configData;
     private String mqttEndpoint;
@@ -56,8 +66,96 @@ public class Application {
     private String deviceType;
     private String tenantDomain;
 
-    @SuppressWarnings("unchecked")
     private Application() {
+        initConfigs();
+        initTransport();
+        initSiddhiEngine();
+    }
+
+    public static void main(String[] args) {
+        application = new Application();
+        EventSimulator simulator = new EventSimulator(application.inputHandler);
+        simulator.start(5000);
+    }
+
+    private void initSiddhiEngine() {
+        String executionPlan = "define stream agentEventStream (engine_status string, fuel_level double, speed double, " +
+                               "load double);" +
+                               "@info(name = 'publish_query') " +
+                               "from agentEventStream " +
+                               "select engine_status, fuel_level, speed, load " +
+                               "insert into Output;" +
+                               "@info(name = 'process_query') " +
+                               "from agentEventStream " +
+                               "select engine_status, fuel_level, speed, load " +
+                               "insert into Output;";
+
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(SIDDHI_FILE), Charset.forName(UTF_8)))) {
+            StringBuilder fileContents = new StringBuilder();
+            String line = bufferedReader.readLine();
+            while (line != null) {
+                fileContents.append(line);
+                line = bufferedReader.readLine();
+            }
+            executionPlan = fileContents.toString();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        siddhiEngine = new SiddhiEngine(executionPlan);
+        siddhiEngine.addQueryCallback("publish_query", new QueryCallback() {
+            @Override
+            public void receive(long timestamp, Event[] inEvents, Event[] removeEvents) {
+                if (inEvents == null) {
+                    return;
+                }
+                for (Event event : inEvents) {
+                    application.mqttHandler.publishMessage(tenantDomain + "/" + deviceType + "/" + deviceId + "/events",
+                                                           "{\"engine_status\":\"" + event.getData(0) +
+                                                           "\",\"fuel_level\":" + event.getData(1) +
+                                                           ",\"speed\":" + event.getData(2) +
+                                                           ",\"load\":" + event.getData(3) + "}");
+                }
+            }
+        });
+
+        siddhiEngine.addQueryCallback("process_query", new QueryCallback() {
+            @Override
+            public void receive(long timestamp, Event[] inEvents, Event[] removeEvents) {
+                log.info("Event received to process query");
+                EventPrinter.print(timestamp, inEvents, removeEvents);
+            }
+        });
+
+        inputHandler = siddhiEngine.getInputHandler("agentEventStream");
+    }
+
+    private void initTransport() {
+        try {
+            mqttHandler = new MQTTHandler(mqttEndpoint, tenantDomain, deviceType, deviceId, tokenHandler,
+                                          operation -> {
+                                              switch (operation.getCode()) {
+                                                  case "update-config":
+                                                      updateSiddhiQuery(operation);
+                                                      break;
+                                                  case "upgrade-firmware":
+                                                      //TODO: Implement firmware upgrade flow
+                                                      break;
+                                                  default:
+                                                      String message = "Unknown operation code: " + operation.getCode();
+                                                      log.warn(message);
+                                                      operation.setStatus(Operation.Status.ERROR);
+                                                      operation.setOperationResponse(message);
+                                              }
+                                          });
+        } catch (TransportHandlerException e) {
+            log.error("Error occurred when creating MQTT Client.", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void initConfigs() {
         ApiApplicationKey apiApplicationKey = new ApiApplicationKey();
         AccessTokenInfo accessTokenInfo = new AccessTokenInfo();
         try (BufferedReader bufferedReader = new BufferedReader(
@@ -79,58 +177,17 @@ public class Application {
 
         tokenHandler = new TokenHandler(httpEndpoint + "/token", accessTokenInfo, apiApplicationKey,
                                         updatedTokenInfo -> {
-            configData.put("accessToken", updatedTokenInfo.getAccessToken());
-            configData.put("refreshToken", updatedTokenInfo.getRefreshToken());
-            try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(CONFIG_FILE), UTF_8))) {
-                writer.write(configData.toJSONString());
-                writer.close();
-            } catch (IOException e) {
-                log.error("Error occurred when writing device details to config json file.", e);
-            }
-        });
-        try {
-            mqttHandler = new MQTTHandler(mqttEndpoint, tenantDomain, deviceType, deviceId, tokenHandler,
-                                          operation -> {
-                switch (operation.getCode()) {
-                    case "update-config":
-                        updateSiddhiQuery(operation);
-                        break;
-                    case "upgrade-firmware":
-                        //TODO: Implement firmware upgrade flow
-                        break;
-                    default:
-                        String message = "Unknown operation code: " + operation.getCode();
-                        log.warn(message);
-                        operation.setStatus(Operation.Status.ERROR);
-                        operation.setOperationResponse(message);
-                }
-            });
-        } catch (TransportHandlerException e) {
-            log.error("Error occurred when creating MQTT Client.", e);
-        }
-        String executionPlan = "" +
-                               "define stream agentEventStream (symbol string, price long, volume long);" +
-                               "" +
-                               "@info(name = 'query1') " +
-                               "from agentEventStream " +
-                               "select symbol, price, volume as totalCount " +
-                               "insert into Output;";
-
-        try (BufferedReader bufferedReader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(SIDDHI_FILE), Charset.forName(UTF_8)))) {
-            StringBuilder fileContents = new StringBuilder();
-            String line = bufferedReader.readLine();
-            while (line != null) {
-                fileContents.append(line);
-                line = bufferedReader.readLine();
-            }
-            executionPlan = fileContents.toString();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-
-        siddhiEngine = new SiddhiEngine(mqttHandler, executionPlan);
+                                            configData.put("accessToken", updatedTokenInfo.getAccessToken());
+                                            configData.put("refreshToken", updatedTokenInfo.getRefreshToken());
+                                            try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                                                    new FileOutputStream(CONFIG_FILE), UTF_8))) {
+                                                writer.write(configData.toJSONString());
+                                                writer.close();
+                                            } catch (IOException e) {
+                                                log.error("Error occurred when writing device details to " +
+                                                          "config json file.", e);
+                                            }
+                                        });
     }
 
     private void updateSiddhiQuery(Operation operation) {
@@ -146,39 +203,4 @@ public class Application {
         operation.setStatus(Operation.Status.COMPLETED);
     }
 
-    public static void main(String[] args) {
-        init();
-    }
-
-    public static void init() {
-        application = new Application();
-    }
-
-    public static Application getInstance() {
-        return application;
-    }
-
-    public MQTTHandler getMqttHandler() {
-        return mqttHandler;
-    }
-
-    public TokenHandler getTokenHandler() {
-        return tokenHandler;
-    }
-
-    public SiddhiEngine getSiddhiEngine() {
-        return siddhiEngine;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public String getDeviceType() {
-        return deviceType;
-    }
-
-    public String getTenantDomain() {
-        return tenantDomain;
-    }
 }

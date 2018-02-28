@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.iot.agent.dto;
+package org.wso2.iot.agent.transport.dto;
 
 /**
  * This hold access token info that returned from the api call

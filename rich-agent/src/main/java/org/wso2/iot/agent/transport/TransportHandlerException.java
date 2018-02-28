@@ -6,7 +6,7 @@
  * in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,24 +16,24 @@
  * under the License.
  */
 
-package org.wso2.iot.agent;
+package org.wso2.iot.agent.transport;
 
-public class TokenRenewalException extends Exception {
-    public TokenRenewalException(String message) {
+public class TransportHandlerException extends Exception {
+    public TransportHandlerException(String message) {
         super(message);
     }
 
-    public TokenRenewalException(String message, Throwable cause) {
+    public TransportHandlerException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public TokenRenewalException(Throwable cause) {
+    public TransportHandlerException(Throwable cause) {
         super(cause);
     }
 
-    public TokenRenewalException(String message, Throwable cause,
-                                 boolean enableSuppression,
-                                 boolean writableStackTrace) {
+    public TransportHandlerException(String message, Throwable cause,
+                                     boolean enableSuppression,
+                                     boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

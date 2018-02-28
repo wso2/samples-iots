@@ -16,11 +16,28 @@
  * under the License.
  */
 
-package org.wso2.iot.agent;
+package org.wso2.iot.agent.transport.dto;
 
-import org.wso2.iot.agent.dto.AccessTokenInfo;
+/**
+ * This holds api application consumer key and secret.
+ */
+public class ApiApplicationKey {
+    private String clientId;
+    private String clientSecret;
 
-public interface TokenRenewListener {
+    public String getConsumerKey() {
+        return this.clientId;
+    }
 
-    void onTokenRenewed(AccessTokenInfo updatedTokenInfo);
+    public void setClientId(String consumerKey) {
+        this.clientId = consumerKey;
+    }
+
+    public String getConsumerSecret() {
+        return this.clientSecret;
+    }
+
+    public void setClientSecret(String consumerSecret) {
+        this.clientSecret = consumerSecret;
+    }
 }

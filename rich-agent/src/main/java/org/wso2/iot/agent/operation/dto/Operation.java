@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.iot.agent.dto;
+package org.wso2.iot.agent.operation.dto;
 
 import java.io.Serializable;
 
