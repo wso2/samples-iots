@@ -5,6 +5,7 @@ then
     echo "Upgrading firmware..." >> agent.log
     mv agent.jar agent.jar.bkp
     mv temp.jar agent.jar
+    touch upgraded
     sleep 5
 fi
 java -jar agent.jar

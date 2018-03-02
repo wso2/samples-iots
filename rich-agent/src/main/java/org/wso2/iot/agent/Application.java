@@ -55,12 +55,15 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 
 public class Application {
 
-    private static final String AGENT_VERSION = "v1.0.0";
+    private static final String AGENT_VERSION = "v1.2.1";
     private static final double LATITUDE = 6.927079;
     private static final double LONGITUDE = 79.861244;
 
@@ -68,6 +71,7 @@ public class Application {
     private static final String CONFIG_FILE = "config.json";
     private static final String SIDDHI_FILE = "plan.siddhiql";
     private static final String TEMP_AGENT = "temp.jar";
+    private static final String UPGRADE_INFO_FILE = "upgrade.info";
 
     private static Application application;
     private MQTTHandler mqttHandler;
@@ -85,6 +89,12 @@ public class Application {
         initConfigs();
         initTransport();
         initSiddhiEngine();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                cleanUpFirmwareUpgrades();
+            }
+        }, 5000);
     }
 
     public static void main(String[] args) {
@@ -181,6 +191,25 @@ public class Application {
         }
     }
 
+    private void cleanUpFirmwareUpgrades() {
+        File upgradeInfo = new File(UPGRADE_INFO_FILE);
+        if (upgradeInfo.exists()) {
+            try {
+                String operationId = new String(Files.readAllBytes(upgradeInfo.toPath()));
+                org.json.JSONObject responseObj = new org.json.JSONObject();
+                responseObj.put("id", Integer.parseInt(operationId));
+                responseObj.put("status", Operation.Status.COMPLETED);
+                responseObj.put("operationResponse", "Upgraded to " + AGENT_VERSION);
+                mqttHandler.publishMessage(tenantDomain + "/" + deviceType + "/" + deviceId +
+                                           "/update/operation", responseObj.toString());
+            } catch (Exception e) {
+                log.error("Unable to process firmware upgrade info file.", e);
+            } finally {
+                log.info("Upgrade info removed: " + upgradeInfo.delete());
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private void initConfigs() {
         ApiApplicationKey apiApplicationKey = new ApiApplicationKey();
@@ -272,6 +301,8 @@ public class Application {
                 Files.copy(in, new File(TEMP_AGENT).toPath(), StandardCopyOption.REPLACE_EXISTING);
                 operation.setStatus(Operation.Status.IN_PROGRESS);
             }
+            Files.write(new File(UPGRADE_INFO_FILE).toPath(), String.valueOf(operation.getId()).getBytes(),
+                        StandardOpenOption.CREATE);
             Runtime.getRuntime().exec("sh start.sh");
             System.exit(0);
         } catch (Exception e) {
