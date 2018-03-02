@@ -10,14 +10,83 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/txtOrderDetails"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linearLayout"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/top_banner">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:text="@string/txt_order_details"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large" />
+
+            <TextView
+                android:id="@+id/txtPoSId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp"
+                android:paddingTop="3dp" />
+
+            <TextView
+                android:id="@+id/txtOrderId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp"
+                android:paddingTop="3dp" />
+
+            <TextView
+                android:id="@+id/txtItems"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp"
+                android:paddingTop="3dp"
+                android:singleLine="false"
+                android:textAppearance="@android:style/TextAppearance.Medium" />
+
+            <TextView
+                android:id="@+id/txtSubTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp"
+                android:paddingTop="3dp"
+                android:textAlignment="textEnd" />
+
+            <TextView
+                android:id="@+id/txtTax"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp"
+                android:paddingTop="3dp"
+                android:textAlignment="textEnd" />
+
+            <TextView
+                android:id="@+id/txtTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp"
+                android:paddingTop="3dp"
+                android:textAlignment="textEnd"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large" />
+        </LinearLayout>
+
+    </ScrollView>
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

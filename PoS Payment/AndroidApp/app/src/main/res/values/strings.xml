@@ -19,4 +19,5 @@
     <string name="txt_pos_device_id">PoS Device:</string>
     <string name="btn_txt_confirm">Confirm</string>
     <string name="btn_txt_cancel">Cancel</string>
+    <string name="txt_order_details">Order Details</string>
 </resources>
