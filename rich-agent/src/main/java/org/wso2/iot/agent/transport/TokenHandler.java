@@ -61,16 +61,15 @@ public class TokenHandler {
         String encodedClientApp = new String(
                 Base64.encodeBase64((apiApplicationKey.getConsumerKey() + ":" + apiApplicationKey.getConsumerSecret())
                                             .getBytes(Charset.forName(UTF_8))), Charset.forName(UTF_8));
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpPost httpPost = new HttpPost(this.tokenEndpoint);
-            httpPost.setHeader("Authorization", "Basic " + encodedClientApp);
-            httpPost.setHeader("Content-Type", APPLICATION_FORM_URLENCODED);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost httpPost = new HttpPost(this.tokenEndpoint);
+        httpPost.setHeader("Authorization", "Basic " + encodedClientApp);
+        httpPost.setHeader("Content-Type", APPLICATION_FORM_URLENCODED);
 
-            StringEntity tokenEPPayload = new StringEntity(
-                    "grant_type=refresh_token&refresh_token=" + accessTokenInfo.getRefreshToken(),
-                    "UTF-8");
-            httpPost.setEntity(tokenEPPayload);
-            String tokenResult;
+        StringEntity tokenEPPayload = new StringEntity(
+                "grant_type=refresh_token&refresh_token=" + accessTokenInfo.getRefreshToken(), UTF_8);
+        httpPost.setEntity(tokenEPPayload);
+        String tokenResult;
 
         HttpResponse response;
         try {
@@ -80,7 +79,7 @@ public class TokenHandler {
             throw new TokenRenewalException(e);
         }
         try (BufferedReader bufferedReader = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent(), Charset.forName(UTF_8)))){
+                new InputStreamReader(response.getEntity().getContent(), Charset.forName(UTF_8)))) {
             StringBuilder result = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null) {

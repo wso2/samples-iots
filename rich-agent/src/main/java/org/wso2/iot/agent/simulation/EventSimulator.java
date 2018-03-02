@@ -23,43 +23,51 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.iot.agent.Application;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 
+import javax.swing.*;
 import java.util.Random;
 
 public class EventSimulator {
 
     private static final Log log = LogFactory.getLog(Application.class);
-    private static final String[] engineStates = {"idle", "running", "stopped"};
     private final InputHandler inputHandler;
-    private double fuelLevel = 100.0;
-    private double speed = 0.0;
-    private double load = 0.0;
+    private AgentUI agentUI;
 
     public EventSimulator(InputHandler inputHandler) {
         this.inputHandler = inputHandler;
+
+        try {
+            // Set System L&F for Device UI
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (UnsupportedLookAndFeelException e) {
+            log.error(
+                    "'UnsupportedLookAndFeelException' error occurred whilst initializing the" +
+                    " Agent UI.");
+        } catch (ClassNotFoundException e) {
+            log.error(
+                    "'ClassNotFoundException' error occurred whilst initializing the Agent UI.");
+        } catch (InstantiationException e) {
+            log.error(
+                    "'InstantiationException' error occurred whilst initializing the Agent UI.");
+        } catch (IllegalAccessException e) {
+            log.error(
+                    "'IllegalAccessException' error occurred whilst initializing the Agent UI.");
+        }
+        java.awt.EventQueue.invokeLater(() -> {
+            agentUI = new AgentUI();
+            agentUI.setVisible(true);
+        });
     }
 
     public void start(long intervalMillis){
         Runnable simulator = () -> {
             boolean interrupted = false;
             while (!interrupted) {
-                Random random = new Random();
-                String engineState = engineStates[random.nextInt(3)];
-                fuelLevel = Math.round((fuelLevel - random.nextDouble()) * 100) / 100.0;
-                if ("stopped".equals(engineState)){
-                    speed = 0.0;
-                    load = 0.0;
-                } else {
-                    if (speed < 1.0) {
-                        speed = 10.0;
-                    }
-                    if (load < 1.0) {
-                        load = 5.0;
-                    }
-                    speed = (int)(random.nextInt((int)(speed * 110 - speed * 90)) + speed * 90) / 100.0;
-                    load = (int)(random.nextInt((int)(load * 110 - load * 90)) + load * 90) / 100.0;
-                }
                 try {
-                    inputHandler.send(new Object[]{engineState, fuelLevel, speed, load});
+                    //EngineTemp double, humidity double, " +
+                    //"tractorSpeed double, loadWeight double,
+                    // soilMoisture double, illumination double, " +
+                    //"fuelUsage double, engineidle bool, raining bool, temperature double
+                    inputHandler.send(new Object[]{90.0, 42.1, 10.1, 5.2, 8.3, 56.3, 89.2, true, true, 32.1});
                     log.info("New event emitted.");
                     Thread.sleep(intervalMillis);
                 } catch (InterruptedException e) {
