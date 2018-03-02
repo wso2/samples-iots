@@ -63,7 +63,8 @@ import static org.apache.commons.codec.CharEncoding.UTF_8;
 
 public class Application {
 
-    private static final String AGENT_VERSION = "v1.2.1";
+    public static final String AGENT_VERSION = "v1.2.1";
+
     private static final double LATITUDE = 6.927079;
     private static final double LONGITUDE = 79.861244;
 
@@ -100,7 +101,7 @@ public class Application {
     public static void main(String[] args) {
         application = new Application();
         EventSimulator simulator = new EventSimulator(application.inputHandler);
-        simulator.start(5000);
+        simulator.start();
     }
 
     private void initSiddhiEngine() {

@@ -15,16 +15,105 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.iot.agent.simulation;
+
+import org.wso2.iot.agent.Application;
+
+import javax.swing.table.DefaultTableModel;
 
 public class AgentUI extends javax.swing.JFrame {
 
+    // Variables declaration - do not modify                     
+    private javax.swing.JCheckBox chkRaining;
+    private javax.swing.JCheckBox chkRunning;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton jbtnTrigger;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jlblEngineState;
+    private javax.swing.JLabel jlblEngineTemperature;
+    private javax.swing.JLabel jlblFuelLevel;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel jlblHumidity;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel jlblIllumination;
+    private javax.swing.JLabel jlblSoilMoisture;
+    private javax.swing.JLabel jlblTemperature;
+    private javax.swing.JLabel jlblTractorLoad;
+    private javax.swing.JLabel jlblTractorSpeed;
+    private javax.swing.JLabel jlblVersion;
+    private javax.swing.JPanel jpnlAlert;
+    private javax.swing.JPanel jpnlParameters;
+    private javax.swing.JTable jtblAlerts;
+    private javax.swing.JSpinner spnrEngineTemperature;
+    private javax.swing.JSpinner spnrFuelLevel;
+    private javax.swing.JSpinner spnrHumidity;
+    private javax.swing.JSpinner spnrIllumination;
+    private javax.swing.JSpinner spnrInterval;
+    private javax.swing.JSpinner spnrSoilMoisture;
+    private javax.swing.JSpinner spnrTemperature;
+    private javax.swing.JSpinner spnrTractorLoad;
+    private javax.swing.JSpinner spnrTractorSpeed;
+
     /**
-     * Creates new form agent
+     * Creates new form Agent
      */
     public AgentUI() {
         initComponents();
+        jlblVersion.setText(Application.AGENT_VERSION);
+    }
+
+    public double getEngineTemp() {
+        return (double) spnrEngineTemperature.getValue();
+    }
+
+    public double getHumidity() {
+        return (double) spnrHumidity.getValue();
+    }
+
+    public double getTractorSpeed() {
+        return (double) spnrTractorSpeed.getValue();
+    }
+
+    public double getLoadWeight() {
+        return (double) spnrTractorLoad.getValue();
+    }
+
+    public double getSoilMoisture() {
+        return (double) spnrSoilMoisture.getValue();
+    }
+
+    public double getIllumination() {
+        return (double) spnrIllumination.getValue();
+    }
+
+    public double getFuelUsage() {
+        return (double) spnrFuelLevel.getValue();
+    }
+
+    public double getTemperature() {
+        return (double) spnrTemperature.getValue();
+    }
+
+    public boolean isEngineIdle() {
+        return chkRunning.isSelected();
+    }
+
+    public boolean isRaining() {
+        return chkRaining.isSelected();
+    }
+
+    public long getInterval() {
+        return ((int) spnrInterval.getValue()) * 1000L;
     }
 
     /**
@@ -36,211 +125,292 @@ public class AgentUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        engineStatus = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jSpinner2 = new javax.swing.JSpinner();
-        jPanel6 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jSpinner3 = new javax.swing.JSpinner();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jSpinner4 = new javax.swing.JSpinner();
-        jPanel8 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jSpinner1 = new javax.swing.JSpinner();
-        jSeparator1 = new javax.swing.JSeparator();
-        jButton1 = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        jpnlAlert = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        alertLabel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jtblAlerts = new javax.swing.JTable();
+        jpnlParameters = new javax.swing.JPanel();
+        jlblHumidity = new javax.swing.JLabel();
+        jlblSoilMoisture = new javax.swing.JLabel();
+        jlblIllumination = new javax.swing.JLabel();
+        jlblEngineTemperature = new javax.swing.JLabel();
+        jlblTractorSpeed = new javax.swing.JLabel();
+        jlblTractorLoad = new javax.swing.JLabel();
+        jlblFuelLevel = new javax.swing.JLabel();
+        jlblTemperature = new javax.swing.JLabel();
+        jlblEngineState = new javax.swing.JLabel();
+        spnrTemperature = new javax.swing.JSpinner();
+        spnrHumidity = new javax.swing.JSpinner();
+        spnrSoilMoisture = new javax.swing.JSpinner();
+        spnrIllumination = new javax.swing.JSpinner();
+        spnrEngineTemperature = new javax.swing.JSpinner();
+        spnrTractorSpeed = new javax.swing.JSpinner();
+        spnrTractorLoad = new javax.swing.JSpinner();
+        spnrFuelLevel = new javax.swing.JSpinner();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        chkRaining = new javax.swing.JCheckBox();
+        chkRunning = new javax.swing.JCheckBox();
+        jSeparator1 = new javax.swing.JSeparator();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        spnrInterval = new javax.swing.JSpinner();
+        jbtnTrigger = new javax.swing.JButton();
+        jlblVersion = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Farm Manager Agent");
 
-        jPanel5.setBackground(java.awt.Color.lightGray);
-        jPanel5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jpnlAlert.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel3.setFont(new java.awt.Font("Ubuntu Condensed", 1, 18)); // NOI18N
-        jLabel3.setText("Fuel Level ");
+        jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        jLabel1.setText("ALERTS");
 
-        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(0.0d, null, null, 0.25d));
+        jtblAlerts.setModel(new javax.swing.table.DefaultTableModel(
+                new Object[][]{
+                        {null},
+                        {null},
+                        {null},
+                        {null},
+                        {null}
+                },
+                new String[]{
+                        ""
+                }
+        ) {
+            boolean[] canEdit = new boolean[]{
+                    false
+            };
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit[columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(jtblAlerts);
+        if (jtblAlerts.getColumnModel().getColumnCount() > 0) {
+            jtblAlerts.getColumnModel().getColumn(0).setResizable(false);
+        }
+
+        javax.swing.GroupLayout jpnlAlertLayout = new javax.swing.GroupLayout(jpnlAlert);
+        jpnlAlert.setLayout(jpnlAlertLayout);
+        jpnlAlertLayout.setHorizontalGroup(
+                jpnlAlertLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jpnlAlertLayout.createSequentialGroup()
+                .addContainerGap()
+                                          .addComponent(jScrollPane1)
+                                          .addContainerGap())
+                        .addGroup(jpnlAlertLayout.createSequentialGroup()
+                                          .addGap(258, 258, 258)
+                                          .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(jLabel3)
+        jpnlAlertLayout.setVerticalGroup(
+                jpnlAlertLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jpnlAlertLayout.createSequentialGroup()
+                                          .addContainerGap()
+                                          .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                                          .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                          .addContainerGap(18, Short.MAX_VALUE))
         );
 
-        jPanel6.setBackground(java.awt.Color.lightGray);
-        jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jpnlParameters.setBackground(java.awt.Color.lightGray);
 
-        jLabel4.setFont(new java.awt.Font("Ubuntu Condensed", 1, 18)); // NOI18N
-        jLabel4.setText("Speed");
+        jlblHumidity.setText("Humidity :");
 
-        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(0.0d, null, null, 0.25d));
+        jlblSoilMoisture.setText("SoilMoisture :");
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                        .addGap(0, 8, Short.MAX_VALUE)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jSpinner3))
-                .addContainerGap())
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSpinner3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
-        );
+        jlblIllumination.setText("Illumination :");
 
-        jPanel7.setBackground(java.awt.Color.lightGray);
-        jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jlblEngineTemperature.setText("Engine Temperature :");
 
-        jLabel5.setFont(new java.awt.Font("Ubuntu Condensed", 1, 18)); // NOI18N
-        jLabel5.setText("Load");
+        jlblTractorSpeed.setText("Tractor Speed :");
 
-        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(0.0d, null, null, 0.25d));
+        jlblTractorLoad.setText("Tractor Load :");
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addContainerGap(24, Short.MAX_VALUE)
-                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jSpinner4)
-                .addContainerGap())
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
-        );
+        jlblFuelLevel.setText("Fuel Level :");
 
-        jPanel8.setBackground(java.awt.Color.lightGray);
-        jPanel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jlblTemperature.setText("Temperature :");
 
-        jLabel6.setFont(new java.awt.Font("Ubuntu Condensed", 1, 18)); // NOI18N
-        jLabel6.setText("Engine State");
+        jlblEngineState.setText("Engine State :");
 
-        engineStatus.add(jRadioButton2);
-        jRadioButton2.setText("idle");
-        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+        spnrTemperature.setModel(new javax.swing.SpinnerNumberModel(0.0d, null, null, 0.25d));
+
+        spnrHumidity.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, 100.0d, 0.25d));
+
+        spnrSoilMoisture.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, 100.0d, 0.25d));
+
+        spnrIllumination.setModel(new javax.swing.SpinnerNumberModel(0.0d, null, null, 0.25d));
+
+        spnrEngineTemperature.setModel(new javax.swing.SpinnerNumberModel(0.0d, null, null, 0.25d));
+
+        spnrTractorSpeed.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, null, 0.25d));
+
+        spnrTractorLoad.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, 100.0d, 0.25d));
+
+        spnrFuelLevel.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, 100.0d, 0.25d));
+
+        jLabel4.setText("C");
+
+        jLabel5.setText("%");
+
+        jLabel6.setText("%");
+
+        jLabel8.setText("%");
+
+        jLabel9.setText("C");
+
+        jLabel10.setText("%");
+
+        jLabel12.setText("mph");
+
+        jLabel13.setText("candela");
+
+        jLabel7.setText("Raining :");
+
+        chkRaining.setText("true");
+        chkRaining.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton2ActionPerformed(evt);
+                chkRainingActionPerformed(evt);
             }
         });
 
-        engineStatus.add(jRadioButton3);
-        jRadioButton3.setText("running");
-
-        engineStatus.add(jRadioButton4);
-        jRadioButton4.setText("Stopped");
-        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
+        chkRunning.setText("true");
+        chkRunning.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton4ActionPerformed(evt);
+                chkRunningActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jRadioButton4)
-                    .addComponent(jRadioButton3)
-                    .addComponent(jRadioButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(jRadioButton4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(jRadioButton3))
-                .addGap(12, 12, 12)
-                .addComponent(jRadioButton2))
-        );
-
-        jPanel3.setBackground(new java.awt.Color(70, 220, 240));
-        jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        jLabel2.setText("Data Push Interval :");
-
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(0.0d, null, null, 0.25d));
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(163, 163, 163)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(4, 4, 4)
-                .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout jpnlParametersLayout = new javax.swing.GroupLayout(jpnlParameters);
+        jpnlParameters.setLayout(jpnlParametersLayout);
+        jpnlParametersLayout.setHorizontalGroup(
+                jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jpnlParametersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                          .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpnlParametersLayout.createSequentialGroup()
+                                                                    .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                      .addGroup(jpnlParametersLayout.createSequentialGroup()
+                                                                                                        .addComponent(jLabel7)
+                                                                                                        .addGap(0, 0, Short.MAX_VALUE))
+                                                                                      .addComponent(jlblTemperature, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                    .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                                      .addComponent(spnrTemperature)
+                                                                                      .addComponent(chkRaining)
+                                                                                      .addComponent(spnrTractorSpeed)
+                                                                                      .addComponent(spnrIllumination)
+                                                                                      .addComponent(spnrFuelLevel, javax.swing.GroupLayout.Alignment.TRAILING))
+                                                                    .addGap(10, 10, 10)
+                                                                    .addComponent(jLabel4)
+                                                                    .addGap(74, 74, 74))
+                                                            .addGroup(jpnlParametersLayout.createSequentialGroup()
+                                                                              .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                                .addGroup(jpnlParametersLayout.createSequentialGroup()
+                                                                                                                  .addComponent(jlblIllumination, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                                  .addGap(90, 90, 90)
+                                                                                                                  .addComponent(jLabel13))
+                                                                                                .addGroup(jpnlParametersLayout.createSequentialGroup()
+                                                                                                                  .addComponent(jlblTractorSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                                  .addGap(109, 109, 109)
+                                                                                                                  .addComponent(jLabel12))
+                                                                                                .addGroup(jpnlParametersLayout.createSequentialGroup()
+                                                                                                                  .addComponent(jlblFuelLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                                  .addGap(128, 128, 128)
+                                                                                                                  .addComponent(jLabel5)))
+                                                                              .addGap(18, 30, Short.MAX_VALUE)))
+                                          .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                            .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                              .addComponent(jlblTractorLoad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                              .addComponent(jlblSoilMoisture, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                              .addComponent(jlblEngineTemperature, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                              .addComponent(jlblHumidity, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                            .addComponent(jlblEngineState, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                          .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                            .addGroup(jpnlParametersLayout.createSequentialGroup()
+                                                                              .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                                .addComponent(spnrHumidity)
+                                                                                                .addGroup(jpnlParametersLayout.createSequentialGroup()
+                                                                                                                  .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                                                                    .addComponent(spnrEngineTemperature, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                                                    .addComponent(spnrSoilMoisture, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                                                    .addComponent(spnrTractorLoad, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                                                                  .addGap(1, 1, 1)))
+                                                                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                              .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                                .addComponent(jLabel6)
+                                                                                                .addComponent(jLabel8)
+                                                                                                .addComponent(jLabel9)
+                                                                                                .addComponent(jLabel10))
+                                                                              .addGap(14, 14, 14))
+                                                            .addGroup(jpnlParametersLayout.createSequentialGroup()
+                                                                              .addComponent(chkRunning)
+                                                                              .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        jpnlParametersLayout.setVerticalGroup(
+                jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jpnlParametersLayout.createSequentialGroup()
+                                          .addGap(20, 20, 20)
+                                          .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                            .addComponent(jlblTemperature)
+                                                            .addComponent(spnrTemperature, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            .addComponent(jlblHumidity)
+                                                            .addComponent(spnrHumidity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            .addComponent(jLabel4)
+                                                            .addComponent(jLabel8))
+                                          .addGap(18, 18, 18)
+                                          .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                            .addComponent(jlblIllumination)
+                                                            .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                              .addComponent(jlblSoilMoisture)
+                                                                              .addComponent(spnrSoilMoisture, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                              .addComponent(spnrIllumination, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                              .addComponent(jLabel10)
+                                                                              .addComponent(jLabel13)))
+                                          .addGap(18, 18, 18)
+                                          .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                            .addComponent(jlblTractorSpeed)
+                                                            .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                              .addComponent(jlblEngineTemperature)
+                                                                              .addComponent(spnrEngineTemperature, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                              .addComponent(spnrTractorSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                              .addComponent(jLabel9)
+                                                                              .addComponent(jLabel12)))
+                                          .addGap(18, 18, 18)
+                                          .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                            .addComponent(jlblTractorLoad)
+                                                            .addComponent(spnrTractorLoad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            .addComponent(jlblFuelLevel)
+                                                            .addComponent(spnrFuelLevel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            .addComponent(jLabel5)
+                                                            .addComponent(jLabel6))
+                                          .addGap(20, 20, 20)
+                                          .addGroup(jpnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                            .addComponent(jLabel7)
+                                                            .addComponent(chkRaining)
+                                                            .addComponent(jlblEngineState)
+                                                            .addComponent(chkRunning))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton1.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
-        jButton1.setText("Trigger");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jPanel1.setBackground(new java.awt.Color(184, 222, 179));
+
+        jLabel3.setText("Data Push Interval :");
+
+        spnrInterval.setModel(new javax.swing.SpinnerNumberModel(10, 5, null, 1));
+
+        jbtnTrigger.setText("Trigger");
+        jbtnTrigger.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jbtnTriggerActionPerformed(evt);
             }
         });
 
@@ -248,139 +418,97 @@ public class AgentUI extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jSeparator1)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jLabel3)
+                            .addGap(42, 42, 42)
+                            .addComponent(spnrInterval, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jbtnTrigger)
                 .addContainerGap())
         );
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jPanel6, jPanel7});
-
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1))
-        );
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jPanel5, jPanel6, jPanel7, jPanel8});
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
-        jLabel1.setText("ALERT");
-
-        alertLabel.setBackground(java.awt.Color.white);
-        alertLabel.setOpaque(true);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(64, 64, 64)
-                        .addComponent(alertLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(219, 219, 219)
-                        .addComponent(jLabel1)))
-                .addContainerGap(89, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(12, 12, 12)
-                .addComponent(alertLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
-                .addGap(17, 17, 17))
+                              .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(jLabel3)
+                                                .addComponent(spnrInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jbtnTrigger))
+                              .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jlblVersion.setText("agent version 1.1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                .addComponent(jpnlAlert, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGroup(layout.createSequentialGroup()
+                                                                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                                    .addComponent(jpnlParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                  .addComponent(jSeparator1)))
+                              .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jlblVersion)
+                            .addGap(241, 241, 241))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                              .addComponent(jpnlAlert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                              .addComponent(jpnlParameters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(layout.createSequentialGroup()
+                                                                  .addGap(55, 55, 55)
+                                                                  .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                  .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                              .addComponent(jlblVersion)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+    private void jbtnTriggerActionPerformed(
+            java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnTriggerActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
+        double temperature = (double) spnrTemperature.getValue();
+        double humidity = (double) spnrHumidity.getValue();
+        double illumination = (double) spnrIllumination.getValue();
+        double fuelLevel = (double) spnrFuelLevel.getValue();
+        double soilMoisture = (double) spnrSoilMoisture.getValue();
+        double tractorLoad = (double) spnrTractorLoad.getValue();
+        double tractorSpeed = (double) spnrTractorSpeed.getValue();
+        double engineTemp = (double) spnrEngineTemperature.getValue();
+        boolean raining = chkRaining.isSelected();
+        int interval = (int) spnrInterval.getValue();
+        jLabel1.setText("int" + interval);
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        DefaultTableModel model = (DefaultTableModel) jtblAlerts.getModel();
+        model.setValueAt("raining " + raining, 0, 0);//first row
+        model.setValueAt("temperature" + temperature, 1, 0);
+        model.setValueAt("humidity" + humidity, 2, 0);
+        model.setValueAt("illumination" + illumination, 3, 0);
+        model.setValueAt("enginetemp" + engineTemp, 4, 0);
+    }//GEN-LAST:event_jbtnTriggerActionPerformed
+
+    private void chkRainingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRainingActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_chkRainingActionPerformed
 
-    private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
+    private void chkRunningActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRunningActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioButton4ActionPerformed
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel alertLabel;
-    private javax.swing.ButtonGroup engineStatus;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner2;
-    private javax.swing.JSpinner jSpinner3;
-    private javax.swing.JSpinner jSpinner4;
-    // End of variables declaration//GEN-END:variables
+    }//GEN-LAST:event_chkRunningActionPerformed
+    // End of variables declaration                   
 }

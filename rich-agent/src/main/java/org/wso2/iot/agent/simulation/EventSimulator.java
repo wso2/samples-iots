@@ -24,7 +24,6 @@ import org.wso2.iot.agent.Application;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 
 import javax.swing.*;
-import java.util.Random;
 
 public class EventSimulator {
 
@@ -52,24 +51,28 @@ public class EventSimulator {
             log.error(
                     "'IllegalAccessException' error occurred whilst initializing the Agent UI.");
         }
+    }
+
+    public void start() {
         java.awt.EventQueue.invokeLater(() -> {
             agentUI = new AgentUI();
             agentUI.setVisible(true);
+            publishData();
         });
     }
 
-    public void start(long intervalMillis){
+    private void publishData() {
         Runnable simulator = () -> {
             boolean interrupted = false;
             while (!interrupted) {
                 try {
-                    //EngineTemp double, humidity double, " +
-                    //"tractorSpeed double, loadWeight double,
-                    // soilMoisture double, illumination double, " +
-                    //"fuelUsage double, engineidle bool, raining bool, temperature double
-                    inputHandler.send(new Object[]{90.0, 42.1, 10.1, 5.2, 8.3, 56.3, 89.2, true, true, 32.1});
+                    inputHandler.send(new Object[]{agentUI.getEngineTemp(), agentUI.getHumidity(),
+                                                   agentUI.getTractorSpeed(), agentUI.getLoadWeight(),
+                                                   agentUI.getSoilMoisture(), agentUI.getIllumination(),
+                                                   agentUI.getFuelUsage(), agentUI.isEngineIdle(),
+                                                   agentUI.isRaining(), agentUI.getTemperature()});
                     log.info("New event emitted.");
-                    Thread.sleep(intervalMillis);
+                    Thread.sleep(agentUI.getInterval());
                 } catch (InterruptedException e) {
                     log.warn("Thread interrupted.", e);
                     interrupted = true;
