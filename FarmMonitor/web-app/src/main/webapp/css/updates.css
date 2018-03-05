@@ -1,0 +1,124 @@
+/*
+* Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* WSO2 Inc. licenses this file to you under the Apache License,
+* Version 2.0 (the "License"); you may not use this file except
+* in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+
+.main-panel-full {
+    position: relative;
+    float: right;
+    width: 100%;
+    -webkit-transition: all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1);
+    -moz-transition: all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1);
+    -o-transition: all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1);
+    -ms-transition: all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1);
+    transition: all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1);
+    max-height: 100%;
+    overflow-y: scroll;
+
+}
+
+.main-panel-full > .content {
+    margin-top: 70px;
+    padding: 30px 15px;
+    min-height: calc(100% - 123px);
+}
+
+.card .card-header.card-chart.maxHeight {
+    margin-top: 10px;
+    padding: 0;
+    max-height: 90%;
+    top: 0;
+
+}
+
+.card.padzero {
+    margin: 0 0;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+
+}
+
+.modal .chart {
+    height: 100%;
+}
+
+.ct-chart.fillcontent {
+    height: -webkit-fill-available;
+}
+
+#inputMapId {
+    width: 90%;
+    height: 40%;
+    margin-left: 27px;
+    margin-top: 5px;
+}
+
+.leaflet-popup-content {
+    margin: 5px 5px;
+    cursor: pointer;
+    width: -webkit-fill-available;
+}
+
+.leaflet-popup-tip-container {
+    display: none;
+}
+
+.leaflet-popup-content-wrapper {
+
+    text-align: center;
+}
+
+.setheight {
+    height: 160px;
+}
+
+.setHistorical {
+    height: 220px;
+}
+
+.resize {
+    height: 260px;
+}
+
+.menubutton {
+
+    height: 2.5em;
+
+    display: inline-block;
+
+    margin-left: 20px;
+
+}
+
+.ct-chart {
+    cursor: pointer;
+}
+
+td {
+    width: 25%;
+}
+
+
