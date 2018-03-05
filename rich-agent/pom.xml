@@ -115,5 +115,15 @@
             <artifactId>siddhi-core</artifactId>
             <version>4.1.10</version>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.string</groupId>
+            <artifactId>siddhi-execution-string</artifactId>
+            <version>4.0.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.extension.siddhi.execution.time</groupId>
+            <artifactId>siddhi-execution-time</artifactId>
+            <version>4.0.10</version>
+        </dependency>
     </dependencies>
 </project>

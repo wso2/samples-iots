@@ -27,7 +27,7 @@
         <dependencySet>
             <outputDirectory>libs/</outputDirectory>
             <useProjectArtifact>true</useProjectArtifact>
-            <unpack>true</unpack>
+            <unpack>false</unpack>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>

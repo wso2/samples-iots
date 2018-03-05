@@ -20,9 +20,10 @@ package org.wso2.iot.agent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.json.simple.JSONArray;
+import org.json.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -37,8 +38,6 @@ import org.wso2.iot.agent.transport.dto.AccessTokenInfo;
 import org.wso2.iot.agent.transport.dto.ApiApplicationKey;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.util.EventPrinter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -56,6 +55,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -63,7 +63,7 @@ import static org.apache.commons.codec.CharEncoding.UTF_8;
 
 public class Application {
 
-    public static final String AGENT_VERSION = "v1.2.1";
+    public static final String AGENT_VERSION = "v1.1.0";
 
     private static final double LATITUDE = 6.927079;
     private static final double LONGITUDE = 79.861244;
@@ -71,13 +71,12 @@ public class Application {
     private static final Log log = LogFactory.getLog(Application.class);
     private static final String CONFIG_FILE = "config.json";
     private static final String SIDDHI_FILE = "plan.siddhiql";
-    private static final String TEMP_AGENT = "temp.jar";
+    private static final String UPGRADE_ZIP = "upgrade.zip";
     private static final String UPGRADE_INFO_FILE = "upgrade.info";
 
     private static Application application;
     private MQTTHandler mqttHandler;
     private TokenHandler tokenHandler;
-    private InputHandler inputHandler;
     private SiddhiEngine siddhiEngine;
     private JSONObject configData;
     private String mqttEndpoint;
@@ -94,13 +93,14 @@ public class Application {
             @Override
             public void run() {
                 cleanUpFirmwareUpgrades();
+                updatedProperties();
             }
         }, 5000);
     }
 
     public static void main(String[] args) {
         application = new Application();
-        EventSimulator simulator = new EventSimulator(application.inputHandler);
+        EventSimulator simulator = new EventSimulator(application.siddhiEngine);
         simulator.start();
     }
 
@@ -112,12 +112,16 @@ public class Application {
                                "from agentEventStream " +
                                "select EngineTemp, humidity, tractorSpeed, loadWeight, soilMoisture, illumination, " +
                                "fuelUsage, engineidle, raining, temperature " +
-                               "insert into Output;" +
-                               "@info(name = 'process_query') " +
-                               "from agentEventStream " +
-                               "select EngineTemp, humidity, tractorSpeed, loadWeight, soilMoisture, illumination, " +
-                               "fuelUsage, engineidle, raining, temperature " +
-                               "insert into Output;";
+                               "insert into publishEvents; " +
+                               "from every e1=agentEventStream, e2=agentEventStream[e2.EngineTemp > e1.EngineTemp + 5 " +
+                               "and e1.EngineTemp > 100] " +
+                               "select str:concat(time:currentTimestamp(), ' Engine temperature increasing rapidly. " +
+                               "Current: ', e2.EngineTemp) as alert " +
+                               "insert into alertEvents;" +
+                               "@info(name = 'alert_query') " +
+                               "from alertEvents " +
+                               "select alert " +
+                               "insert into alertStream;";
 
         try (BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(SIDDHI_FILE), Charset.forName(UTF_8)))) {
@@ -152,20 +156,11 @@ public class Application {
                                                            ",\"fuelUsage\":" + event.getData(6) +
                                                            ",\"engineidle\":" + event.getData(7) +
                                                            ",\"raining\":" + event.getData(8) +
-                                                           ",\"temperature\":" + event.getData(9) + "}");
+                                                           ",\"temperature\":" + event.getData(9) +
+                                                           ",\"timestamp\":" + Calendar.getInstance().getTimeInMillis() + "}");
                 }
             }
         });
-
-        siddhiEngine.addQueryCallback("process_query", new QueryCallback() {
-            @Override
-            public void receive(long timestamp, Event[] inEvents, Event[] removeEvents) {
-                log.info("Event received to process query");
-                EventPrinter.print(timestamp, inEvents, removeEvents);
-            }
-        });
-
-        inputHandler = siddhiEngine.getInputHandler("agentEventStream");
     }
 
     private void initTransport() {
@@ -245,7 +240,9 @@ public class Application {
                                                           "config json file.", e);
                                             }
                                         });
+    }
 
+    private void updatedProperties() {
         OauthHttpClient client = new OauthHttpClient(tokenHandler);
         HttpPut httpPut = new HttpPut(this.httpEndpoint + "/api/device-mgt/v1.0/device/agent/properties/" +
                                       this.deviceType + "/" + this.deviceId);
@@ -254,29 +251,29 @@ public class Application {
         JSONArray properties = new JSONArray();
 
         org.json.JSONObject firmwareVersion = new org.json.JSONObject();
-        firmwareVersion.put("name", "firmware-version");
+        firmwareVersion.put("name", "FirmwareVersion");
         firmwareVersion.put("value", AGENT_VERSION);
-        properties.add(firmwareVersion);
+        properties.put(firmwareVersion);
 
         org.json.JSONObject latitude = new org.json.JSONObject();
         latitude.put("name", "FarmLatitude");
-        latitude.put("value", LATITUDE);
-        properties.add(latitude);
+        latitude.put("value", String.valueOf(LATITUDE));
+        properties.put(latitude);
 
         org.json.JSONObject longitude = new org.json.JSONObject();
         longitude.put("name", "FarmLongitude");
-        longitude.put("value", LONGITUDE);
-        properties.add(longitude);
+        longitude.put("value", String.valueOf(LONGITUDE));
+        properties.put(longitude);
 
-        StringEntity tokenEPPayload = new StringEntity(properties.toJSONString(), UTF_8);
+        StringEntity tokenEPPayload = new StringEntity(properties.toString(), UTF_8);
         httpPut.setEntity(tokenEPPayload);
 
-//        try {
-//            HttpResponse response = client.execute(httpPut);
-//            log.info("Device properties update response: " + response.getStatusLine());
-//        } catch (IOException e) {
-//            log.error("Cannot update device properties due to " + e.getMessage(), e);
-//        }
+        try {
+            HttpResponse response = client.execute(httpPut);
+            log.info("Device properties update response: " + response.getStatusLine());
+        } catch (IOException e) {
+            log.error("Cannot update device properties due to " + e.getMessage(), e);
+        }
     }
 
     private void updateSiddhiQuery(Operation operation) {
@@ -299,12 +296,12 @@ public class Application {
         try {
             URL upgradeFile = new URL(operation.getPayload());
             try (InputStream in = upgradeFile.openStream()) {
-                Files.copy(in, new File(TEMP_AGENT).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(in, new File(UPGRADE_ZIP).toPath(), StandardCopyOption.REPLACE_EXISTING);
                 operation.setStatus(Operation.Status.IN_PROGRESS);
             }
             Files.write(new File(UPGRADE_INFO_FILE).toPath(), String.valueOf(operation.getId()).getBytes(),
                         StandardOpenOption.CREATE);
-            Runtime.getRuntime().exec("sh start.sh");
+            Runtime.getRuntime().exec("sh start.sh > upgrade.log");
             System.exit(0);
         } catch (Exception e) {
             log.error("Error occurred when upgrading firmware.", e);

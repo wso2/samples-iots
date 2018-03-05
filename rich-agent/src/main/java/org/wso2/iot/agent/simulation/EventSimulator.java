@@ -20,19 +20,22 @@ package org.wso2.iot.agent.simulation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.iot.agent.Application;
+import org.wso2.iot.agent.analytics.SiddhiEngine;
+import org.wso2.siddhi.core.event.Event;
+import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.core.util.EventPrinter;
 
 import javax.swing.*;
 
 public class EventSimulator {
 
-    private static final Log log = LogFactory.getLog(Application.class);
-    private final InputHandler inputHandler;
+    private static final Log log = LogFactory.getLog(EventSimulator.class);
+    private final SiddhiEngine siddhiEngine;
     private AgentUI agentUI;
 
-    public EventSimulator(InputHandler inputHandler) {
-        this.inputHandler = inputHandler;
+    public EventSimulator(SiddhiEngine siddhiEngine) {
+        this.siddhiEngine = siddhiEngine;
 
         try {
             // Set System L&F for Device UI
@@ -57,6 +60,19 @@ public class EventSimulator {
         java.awt.EventQueue.invokeLater(() -> {
             agentUI = new AgentUI();
             agentUI.setVisible(true);
+            siddhiEngine.addQueryCallback("alert_query", new QueryCallback() {
+                @Override
+                public void receive(long timestamp, Event[] inEvents, Event[] removeEvents) {
+                    log.info("Event received to alert query");
+                    EventPrinter.print(timestamp, inEvents, removeEvents);
+                    if (inEvents == null) {
+                        return;
+                    }
+                    for (Event event : inEvents) {
+                        agentUI.addAlert(event.getData(0).toString());
+                    }
+                }
+            });
             publishData();
         });
     }
@@ -64,8 +80,10 @@ public class EventSimulator {
     private void publishData() {
         Runnable simulator = () -> {
             boolean interrupted = false;
+            InputHandler inputHandler;
             while (!interrupted) {
                 try {
+                    inputHandler = siddhiEngine.getInputHandler("agentEventStream");
                     inputHandler.send(new Object[]{agentUI.getEngineTemp(), agentUI.getHumidity(),
                                                    agentUI.getTractorSpeed(), agentUI.getLoadWeight(),
                                                    agentUI.getSoilMoisture(), agentUI.getIllumination(),
