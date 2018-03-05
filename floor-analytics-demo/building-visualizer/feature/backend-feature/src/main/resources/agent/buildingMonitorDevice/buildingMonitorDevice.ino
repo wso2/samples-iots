@@ -42,11 +42,6 @@ unsigned long previousMillis = 0;        // will store last temp was read
 const long interval = 2000;              // interval at which to read sensor
 long startDelay = millis();
 // Update these with values suitable for your network.
-//const char* ssid = "linksys";
-//const char* password = "linksys@abcdf@12345";
-//const char* gateway = "http://192.168.1.103:8280";
-//const char* mqtt_server = "192.168.1.103";
-
 
 const char* ssid = "...";
 const char* password = "....";

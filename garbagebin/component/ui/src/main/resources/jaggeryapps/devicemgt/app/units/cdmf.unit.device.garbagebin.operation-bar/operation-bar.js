@@ -21,24 +21,18 @@ function onRequest(context) {
     var operationModule = require("/app/modules/business-controllers/operation.js")["operationModule"];
     var device = context.unit.params.device;
     var autoCompleteParams = context.unit.params.autoCompleteParams;
-    var encodedFeaturePayloads=context.unit.params.encodedFeaturePayloads;
+    var encodedFeaturePayloads = context.unit.params.encodedFeaturePayloads;
     var controlOperations = operationModule.getControlOperations(device);
-  //  new Log().info("control operation length : " + controlOperations.length);
     var queryParams = [];
     var formParams = [];
     var pathParams = [];
     for (var i = 0; i < controlOperations.length; i++) {
         var currentParamList = controlOperations[i]["params"];
-       // new Log().info("currentParamList length : " + currentParamList.length);
         for (var j = 0; j < currentParamList.length; j++) {
             var currentParam = currentParamList[j];
             currentParamList[j]["formParams"] = processParams(currentParam["formParams"], autoCompleteParams);
             var queryParamList = currentParamList["queryParams"];
-           // new Log().info("queryParamList  : " +  queryParamList );
             currentParamList[i]["queryParams"] = processParams(currentParam["queryParams"], autoCompleteParams);
-            // for (var l = 0; l < queryParamList.leng; l++) {
-            //     currentParamList[l]["queryParams"] = processParams(currentParam["queryParams"], autoCompleteParams);
-            // }
             currentParamList[j]["pathParams"] = processParams(currentParam["pathParams"], autoCompleteParams);
         }
         controlOperations[i]["params"] = currentParamList;
@@ -65,7 +59,7 @@ function processParams(paramsList, autoCompleteParams) {
     return paramsList;
 }
 
-function getPayload(featuresPayload, featureCode){
+function getPayload(featuresPayload, featureCode) {
     var featuresJSONPayloads = JSON.parse(featuresPayload);
     return featuresJSONPayloads[featureCode];
 }
