@@ -102,7 +102,8 @@ public class BuildingPluginDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            String msg = "SQL Exception";
+            log.error(msg, e);
         }finally {
             DeviceTypeUtils.cleanupResources(stmt, null);
         }
@@ -126,7 +127,8 @@ public class BuildingPluginDAO {
             stmt.setInt(4, building.getBuildingId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            String msg = "SQL Exception";
+            log.error(msg, e);
         } finally {
             buildingInfo = getBuilding(building.getBuildingId());
             DeviceTypeUtils.cleanupResources(stmt, null);
@@ -386,7 +388,8 @@ public class BuildingPluginDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            String msg = "SQL Exception";
+            log.error(msg, e);
         } finally {
             DeviceTypeUtils.cleanupResources(stmt, resultSet);
         }
@@ -405,7 +408,8 @@ public class BuildingPluginDAO {
             stmt.setInt(1, buildingId);
             check = stmt.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            String msg = "SQL Exception";
+            log.error(msg, e);
         } finally {
             DeviceTypeUtils.cleanupResources(stmt, null);
         }

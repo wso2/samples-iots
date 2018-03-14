@@ -205,7 +205,6 @@ function preLoadBuildings() {
 
                                     }
                                     addingMarker(cord, obj.buildingName, obj.buildingId, buildings[i], buildingdevice);
-                                    //printBuildingData(obj);
                                 }
 
                             },
@@ -240,10 +239,8 @@ $(document).ready(function () {
 
 function onAddMarker() {
     map.once('click', addBuilding);
-//        if(click !== null){
     $('body.fixed ').addClass('marker-cursor');
     $('#device-location').addClass('marker-cursor');
-//        }
 }
 
 function onAddMarkerLocation() {
@@ -362,7 +359,6 @@ function deleteBuilding(id) {
 }
 
 function addBuilding(e) {
-    //save building here.
     tmpEventStore = e;
     var cord = e.latlng;
     var content = $("#building-response-template");
@@ -373,7 +369,6 @@ function addBuilding(e) {
 }
 
 function addDevice(e) {
-    //save building here.
     tmpEventStore = e;
     var cord = e.latlng;
     var content = $("#device-response-template");
@@ -407,10 +402,6 @@ function onMarkerDragged(event) {
 
         }
     }, "application/json", "application/json");
-
-    //apiInvokerUTIL.post
-    //marker.setLatLng(event.latlng, {id:marker.title, draggable:'true'}).bindPopup(popup).update();
-
 }
 
 function addingMarker(cord, locationName, buildingId, building, buildingdevice) {
@@ -454,10 +445,8 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
     })
         .setContent(content.html());
 
-    //variable for marker
     var marker;
 
-    //markers info JSON array
     var markerInfo = {
         info: []
     };
@@ -488,7 +477,6 @@ function addingMarker(cord, locationName, buildingId, building, buildingdevice) 
 
     // Remove Marker
     $('.remove').on("click", function () {
-        // Remove the marker
         map.removeLayer(markers[$(this).attr('id')]);
 
         var idNo = $(this).attr('id');
