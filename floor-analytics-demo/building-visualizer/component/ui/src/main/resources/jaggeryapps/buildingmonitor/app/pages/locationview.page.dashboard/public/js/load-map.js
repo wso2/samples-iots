@@ -68,6 +68,11 @@ function zoomOut (e) {
 }
 
 function loadLeafletMap() {
+
+    if (typeof(map) !== 'undefined') {
+        map.remove();
+    }
+
     var deviceLocationID = "#device-location"
     container = "device-location",
         zoomLevel = 13,
