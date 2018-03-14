@@ -24,4 +24,4 @@ CREATE  TABLE IF NOT EXISTS `floor` (
   `buildingId` INTEGER NOT NULL ,
   `image` BLOB NULL DEFAULT NULL,
   PRIMARY KEY (`buildingId`,`floorNum`),
-  FOREIGN KEY (`buildingId`) REFERENCES building(`buildingId`)) ;
+  FOREIGN KEY (`buildingId`) REFERENCES building(`buildingId`) ON DELETE CASCADE) ;
