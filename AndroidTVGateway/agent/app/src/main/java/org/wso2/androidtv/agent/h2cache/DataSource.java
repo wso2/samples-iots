@@ -31,6 +31,7 @@ public class DataSource {
 
     private static final HikariConfig config = new HikariConfig();
     private static final HikariDataSource Hikarids;
+	private static final String TAG = "DataSource";
 
     static {
 
@@ -38,7 +39,7 @@ public class DataSource {
             Class.forName("org.h2.Driver");
 
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            Log.e(TAG,"ClassNotFoundException was thrown", e);
         }
         config.setJdbcUrl( "jdbc:h2:/data/data/org.wso2.androidtv.agent/data/edgeTVGateway;" +
                 "FILE_LOCK=FS;PAGE_SIZE=1024;CACHE_SIZE=8192" );

@@ -383,12 +383,4 @@ public abstract class MQTTTransportHandler implements MqttCallback, TransportHan
     public MqttConnectOptions getOptions() {
         return options;
     }
-
-//    public void onConnect(MqttClient mqttc, String userdata, String flags, int result_code){
-//        System.out.println("In on_connect call back");
-//
-//    }
-
-
-
 }

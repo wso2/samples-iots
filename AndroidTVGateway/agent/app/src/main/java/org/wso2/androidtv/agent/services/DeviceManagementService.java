@@ -271,11 +271,6 @@ public class DeviceManagementService extends Service {
        androidTVMQTTHandler.connect();
 
        H2Connection h2Connection = new H2Connection(this);
-//        try {
-//            h2Connection.CreateQuery();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
         try {
             h2Connection.initializeConnection();
         } catch (Exception e) {
@@ -315,13 +310,13 @@ public class DeviceManagementService extends Service {
                 "topic='AC', persist = 'true' , " +
                 "@map(type='json'))"+"define stream acOutputStream (AC Float);"+
                 "@sink(type='edgeGateway'," +
-                "topic='HUMIDITY',persist = 'true' , " +
+                "topic='HUMIDITY', persist = 'true' , " +
                 "@map(type='json'))"+"define stream humidityOutputStream (HUMIDITY Float);"+
                 "@sink(type='edgeGateway'," +
-                "topic='TEMP',persist = 'true' , " +
+                "topic='TEMP', persist = 'true' , " +
                 "@map(type='json'))"+"define stream temperatureOutputStream (TEMP Float);"+
                 "@sink(type='edgeGateway'," +
-                "topic='WINDOW',persist = 'true' , " +
+                "topic='WINDOW', persist = 'true' , " +
                 "@map(type='json'))"+"define stream windowOutputStream (WINDOW Float);"+
 
                 "@sink(type='edgeResponse',topic='at_response',@map(type='json'))" +
@@ -332,17 +327,10 @@ public class DeviceManagementService extends Service {
 
                 "@config(async = 'true') define stream alertStream (alertMessage String);"+
 
-
-
-
-                "from every ae1=edgeDeviceEventStream, ae2=edgeDeviceEventStream[ae1.ac != ac ] " +
+				"from every ae1=edgeDeviceEventStream, ae2=edgeDeviceEventStream[ae1.ac != ac ] " +
                 "select ae2.ac as AC insert into acOutputStream; "+
 
-
-
-
-
-                "from every he1=edgeDeviceEventStream," +
+				"from every he1=edgeDeviceEventStream," +
                 " he2=edgeDeviceEventStream[he1.humidity != humidity ] " +
                 "select he2.humidity as HUMIDITY insert into humidityOutputStream; "+
 

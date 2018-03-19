@@ -172,7 +172,7 @@ class EdgeGatewaySink extends Sink {
                 try {
                     payload.put(event.names().getString(i), event.get(event.names().getString(i)));
                 } catch (JSONException e) {
-                    e.printStackTrace();
+					Log.e(TAG_SINK,"Error while inserting values to JSON object", e);
                 }
             }
 
@@ -191,7 +191,7 @@ class EdgeGatewaySink extends Sink {
 
                 if (androidTVMQTTHandler.isConnected()) {
 
-                    if(hasPersistedData){
+                    if (hasPersistedData){
 
                         queue.add(wrapper.toString());
 
@@ -228,10 +228,9 @@ class EdgeGatewaySink extends Sink {
                         }
 
                         try {
-                            System.out.println("ThIS IS topic "+ specificTopic);
                             H2Conn.insertQuery(data_to_persist, specificTopic);
                         } catch (SQLException e) {
-                            e.printStackTrace();
+							Log.e(TAG,"Error while inserting data", e);
                         }
 
                         hasPersistedData = true;
@@ -239,7 +238,7 @@ class EdgeGatewaySink extends Sink {
                         try {
                             H2Conn.retrieveData(specificTopic);
                         } catch (SQLException e) {
-                            e.printStackTrace();
+							Log.e(TAG,"Error while retrieving data", e);
                         }
                     }
                 }
@@ -252,7 +251,7 @@ class EdgeGatewaySink extends Sink {
         } catch (JSONException | TransportHandlerException e) {
             Log.e(TAG_SINK,"JSONException was thrown", e);
         } catch (SQLException e) {
-            e.printStackTrace();
+			Log.e(TAG_SINK,"SQLException was thrown", e);
         }
     }
 
