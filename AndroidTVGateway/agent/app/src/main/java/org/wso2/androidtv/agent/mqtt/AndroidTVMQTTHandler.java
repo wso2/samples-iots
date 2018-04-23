@@ -144,7 +144,8 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
 
     /**
      * {@inheritDoc}
-     * AndroidSense device-type specific implementation to publish data to the device. This method calls the
+     * AndroidSense device-type specific implementation to publish data to the device.
+     * This method calls the
      * {@link #publishToQueue(String, MqttMessage)} method of the "MQTTTransportHandler" class.
      */
     @Override
@@ -193,7 +194,6 @@ public class AndroidTVMQTTHandler extends MQTTTransportHandler {
         Thread terminatorThread = new Thread(stopConnection);
         terminatorThread.start();
     }
-
 
     /**
      * {@inheritDoc}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -58,7 +58,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLDecoder;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -86,7 +85,7 @@ public class DeviceManagementService extends Service {
     private static volatile String incomingMessage = "";
     private static volatile String sendingMessage = "";
     private static volatile boolean isCacheEnabled = false;
-    private static ArrayList<EdgeSourceSubscriber> sourceSubscribers = new ArrayList<>();
+    private static final ArrayList<EdgeSourceSubscriber> sourceSubscribers = new ArrayList<>();
 
 
     private DownloadManager downloadManager;
@@ -121,7 +120,7 @@ public class DeviceManagementService extends Service {
         }
     };
 
-    private Runnable syncScheduler = new Runnable() {
+    private final Runnable syncScheduler = new Runnable() {
         @Override
         public void run() {
             while (!isSyncStopped) {
@@ -158,9 +157,10 @@ public class DeviceManagementService extends Service {
         }
     };
 
-    private BroadcastReceiver configDownloadReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver configDownloadReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
+            assert extras != null;
             long currentId = extras.getLong(DownloadManager.EXTRA_DOWNLOAD_ID);
             if (downloadId == currentId) {
                 DownloadManager.Query q = new DownloadManager.Query();
@@ -171,7 +171,8 @@ public class DeviceManagementService extends Service {
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         unregisterReceiver(configDownloadReceiver);
                         hasPendingConfigDownload = false;
-                        String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                        String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.
+                                COLUMN_LOCAL_URI));
                         if (downloadFileLocalUri != null) {
                             File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
                             String downloadFilePath = mFile.getAbsolutePath();
@@ -211,7 +212,8 @@ public class DeviceManagementService extends Service {
                             Node nNode = nList.item(i);
                             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                                 Element eElement = (Element) nNode;
-                                String atCommand = "AT" + eElement.getAttribute("command") + eElement.getTextContent() + "\r";
+                                String atCommand = "AT" + eElement.getAttribute("command")
+                                        + eElement.getTextContent() + "\r";
                                 sendConfigLine(atCommand);
                             }
                         }
@@ -257,20 +259,21 @@ public class DeviceManagementService extends Service {
 
     @Override
     public void onCreate() {
-       androidTVMQTTHandler = new AndroidTVMQTTHandler(this, new MessageReceivedCallback() {
+
+        synchronized (this){
+        androidTVMQTTHandler = new AndroidTVMQTTHandler(this, new MessageReceivedCallback() {
             @Override
             public void onMessageReceived(JSONObject message) throws JSONException {
                 performAction(message.getString("action"), message.getString("payload"));
             }
         });
+        }
        androidTVMQTTHandler.connect();
 
        H2Connection h2Connection = new H2Connection(this);
         try {
             h2Connection.initializeConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -304,16 +307,16 @@ public class DeviceManagementService extends Service {
                 "define stream lightOffStream (lightOff String);"+
 
                 "@sink(type='edgeGateway'," +
-                "topic='AC'," +
+                "topic='AC', persist = 'true' , " +
                 "@map(type='json'))"+"define stream acOutputStream (AC Float);"+
                 "@sink(type='edgeGateway'," +
-                "topic='HUMIDITY'," +
+                "topic='HUMIDITY', persist = 'true' , " +
                 "@map(type='json'))"+"define stream humidityOutputStream (HUMIDITY Float);"+
                 "@sink(type='edgeGateway'," +
-                "topic='TEMP'," +
+                "topic='TEMP', persist = 'true' , " +
                 "@map(type='json'))"+"define stream temperatureOutputStream (TEMP Float);"+
                 "@sink(type='edgeGateway'," +
-                "topic='WINDOW'," +
+                "topic='WINDOW', persist = 'true' , " +
                 "@map(type='json'))"+"define stream windowOutputStream (WINDOW Float);"+
 
                 "@sink(type='edgeResponse',topic='at_response',@map(type='json'))" +
@@ -324,10 +327,10 @@ public class DeviceManagementService extends Service {
 
                 "@config(async = 'true') define stream alertStream (alertMessage String);"+
 
-                "from every ae1=edgeDeviceEventStream, ae2=edgeDeviceEventStream[ae1.ac != ac ] " +
+				"from every ae1=edgeDeviceEventStream, ae2=edgeDeviceEventStream[ae1.ac != ac ] " +
                 "select ae2.ac as AC insert into acOutputStream; "+
 
-                "from every he1=edgeDeviceEventStream," +
+				"from every he1=edgeDeviceEventStream," +
                 " he2=edgeDeviceEventStream[he1.humidity != humidity ] " +
                 "select he2.humidity as HUMIDITY insert into humidityOutputStream; "+
 
@@ -365,8 +368,11 @@ public class DeviceManagementService extends Service {
     public void onDestroy() {
         unbindService(usbConnection);
         unbindService(siddhiConnection);
-        if (androidTVMQTTHandler != null && androidTVMQTTHandler.isConnected()) {
-            androidTVMQTTHandler.disconnect();
+
+        synchronized (this) {
+            if (androidTVMQTTHandler != null && androidTVMQTTHandler.isConnected()) {
+                androidTVMQTTHandler.disconnect();
+            }
         }
         androidTVMQTTHandler = null;
         if (hasPendingConfigDownload) {
@@ -485,7 +491,7 @@ public class DeviceManagementService extends Service {
         return AndroidTVUtils.generateDeviceId(getBaseContext(), getContentResolver());
     }
 
-    private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
+    private void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras){
         Intent startServiceIntent = new Intent(this, service);
 
         if (extras != null && !extras.isEmpty()) {
@@ -514,10 +520,12 @@ public class DeviceManagementService extends Service {
 
         // get download service and enqueue file
         downloadId = downloadManager.enqueue(request);
-        registerReceiver(configDownloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        registerReceiver(configDownloadReceiver, new IntentFilter(DownloadManager.
+                ACTION_DOWNLOAD_COMPLETE));
     }
 
-    // This handler will be passed to UsbService. Data received from serial port is displayed through this handler
+    // This handler will be passed to UsbService. Data received from serial port is
+    // displayed through this handler
     private static class UsbServiceHandler extends Handler {
         private final WeakReference<DeviceManagementService> mService;
 
@@ -558,17 +566,20 @@ public class DeviceManagementService extends Service {
                             try {
                                 publishCacheData();
                             } catch (TransportHandlerException e) {
-                                Log.e("CacheManagementService", "Unable to publish cached data", e);
+                                Log.e("CacheManagementService",
+                                        "Unable to publish cached data", e);
                             }
                         } else {
-                            Log.d("CacheManagerService", "Unable to connect to the MQTT server, " +
+                            Log.d("CacheManagerService",
+                                    "Unable to connect to the MQTT server, " +
                                     "hence retry in " + (threadWaitingTime) / 1000 + " seconds");
                         }
                     }
                     try {
                         Thread.sleep(threadWaitingTime);
                     } catch (InterruptedException e) {
-                        Log.e("CacheManagementService", "Error occurred while checking cache", e);
+                        Log.e("CacheManagementService",
+                                "Error occurred while checking cache", e);
                     }
                 }
             }

@@ -278,7 +278,37 @@
                     </span>
                             View
                         </a>
+
+                        <div id = "delete-building" style="float:right">
+                            <a id="building-delete-div" onclick="deleteBuilding(this.id)">
+                    <span class="fw-stack" >
+                        <i class="fw fw-circle-outline fw-stack-2x"></i>
+                        <i class="fw fw-delete fw-stack-1x"></i>
+                    </span>
+                                Delete
+                            </a>
+                        </div>
                     </div>
+
+                    <div id="building-delete-template" style="display: none">
+                        <div class="row">
+                            <div class="col-lg-5 col-md-6 col-centered">
+                                <form action="" method="post" id="register-form-'+ markerId +'" novalidate="novalidate">
+                                    <h3>Do you want to delete the building?</h3>
+                                    <div id="building-deletion-div" class="form-group">
+                                        <button id="delete-yes-div" type="button" class="btn btn-primary" data-toggle="update-data"
+                                                onclick="deleteYes(this.id)">Yes
+                                        </button>
+                                        <button id="no" type="button" class="btn btn-primary" data-toggle="update-data"
+                                                onclick="hidePopup()">No
+                                        </button>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div id="device-location-popup-template">
                     <div id="location-content-div">

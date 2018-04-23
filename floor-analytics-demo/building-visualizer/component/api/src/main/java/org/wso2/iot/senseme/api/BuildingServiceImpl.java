@@ -476,7 +476,7 @@ public class BuildingServiceImpl implements BuildingService {
     @Override
     @POST
     @Path("/remove/{buildingId}")
-    public Response removeBuilding(int buildingId) {
+    public Response removeBuilding(@PathParam("buildingId") int buildingId) {
         boolean res;
         GroupManagementProviderService groupManagementProviderService;
         List<DeviceGroup> userGroups = null;
@@ -497,8 +497,8 @@ public class BuildingServiceImpl implements BuildingService {
                 res = buildingDAO.removeBuilding(buildingId);
                 buildingDAOManager.getBuildingDAOHandler().commitTransaction();
                 return res ?
-                        Response.status(Response.Status.OK).build() :
-                        Response.status(Response.Status.OK).entity("Could not delete the building.").build();
+                        Response.status(Response.Status.OK).entity("Could not delete the building.").build() :
+                        Response.status(Response.Status.OK).build();
             } else {
                 Response.status(Response.Status.UNAUTHORIZED).build();
             }
